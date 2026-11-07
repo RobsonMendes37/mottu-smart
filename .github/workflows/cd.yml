@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 concurrency:
   group: cd-production-deploy
@@ -33,23 +34,39 @@ jobs:
 
       - name: Deploy to Remote VM via SSH
         if: steps.check_creds.outputs.has_creds == 'true'
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          script: |
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          # Garante parsing robusto da chave com quebras de linha reais
+          echo "$SSH_KEY" | sed 's/\\n/\n/g' > ~/.ssh/id_rsa
+          printf "\n" >> ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          # Valida o formato da chave privada
+          ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub 2>/dev/null || {
+            echo "❌ Erro: Formato da chave privada inválido em SSH_PRIVATE_KEY"
+            exit 1
+          }
+
+          echo "🚀 Conectando via SSH à VM ($SSH_USER@$SSH_HOST:$SSH_PORT)..."
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" bash << 'EOF'
             set -e
-            echo "🚀 Deploying Mottu Smart Ops update..."
-            cd /home/ubuntu/mottu-smart-ops || cd ~/mottu-smart-ops || cd /opt/mottu-smart-ops
+            echo "🚀 Atualizando repositório na VM..."
+            cd /home/ubuntu/mottu-smart-ops || cd ~/mottu-smart-ops
             git fetch origin main
             git reset --hard origin/main
             ln -sf .env infra/.env 2>/dev/null || true
+            echo "🚀 Fazendo build e reiniciando containers via Docker Compose..."
             docker compose -f infra/docker-compose.prod.yml build
             docker compose -f infra/docker-compose.prod.yml up -d --remove-orphans
-            echo "⏳ Waiting for healthchecks..."
+            echo "⏳ Aguardando healthchecks..."
             sleep 10
             docker compose -f infra/docker-compose.prod.yml ps
-            echo "✅ Deployment completed successfully!"
-
+            echo "✅ Mottu Smart Ops atualizado e operando com sucesso!"
+          EOF

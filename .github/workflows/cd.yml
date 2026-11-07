@@ -43,30 +43,28 @@ jobs:
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
+          # Normalização e autorreparo inteligente da chave privada SSH (suporta base64 puro ou com headers)
           python3 -c "
           import os
-          k = os.environ.get('SSH_KEY', '').strip()
-          print('--- Diagnóstico Seguro de SSH_PRIVATE_KEY ---')
-          print('Tamanho (caracteres):', len(k))
-          print('Quantidade de linhas:', len(k.splitlines()))
-          print('Começa com:', k[:20] if len(k) >= 20 else k)
-          print('Termina com:', k[-20:] if len(k) >= 20 else k)
-          print('Contém \"PRIVATE KEY\":', 'PRIVATE KEY' in k)
-          print('Contém \"ssh-rsa\":', 'ssh-rsa' in k)
-          print('Parece caminho de arquivo:', k.startswith('/') or k.startswith('C:'))
-          print('-------------------------------------------')
+          key = os.environ.get('SSH_KEY', '').strip().replace(chr(13), '')
+          if '\\\\n' in key and chr(10) not in key:
+              key = key.replace('\\\\n', chr(10))
+          if not key.startswith('-----BEGIN'):
+              key = '-----BEGIN RSA PRIVATE KEY-----\n' + key + '\n-----END RSA PRIVATE KEY-----'
+          with open(os.path.expanduser('~/.ssh/id_rsa'), 'w') as f:
+              f.write(key + chr(10))
           "
-
-          # Garante parsing robusto da chave privada (normalizando Unix, Windows e literais \n)
-          python3 -c "import os; key = os.environ.get('SSH_KEY', '').strip().replace(chr(13), ''); key = key.replace('\\\\n', chr(10)) if chr(10) not in key else key; open(os.path.expanduser('~/.ssh/id_rsa'), 'w').write(key + chr(10))"
           chmod 600 ~/.ssh/id_rsa
 
           # Valida o formato da chave privada
           ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub 2>&1 || {
-            echo "❌ Erro do ssh-keygen:"
+            echo "❌ Erro ao validar a chave privada com ssh-keygen:"
             cat ~/.ssh/id_rsa.pub || true
             exit 1
           }
+
+          echo "✅ Chave SSH validada com sucesso! Fingerprint público:"
+          ssh-keygen -l -f ~/.ssh/id_rsa
 
           echo "🚀 Conectando via SSH à VM ($SSH_USER@$SSH_HOST:$SSH_PORT)..."
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" bash << 'EOF'

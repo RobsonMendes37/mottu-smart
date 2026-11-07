@@ -220,14 +220,16 @@ services:
       - mottu-net
 
   caddy:
-    image: caddy:2-alpine
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.caddy
+    image: mottu-smart-ops/caddy:latest
     container_name: mottu-caddy-prod
     restart: always
     ports:
       - "${HOST_PORT_CADDY:-18088}:80"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ../apps/web-app/dist/web-app/browser:/srv:ro
       - caddy_prod_data:/data
       - caddy_prod_config:/config
     deploy:

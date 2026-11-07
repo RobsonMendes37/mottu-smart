@@ -72,4 +72,9 @@ describe('GarageComponent (Screen T02 - Minha Moto / Garagem)', () => {
     comp.onViewInspection('ins-uuid-123');
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/rider/inspections', 'ins-uuid-123']);
   });
+
+  it('TC-T02-6: Navigates to accident reporting wizard on CTA click', () => {
+    comp.onReportAccident();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/rider/accidents/new']);
+  });
 });

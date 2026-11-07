@@ -37,3 +37,15 @@
 * **Ajustar telas (se quiser):** Abra o arquivo [`design/mottu-smart-ops.pen`](file:///home/robson/Projetos_Desenvolvimento/mattu-projeto-selecao/design/mottu-smart-ops.pen) com a extensão **Pencil (`pen.dev`)**. Se você mudar qualquer cor, texto ou posição lá dentro amanhã, basta mandar no chat: *"Atualize as telas do Angular conforme minhas edições no `.pen`"*.
 * **Domínio HTTPS na sua VM Oracle:** No arquivo `infra/Caddyfile`, troque `localhost` pelo seu domínio/subdomínio quando for subir na nuvem e troque `JWT_SECRET` / senhas do `.env` por senhas fortes de produção.
 
+---
+
+## 4. GitHub Secrets para CI/CD Automático (GitHub Actions v3.0)
+* **Onde configurar:** No seu repositório no GitHub: `Settings` → `Secrets and variables` → `Actions` → `New repository secret`.
+* **Secrets Opcionais para Deploy Automático na VM Oracle (`cd.yml`):**
+  * `SSH_HOST`: IP público ou domínio da sua VM Oracle.
+  * `SSH_USER`: Usuário SSH da máquina (ex: `ubuntu` ou `opc`).
+  * `SSH_PRIVATE_KEY`: Sua chave privada SSH para acesso à VM.
+  * `PROD_ENV_FILE`: Conteúdo completo do seu `.env` de produção com senhas reais e `GEMINI_API_KEY`.
+* *(Nota: O workflow de CI `ci.yml` não depende de nenhuma secret e roda 100% dos testes offline com sucesso imediato em qualquer PR).*
+
+

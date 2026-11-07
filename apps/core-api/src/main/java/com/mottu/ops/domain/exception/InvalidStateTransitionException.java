@@ -13,6 +13,12 @@ public class InvalidStateTransitionException extends BusinessRuleViolationExcept
         this.to = to;
     }
 
+    public InvalidStateTransitionException(String message) {
+        super(message);
+        this.from = null;
+        this.to = null;
+    }
+
     public InvalidStateTransitionException(InspectionStatus from, InspectionStatus to, String detail) {
         super(String.format("Invalid state transition from %s to %s: %s", from, to, detail));
         this.from = from;

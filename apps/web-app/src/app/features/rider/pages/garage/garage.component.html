@@ -100,6 +100,18 @@
       <span>Reportar Defeito / Nova Vistoria</span>
     </button>
 
+    <!-- Secondary CTA: Relatar Acidente / Sinistro (T02) -->
+    <button
+      type="button"
+      (click)="onReportAccident()"
+      class="w-full h-12 font-bold text-sm rounded-xl flex items-center justify-center gap-2 bg-[#FF4D4F]/10 hover:bg-[#FF4D4F]/20 text-[#FF4D4F] border border-[#FF4D4F]/30 active:scale-[0.98] transition cursor-pointer"
+    >
+      <svg class="w-5 h-5 text-[#FF4D4F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <span>🚨 Relatar Acidente / Sinistro</span>
+    </button>
+
     <!-- Recent Tickets Section -->
     <div class="flex flex-col gap-3 mt-2">
       <div class="flex items-center justify-between">

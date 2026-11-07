@@ -1,0 +1,132 @@
+name: CI - Mottu Smart Ops Quality Gates
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  core-api-ci:
+    name: Java Core API (TDD & Hexagonal Purity)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Grant Execute Permission to Maven Wrapper
+        run: chmod +x apps/core-api/mvnw
+
+      - name: Build, Test and Verify Domain Coverage (100%)
+        working-directory: apps/core-api
+        run: ./mvnw clean verify -B
+
+  intelligence-ci:
+    name: Python Intelligence Service (CRAG & AST Purity)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        working-directory: apps/intelligence-service
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Pytest Suite with 100% Domain Coverage & Hexagonal Purity
+        working-directory: apps/intelligence-service
+        env:
+          GEMINI_MOCK_MODE: "true"
+          BIGQUERY_ENABLED: "false"
+        run: |
+          pytest tests/ -v
+          pytest tests/unit/ --cov=app/domain --cov-fail-under=100
+          pytest tests/test_domain_purity.py -v
+
+  web-app-ci:
+    name: Angular 19 Web App (Vitest & Production Build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/web-app/package-lock.json
+
+      - name: Install Frontend Dependencies
+        working-directory: apps/web-app
+        run: npm ci
+
+      - name: Typecheck and Lint
+        working-directory: apps/web-app
+        run: npm run lint
+
+      - name: Run Angular Vitest Suite
+        working-directory: apps/web-app
+        run: npm run test:ci
+
+      - name: Build Production Bundle
+        working-directory: apps/web-app
+        run: npm run build
+
+      - name: Verify Strict Purple Ban (Zero Violet/Purple/Indigo)
+        run: |
+          echo "Scanning apps/web-app/src for forbidden purple/violet/indigo CSS..."
+          MATCHES=$(grep -rnEi "(text|bg|border)-(purple|violet|indigo)" apps/web-app/src || true)
+          if [ -n "$MATCHES" ]; then
+            echo "❌ ERROR: Purple Ban violation detected in frontend code:"
+            echo "$MATCHES"
+            exit 1
+          fi
+          echo "✅ Strict Purple Ban verified: zero purple classes in apps/web-app/src."
+
+  security-and-ux-audit:
+    name: Security & UX Quality Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run AG Kit Security Vulnerability Scanner
+        run: python3 .agents/skills/vulnerability-scanner/scripts/security_scan.py . --fail-on critical
+
+      - name: Run UX Design & Solar Readability Audit
+        run: python3 .agents/skills/frontend-design/scripts/ux_audit.py .

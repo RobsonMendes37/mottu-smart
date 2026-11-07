@@ -312,3 +312,104 @@ export interface AnalyticsSummaryResponse {
   estimatedMechanicHoursSaved: number;
   lookerStudioEmbedUrl: string;
 }
+
+// 6.7 Accident Reporting & Video Analysis Contracts
+export interface AccidentUploadVideoUrlRequest {
+  contentType: string;
+  fileSize: number;
+  durationSeconds?: number;
+}
+
+export interface AccidentUploadVideoUrlResponse {
+  uploadUrl: string;
+  videoObjectKey: string;
+  expiresAt: string;
+}
+
+export interface AccidentUploadPhotoUrlRequest {
+  contentType: string;
+  fileSize: number;
+}
+
+export interface AccidentUploadPhotoUrlResponse {
+  uploadUrl: string;
+  photoObjectKey: string;
+  expiresAt: string;
+}
+
+export interface CreateAccidentReportRequest {
+  videoObjectKey: string;
+  photoObjectKeys?: string[];
+  hasInjuries: boolean;
+  involvesThirdParty: boolean;
+  policeReportNumber?: string;
+  drivability: 'DRIVABLE' | 'NEEDS_TOWING';
+  reportedOdometerKm: number;
+  description?: string;
+}
+
+export interface CreateAccidentReportResponse {
+  accidentReportId: string;
+  status: string;
+  message: string;
+  estimatedAt: string;
+}
+
+export interface AccidentBudgetItemDto {
+  id: string;
+  partName: string;
+  unitPriceBrl: number;
+  videoTimestampSeconds?: number;
+}
+
+export interface RiderAccidentDetailsResponse {
+  id: string;
+  status: string;
+  plate: string;
+  model: string;
+  hasInjuries: boolean;
+  involvesThirdParty: boolean;
+  policeReportNumber?: string;
+  drivability: 'DRIVABLE' | 'NEEDS_TOWING';
+  reportedOdometerKm: number;
+  partsSubtotalBrl: number;
+  laborFeeBrl: number;
+  towingFeeBrl: number;
+  totalCostBrl: number;
+  items: AccidentBudgetItemDto[];
+  estimatedAt: string;
+}
+
+export interface MechanicAccidentQueueItem {
+  id: string;
+  status: string;
+  plate: string;
+  model: string;
+  riderName: string;
+  hasInjuries: boolean;
+  drivability: string;
+  totalCostBrl: number;
+  itemsCount: number;
+  createdAt: string;
+}
+
+export interface MechanicAccidentDetailsResponse extends RiderAccidentDetailsResponse {
+  videoDownloadUrl?: string;
+  riderName: string;
+  riderPhone: string;
+  mechanicNotes?: string;
+  confirmedAt?: string;
+}
+
+export interface ConfirmAccidentRequest {
+  confirmedPartIds: string[];
+  mechanicNotes?: string;
+}
+
+export interface ConfirmAccidentResponse {
+  accidentReportId: string;
+  status: string;
+  confirmedTotalCostBrl: number;
+  message: string;
+  confirmedAt: string;
+}

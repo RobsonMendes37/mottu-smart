@@ -1,0 +1,241 @@
+<div class="min-h-screen bg-[#0A0E0D] text-[#F2F7F5] flex flex-col items-center px-4 py-6">
+  <div class="w-full max-w-[420px] flex flex-col gap-4">
+    <!-- Top Bar -->
+    <header class="flex items-center gap-3 pt-2">
+      <button
+        type="button"
+        (click)="onBack()"
+        title="Voltar para a garagem"
+        class="p-2 text-[#94A39E] hover:text-[#F2F7F5] bg-[#121816] border border-[#26332E] rounded-lg transition"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <div class="flex flex-col">
+        <span class="text-xs font-semibold text-[#FF4D4F] uppercase tracking-wider font-mono">🚨 Sinistro / Acidente</span>
+        <h1 class="text-lg font-bold text-[#F2F7F5]">Auto-Relato com Vídeo</h1>
+      </div>
+    </header>
+
+    <!-- Error Alert Banner -->
+    @if (errorMessage()) {
+      <div class="bg-[#FF4D4F]/10 border border-[#FF4D4F]/40 rounded-xl p-3 flex items-start gap-2.5 text-xs text-[#FF4D4F]">
+        <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <!-- 1. Video Guided Capture -->
+    <div class="bg-[#121816] rounded-2xl p-4 border border-[#26332E] flex flex-col gap-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-[#F2F7F5] flex items-center gap-1.5">
+          <span>📹 Vídeo do Acidente (Obrigatório)</span>
+        </h2>
+        <span class="text-xs font-mono text-[#00E676] bg-[#00E676]/10 px-2 py-0.5 rounded border border-[#00E676]/30 font-bold">Máx 30s</span>
+      </div>
+      <p class="text-xs text-[#94A39E]">
+        Grave caminhando lentamente ao redor da moto, focando nas partes danificadas (manetes, retrovisores, pedais e carenagens).
+      </p>
+
+      <label
+        class="border-2 border-dashed border-[#26332E] hover:border-[#00E676]/50 rounded-xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition bg-[#1A2320]/50"
+      >
+        <input
+          type="file"
+          accept="video/mp4,video/webm"
+          (change)="onVideoSelected($event)"
+          class="hidden"
+        />
+        <svg class="w-8 h-8 text-[#00E676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+        <div class="flex flex-col items-center text-center">
+          @if (videoFile()) {
+            <span class="text-xs font-bold text-[#00E676]">{{ videoFile()?.name }}</span>
+            <span class="text-[11px] font-mono text-[#94A39E]">
+              {{ videoDuration() }}s | {{ (videoFile()!.size / (1024 * 1024)).toFixed(1) }} MB
+            </span>
+          } @else {
+            <span class="text-xs font-bold text-[#F2F7F5]">Clique para gravar ou selecionar vídeo</span>
+            <span class="text-[11px] text-[#94A39E]">Formatos MP4 ou WebM (até 30 MB)</span>
+          }
+        </div>
+      </label>
+    </div>
+
+    <!-- 2. Optional Close Photos (Up to 3) -->
+    <div class="bg-[#121816] rounded-2xl p-4 border border-[#26332E] flex flex-col gap-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-[#F2F7F5]">📸 Fotos de Close (Opcional - até 3)</h2>
+        <span class="text-xs font-mono text-[#94A39E]">{{ photoFiles().length }}/3</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2">
+        @for (idx of [0, 1, 2]; track idx) {
+          <label class="h-20 rounded-xl border border-dashed border-[#26332E] bg-[#1A2320]/40 flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-[#00E676]/40 transition overflow-hidden relative">
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              (change)="onPhotoSelected($event, idx)"
+              class="hidden"
+            />
+            @if (photoPreviews()[idx]) {
+              <img [src]="photoPreviews()[idx]" alt="Foto detalhe" class="w-full h-full object-cover" />
+            } @else {
+              <svg class="w-5 h-5 text-[#94A39E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              <span class="text-[10px] text-[#94A39E]">Foto {{ idx + 1 }}</span>
+            }
+          </label>
+        }
+      </div>
+    </div>
+
+    <!-- 3. Emergency & Conditions Checklist -->
+    <div class="bg-[#121816] rounded-2xl p-4 border border-[#26332E] flex flex-col gap-3">
+      <h2 class="text-sm font-bold text-[#F2F7F5]">🚨 Checklist de Emergência e Segurança</h2>
+
+      <!-- Injuries Switch -->
+      <div class="flex items-center justify-between py-1 border-b border-[#26332E]">
+        <div class="flex flex-col">
+          <span class="text-xs font-bold text-[#F2F7F5]">Houve pessoas feridas?</span>
+          <span class="text-[11px] text-[#94A39E]">Você ou terceiros se machucaram?</span>
+        </div>
+        <button
+          type="button"
+          (click)="toggleInjuries()"
+          class="w-12 h-6 rounded-full border border-[#26332E] p-0.5 transition flex items-center"
+          [ngClass]="hasInjuries() ? 'bg-[#FF4D4F]' : 'bg-[#1A2320]'"
+        >
+          <div
+            class="w-5 h-5 rounded-full bg-white transition-transform"
+            [ngClass]="hasInjuries() ? 'translate-x-6' : 'translate-x-0'"
+          ></div>
+        </button>
+      </div>
+
+      <!-- SAMU Alert Banner if injuries -->
+      @if (hasInjuries()) {
+        <div class="bg-[#FF4D4F]/15 border border-[#FF4D4F] rounded-xl p-3 flex items-start gap-2 text-xs text-[#FF4D4F] font-bold animate-pulse">
+          <span>⚠️ ATENÇÃO: Se houver feridos com gravidade, ligue imediatamente para o SAMU 192 ou Bombeiros 193!</span>
+        </div>
+      }
+
+      <!-- Third party Switch -->
+      <div class="flex items-center justify-between py-1 border-b border-[#26332E]">
+        <div class="flex flex-col">
+          <span class="text-xs font-bold text-[#F2F7F5]">Envolveu outro veículo ou terceiro?</span>
+          <span class="text-[11px] text-[#94A39E]">Colisão com carro, moto ou poste</span>
+        </div>
+        <button
+          type="button"
+          (click)="toggleThirdParty()"
+          class="w-12 h-6 rounded-full border border-[#26332E] p-0.5 transition flex items-center"
+          [ngClass]="involvesThirdParty() ? 'bg-[#00E676]' : 'bg-[#1A2320]'"
+        >
+          <div
+            class="w-5 h-5 rounded-full bg-white transition-transform"
+            [ngClass]="involvesThirdParty() ? 'translate-x-6' : 'translate-x-0'"
+          ></div>
+        </button>
+      </div>
+
+      @if (involvesThirdParty()) {
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-mono text-[#94A39E]">Nº do Boletim de Ocorrência (B.O.)</label>
+          <input
+            type="text"
+            [value]="policeReportNumber()"
+            (input)="onPoliceReportInput($event)"
+            placeholder="Ex: BO-2026-987654"
+            class="w-full bg-[#1A2320] border border-[#26332E] rounded-xl px-3 py-2 text-xs text-[#F2F7F5] outline-none focus:border-[#00E676]"
+          />
+        </div>
+      }
+
+      <!-- Drivability Selection -->
+      <div class="flex flex-col gap-2 pt-1">
+        <span class="text-xs font-bold text-[#F2F7F5]">Condição de Rodagem da Moto</span>
+        <div class="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            (click)="setDrivability('DRIVABLE')"
+            class="p-3 rounded-xl border flex flex-col items-center text-center gap-1 transition"
+            [ngClass]="drivability() === 'DRIVABLE' ? 'border-[#00E676] bg-[#00E676]/10 text-[#00E676]' : 'border-[#26332E] bg-[#1A2320] text-[#94A39E]'"
+          >
+            <span class="text-xs font-bold">Roda Normal</span>
+            <span class="text-[10px]">Posso pilotar até a oficina</span>
+          </button>
+
+          <button
+            type="button"
+            (click)="setDrivability('NEEDS_TOWING')"
+            class="p-3 rounded-xl border flex flex-col items-center text-center gap-1 transition"
+            [ngClass]="drivability() === 'NEEDS_TOWING' ? 'border-[#FF4D4F] bg-[#FF4D4F]/10 text-[#FF4D4F]' : 'border-[#26332E] bg-[#1A2320] text-[#94A39E]'"
+          >
+            <span class="text-xs font-bold">Precisa de Guincho</span>
+            <span class="text-[10px]">R$ 80,00 taxa guincho</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Odometer Input -->
+      <div class="flex flex-col gap-1 pt-1">
+        <label class="text-xs font-bold text-[#F2F7F5]">Odômetro no Momento (km)</label>
+        <input
+          type="number"
+          [value]="reportedOdometerKm()"
+          (input)="onOdometerInput($event)"
+          placeholder="Ex: 1250"
+          class="w-full bg-[#1A2320] border border-[#26332E] rounded-xl px-3 py-2 text-sm font-mono text-[#F2F7F5] outline-none focus:border-[#00E676]"
+        />
+      </div>
+
+      <!-- Rider Notes -->
+      <div class="flex flex-col gap-1 pt-1">
+        <label class="text-xs font-bold text-[#F2F7F5]">O que aconteceu? (Notas do Relato)</label>
+        <textarea
+          rows="2"
+          [value]="riderNotes()"
+          (input)="onRiderNotesInput($event)"
+          placeholder="Ex: Queda lateral em curva com óleo na pista..."
+          class="w-full bg-[#1A2320] border border-[#26332E] rounded-xl p-3 text-xs text-[#F2F7F5] outline-none focus:border-[#00E676]"
+        ></textarea>
+      </div>
+
+      <!-- Note to Mechanic -->
+      <div class="flex flex-col gap-1 pt-1">
+        <label class="text-xs font-bold text-[#F2F7F5]">Recado para o Mecânico da Oficina</label>
+        <textarea
+          rows="2"
+          [value]="riderToMechanicNotes()"
+          (input)="onRiderToMechanicNotesInput($event)"
+          placeholder="Ex: A carenagem só deu uma ralada de leve, conferir manete..."
+          class="w-full bg-[#1A2320] border border-[#26332E] rounded-xl p-3 text-xs text-[#F2F7F5] outline-none focus:border-[#00E676]"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Submit CTA -->
+    <button
+      type="button"
+      (click)="onSubmit()"
+      [disabled]="isSubmitting() || !videoFile() || !reportedOdometerKm()"
+      class="w-full h-14 font-extrabold text-base rounded-xl flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed bg-[#00E676] hover:bg-[#00C853] text-[#06120B] shadow-lg shadow-[#00E676]/20 active:scale-[0.98] cursor-pointer"
+    >
+      @if (isSubmitting()) {
+        <svg class="w-5 h-5 animate-spin text-[#06120B]" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        <span>{{ uploadStatusMessage() }}</span>
+      } @else {
+        <span>Enviar Vídeo e Gerar Orçamento</span>
+      }
+    </button>
+  </div>
+</div>

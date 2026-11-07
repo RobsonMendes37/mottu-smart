@@ -143,6 +143,65 @@ Para **toda** tarefa de código, o agente executor deve seguir rigorosamente est
 
 ---
 
+### `UC-13` — Cálculo do Orçamento de Sinistro com Peças Novas, Mão de Obra e Guincho (v3.0)
+* **Arquivo de Teste:** `apps/core-api/src/test/java/com/mottu/ops/domain/service/AccidentBudgetCalculatorTest.java`
+* **Regra (100% Testada em Domínio Puro Java):**
+  * `subtotal_pecas` = Soma de `unit_price_brl * quantity` para cada peça deduplicada.
+  * `mao_de_obra`: `0` peças → `R$ 0,00`; `1 a 2` peças → `R$ 35,00`; `3 ou mais` peças → `R$ 90,00`.
+  * `taxa_guincho`: `DRIVABLE` → `R$ 0,00`; `NEEDS_TOWING` → `R$ 80,00`.
+  * `total_estimado` = `subtotal_pecas + mao_de_obra + taxa_guincho`.
+* **Testes Unitários Obrigatórios:**
+  1. **Dado** 0 peças avariadas e moto `DRIVABLE`, **Quando** calcular orçamento, **Então** total é `R$ 0,00`.
+  2. **Dado** 2 peças (ex: `R$ 25,00` + `R$ 42,50`) e moto `DRIVABLE`, **Quando** calcular, **Então** peças `R$ 67,50` + mão de obra leve `R$ 35,00` + guincho `R$ 0,00` = `R$ 102,50`.
+  3. **Dado** 3 peças (ex: `R$ 25,00` + `R$ 42,50` + `R$ 80,00`) e moto `NEEDS_TOWING`, **Quando** calcular, **Então** peças `R$ 147,50` + mão de obra pesada `R$ 90,00` + guincho `R$ 80,00` = `R$ 317,50`.
+
+---
+
+### `UC-14` — Ciclo de Vida do Acidente e Trava de Segurança da Frota (v3.0)
+* **Arquivo de Teste:** `apps/core-api/src/test/java/com/mottu/ops/domain/service/AccidentStateMachineTest.java`
+* **Regra:**
+  * Transições permitidas: `QUEUED_AI` → `ESTIMATED_PENDING_WORKSHOP` (ou `AWAITING_AI_RECOVERY`) → `WORKSHOP_CONFIRMED`.
+  * Se `drivability == NEEDS_TOWING`, a motocicleta obrigatoriamente transiciona para `IN_MAINTENANCE` para prevenir circulação insegura.
+* **Testes Unitários Obrigatórios:**
+  1. **Dado** relato de acidente com `NEEDS_TOWING`, **Quando** registrar no domínio, **Então** moto associada transiciona para `IN_MAINTENANCE`.
+  2. **Dado** tentativa de transição ilegal (ex: direto de `QUEUED_AI` para `WORKSHOP_CONFIRMED` sem estimativa), **Quando** tentar mudar status, **Então** lança `InvalidStateTransitionException`.
+
+---
+
+### `UC-15` — Deduplicação Temporal de Peças no Vídeo e Análise Multimodal (v3.0)
+* **Arquivo de Teste (`Pytest`):** `apps/intelligence-service/tests/unit/test_accident_deduplicator.py`
+* **Regra (100% Testada em Domínio Puro Python):**
+  * Se o mesmo item aparecer nos segundos `00:04` e `00:26` do vídeo, o deduplicador deve consolidar em 1 único item de reposição mantendo o timestamp do primeiro avistamento mais nítido.
+* **Testes Obrigatórios:**
+  1. **Dado** lista de detecções temporais contendo o mesmo SKU em `ts=4` e `ts=22`, **Quando** deduplicar, **Então** resulta em 1 item com `quantity = 1` e `video_timestamp_seconds = 4`.
+  2. **Dado** detecções de peças distintas (`Manete`, `Retrovisor`, `Pedal`), **Quando** deduplicar, **Então** preserva os 3 itens com seus respectivos preços e timestamps.
+
+---
+
+### `UC-16` — Upload de Vídeo e Abertura de Relato de Acidente (v3.0)
+* **Arquivo de Teste:** `apps/core-api/src/test/java/com/mottu/ops/infrastructure/adapter/in/web/AccidentReportIntegrationTest.java`
+* **Regra:** Valida URL pré-assinada para vídeo (`<= 30MB`, `mp4/webm`), exige `Idempotency-Key` e envia evento para `queue:ai_accident_jobs`.
+* **Testes Obrigatórios:**
+  1. **Dado** requisição de upload para arquivo de vídeo de `35 MB`, **Quando** solicitar URL, **Então** rejeita com `400 Bad Request`.
+  2. **Dado** criação de relato com vídeo e checklist válidos, **Quando** enviar `POST /api/v1/rider/accidents`, **Então** responde `202 Accepted` com `status = QUEUED_AI` e publica na fila Redis.
+
+---
+
+### `UC-17` — Dossiê de Acidente na Oficina e Confirmação Presencial (v3.0)
+* **Arquivo de Teste:** `apps/core-api/src/test/java/com/mottu/ops/infrastructure/adapter/in/web/AccidentReportIntegrationTest.java`
+* **Regra:** Mecânico visualiza o dossiê com vídeo e lista de peças pré-selecionadas pela IA e confirma o orçamento final na oficina, transicionando para `WORKSHOP_CONFIRMED`.
+* **Testes Obrigatórios:**
+  1. **Dado** chamado em `ESTIMATED_PENDING_WORKSHOP`, **Quando** mecânico confirmar peças e notas, **Então** atualiza status para `WORKSHOP_CONFIRMED` e recalcula total final.
+
+---
+
+### `UC-18` — Esteira Integrada CI/CD no GitHub Actions (v3.0)
+* **Arquivo de Teste:** `.github/workflows/ci.yml` e script de smoke test
+* **Regra:** CI roda automaticamente Java (100% domain LINE JaCoCo + ArchUnit), Python (100% domain pytest), Angular (lint + Vitest + build + Purple Ban) e Playwright E2E em qualquer push/PR.
+
+
+---
+
 ## 3. Comandos Automáticos de Verificação (Portão de Qualidade)
 
 Nenhum agente poderá marcar uma funcionalidade como concluída sem que estes comandos terminem sem erros:

@@ -158,6 +158,8 @@ Todos os 3 sistemas (`Angular`, `Java` e `Python`) e o banco de dados usam **exa
   4. `FRAUD_SUSPICION` *(peso `4`)*
 * **`InspectionStatus`:** `QUEUED_AI` | `INVALID_IMAGE` | `AWAITING_AI_RECOVERY` | `AUTO_RESOLVED` | `HUMAN_TRIAGE` | `HUMAN_RESOLVED` | `SCHEDULED` | `CLOSED`
 * **`AppointmentShift`:** `MORNING` | `AFTERNOON`
+* **`AccidentReportStatus` (v3.0):** `QUEUED_AI` | `AWAITING_AI_RECOVERY` | `ESTIMATED_PENDING_WORKSHOP` | `WORKSHOP_CONFIRMED`
+* **`VehicleDrivability` (v3.0):** `DRIVABLE` | `NEEDS_TOWING`
 
 ### Máquina de Estados Exata da Vistoria (Zero Dúvida!)
 * **Quais status contam como "Chamado em Aberto" (limite máximo de `3` por contrato)?**
@@ -179,6 +181,17 @@ Todos os 3 sistemas (`Angular`, `Java` e `Python`) e o banco de dados usam **exa
      * Muda de `HUMAN_TRIAGE` para **`HUMAN_RESOLVED`** (decisão final, `contested_once` bloqueado para sempre, grava evento na `analytics_outbox`).
   5. **Quando o Entregador agenda ida ao galpão (`POST /appointment`):**
      * Permitido em `AUTO_RESOLVED` ou `HUMAN_RESOLVED` → muda para **`SCHEDULED`**.
+
+### Máquina de Estados do Auto-Relato de Acidente (v3.0)
+* **Transições Válidas de Acidente:**
+  1. **Ao criar relato de acidente (`POST /rider/accidents`):**
+     * Nasce em **`QUEUED_AI`** e vai para `queue:ai_accident_jobs`.
+     * Se `drivability == 'NEEDS_TOWING'`, o status da moto é automaticamente atualizado para `IN_MAINTENANCE`.
+  2. **Ao receber processamento do vídeo (`queue:ai_accident_results`):**
+     * Se `outcome == 'AI_UNAVAILABLE'` → muda para **`AWAITING_AI_RECOVERY`** (backoff exponencial).
+     * Se `outcome == 'SUCCESS'` → muda para **`ESTIMATED_PENDING_WORKSHOP`**. O entregador recebe o orçamento detalhado na hora via SSE e o dossiê fica disponível para o Mecânico.
+  3. **Conferência na Oficina (`POST /mechanic/accidents/{id}/confirm`):**
+     * Mecânico revisa o vídeo com timestamps e peças no galpão, podendo adicionar/remover itens e emite a confirmação → status transiciona para **`WORKSHOP_CONFIRMED`** (grava evento na `analytics_outbox`).
 
 ---
 
@@ -334,11 +347,65 @@ CREATE TABLE inspection_audit_logs (
 -- 11. Caixa de Saída para o Google BigQuery (Envio em Lote NDJSON)
 CREATE TABLE analytics_outbox (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    inspection_id UUID NOT NULL REFERENCES inspections(id),
+    inspection_id UUID REFERENCES inspections(id),
+    accident_report_id UUID,
     payload_json JSONB NOT NULL,
     exported BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     exported_at TIMESTAMPTZ
+);
+
+-- 12. Relatórios de Acidente com Vídeo (V3__accident_reports_schema.sql)
+CREATE TABLE accident_reports (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    idempotency_key VARCHAR(80) NOT NULL UNIQUE,
+    contract_id UUID NOT NULL REFERENCES rental_contracts(id),
+    rider_id UUID NOT NULL REFERENCES users(id),
+    motorcycle_id UUID NOT NULL REFERENCES motorcycles(id),
+    video_object_key VARCHAR(255) NOT NULL,
+    video_duration_seconds INTEGER NOT NULL,
+    video_size_bytes BIGINT NOT NULL,
+    has_injuries BOOLEAN NOT NULL DEFAULT FALSE,
+    involves_third_party BOOLEAN NOT NULL DEFAULT FALSE,
+    police_report_number VARCHAR(60),
+    drivability VARCHAR(20) NOT NULL,            -- VehicleDrivability (DRIVABLE / NEEDS_TOWING)
+    reported_odometer_km INTEGER NOT NULL,
+    rider_notes VARCHAR(500),
+    rider_to_mechanic_notes VARCHAR(500),
+    status VARCHAR(35) NOT NULL,                 -- AccidentReportStatus
+    ai_confidence NUMERIC(4, 3),
+    structural_risk_alert BOOLEAN NOT NULL DEFAULT FALSE,
+    ai_technical_summary TEXT,
+    parts_subtotal_brl NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
+    labor_fee_brl NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
+    towing_fee_brl NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
+    total_estimated_brl NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
+    reviewed_by_mechanic_id UUID REFERENCES users(id),
+    mechanic_notes VARCHAR(500),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    confirmed_at TIMESTAMPTZ
+);
+CREATE INDEX idx_accident_reports_status ON accident_reports(status, created_at);
+
+-- 13. Fotos Opcionais de Close do Acidente
+CREATE TABLE accident_report_photos (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    accident_report_id UUID NOT NULL REFERENCES accident_reports(id) ON DELETE CASCADE,
+    photo_object_key VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 14. Peças Identificadas e Deduplicadas no Acidente
+CREATE TABLE accident_report_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    accident_report_id UUID NOT NULL REFERENCES accident_reports(id) ON DELETE CASCADE,
+    catalog_part_id UUID REFERENCES catalog_parts(id),
+    part_name_snapshot VARCHAR(180) NOT NULL,
+    unit_price_snapshot_brl NUMERIC(10, 2) NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    video_timestamp_seconds INTEGER,
+    confirmed_by_mechanic BOOLEAN NOT NULL DEFAULT TRUE,
+    added_by VARCHAR(15) NOT NULL                -- 'AI' ou 'MECHANIC'
 );
 ```
 
@@ -483,6 +550,58 @@ Enviada em lote (`Batch Load NDJSON`) a cada 60s pelo Spring Boot quando `BIGQUE
   * **Entrada:** `{ "yardId": "uuid", "scheduledDate": "2026-11-10", "shift": "MORNING" }`
   * **Saída (`201 Created`):** `{ "appointmentId": "uuid", "inspectionStatus": "SCHEDULED", "yardName": "Galpão Mottu Butantã", "scheduledDate": "2026-11-10", "shift": "MORNING" }`
 
+#### 6.2.1. Rotas de Acidente do Entregador (v3.0)
+* **`POST /api/v1/rider/accidents/upload-video-url`** *(Valida `video/mp4` ou `video/webm` e `fileSizeBytes <= 31457280` - 30MB)*
+  * **Entrada:** `{ "contentType": "video/mp4", "fileSizeBytes": 15400000 }`
+  * **Saída (`200 OK`):** `{ "uploadUrl": "http://localhost:9000/mottu-inspections/...", "videoObjectKey": "accidents/2026/11/uuid.mp4", "expiresInSeconds": 600 }`
+* **`POST /api/v1/rider/accidents/upload-photo-url`** *(Até 3 fotos de close opcionais)*
+  * **Entrada:** `{ "contentType": "image/webp", "fileSizeBytes": 450000 }`
+  * **Saída (`200 OK`):** `{ "uploadUrl": "http://localhost:9000/mottu-inspections/...", "photoObjectKey": "accidents/2026/11/uuid.webp", "expiresInSeconds": 300 }`
+* **`POST /api/v1/rider/accidents`** *(Obrigatório header `Idempotency-Key: <uuid>`)*
+  * **Entrada:**
+    ```json
+    {
+      "videoObjectKey": "accidents/2026/11/uuid.mp4",
+      "videoDurationSeconds": 24,
+      "videoSizeBytes": 15400000,
+      "photoObjectKeys": ["accidents/2026/11/photo1.webp"],
+      "hasInjuries": false,
+      "involvesThirdParty": false,
+      "policeReportNumber": null,
+      "drivability": "NEEDS_TOWING",
+      "reportedOdometerKm": 1045,
+      "riderNotes": "Queda em curva molhada, quebrou manete, retrovisor e estribo.",
+      "riderToMechanicNotes": "A carenagem só ralou um pouco."
+    }
+    ```
+  * **Saída (`202 Accepted`):** `{ "accidentReportId": "uuid", "status": "QUEUED_AI", "motorcycleStatus": "IN_MAINTENANCE" }`
+* **`GET /api/v1/rider/accidents/{id}`** *(Alimenta a tela `T12`)*
+  * **Saída (`200 OK`):**
+    ```json
+    {
+      "id": "uuid",
+      "status": "ESTIMATED_PENDING_WORKSHOP",
+      "videoDownloadUrl": "http://localhost:9000/mottu-inspections/...",
+      "drivability": "NEEDS_TOWING",
+      "hasInjuries": false,
+      "structuralRiskAlert": false,
+      "aiConfidence": 0.94,
+      "partsSubtotalBrl": 147.50,
+      "laborFeeBrl": 90.00,
+      "towingFeeBrl": 80.00,
+      "totalEstimatedBrl": 317.50,
+      "items": [
+        { "catalogPartId": "uuid-1", "partName": "Manete de Freio Direito", "unitPriceBrl": 25.00, "quantity": 1, "videoTimestampSeconds": 6 },
+        { "catalogPartId": "uuid-2", "partName": "Retrovisor Direito", "unitPriceBrl": 42.50, "quantity": 1, "videoTimestampSeconds": 14 },
+        { "catalogPartId": "uuid-3", "partName": "Pedal de Apoio Dianteiro Direito", "unitPriceBrl": 80.00, "quantity": 1, "videoTimestampSeconds": 21 }
+      ],
+      "riderToMechanicNotes": "A carenagem só ralou um pouco.",
+      "createdAt": "2026-11-07T12:00:00Z"
+    }
+    ```
+* **`GET /api/v1/rider/accidents/{id}/stream`** (`text/event-stream` SSE)
+  * Evento: `data: {"accidentReportId":"uuid","status":"ESTIMATED_PENDING_WORKSHOP","stepLabel":"Orçamento de peças novas pronto!"}`
+
 ### 6.3. Rotas do Mecânico (`ROLE_MECHANIC` ou `ROLE_MANAGER`)
 * **`GET /api/v1/mechanic/queue?reason=&plate=&page=0&size=20`** *(Retorna `PageResponse` de chamados em `HUMAN_TRIAGE`)*
   * **Item da Fila (`items[]`):**
@@ -513,6 +632,20 @@ Enviada em lote (`Batch Load NDJSON`) a cada 60s pelo Spring Boot quando `BIGQUE
     }
     ```
   * **Saída (`200 OK`):** `{ "inspectionId": "uuid", "status": "HUMAN_RESOLVED", "finalVerdict": "MAU_USO", "totalEstimatedBrl": 60.00, "customerFeedbackText": "Olá! Nosso mecânico revisou sua foto com atenção..." }`
+* **`GET /api/v1/mechanic/accidents?page=0&size=20`** *(Alimenta a Fila de Dossiês de Sinistro na Oficina)*
+  * **Saída (`200 OK`):** PageResponse contendo itens com `id`, `plate`, `model`, `riderName`, `drivability`, `hasInjuries`, `totalEstimatedBrl`, `itemCount`, `status`, `createdAt`.
+* **`GET /api/v1/mechanic/accidents/{id}`** *(Alimenta a tela `T13` - Dossiê de Acidente)*
+  * **Saída (`200 OK`):** Objeto completo com vídeo URL, fotos URLs, checklist de emergência, lista de peças identificadas pela IA com `videoTimestampSeconds`, observações do entregador.
+* **`POST /api/v1/mechanic/accidents/{id}/confirm`**
+  * **Entrada:**
+    ```json
+    {
+      "confirmedPartIds": ["uuid-1", "uuid-2"],
+      "additionalCatalogPartIds": ["uuid-4"],
+      "mechanicNotes": "Confirmadas peças danificadas no impacto lateral e substituído também o suporte de placa."
+    }
+    ```
+  * **Saída (`200 OK`):** `{ "accidentReportId": "uuid", "status": "WORKSHOP_CONFIRMED", "totalEstimatedBrl": 340.00, "confirmedAt": "2026-11-07T14:00:00Z" }`
 * **`GET /api/v1/fleet/motorcycles?status=&plate=&page=0&size=20`** → Retorna `PageResponse` com `{ "id", "plate", "model", "yardId", "yardName", "status", "currentOdometerKm", "activeRiderName" }`.
 * **`POST /api/v1/fleet/motorcycles`** → Entrada: `{ "plate": "MOT9Z99", "model": "MOTTU_SPORT_110I", "yardId": "uuid", "currentOdometerKm": 0 }` → Saída (`201`): objeto da moto criada (`AVAILABLE`).
 * **`PATCH /api/v1/fleet/motorcycles/{id}/status`** → Entrada: `{ "status": "IN_MAINTENANCE" }` → Saída (`200`): moto atualizada.
@@ -578,3 +711,43 @@ Enviada em lote (`Batch Load NDJSON`) a cada 60s pelo Spring Boot quando `BIGQUE
 4. **HTTP Interno `POST http://intelligence-service:8000/internal/v1/feedback/polish`** *(Transforma a nota curta do mecânico em resposta empática; se o Gemini oscilar, usa template educado local sem nunca falhar o laudo do mecânico!)*
    * **Entrada:** `{ "finalVerdict": "MAU_USO", "partNames": ["Manete de Freio"], "totalEstimatedBrl": 60.00, "mechanicNotes": "Quebra por queda lateral recente." }`
    * **Saída (`200 OK`):** `{ "customerFriendlyMessage": "Olá! Nosso mecânico revisou sua foto com atenção e confirmou quebra por impacto lateral no Manete de Freio. O valor estimado para reposição no galpão é de R$ 60,00." }`
+
+5. **Fila Redis `queue:ai_accident_jobs` (v3.0 - `LPUSH` Java → `BRPOP` Python):**
+   ```json
+   {
+     "accidentReportId": "uuid",
+     "correlationId": "uuid",
+     "videoObjectKey": "accidents/2026/11/uuid.mp4",
+     "photoObjectKeys": ["accidents/2026/11/photo1.webp"],
+     "motorcycleModel": "MOTTU_SPORT_110I",
+     "drivability": "NEEDS_TOWING",
+     "riderNotes": "Queda em curva molhada..."
+   }
+   ```
+6. **Fila Redis `queue:ai_accident_results` (v3.0 - `LPUSH` Python → `BRPOP` Java):**
+   ```json
+   {
+     "accidentReportId": "uuid",
+     "correlationId": "uuid",
+     "outcome": "SUCCESS",
+     "confidence": 0.94,
+     "structuralRiskAlert": false,
+     "aiTechnicalSummary": "Avarias por queda lateral direita identificadas no vídeo.",
+     "deduplicatedParts": [
+       {
+         "catalogPartId": "uuid-1",
+         "partName": "Manete de Freio Direito",
+         "unitPriceBrl": 25.00,
+         "quantity": 1,
+         "videoTimestampSeconds": 6
+       },
+       {
+         "catalogPartId": "uuid-2",
+         "partName": "Retrovisor Direito",
+         "unitPriceBrl": 42.50,
+         "quantity": 1,
+         "videoTimestampSeconds": 14
+       }
+     ]
+   }
+   ```

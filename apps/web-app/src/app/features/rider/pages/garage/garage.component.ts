@@ -73,6 +73,10 @@ export class GarageComponent implements OnInit {
     this.router?.navigate(['/rider/inspections/new']);
   }
 
+  onReportAccident(): void {
+    this.router?.navigate(['/rider/accidents/new']);
+  }
+
   onViewInspection(inspectionId: string): void {
     this.router?.navigate(['/rider/inspections', inspectionId]);
   }

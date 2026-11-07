@@ -1,0 +1,54 @@
+name: CD - Mottu Smart Ops Continuous Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: cd-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Continuous Deployment to Cloud VM
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Evaluate Deployment Credentials
+        id: check_creds
+        run: |
+          if [ -n "${{ secrets.SSH_HOST }}" ] && [ -n "${{ secrets.SSH_USER }}" ] && [ -n "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+            echo "has_creds=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Deployment credentials present. Proceeding with automated deployment."
+          else
+            echo "has_creds=false" >> "$GITHUB_OUTPUT"
+            echo "⚠️ Notice: SSH deployment secrets (SSH_HOST, SSH_USER, SSH_PRIVATE_KEY) not configured in GitHub Secrets."
+            echo "ℹ️ Skipping automated remote deployment gracefully without breaking the pipeline."
+          fi
+
+      - name: Deploy to Remote VM via SSH
+        if: steps.check_creds.outputs.has_creds == 'true'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            set -e
+            echo "🚀 Deploying Mottu Smart Ops update..."
+            cd /opt/mottu-smart-ops || cd ~/mottu-smart-ops
+            git fetch origin main
+            git reset --hard origin/main
+            docker compose down --remove-orphans
+            docker compose build --pull
+            docker compose up -d
+            echo "⏳ Waiting for healthchecks..."
+            sleep 10
+            docker compose ps
+            echo "✅ Deployment completed successfully!"

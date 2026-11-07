@@ -589,3 +589,169 @@
   - Auditoria UX (`ux_audit.py`): `STATUS: PASS` (24 verificações aprovadas).
   - Varredura Purple Ban: 0 ocorrências de tons roxos/violetas/índigo.
 - **Resultado Visual:** As 10 telas agora possuem acabamento profissional industrial no editor Pencil (`pen.dev`), com separação clara de cards, contraste solar para rua e oficina, inputs com ícones e tabelas completas com badges de status.
+
+### [2026-11-07 12:45] — `TASK-19`: Baseline Git (`main` → `feature/accident-video-cicd`) e Especificações v3.0
+- **Agente / Modelo:** `@project-planner` + `@devops-engineer`
+- **Arquivos Criados/Alterados:**
+  - Git: commit inicial na branch `main` (`feat: baseline Mottu Smart Ops v2.0`) e checkout da branch `feature/accident-video-cicd`.
+  - `accident-video-cicd.md` (Plano de expansão v3.0 com `TASK-19` a `TASK-27`).
+  - `docs/01-PMD.md` (Adicionada Seção 9: Módulo de Auto-Relato de Acidente por Vídeo, regras de checklist, deduplicação, taxas escalonadas e telas T11–T13).
+  - `docs/02-ARQUITETURA-E-APIS.md` (Adicionadas tabelas `accident_reports`, `accident_report_photos`, `accident_report_items`, Enums `AccidentReportStatus`/`VehicleDrivability`, rotas REST do Entregador/Mecânico e filas Redis `queue:ai_accident_*`).
+  - `docs/03-CASOS-DE-USO-TDD.md` (Adicionados casos `UC-13` a `UC-18` cobrindo regras matemáticas, máquinas de estado, deduplicação de vídeo, MinIO, oficina e CI/CD).
+  - `docs/PENDENCIAS_DO_HUMANO.md` (Adicionada Seção 4 com guia de secrets do GitHub Actions).
+- **Testes Executados:** `git branch --show-current` retornou `feature/accident-video-cicd`. Documentação 100% alinhada com as leis do `AGENTS.md`.
+- **Próxima Tarefa Liberada:** `TASK-20` (Prototipar Telas `T11`, `T12` e `T13` em `design/mottu-smart-ops.pen`).
+
+### [2026-11-07 12:48] — `TASK-20`: Prototipar Telas `T11`, `T12` e `T13` (+ Atalho `T02`) em `design/mottu-smart-ops.pen`
+- **Agente / Modelo:** `@frontend-specialist` + `@design-spec`
+- **Arquivos Criados/Alterados:**
+  - `design/mottu-smart-ops.pen` (Atualizado frame `T02` com botão CTA `🚨 Relatar Acidente / Sinistro` e adicionados frames `T11 - Auto-Relato de Acidente (Vídeo & Checklist)`, `T12 - Orçamento Detalhado de Peças Novas` e `T13-Web - Dossiê de Acidente na Oficina (Desktop)` com timeline de avarias e conferência física).
+  - `scripts/add_accident_screens_pen.py` (Script gerador de alta fidelidade visual para as telas do módulo de acidente).
+  - `accident-video-cicd.md` (`TASK-20` marcada como `[x]`).
+- **Testes Executados:**
+  - Validação de integridade JSON: 25 frames estruturados no arquivo `.pen`.
+  - Auditoria UX (`ux_audit.py`): `STATUS: PASS` (24 verificações aprovadas).
+  - Varredura Purple Ban: 0 ocorrências de tons roxos/violetas/índigo.
+- **Próxima Tarefa Liberada:** `TASK-21` (TDD Domínio Java: `AccidentReport`, `AccidentBudgetCalculator` e Máquina de Estados).
+
+### [2026-11-07 12:57] — `TASK-21`: TDD Domínio Java (`AccidentReport`, `AccidentBudgetCalculator` e Máquina de Estados `UC-13`, `UC-14`)
+- **Agente / Modelo:** `@test-engineer` → `@backend-specialist`
+- **Arquivos Criados/Alterados:**
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/enums/AccidentReportStatus.java` (QUEUED_AI, AWAITING_AI_RECOVERY, ESTIMATED_PENDING_WORKSHOP, WORKSHOP_CONFIRMED)
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/enums/VehicleDrivability.java` (DRIVABLE, NEEDS_TOWING)
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/model/AccidentBudget.java` (Record puro com subtotal de peças, mão de obra, guincho e total)
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/model/AccidentReportItem.java` (Entidade de peça de reposição com snapshot de preço e timestamp do vídeo)
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/model/AccidentReport.java` (Entidade raiz com limites de 30s/30MB, ciclo de vida e trava de segurança da frota)
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/model/Money.java` (Adicionado método `multiply(int)`)
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/service/AccidentBudgetCalculator.java` (Cálculo puro: R$ 35 para 1-2 peças, R$ 90 para 3+ peças, R$ 80 para guincho se NEEDS_TOWING)
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/service/AccidentStateMachine.java` (Validador estrito de transições da máquina de estados de acidente)
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/exception/InvalidStateTransitionException.java` (Suporte a construtor com mensagem genérica)
+  - `apps/core-api/src/test/java/com/mottu/ops/domain/service/AccidentBudgetCalculatorTest.java` (6 testes unitários cobrindo UC-13)
+  - `apps/core-api/src/test/java/com/mottu/ops/domain/service/AccidentStateMachineTest.java` (4 testes unitários cobrindo transições e estados terminais)
+  - `apps/core-api/src/test/java/com/mottu/ops/domain/model/AccidentReportTest.java` (8 testes unitários cobrindo UC-14, ciclo de vida e reconstituição)
+  - `apps/core-api/src/test/java/com/mottu/ops/domain/model/AccidentReportItemTest.java` (5 testes unitários)
+  - `apps/core-api/src/test/java/com/mottu/ops/domain/model/AccidentBudgetTest.java` (3 testes unitários)
+  - `accident-video-cicd.md` (`TASK-21` marcada como `[x]`)
+- **Testes TDD Executados (`RED -> GREEN`):**
+  - RED: `test-compile` falhou por ausência das classes de domínio de acidente.
+  - GREEN: `./mvnw test -Dtest="*Accident*,DomainPurityTest,MoneyTest"` executou 30 testes com 100% de sucesso.
+  - PUREZA HEXAGONAL & COBERTURA: `./mvnw jacoco:check` passou com sucesso ("All coverage checks have been met", 100% de cobertura de linhas em `domain/model` e `domain/service`). `DomainPurityTest` (ArchUnit) passou com 0 violações de frameworks.
+- **Próxima Tarefa Liberada:** `TASK-22` (TDD Domínio Python: Deduplicador Temporal de Vídeo e Avaliador de Peças Novas).
+
+### [2026-11-07 13:00] — `TASK-22`: TDD Domínio Python: Deduplicador Temporal de Vídeo e Avaliador de Peças Novas (`UC-15`)
+- **Agente / Modelo:** `@test-engineer` → `@backend-specialist`
+- **Arquivos Criados/Alterados:**
+  - `apps/intelligence-service/app/domain/enums.py` (Adicionados `VehicleDrivability` e `AccidentReportStatus`).
+  - `apps/intelligence-service/app/domain/models.py` (Adicionados `VideoPartDetection`, `DeduplicatedPart`, `AccidentEvaluationResult`).
+  - `apps/intelligence-service/app/domain/accident_deduplicator.py` (Funções puras `deduplicate_detected_parts` e `evaluate_accident_video_detections` mantendo menor timestamp para mesma peça e somatórios monetários).
+  - `apps/intelligence-service/tests/unit/test_accident_deduplicator.py` (8 testes unitários cobrindo UC-15, limites de timestamp, ordenação e consolidação de peças).
+  - `accident-video-cicd.md` (`TASK-22` marcada como `[x]`).
+- **Testes TDD Executados (`RED -> GREEN`):**
+  - RED: `pytest` falhou por ausência das classes e funções de deduplicação de acidente.
+  - GREEN: `pytest tests/unit/ -v --cov=app/domain --cov-fail-under=100` executou 111 testes com **100.00% de cobertura de instruções e branches** em `app/domain` (238/238 stmts, 68/68 branches).
+  - PUREZA HEXAGONAL: `pytest tests/test_domain_purity.py` passou com **0 violações** AST.
+- **Próxima Tarefa Liberada:** `TASK-23` (Back-end Java Core API: Flyway V3, Upload Vídeo MinIO, Filas Redis, SSE e Rotas Entregador/Oficina).
+
+### [2026-11-07 13:21] — `TASK-23`: Back-end Java Core API: Flyway V3, Upload Vídeo MinIO, Filas Redis, SSE e Rotas Entregador/Oficina (`UC-16`, `UC-17`)
+- **Agente / Modelo:** `@database-architect` + `@backend-specialist`
+- **Arquivos Criados/Alterados:**
+  - `apps/core-api/src/main/resources/db/migration/V3__accident_reports_schema.sql` (Tabelas `accident_reports`, `accident_report_photos`, `accident_report_items` e ajuste de `analytics_outbox`).
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/entity/AccidentReportJpaEntity.java` (Entidade JPA com dados de telemetria, checklist e orçamento).
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/entity/AccidentReportPhotoJpaEntity.java` (Entidade JPA para fotos complementares).
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/entity/AccidentReportItemJpaEntity.java` (Entidade JPA para peças com snapshot de preço e timestamp no vídeo).
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/entity/AnalyticsOutboxJpaEntity.java` (Atualizado com suporte a `accident_report_id` nulo ou presente).
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/repository/SpringDataAccidentReportRepository.java` (Repositório Spring Data JPA com busca por chave de idempotência e paginação).
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/repository/SpringDataAccidentReportItemRepository.java` (Repositório Spring Data JPA para itens).
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/repository/SpringDataAccidentReportPhotoRepository.java` (Repositório Spring Data JPA para fotos).
+  - `apps/core-api/src/main/java/com/mottu/ops/application/port/out/AccidentReportRepositoryPort.java` (Porta de saída hexagonal de persistência).
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/adapter/AccidentReportPersistenceAdapter.java` (Adaptador de persistência sincronizando entidade, itens e fotos).
+  - `apps/core-api/src/main/java/com/mottu/ops/application/port/out/StoragePort.java` & `MinioStorageAdapter.java` (Suporte a URLs presigned de vídeo até 30s/30MB, fotos de close e URLs presigned de download).
+  - `apps/core-api/src/main/java/com/mottu/ops/application/port/out/AccidentQueuePort.java` & `RedisAccidentQueueAdapter.java` (Publicação em `queue:ai_accident_jobs` com suporte a buffer em memória para testes e modo offline).
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/in/web/sse/SseEmitterRegistry.java` (Adicionado suporte a streaming SSE para relatórios de acidente).
+  - `apps/core-api/src/main/java/com/mottu/ops/application/dto/*` (Criados 12 DTOs: requests/responses de upload, criação de relato, visualização entregador/mecânico, fila de oficina, confirmação e payloads de integração Redis).
+  - `apps/core-api/src/main/java/com/mottu/ops/application/port/in/*` (Casos de uso `RiderAccidentUseCase`, `MechanicAccidentUseCase`, `AccidentResultConsumerUseCase`).
+  - `apps/core-api/src/main/java/com/mottu/ops/application/usecase/RiderAccidentService.java` (Implementação de caso de uso do entregador com bloqueio automático da moto para `IN_MAINTENANCE` se guincho necessário).
+  - `apps/core-api/src/main/java/com/mottu/ops/application/usecase/MechanicAccidentService.java` (Implementação de caso de uso da oficina com conferência e publicação na `analytics_outbox`).
+  - `apps/core-api/src/main/java/com/mottu/ops/application/usecase/AccidentResultConsumerService.java` (Consumidor de resultados de IA via Redis com fallback para `AWAITING_AI_RECOVERY` e notificação SSE ao vivo).
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/in/web/RiderAccidentController.java` (`POST /upload-video-url`, `POST /upload-photo-url`, `POST /`, `GET /{id}`, `GET /{id}/stream`).
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/in/web/MechanicAccidentController.java` (`GET /`, `GET /{id}`, `POST /{id}/confirm`).
+  - `apps/core-api/src/test/java/com/mottu/ops/infrastructure/adapter/in/web/AccidentReportIntegrationTest.java` (Teste de integração completo cobrindo ciclo de vida de ponta a ponta: upload de vídeo, idempotência, cálculo de orçamento, bloqueio de moto, streaming e aprovação na oficina).
+  - `accident-video-cicd.md` (`TASK-23` marcada como `[x]`).
+- **Testes TDD Executados (`RED -> GREEN`):**
+  - RED: Falhas iniciais de compilação por tipos e contratos de teste.
+  - GREEN: `./mvnw test` executou **257 testes com 100% de sucesso (0 falhas, 0 erros)**.
+  - PUREZA HEXAGONAL & VERIFICAÇÃO FINAL: `./mvnw verify` executou com sucesso total:
+    * `jacoco:check`: "All coverage checks have been met" (100% de cobertura no domínio).
+    * `DomainPurityTest` (ArchUnit): 0 violações de frameworks no domínio.
+- **Próxima Tarefa Liberada:** `TASK-24` (Serviço Python FastAPI: Worker `queue:ai_accident_jobs`, Gemini Multimodal Video SDK + Mock Offline).
+
+### [2026-11-07 13:26] — `TASK-24`: Serviço Python FastAPI: Worker `queue:ai_accident_jobs`, Gemini Multimodal Video SDK + Mock Offline (`UC-15`)
+- **Agente / Modelo:** `@backend-specialist`
+- **Arquivos Criados/Alterados:**
+  - `apps/intelligence-service/app/application/dtos/accident_job_dto.py` (Pydantic DTOs para `AccidentJobPayloadDTO`, `AccidentDeduplicatedPartDTO` e `AccidentResultPayloadDTO`).
+  - `apps/intelligence-service/app/modules/triage_ai/mock_gemini.py` (Adicionado `inspect_accident_video` com detecção multimodal determinística offline e peças duplicadas em timestamps distintos para exercício de deduplicação).
+  - `apps/intelligence-service/app/infrastructure/adapters/gemini_video_adapter.py` (Adaptador de vídeo multimodal compatível com Google GenAI SDK `google-genai` com upload via File API, limpeza em bloco `finally` e modo mock resiliente).
+  - `apps/intelligence-service/app/infrastructure/adapters/accident_worker.py` (Supervisor de fila `AccidentJobWorker` consumindo `queue:ai_accident_jobs`, aplicando deduplicação temporal de menor timestamp, consulta vetorial CRAG para precificação e postagem em `queue:ai_accident_results`).
+  - `apps/intelligence-service/app/main.py` (Registrado `AccidentJobWorker` no `lifespan` assíncrono do FastAPI com inicialização e encerramento gracioso).
+  - `apps/intelligence-service/app/domain/models.py` (Ajustado `VideoPartDetection.unit_price_brl` com default 0.0 para compatibilidade).
+  - `apps/intelligence-service/tests/test_accident_worker.py` (6 testes de integração e comportamento: fluxo de sucesso, deduplicação temporal de timestamp menor, fallback `AI_UNAVAILABLE`, descarte de jobs inválidos, ciclo de vida e resiliência Redis offline).
+  - `accident-video-cicd.md` (`TASK-24` marcada como `[x]`).
+- **Testes TDD Executados (`RED -> GREEN`):**
+  - RED: Erro de inicialização por ausência do argumento `unit_price_brl`.
+  - GREEN: `pytest tests/test_accident_worker.py` executou com 6 testes aprovados.
+  - SUÍTE COMPLETA: `pytest tests/` executou **132 testes com 100% de sucesso (0 falhas, 0 erros)**.
+  - COBERTURA & PUREZA: `pytest tests/unit/ --cov=app/domain --cov-fail-under=100` manteve **100.00% de cobertura** e `test_domain_purity.py` confirmou **0 violações** de framework.
+- **Próxima Tarefa Liberada:** `TASK-25` (Front-end Angular 19: Telas do Entregador T02 Atalho + T11 Vídeo Guiado + T12 Orçamento de Peças Novas & Oficina T13).
+
+### [2026-11-07 13:38] — `TASK-25`: Front-end Angular 19: Telas do Entregador (`T02` Atalho + `T11` Vídeo Guiado + `T12` Orçamento de Peças Novas) & Oficina (`T13` Dossiê)
+- **Agente / Modelo:** `@frontend-specialist`
+- **Arquivos Criados/Alterados:**
+  - `apps/web-app/src/app/features/rider/models/accident.models.ts` (Modelos e tipos para upload presigned, relatório de sinistro e SSE streaming).
+  - `apps/web-app/src/app/features/mechanic/models/accident-dossier.models.ts` (Modelos de visualização de dossiê para mecânico com checklist de conferência física).
+  - `apps/web-app/src/app/features/rider/services/accident.service.ts` & `accident.service.spec.ts` (Serviço de upload direto de vídeo/fotos ao MinIO via `fetch(PUT)`, criação de sinistro e SSE streaming com `fetch` + `ReadableStream`).
+  - `apps/web-app/src/app/features/mechanic/services/accident-mechanic.service.ts` & `accident-mechanic.service.spec.ts` (Serviço para mecânico listar dossiê e confirmar orçamento no galpão).
+  - `apps/web-app/src/app/features/rider/pages/garage/garage.component.html|ts|spec.ts` (Adicionado botão CTA de emergência `🚨 Relatar Acidente` navegando para `/rider/accidents/new`).
+  - `apps/web-app/src/app/features/rider/pages/accident-wizard/accident-wizard.component.html|ts|spec.ts` (Tela `T11`: upload de vídeo com validação <=30s e <=30MB, até 3 fotos opcionais, checklist de feridos com alerta SAMU 192, B.O. para terceiros, seletor de rodagem `DRIVABLE` vs `NEEDS_TOWING`).
+  - `apps/web-app/src/app/features/rider/pages/accident-quote/accident-quote.component.html|ts|spec.ts` (Tela `T12`: streaming SSE com barra de progresso ao vivo, tabela de peças novas substituídas, clique no timestamp do vídeo para salto e total com taxa de guincho e mão de obra escalonada).
+  - `apps/web-app/src/app/features/mechanic/pages/t13-dossier/t13-accident-dossier.component.html|ts|spec.ts` (Tela `T13`: workspace assimétrico com player de vídeo, timeline de detecções por timestamp, checklist de conferência física pelo mecânico, recálculo dinâmico e confirmação de manutenção).
+  - `apps/web-app/src/app/app.routes.ts` & `app.routes.spec.ts` (Registro e testes de rotas `/rider/accidents/new`, `/rider/accidents/:id` e `/mechanic/accidents/:id`).
+  - `accident-video-cicd.md` (`TASK-25` marcada como `[x]`).
+- **Testes TDD Executados (`RED -> GREEN`):**
+  - RED: Falhas iniciais por ausência de rotas e componentes.
+  - GREEN: `npm run test:ci` executou **29 arquivos de teste e 170 testes com 100% de sucesso**.
+  - LINT & BUILD: `tsc --noEmit` passou com 0 erros de tipagem e `ng build --configuration production` gerou chunks de produção otimizados sem erros.
+  - PURPLE BAN & UX: `ux_audit.py` passou (0 erros) e verificação de cores roxas/violetas confirmou zero violações em todo o app.
+- **Próxima Tarefa Liberada:** `TASK-26` (Esteira Completa CI/CD no GitHub Actions + Script de Smoke Test Real).
+
+### [2026-11-07 13:42] — `TASK-26`: Esteira Completa CI/CD no GitHub Actions (`.github/workflows/ci.yml` e `cd.yml`) + Script de Smoke Test Real
+- **Agente / Modelo:** `@devops-engineer` + `@security-auditor`
+- **Arquivos Criados/Alterados:**
+  - `.github/workflows/ci.yml` (Workflow CI completo com 4 jobs paralelos: Java Core API com verificação JaCoCo 100% de domínio e ArchUnit, Python Intelligence Service com pytest 100% de cobertura de domínio e AST purity, Angular 19 com lint, Vitest e build de produção + verificação estrita do Purple Ban, e auditoria de segurança com `security_scan.py` e `ux_audit.py`).
+  - `.github/workflows/cd.yml` (Workflow CD para deploy contínuo via SSH na branch `main`, com verificação graciosa de credenciais de deploy sem falhar caso secrets ainda não estejam configurados).
+  - `scripts/verify_env_keys.sh` (Script bash executável com validação formatada de banco de dados, Redis, MinIO, JWT >= 32 chars, modo offline/mock de IA e BigQuery).
+  - `accident-video-cicd.md` (`TASK-26` marcada como `[x]`).
+- **Testes e Verificações Executados:**
+  - Sintaxe YAML validada via Python `yaml.safe_load` para `ci.yml` e `cd.yml` (0 erros).
+  - `./scripts/verify_env_keys.sh .env.example` executado com 0 erros, 0 avisos e exit code 0.
+  - `security_scan.py . --fail-on critical` executado com 0 vulnerabilidades críticas.
+- **Próxima Tarefa Liberada:** `TASK-27` (Phase X: Suíte E2E Playwright do Módulo de Acidente, Auditoria Final e Checklist Geral).
+
+### [2026-11-07 13:51] — `TASK-27`: Phase X: Suíte E2E Playwright do Módulo de Acidente, Auditoria Final e Checklist Geral (`UC-18`)
+- **Agente / Modelo:** `@qa-automation-engineer` + `@security-auditor` + `@orchestrator`
+- **Arquivos Criados/Alterados:**
+  - `e2e/src/contracts/types.ts` (Adicionados tipos e contratos de API para upload de vídeo, relatório de acidente e confirmação de oficina).
+  - `e2e/src/client/api-client.ts` (Implementados métodos cliente `getAccidentUploadVideoUrl`, `getAccidentUploadPhotoUrl`, `createAccidentReport`, `getRiderAccident`, `getMechanicAccidentQueue`, `getMechanicAccidentDetail` e `confirmMechanicAccident`).
+  - `e2e/src/mock-server/contract-server.ts` (Implementados handlers para as 7 rotas de sinistro com validação de vídeo <=30s/30MB, recálculo de mão de obra escalonada, taxa de guincho R$ 80, idempotência, isolamento RBAC e publicação em outbox).
+  - `e2e/tests/tier1-features/13-accident-video-reporting.spec.ts` (12 testes cobrindo upload de vídeo, rejeição de formatos/tamanhos inválidos, taxa de guincho, idempotência, visualização de laudo e RBAC).
+  - `e2e/tests/tier4-scenarios/journey-accident-video-quote.spec.ts` (Jornada ponta a ponta: relato na rua com vídeo -> orçamento imediato -> guincho -> bloqueio de moto -> inspeção física pelo mecânico -> emissão para outbox analytics).
+  - `accident-video-cicd.md` (`TASK-27` e todos os 8 itens da Seção 7 Phase X Verification Checklist marcados como `[x]`).
+- **Resultados de Verificação dos Quality Gates (Phase X):**
+  1. **Strict Purple Ban:** Zero ocorrências de cores violeta/púrpura/índigo em `.pen`, Angular ou CSS.
+  2. **Security Vulnerability Scanner:** `security_scan.py . --fail-on critical` passou com 0 vulnerabilidades críticas.
+  3. **UX Audit & Design Rules:** `ux_audit.py .` passou com `STATUS: PASS` (0 erros).
+  4. **Java Core API:** `./mvnw clean verify` executou 257 testes com 100% de sucesso, 0 violações ArchUnit e 100% de cobertura de domínio JaCoCo.
+  5. **Python Intelligence Service:** `pytest tests/` executou 132 testes com 100% de sucesso, 100.00% de cobertura de instruções/branches no domínio e 0 violações de pureza AST.
+  6. **Angular 19 Frontend:** `npm run lint` (0 erros), `npm run test:ci` (29 arquivos, 170 testes verdes) e `ng build --configuration production` concluído sem warnings.
+  7. **Playwright E2E:** `npx playwright test` executou **148 testes com 100% de aprovação (0 falhas)** em 6.0 segundos.
+  8. **CI/CD GitHub Actions:** `.github/workflows/ci.yml` e `cd.yml` com sintaxe YAML validada e `./scripts/verify_env_keys.sh .env.example` passou com 0 erros e 0 avisos.
+- **Status do Módulo:** 100% Concluído e Pronto para Produção! <!-- GOAL_COMPLETE -->

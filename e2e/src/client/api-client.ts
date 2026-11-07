@@ -33,6 +33,17 @@ import {
   SystemSettingsDto,
   AnalyticsSummaryResponse,
   PublicConfigResponse,
+  AccidentUploadVideoUrlRequest,
+  AccidentUploadVideoUrlResponse,
+  AccidentUploadPhotoUrlRequest,
+  AccidentUploadPhotoUrlResponse,
+  CreateAccidentReportRequest,
+  CreateAccidentReportResponse,
+  RiderAccidentDetailsResponse,
+  MechanicAccidentQueueItem,
+  MechanicAccidentDetailsResponse,
+  ConfirmAccidentRequest,
+  ConfirmAccidentResponse,
 } from '../contracts/types.js';
 
 export interface ApiResponse<T> {
@@ -229,5 +240,57 @@ export class MottuApiClient {
 
   public async getAnalyticsSummary(): Promise<ApiResponse<AnalyticsSummaryResponse>> {
     return this.request('/api/v1/manager/analytics/summary');
+  }
+
+  // 6.7 Accident Reporting & Video Analysis
+  public async getAccidentUploadVideoUrl(
+    req: AccidentUploadVideoUrlRequest
+  ): Promise<ApiResponse<AccidentUploadVideoUrlResponse>> {
+    return this.request('/api/v1/rider/accidents/upload-video-url', { method: 'POST', body: req });
+  }
+
+  public async getAccidentUploadPhotoUrl(
+    req: AccidentUploadPhotoUrlRequest
+  ): Promise<ApiResponse<AccidentUploadPhotoUrlResponse>> {
+    return this.request('/api/v1/rider/accidents/upload-photo-url', { method: 'POST', body: req });
+  }
+
+  public async createAccidentReport(
+    req: CreateAccidentReportRequest,
+    idempotencyKey?: string
+  ): Promise<ApiResponse<CreateAccidentReportResponse>> {
+    return this.request('/api/v1/rider/accidents', {
+      method: 'POST',
+      body: req,
+      idempotencyKey: idempotencyKey || crypto.randomUUID(),
+    });
+  }
+
+  public async getRiderAccident(id: string): Promise<ApiResponse<RiderAccidentDetailsResponse>> {
+    return this.request(`/api/v1/rider/accidents/${id}`);
+  }
+
+  public async getMechanicAccidentQueue(params: {
+    status?: string;
+    page?: number;
+    size?: number;
+  } = {}): Promise<ApiResponse<PageResponse<MechanicAccidentQueueItem>>> {
+    const q = new URLSearchParams();
+    if (params.status) q.set('status', params.status);
+    if (params.page !== undefined) q.set('page', String(params.page));
+    if (params.size !== undefined) q.set('size', String(params.size));
+    const query = q.toString() ? `?${q.toString()}` : '';
+    return this.request(`/api/v1/mechanic/accidents${query}`);
+  }
+
+  public async getMechanicAccidentDetail(id: string): Promise<ApiResponse<MechanicAccidentDetailsResponse>> {
+    return this.request(`/api/v1/mechanic/accidents/${id}`);
+  }
+
+  public async confirmMechanicAccident(
+    id: string,
+    req: ConfirmAccidentRequest
+  ): Promise<ApiResponse<ConfirmAccidentResponse>> {
+    return this.request(`/api/v1/mechanic/accidents/${id}/confirm`, { method: 'POST', body: req });
   }
 }

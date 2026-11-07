@@ -42,6 +42,38 @@ class MockGeminiService:
                 f"O valor estimado para reposição no galpão é de R$ {total_estimated_brl:.2f}."
             )
 
+    async def inspect_accident_video(
+        self, video_bytes: bytes, context_prompt: str
+    ) -> Dict[str, Any]:
+        return {
+            "isValidVideo": True,
+            "confidence": 0.94,
+            "structuralRiskAlert": False,
+            "aiTechnicalSummary": "Avarias por queda lateral direita identificadas no vídeo.",
+            "detectedParts": [
+                {
+                    "partName": "Manete de Freio Direito",
+                    "videoTimestampSeconds": 6,
+                    "confidence": 0.95,
+                },
+                {
+                    "partName": "Retrovisor Direito",
+                    "videoTimestampSeconds": 14,
+                    "confidence": 0.93,
+                },
+                {
+                    "partName": "Pedal de Apoio Dianteiro Direito",
+                    "videoTimestampSeconds": 21,
+                    "confidence": 0.92,
+                },
+                {
+                    "partName": "Manete de Freio Direito",
+                    "videoTimestampSeconds": 28,
+                    "confidence": 0.94,
+                },
+            ],
+        }
+
     def generate_embedding(self, text: str) -> List[float]:
         """Generates a deterministic 768-d normalized unit vector for offline CRAG matching.
 

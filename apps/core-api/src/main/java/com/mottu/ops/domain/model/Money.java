@@ -27,6 +27,10 @@ public final class Money {
         return new Money(this.amount.add(other.amount));
     }
 
+    public Money multiply(int factor) {
+        return new Money(this.amount.multiply(BigDecimal.valueOf(factor)));
+    }
+
     public BigDecimal getAmount() {
         return amount;
     }

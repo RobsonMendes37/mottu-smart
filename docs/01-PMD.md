@@ -203,3 +203,40 @@ Você pediu para usarmos **TDD** e buscarmos **altíssima cobertura de testes** 
 ## 8. O que NÃO Faremos Agora (Para Não Perder o Foco)
 * **Cobrança bancária real (PIX/Cartão):** O sistema calcula e informa o orçamento oficial exato para o entregador se preparar e agenda a ida ao galpão, mas não movimenta dinheiro real em banco.
 * **App de loja (Google Play / App Store):** Como será um **PWA (Site Instalável)**, ele abre direto pelo navegador do celular e pode ser adicionado na tela inicial igual a um aplicativo sem burocracia de loja.
+
+---
+
+## 9. Módulo de Auto-Relato de Acidente / Sinistro por Vídeo (Versão 3.0)
+
+Enquanto o módulo de Vistoria comum lida com fotos de avarias do dia a dia e dúvidas de responsabilidade (pré-existente vs desgaste vs mau uso), o **Módulo de Acidente** foi feito para momentos críticos na rua, onde o entregador já sofreu uma colisão/queda, precisa registrar o sinistro rapidamente e quer transparência total de orçamento para reposição por **peças novas**.
+
+### 9.1. Regras de Negócio e Fórmula do Orçamento de Sinistro
+1. **Vídeo Guiado Temporal:** O entregador grava ou anexa **1 vídeo de até 30 segundos (até 30 MB)** circundando a moto (*Frente → Lateral Direita → Traseira → Lateral Esquerda → Foco na avaria*) + até 3 fotos opcionais de close.
+2. **Checklist Rápido de Emergência:**
+   * *Houve feridos?* Se `Sim`, o app exibe na hora card de socorro `SAMU 192 / Bombeiros 193`.
+   * *Envolveu terceiros / B.O.?* Registra flag e número do B.O. (se houver).
+   * *Condição da moto:*
+     * `DRIVABLE` (consegue rodar com segurança até o galpão) → Taxa de guincho: `R$ 0,00`.
+     * `NEEDS_TOWING` (moto travada, vazando ou insegura) → Taxa de guincho: `R$ 80,00` (`ACCIDENT_TOWING_FEE_BRL`) e status da moto muda para `IN_MAINTENANCE`.
+3. **Deduplicação de Peças no Vídeo:**
+   * Se a IA identificar a mesma peça em múltiplos momentos do vídeo (ex: `00:05 - Manete de Freio` e `00:22 - Manete de Freio`), o domínio consolida em **1 única unidade de reposição**.
+4. **Reposição por Peças Novas do Catálogo:**
+   * Toda peça avariada entra pelo seu preço unitário oficial de reposição na `loja.mottu.com.br` (`catalog_parts`).
+5. **Mão de Obra Escalonada:**
+   * `0 peças`: `R$ 0,00`
+   * `1 a 2 peças`: `R$ 35,00` (`ACCIDENT_LIGHT_LABOR_FEE_BRL`)
+   * `3 ou mais peças`: `R$ 90,00` (`ACCIDENT_HEAVY_LABOR_FEE_BRL`)
+6. **Total do Orçamento:**
+   * `Total Estimado = Soma das Peças Novas + Mão de Obra Escalonada + Taxa de Guincho`.
+7. **Fluxo Simultâneo Entregador + Oficina:**
+   * O entregador recebe o orçamento completo item a item na hora (`ESTIMATED_PENDING_WORKSHOP`), e o dossiê (vídeo com marcas de tempo, fotos e peças) entra automaticamente no console da Oficina para conferência física na chegada da moto ao galpão (`WORKSHOP_CONFIRMED`).
+
+### 9.2. Novas Telas do Módulo de Acidente
+* **Atalho na tela `T02` (Garagem):** Botão de emergência `🚨 Relatar Acidente` ao lado de `📸 Reportar Defeito`.
+* **`T11` — Auto-Relato de Acidente (Checklist + Vídeo):**
+  * Checklist de segurança (feridos, guincho, B.O.), upload direto de vídeo (até 30s) + até 3 fotos closes, barra de luminância/áudio e botão de envio com idempotência.
+* **`T12` — Orçamento Detalhado de Reposição (Visão do Entregador):**
+  * Tabela completa de peças novas necessárias (nome da peça, segundo do vídeo, preço unitário), discriminativo de mão de obra e guincho, soma total estimada, alerta de conferência de chassi e opção de adicionar observação para o mecânico.
+* **`T13` — Dossiê de Acidente na Oficina (Visão do Mecânico):**
+  * Player de vídeo com marcadores nos segundos exatos onde a IA identificou as peças, checklist de segurança respondido pelo entregador, tabela para conferência presencial (confirmar/desmarcar peças) e botão para emissão do laudo definitivo `WORKSHOP_CONFIRMED`.
+

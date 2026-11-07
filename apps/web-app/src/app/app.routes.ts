@@ -42,6 +42,20 @@ export const routes: Routes = [
             (m) => m.InspectionStatusComponent
           ),
       },
+      {
+        path: 'accidents/new',
+        loadComponent: () =>
+          import('./features/rider/pages/accident-wizard/accident-wizard.component').then(
+            (m) => m.AccidentWizardComponent
+          ),
+      },
+      {
+        path: 'accidents/:id',
+        loadComponent: () =>
+          import('./features/rider/pages/accident-quote/accident-quote.component').then(
+            (m) => m.AccidentQuoteComponent
+          ),
+      },
     ],
   },
   {
@@ -65,6 +79,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/mechanic/pages/t06-workbench/t06-workbench.component').then(
             (m) => m.T06WorkbenchComponent
+          ),
+      },
+      {
+        path: 'accidents/:id',
+        loadComponent: () =>
+          import('./features/mechanic/pages/t13-dossier/t13-accident-dossier.component').then(
+            (m) => m.T13AccidentDossierComponent
           ),
       },
       {

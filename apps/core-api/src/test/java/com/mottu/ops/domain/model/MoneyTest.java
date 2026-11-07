@@ -16,8 +16,10 @@ class MoneyTest {
         Money m1 = Money.of(10.0);
         Money m2 = Money.of(25.5);
         Money sum = m1.add(m2);
+        Money multiplied = m1.multiply(3);
 
         assertThat(sum.getAmount()).isEqualByComparingTo("35.50");
+        assertThat(multiplied.getAmount()).isEqualByComparingTo("30.00");
         assertThat(Money.ZERO.getAmount()).isEqualByComparingTo("0.00");
         assertThat(Money.of(new BigDecimal("10.00"))).isEqualTo(m1);
         assertThat(m1).isEqualTo(Money.of(10.00));

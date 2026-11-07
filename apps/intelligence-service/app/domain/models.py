@@ -39,3 +39,35 @@ class CRAGEvaluationResult:
     triage_reason: Optional[str] = None
 
 
+@dataclass(frozen=True)
+class VideoPartDetection:
+    part_name: str
+    unit_price_brl: float = 0.0
+    catalog_part_id: Optional[str] = None
+    video_timestamp_seconds: Optional[int] = None
+    confidence: float = 1.0
+
+    def __post_init__(self):
+        if self.unit_price_brl < 0:
+            raise ValueError("unit_price_brl cannot be negative")
+
+
+@dataclass(frozen=True)
+class DeduplicatedPart:
+    catalog_part_id: Optional[str]
+    part_name: str
+    unit_price_brl: float
+    quantity: int
+    video_timestamp_seconds: Optional[int]
+
+
+@dataclass(frozen=True)
+class AccidentEvaluationResult:
+    confidence: float
+    structural_risk_alert: bool
+    ai_technical_summary: str
+    deduplicated_parts: List[DeduplicatedPart]
+    total_parts_count: int
+    subtotal_parts_brl: float
+
+

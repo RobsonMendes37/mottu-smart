@@ -1,6 +1,8 @@
 package com.mottu.ops.infrastructure.adapter.in.web.sse;
 
+import com.mottu.ops.application.dto.AccidentStatusChangeEventDto;
 import com.mottu.ops.application.dto.SseStatusChangeEventDto;
+import com.mottu.ops.domain.enums.AccidentReportStatus;
 import com.mottu.ops.domain.enums.InspectionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,63 @@ public class SseEmitterRegistry {
         }
 
         return emitter;
+    }
+
+    public SseEmitter registerAccidentEmitter(UUID accidentReportId, AccidentReportStatus currentStatus) {
+        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT_MS);
+        emitterMap.computeIfAbsent(accidentReportId, k -> new CopyOnWriteArrayList<>()).add(emitter);
+
+        Runnable cleanup = () -> removeEmitter(accidentReportId, emitter);
+        emitter.onCompletion(cleanup);
+        emitter.onTimeout(cleanup);
+        emitter.onError(e -> cleanup.run());
+
+        // Send initial connection event
+        try {
+            String stepLabel = resolveAccidentStepLabel(currentStatus);
+            AccidentStatusChangeEventDto initialEvent = new AccidentStatusChangeEventDto(accidentReportId, currentStatus, stepLabel);
+            emitter.send(SseEmitter.event()
+                    .name("status-change")
+                    .data(initialEvent));
+        } catch (IOException e) {
+            log.warn("Failed to send initial SSE event for accident {}", accidentReportId, e);
+            cleanup.run();
+        }
+
+        return emitter;
+    }
+
+    public void emitAccidentStatusChange(UUID accidentReportId, AccidentReportStatus newStatus) {
+        List<SseEmitter> emitters = emitterMap.get(accidentReportId);
+        if (emitters == null || emitters.isEmpty()) {
+            return;
+        }
+
+        String stepLabel = resolveAccidentStepLabel(newStatus);
+        AccidentStatusChangeEventDto eventDto = new AccidentStatusChangeEventDto(accidentReportId, newStatus, stepLabel);
+
+        for (SseEmitter emitter : emitters) {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("status-change")
+                        .data(eventDto));
+            } catch (Exception e) {
+                log.debug("Removing disconnected SSE emitter for accident {}", accidentReportId);
+                removeEmitter(accidentReportId, emitter);
+            }
+        }
+    }
+
+    private String resolveAccidentStepLabel(AccidentReportStatus status) {
+        if (status == null) {
+            return "Em análise";
+        }
+        return switch (status) {
+            case QUEUED_AI -> "Analisando vídeo do acidente com IA...";
+            case AWAITING_AI_RECOVERY -> "Reagendando análise de vídeo...";
+            case ESTIMATED_PENDING_WORKSHOP -> "Orçamento de peças novas pronto!";
+            case WORKSHOP_CONFIRMED -> "Confirmado pela oficina!";
+        };
     }
 
     public void emitStatusChange(UUID inspectionId, InspectionStatus newStatus) {

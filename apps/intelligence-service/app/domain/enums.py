@@ -47,3 +47,15 @@ class InspectionStatus(str, Enum):
 class TriageOutcome(str, Enum):
     SUCCESS = "SUCCESS"
     AI_UNAVAILABLE = "AI_UNAVAILABLE"
+
+
+class VehicleDrivability(str, Enum):
+    DRIVABLE = "DRIVABLE"
+    NEEDS_TOWING = "NEEDS_TOWING"
+
+
+class AccidentReportStatus(str, Enum):
+    QUEUED_AI = "QUEUED_AI"
+    AWAITING_AI_RECOVERY = "AWAITING_AI_RECOVERY"
+    ESTIMATED_PENDING_WORKSHOP = "ESTIMATED_PENDING_WORKSHOP"
+    WORKSHOP_CONFIRMED = "WORKSHOP_CONFIRMED"

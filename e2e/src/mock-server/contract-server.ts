@@ -33,6 +33,7 @@ export interface ServerState {
   settings: any;
   auditLogs: any[];
   outbox: any[];
+  accidents: Map<string, any>;
 }
 
 export function createInitialState(): ServerState {
@@ -81,6 +82,7 @@ export function createInitialState(): ServerState {
     settings,
     auditLogs: [],
     outbox: [],
+    accidents: new Map(),
   };
 }
 
@@ -827,6 +829,298 @@ export class MockContractServer {
           currentHumanQueueSize: queueSize,
           estimatedMechanicHoursSaved: 36.2,
           lookerStudioEmbedUrl: 'https://lookerstudio.google.com/embed/reporting/placeholder',
+        });
+      }
+
+      // 23. /api/v1/rider/accidents/upload-video-url
+      if (method === 'POST' && path === '/api/v1/rider/accidents/upload-video-url') {
+        const user = this.extractAuthUser(req);
+        if (!user || user.role !== UserRole.RIDER) {
+          return this.sendProblemDetail(res, 403, 'Forbidden', 'Apenas RIDER pode solicitar upload de vídeo de acidente');
+        }
+        const body = await this.parseBody(req);
+        const allowedTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
+        if (!body.contentType || !allowedTypes.includes(body.contentType)) {
+          return this.sendProblemDetail(res, 400, 'Bad Request', 'Tipo de arquivo não suportado. Envie um vídeo MP4, WebM ou QuickTime.');
+        }
+        if (!body.fileSize || body.fileSize > 31457280) { // 30 MB
+          return this.sendProblemDetail(res, 400, 'Bad Request', 'Vídeo excede o limite máximo permitido de 30MB.');
+        }
+        if (body.durationSeconds !== undefined && body.durationSeconds > 30) {
+          return this.sendProblemDetail(res, 400, 'Bad Request', 'Duração do vídeo não pode exceder 30 segundos.');
+        }
+        const videoObjectKey = `accidents/videos/${crypto.randomUUID()}.mp4`;
+        return this.sendJson(res, 200, {
+          uploadUrl: `http://localhost:19000/mottu-inspections/${videoObjectKey}?presigned=true`,
+          videoObjectKey,
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+        });
+      }
+
+      // 24. /api/v1/rider/accidents/upload-photo-url
+      if (method === 'POST' && path === '/api/v1/rider/accidents/upload-photo-url') {
+        const user = this.extractAuthUser(req);
+        if (!user || user.role !== UserRole.RIDER) {
+          return this.sendProblemDetail(res, 403, 'Forbidden', 'Apenas RIDER pode solicitar upload de foto de acidente');
+        }
+        const body = await this.parseBody(req);
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!body.contentType || !allowedTypes.includes(body.contentType)) {
+          return this.sendProblemDetail(res, 400, 'Bad Request', 'Formato de imagem não suportado. Envie WebP, JPEG ou PNG.');
+        }
+        if (!body.fileSize || body.fileSize > 10485760) { // 10 MB
+          return this.sendProblemDetail(res, 400, 'Bad Request', 'Foto excede o limite máximo de 10MB.');
+        }
+        const photoObjectKey = `accidents/photos/${crypto.randomUUID()}.webp`;
+        return this.sendJson(res, 200, {
+          uploadUrl: `http://localhost:19000/mottu-inspections/${photoObjectKey}?presigned=true`,
+          photoObjectKey,
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+        });
+      }
+
+      // 25. /api/v1/rider/accidents
+      if (method === 'POST' && path === '/api/v1/rider/accidents') {
+        const user = this.extractAuthUser(req);
+        if (!user || user.role !== UserRole.RIDER) {
+          return this.sendProblemDetail(res, 403, 'Forbidden', 'Apenas RIDER pode registrar acidente');
+        }
+        const idempotencyKey = (req.headers['idempotency-key'] as string) || '';
+        if (!idempotencyKey) {
+          return this.sendProblemDetail(res, 400, 'Bad Request', 'Cabeçalho Idempotency-Key é obrigatório');
+        }
+        if (this.state.idempotencyKeys.has(idempotencyKey)) {
+          const existingId = this.state.idempotencyKeys.get(idempotencyKey)!;
+          const existing = this.state.accidents.get(existingId);
+          if (existing) {
+            return this.sendJson(res, 200, {
+              accidentReportId: existing.id,
+              status: existing.status,
+              message: 'Relatório já processado anteriormente (Idempotência).',
+              estimatedAt: existing.estimatedAt,
+            });
+          }
+        }
+
+        const body = await this.parseBody(req);
+        if (!body.videoObjectKey) {
+          return this.sendProblemDetail(res, 400, 'Bad Request', 'Chave do vídeo de acidente é obrigatória');
+        }
+        if (body.drivability !== 'DRIVABLE' && body.drivability !== 'NEEDS_TOWING') {
+          return this.sendProblemDetail(res, 400, 'Bad Request', 'Condição de rodagem inválida');
+        }
+        if (body.reportedOdometerKm === undefined || body.reportedOdometerKm < 0) {
+          return this.sendProblemDetail(res, 400, 'Bad Request', 'Odômetro não pode ser negativo');
+        }
+
+        const activeContract = this.state.contracts.find((c) => c.riderId === user.id && c.active);
+        const moto = activeContract
+          ? this.state.motorcycles.find((m) => m.id === activeContract.motorcycleId)
+          : this.state.motorcycles[0];
+
+        if (body.drivability === 'NEEDS_TOWING' && moto) {
+          moto.status = MotorcycleStatus.IN_MAINTENANCE;
+        }
+
+        const accidentId = crypto.randomUUID();
+        const items = [
+          {
+            id: crypto.randomUUID(),
+            partName: 'Guidão Completo',
+            unitPriceBrl: 145.0,
+            videoTimestampSeconds: 4,
+          },
+          {
+            id: crypto.randomUUID(),
+            partName: 'Manete de Freio Dianteiro',
+            unitPriceBrl: 48.0,
+            videoTimestampSeconds: 8,
+          },
+        ];
+
+        const partsSubtotalBrl = 193.0;
+        const laborFeeBrl = 35.0; // Tiered: 2 parts = R$ 35
+        const towingFeeBrl = body.drivability === 'NEEDS_TOWING' ? 80.0 : 0.0;
+        const totalCostBrl = partsSubtotalBrl + laborFeeBrl + towingFeeBrl;
+        const now = new Date().toISOString();
+
+        const accidentRecord = {
+          id: accidentId,
+          riderId: user.id,
+          riderName: user.fullName || 'Rider Mottu',
+          riderPhone: user.phone || '(11) 98765-4321',
+          motorcycleId: moto ? moto.id : 'moto-seed-001',
+          plate: moto ? moto.plate : 'MOT-2026',
+          model: moto ? moto.model : 'SPORT_110I',
+          videoObjectKey: body.videoObjectKey,
+          photoObjectKeys: body.photoObjectKeys || [],
+          hasInjuries: !!body.hasInjuries,
+          involvesThirdParty: !!body.involvesThirdParty,
+          policeReportNumber: body.policeReportNumber || null,
+          drivability: body.drivability,
+          reportedOdometerKm: body.reportedOdometerKm,
+          description: body.description || '',
+          status: 'ESTIMATED_PENDING_WORKSHOP',
+          partsSubtotalBrl,
+          laborFeeBrl,
+          towingFeeBrl,
+          totalCostBrl,
+          items,
+          estimatedAt: now,
+          confirmedAt: null,
+          mechanicNotes: null,
+        };
+
+        this.state.accidents.set(accidentId, accidentRecord);
+        this.state.idempotencyKeys.set(idempotencyKey, accidentId);
+
+        return this.sendJson(res, 201, {
+          accidentReportId: accidentId,
+          status: 'ESTIMATED_PENDING_WORKSHOP',
+          message: 'Relatório registrado com sucesso.',
+          estimatedAt: now,
+        });
+      }
+
+      // 26. /api/v1/rider/accidents/:id
+      if (method === 'GET' && path.startsWith('/api/v1/rider/accidents/')) {
+        const id = path.replace('/api/v1/rider/accidents/', '');
+        const accident = this.state.accidents.get(id);
+        if (!accident) {
+          return this.sendProblemDetail(res, 404, 'Not Found', 'Relatório de acidente não encontrado');
+        }
+        return this.sendJson(res, 200, {
+          id: accident.id,
+          status: accident.status,
+          plate: accident.plate,
+          model: accident.model,
+          hasInjuries: accident.hasInjuries,
+          involvesThirdParty: accident.involvesThirdParty,
+          policeReportNumber: accident.policeReportNumber,
+          drivability: accident.drivability,
+          reportedOdometerKm: accident.reportedOdometerKm,
+          partsSubtotalBrl: accident.partsSubtotalBrl,
+          laborFeeBrl: accident.laborFeeBrl,
+          towingFeeBrl: accident.towingFeeBrl,
+          totalCostBrl: accident.totalCostBrl,
+          items: accident.items,
+          estimatedAt: accident.estimatedAt,
+        });
+      }
+
+      // 27. /api/v1/mechanic/accidents
+      if (method === 'GET' && path === '/api/v1/mechanic/accidents') {
+        const user = this.extractAuthUser(req);
+        if (!user || (user.role !== UserRole.MECHANIC && user.role !== UserRole.MANAGER)) {
+          return this.sendProblemDetail(res, 403, 'Forbidden', 'Apenas MECHANIC ou MANAGER podem acessar a fila de acidentes');
+        }
+        const items = Array.from(this.state.accidents.values()).map((a) => ({
+          id: a.id,
+          status: a.status,
+          plate: a.plate,
+          model: a.model,
+          riderName: a.riderName,
+          hasInjuries: a.hasInjuries,
+          drivability: a.drivability,
+          totalCostBrl: a.totalCostBrl,
+          itemsCount: a.items.length,
+          createdAt: a.estimatedAt,
+        }));
+        return this.sendJson(res, 200, {
+          items,
+          page: 0,
+          size: 20,
+          totalElements: items.length,
+          totalPages: 1,
+        });
+      }
+
+      // 28. /api/v1/mechanic/accidents/:id/confirm
+      if (method === 'POST' && path.match(/^\/api\/v1\/mechanic\/accidents\/([^\/]+)\/confirm$/)) {
+        const user = this.extractAuthUser(req);
+        if (!user || (user.role !== UserRole.MECHANIC && user.role !== UserRole.MANAGER)) {
+          return this.sendProblemDetail(res, 403, 'Forbidden', 'Apenas MECHANIC ou MANAGER podem confirmar laudo');
+        }
+        const match = path.match(/^\/api\/v1\/mechanic\/accidents\/([^\/]+)\/confirm$/);
+        const id = match ? match[1] : '';
+        const accident = this.state.accidents.get(id);
+        if (!accident) {
+          return this.sendProblemDetail(res, 404, 'Not Found', 'Relatório de acidente não encontrado');
+        }
+
+        const body = await this.parseBody(req);
+        const confirmedPartIds: string[] = body.confirmedPartIds || [];
+        const confirmedItems = accident.items.filter((item: any) => confirmedPartIds.includes(item.id));
+        const confirmedPartsSubtotal = confirmedItems.reduce((acc: number, item: any) => acc + item.unitPriceBrl, 0);
+
+        let confirmedLabor = 0.0;
+        if (confirmedItems.length >= 3) confirmedLabor = 90.0;
+        else if (confirmedItems.length >= 1) confirmedLabor = 35.0;
+
+        const confirmedTotal = confirmedPartsSubtotal + confirmedLabor + accident.towingFeeBrl;
+        const now = new Date().toISOString();
+
+        accident.status = 'WORKSHOP_CONFIRMED';
+        accident.confirmedAt = now;
+        accident.mechanicNotes = body.mechanicNotes || 'Oficina confirmou danos estruturais';
+        accident.partsSubtotalBrl = confirmedPartsSubtotal;
+        accident.laborFeeBrl = confirmedLabor;
+        accident.totalCostBrl = confirmedTotal;
+
+        this.state.outbox.push({
+          id: crypto.randomUUID(),
+          eventType: 'ACCIDENT_REPORT_CONFIRMED',
+          accidentReportId: id,
+          payload: {
+            accidentReportId: id,
+            status: 'WORKSHOP_CONFIRMED',
+            totalCostBrl: confirmedTotal,
+            confirmedAt: now,
+          },
+          createdAt: now,
+        });
+
+        return this.sendJson(res, 200, {
+          accidentReportId: id,
+          status: 'WORKSHOP_CONFIRMED',
+          confirmedTotalCostBrl: confirmedTotal,
+          message: 'Laudo de oficina confirmado.',
+          confirmedAt: now,
+        });
+      }
+
+      // 29. /api/v1/mechanic/accidents/:id
+      if (method === 'GET' && path.startsWith('/api/v1/mechanic/accidents/')) {
+        const user = this.extractAuthUser(req);
+        if (!user || (user.role !== UserRole.MECHANIC && user.role !== UserRole.MANAGER)) {
+          return this.sendProblemDetail(res, 403, 'Forbidden', 'Apenas MECHANIC ou MANAGER podem acessar o dossiê');
+        }
+        const id = path.replace('/api/v1/mechanic/accidents/', '');
+        const accident = this.state.accidents.get(id);
+        if (!accident) {
+          return this.sendProblemDetail(res, 404, 'Not Found', 'Relatório de acidente não encontrado');
+        }
+        return this.sendJson(res, 200, {
+          id: accident.id,
+          status: accident.status,
+          plate: accident.plate,
+          model: accident.model,
+          riderName: accident.riderName,
+          riderPhone: accident.riderPhone,
+          hasInjuries: accident.hasInjuries,
+          involvesThirdParty: accident.involvesThirdParty,
+          policeReportNumber: accident.policeReportNumber,
+          drivability: accident.drivability,
+          reportedOdometerKm: accident.reportedOdometerKm,
+          partsSubtotalBrl: accident.partsSubtotalBrl,
+          laborFeeBrl: accident.laborFeeBrl,
+          towingFeeBrl: accident.towingFeeBrl,
+          totalCostBrl: accident.totalCostBrl,
+          items: accident.items,
+          estimatedAt: accident.estimatedAt,
+          confirmedAt: accident.confirmedAt,
+          mechanicNotes: accident.mechanicNotes,
+          videoDownloadUrl: `http://localhost:19000/mottu-inspections/${accident.videoObjectKey}?download=true`,
         });
       }
 

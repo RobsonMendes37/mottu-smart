@@ -755,3 +755,24 @@
   7. **Playwright E2E:** `npx playwright test` executou **148 testes com 100% de aprovação (0 falhas)** em 6.0 segundos.
   8. **CI/CD GitHub Actions:** `.github/workflows/ci.yml` e `cd.yml` com sintaxe YAML validada e `./scripts/verify_env_keys.sh .env.example` passou com 0 erros e 0 avisos.
 - **Status do Módulo:** 100% Concluído e Pronto para Produção! <!-- GOAL_COMPLETE -->
+
+### [2026-11-07 18:31] — `DEPLOY-ORACLE-CICD`: Deploy na VM Oracle Cloud + Automação Completa de CI/CD via GitHub Actions
+- **Agente / Modelo:** `@devops-engineer` + `@orchestrator`
+- **Ambiente Remoto:** Oracle Cloud Always Free VM (`ubuntu@161.153.2.148`), ARM64, Ubuntu 24.04 LTS.
+- **Porta Pública:** `18088` (Caddy Reverse Proxy para Angular 19 SPA + Spring Boot Core API + Python Intelligence Service + MinIO).
+- **Ajustes e Correções:**
+  1. **CI Quality Gates (`.github/workflows/ci.yml`):**
+     - Adicionado `-r requirements-dev.txt` no step de instalação Python para prover `pytest`, `pytest-cov` e `pytest-asyncio`.
+     - Resultado: Todos os 4 jobs do CI (Angular 19, Python Intelligence, Java Core API, Security & UX) passaram com status **SUCCESS (100% verde)**.
+  2. **CD Continuous Deployment (`.github/workflows/cd.yml`):**
+     - Substituído o action legado `appleboy/ssh-action` por execução nativa via OpenSSH no runner Ubuntu.
+     - Implementado autorreparo e normalização inteligente da chave privada SSH via Python, suportando automaticamente tanto blocos PEM completos quanto chaves coladas em formato base64 puro sem headers (`MIIE...`).
+     - Corrigido o link de ambiente `infra/.env` substituindo symlink relativo por cópia segura direta (`cp -f .env infra/.env`), eliminando o erro de *too many levels of symbolic links*.
+  3. **Zero Conflito com Serviços Pré-existentes:**
+     - Portas isoladas (`18088`, `18080`, `18000`, `19000`, `19001`, `15432`, `16379`).
+     - Contêineres de outras aplicações (`nexo-*` e `victor_cell_*`) permaneceram intactos e em execução contínua.
+- **Verificação ao Vivo:**
+  - `curl -I http://161.153.2.148:18088/` -> `HTTP 200 OK`
+  - `curl http://161.153.2.148:18088/api/v1/auth/public-config` -> `{"publicDemoMode":true}`
+  - GitHub Actions Run `42416122586` (CD): **SUCCESS**
+  - GitHub Actions Run `42416122524` (CI): **SUCCESS**

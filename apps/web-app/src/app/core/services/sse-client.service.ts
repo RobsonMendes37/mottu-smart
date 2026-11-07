@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { generateUuid } from '../utils/uuid.util';
 
 export interface SseEvent<T = unknown> {
   event: string;
@@ -27,7 +28,7 @@ export class SseClientService {
     return new Observable((observer) => {
       const abortController = new AbortController();
       const token = this.authService?.accessToken() ?? null;
-      const correlationId = crypto.randomUUID();
+      const correlationId = generateUuid();
 
       const headers: Record<string, string> = {
         Accept: 'text/event-stream',

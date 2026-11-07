@@ -7,6 +7,7 @@ import {
   CreateAccidentReportCommand,
   VehicleDrivability,
 } from '../../models/accident.models';
+import { generateUuid } from '../../../../core/utils/uuid.util';
 
 @Component({
   selector: 'app-accident-wizard',
@@ -177,7 +178,7 @@ export class AccidentWizardComponent {
 
       // 4. Create accident report
       this.uploadStatusMessage.set('Registrando chamado e acionando IA...');
-      const idempotencyKey = crypto.randomUUID();
+      const idempotencyKey = generateUuid();
 
       const command: CreateAccidentReportCommand = {
         videoObjectKey: videoPresigned.videoObjectKey,

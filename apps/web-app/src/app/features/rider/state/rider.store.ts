@@ -12,6 +12,7 @@ import {
 } from '../models/rider.models';
 import { RiderService } from '../services/rider.service';
 import { SseClientService, SseEvent } from '../../../core/services/sse-client.service';
+import { generateUuid } from '../../../core/utils/uuid.util';
 
 export interface PhotoSlotState {
   slot: 'damage' | 'odometer' | 'front' | 'detail';
@@ -210,7 +211,7 @@ export class RiderStore {
     this.isSubmittingInspection.set(true);
     this.submissionError.set(null);
     try {
-      const idempotencyKey = crypto.randomUUID();
+      const idempotencyKey = generateUuid();
       const response = await firstValueFrom(
         this.riderService.createInspection(idempotencyKey, {
           photoObjectKey: primaryKey,

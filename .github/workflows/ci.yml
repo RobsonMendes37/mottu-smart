@@ -130,3 +130,4 @@ jobs:
 
       - name: Run UX Design & Solar Readability Audit
         run: python3 .agents/skills/frontend-design/scripts/ux_audit.py .
+

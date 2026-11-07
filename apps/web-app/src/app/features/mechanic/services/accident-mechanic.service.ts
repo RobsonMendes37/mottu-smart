@@ -38,3 +38,4 @@ export class AccidentMechanicService {
     return this.http.post<ConfirmAccidentReportResponse>(`${this.baseUrl}/${id}/confirm`, command);
   }
 }
+

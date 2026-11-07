@@ -55,23 +55,34 @@ class GeminiVideoAdapter:
                 "- detectedParts: list of objects with partName (str in Brazilian Portuguese), videoTimestampSeconds (int), confidence (float)\n"
             )
 
-            response = self._client.models.generate_content(
-                model=settings.GEMINI_VISION_MODEL,
-                contents=[
-                    uploaded_file,
-                    prompt,
-                ],
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                ),
-            )
+            last_error = None
+            for model_name in settings.vision_models_list:
+                try:
+                    logger.info(f"Analyzing accident video with Gemini model: {model_name}")
+                    response = self._client.models.generate_content(
+                        model=model_name,
+                        contents=[
+                            uploaded_file,
+                            prompt,
+                        ],
+                        config=types.GenerateContentConfig(
+                            response_mime_type="application/json",
+                        ),
+                    )
+                    if response.text and response.text.strip():
+                        logger.info(f"Model {model_name} successfully analyzed accident video.")
+                        return json.loads(response.text)
+                    logger.warning(f"Model {model_name} returned empty text for video, cascading...")
+                except Exception as e:
+                    logger.warning(f"Model {model_name} failed for video ({type(e).__name__}: {e}). Cascading to next model...")
+                    last_error = e
 
-            if not response.text:
-                raise AIUnavailableException("Gemini returned empty response for accident video")
-
-            return json.loads(response.text)
+            logger.error(f"All Gemini video models in cascade exhausted. Last error: {last_error}")
+            raise AIUnavailableException(f"All Gemini video models exhausted: {last_error}") from last_error
+        except AIUnavailableException:
+            raise
         except Exception as e:
-            logger.error(f"Gemini API failure during video inspection: {e}")
+            logger.error(f"Unexpected failure during video inspection: {e}")
             raise AIUnavailableException(f"Gemini video analysis failed: {e}") from e
         finally:
             # File cleanup to prevent storage leaks
@@ -87,4 +98,20 @@ class GeminiVideoAdapter:
                     pass
 
     async def generate_embedding(self, text: str) -> List[float]:
+        if self.mock_mode or not settings.GEMINI_API_KEY or self._client is None:
+            return self.mock_service.generate_embedding(text)
+
+        for model_name in settings.embedding_models_list:
+            try:
+                response = self._client.models.embed_content(
+                    model=model_name,
+                    contents=text,
+                )
+                if hasattr(response, "embedding") and hasattr(response.embedding, "values"):
+                    return list(response.embedding.values)
+                elif hasattr(response, "embeddings") and len(response.embeddings) > 0:
+                    return list(response.embeddings[0].values)
+            except Exception as e:
+                logger.warning(f"Embedding model {model_name} failed ({e}). Cascading to next model...")
+
         return self.mock_service.generate_embedding(text)

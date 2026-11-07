@@ -32,11 +32,25 @@ class Settings(BaseSettings):
     S3_SECRET_KEY: str = "minioadmin123"
     S3_INTERNAL_ENDPOINT: str = "http://localhost:19000"
 
-    # AI Gemini (Offline Default - Law 8)
+    # AI Gemini (Multi-Model Smart Cascading)
     GEMINI_API_KEY: str = ""
-    GEMINI_VISION_MODEL: str = "gemini-2.5-flash"
-    GEMINI_EMBEDDING_MODEL: str = "text-embedding-004"
+    GEMINI_VISION_MODEL: str = "gemini-3.1-flash-lite"
+    GEMINI_VISION_MODELS_CASCADE: str = "gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-3.8-flash,gemini-2.5-flash"
+    GEMINI_EMBEDDING_MODEL: str = "gemini-embedding-2"
+    GEMINI_EMBEDDING_MODELS_CASCADE: str = "gemini-embedding-2,text-embedding-004"
     GEMINI_MOCK_MODE: bool = True
+
+    @property
+    def vision_models_list(self) -> list[str]:
+        if self.GEMINI_VISION_MODELS_CASCADE:
+            return [m.strip() for m in self.GEMINI_VISION_MODELS_CASCADE.split(",") if m.strip()]
+        return [self.GEMINI_VISION_MODEL]
+
+    @property
+    def embedding_models_list(self) -> list[str]:
+        if self.GEMINI_EMBEDDING_MODELS_CASCADE:
+            return [m.strip() for m in self.GEMINI_EMBEDDING_MODELS_CASCADE.split(",") if m.strip()]
+        return [self.GEMINI_EMBEDDING_MODEL]
 
     # External VTEX Store
     VTEX_STORE_BASE_URL: str = "https://www.loja.mottu.com.br"

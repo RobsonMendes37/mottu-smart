@@ -114,3 +114,4 @@ export class AccidentQuoteComponent implements OnInit, OnDestroy {
     this.router?.navigate(['/rider/garage']);
   }
 }
+

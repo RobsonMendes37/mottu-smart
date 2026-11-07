@@ -29,3 +29,4 @@ class AccidentResultPayloadDTO(BaseModel):
     structuralRiskAlert: Optional[bool] = False
     aiTechnicalSummary: Optional[str] = None
     deduplicatedParts: Optional[List[AccidentDeduplicatedPartDTO]] = None
+

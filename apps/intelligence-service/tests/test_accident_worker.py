@@ -145,3 +145,4 @@ async def test_gemini_video_adapter_mock_mode():
 
     emb = await adapter.generate_embedding("Manete de Freio")
     assert len(emb) == 768
+

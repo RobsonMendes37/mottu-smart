@@ -159,3 +159,4 @@ export class T13AccidentDossierComponent implements OnInit {
     this.router?.navigate(['/mechanic/queue']);
   }
 }
+

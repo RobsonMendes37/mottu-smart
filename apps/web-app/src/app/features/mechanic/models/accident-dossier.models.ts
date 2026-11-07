@@ -59,3 +59,4 @@ export interface ConfirmAccidentReportResponse {
   totalEstimatedBrl: number;
   confirmedAt: string;
 }
+

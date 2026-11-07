@@ -134,3 +134,4 @@ describe('T13AccidentDossierComponent (Screen T13 - Dossiê de Acidente na Ofici
     expect(routerMock.navigate).toHaveBeenCalledWith(['/mechanic/queue']);
   });
 });
+

@@ -196,3 +196,4 @@ class AccidentJobWorker:
 
         await self.queue_adapter.push_accident_result(success_result)
         return True
+

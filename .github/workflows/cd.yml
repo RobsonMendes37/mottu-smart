@@ -52,3 +52,4 @@ jobs:
             sleep 10
             docker compose ps
             echo "✅ Deployment completed successfully!"
+

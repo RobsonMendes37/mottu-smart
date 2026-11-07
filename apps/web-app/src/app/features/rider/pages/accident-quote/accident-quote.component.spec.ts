@@ -103,3 +103,4 @@ describe('AccidentQuoteComponent (Screen T12 - Orçamento Detalhado de Peças No
     expect(routerMock.navigate).toHaveBeenCalledWith(['/rider/garage']);
   });
 });
+

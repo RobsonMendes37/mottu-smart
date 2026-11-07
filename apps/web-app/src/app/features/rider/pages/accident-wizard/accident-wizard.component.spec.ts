@@ -94,3 +94,4 @@ describe('AccidentWizardComponent (Screen T11 - Auto-Relato de Acidente)', () =>
     expect(comp.errorMessage()).toContain('Network error uploading video');
   });
 });
+

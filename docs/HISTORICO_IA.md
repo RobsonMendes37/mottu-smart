@@ -776,3 +776,9 @@
   - `curl http://161.153.2.148:18088/api/v1/auth/public-config` -> `{"publicDemoMode":true}`
   - GitHub Actions Run `42416122586` (CD): **SUCCESS**
   - GitHub Actions Run `42416122524` (CI): **SUCCESS**
+
+### [2026-11-07 19:11] — `HOTFIX`: `crypto.randomUUID is not a function` no login via HTTP público
+- **Causa raiz:** `crypto.randomUUID()` só existe em *secure contexts* (HTTPS ou `localhost`). A VM serve em `http://161.153.2.148:18088`, então o interceptor de `X-Correlation-Id` quebrava toda requisição HTTP (incluindo o login).
+- **Correção (TDD):** `apps/web-app/src/app/core/utils/uuid.util.spec.ts` (RED) → `uuid.util.ts` com `generateUuid()` (usa `randomUUID` nativo se existir; senão UUID v4 RFC 4122 via `crypto.getRandomValues`, disponível em HTTP). Substituídas as 4 chamadas: interceptor, SSE client, `rider.store` e `accident-wizard`.
+- **Verificação:** `npm run lint` OK, `vitest run` 173/173, `ng build` OK, CD deploy do commit `7c5f5da` na VM confirmado (bundle contém o fallback), `POST /api/v1/auth/login` → 200.
+- **Pendência estrutural:** servir com HTTPS (domínio + Caddy automático) elimina essa classe de problema (Service Worker/PWA e câmera também exigem secure context).

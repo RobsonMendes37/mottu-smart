@@ -42,14 +42,14 @@ jobs:
           script: |
             set -e
             echo "🚀 Deploying Mottu Smart Ops update..."
-            cd /opt/mottu-smart-ops || cd ~/mottu-smart-ops
+            cd /home/ubuntu/mottu-smart-ops || cd ~/mottu-smart-ops || cd /opt/mottu-smart-ops
             git fetch origin main
             git reset --hard origin/main
-            docker compose down --remove-orphans
-            docker compose build --pull
-            docker compose up -d
+            ln -sf .env infra/.env 2>/dev/null || true
+            docker compose -f infra/docker-compose.prod.yml build
+            docker compose -f infra/docker-compose.prod.yml up -d --remove-orphans
             echo "⏳ Waiting for healthchecks..."
             sleep 10
-            docker compose ps
+            docker compose -f infra/docker-compose.prod.yml ps
             echo "✅ Deployment completed successfully!"
 

@@ -32,7 +32,7 @@ public class ApplicationBeanConfig {
             UserRepositoryPort userRepositoryPort,
             PasswordEncoderPort passwordEncoderPort,
             TokenProviderPort tokenProviderPort,
-            @Value("${mottu.demo-mode:false}") boolean publicDemoMode
+            @Value("${public.demo.mode:${mottu.demo-mode:${PUBLIC_DEMO_MODE:false}}}") boolean publicDemoMode
     ) {
         return new AuthService(userRepositoryPort, passwordEncoderPort, tokenProviderPort, publicDemoMode);
     }

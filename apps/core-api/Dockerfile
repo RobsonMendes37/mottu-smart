@@ -22,7 +22,7 @@ COPY --from=builder /build/target/core-api-*.jar app.jar
 EXPOSE 8080
 
 HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=30s \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
+  CMD curl -f http://localhost:8080/api/v1/auth/public-config || exit 1
 
 ENTRYPOINT ["java", "-XX:+UseG1GC", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]
 

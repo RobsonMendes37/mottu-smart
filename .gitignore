@@ -28,7 +28,7 @@ Thumbs.db
 *.iml
 *.ipr
 *.iws
-out/
+/out/
 
 # Eclipse
 .project

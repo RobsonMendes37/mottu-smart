@@ -1,5 +1,5 @@
 server:
-  port: ${HOST_PORT_CORE_API:18080}
+  port: ${SERVER_PORT:${PORT:8080}}
   compression:
     enabled: true
 

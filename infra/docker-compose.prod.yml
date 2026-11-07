@@ -128,6 +128,7 @@ services:
     ports:
       - "${HOST_PORT_CORE_API:-18080}:8080"
     environment:
+      SERVER_PORT: 8080
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-mottu_ops} # nosec
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-mottu}

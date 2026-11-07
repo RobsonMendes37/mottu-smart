@@ -73,7 +73,8 @@ jobs:
             cd /home/ubuntu/mottu-smart-ops || cd ~/mottu-smart-ops
             git fetch origin main
             git reset --hard origin/main
-            ln -sf .env infra/.env 2>/dev/null || true
+            rm -f infra/.env
+            cp -f .env infra/.env
             echo "🚀 Fazendo build e reiniciando containers via Docker Compose..."
             docker compose -f infra/docker-compose.prod.yml build
             docker compose -f infra/docker-compose.prod.yml up -d --remove-orphans

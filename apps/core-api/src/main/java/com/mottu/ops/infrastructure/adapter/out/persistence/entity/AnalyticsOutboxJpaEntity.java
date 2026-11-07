@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -21,7 +23,8 @@ public class AnalyticsOutboxJpaEntity {
     @Column(name = "accident_report_id")
     private UUID accidentReportId;
 
-    @Column(name = "payload_json", nullable = false, columnDefinition = "TEXT")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "payload_json", nullable = false, columnDefinition = "jsonb")
     private String payloadJson;
 
     @Column(name = "exported", nullable = false)

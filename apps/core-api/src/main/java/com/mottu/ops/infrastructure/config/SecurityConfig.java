@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/auth/public-config").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()

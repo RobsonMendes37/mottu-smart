@@ -11,7 +11,7 @@ class Settings(BaseSettings):
 
     # Service Identification
     SERVICE_NAME: str = "intelligence-service"
-    SERVICE_VERSION: str = "1.0.0"
+    SERVICE_VERSION: str = "2.2.0"
     PORT: int = 8000
     INTERNAL_API_TOKEN: str = "internal-mottu-service-token-2026"
 

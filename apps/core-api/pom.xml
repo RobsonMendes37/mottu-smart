@@ -13,7 +13,7 @@
 
     <groupId>com.mottu</groupId>
     <artifactId>core-api</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>2.2.0</version>
     <name>core-api</name>
     <description>Mottu Smart Ops - Core API</description>
 

@@ -12,5 +12,5 @@ def test_health_check_returns_200_and_service_info():
     assert data == {
         "status": "UP",
         "service": "intelligence-service",
-        "version": "1.0.0",
+        "version": "2.2.0",
     }

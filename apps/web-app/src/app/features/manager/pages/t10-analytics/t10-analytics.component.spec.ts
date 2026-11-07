@@ -1,0 +1,80 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { of, throwError } from 'rxjs';
+import { T10AnalyticsComponent } from './t10-analytics.component';
+import { AnalyticsSummaryResponseDto } from '../../models/manager.models';
+
+describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)', () => {
+  let comp: T10AnalyticsComponent;
+  let mockManagerService: any;
+  let mockSanitizer: any;
+
+  const mockSummaryWithEmbed: AnalyticsSummaryResponseDto = {
+    activeMotorcyclesCount: 124,
+    autoResolvedPercentage: 78.5,
+    currentHumanQueueSize: 4,
+    estimatedMechanicHoursSaved: 36.2,
+    lookerStudioEmbedUrl: 'https://lookerstudio.google.com/embed/reporting/mottu-smart-ops-bi',
+  };
+
+  const mockSummaryEmptyEmbed: AnalyticsSummaryResponseDto = {
+    activeMotorcyclesCount: 88,
+    autoResolvedPercentage: 81.2,
+    currentHumanQueueSize: 2,
+    estimatedMechanicHoursSaved: 24.5,
+    lookerStudioEmbedUrl: null,
+  };
+
+  beforeEach(() => {
+    mockManagerService = {
+      getAnalyticsSummary: vi.fn().mockReturnValue(of(mockSummaryWithEmbed)),
+    };
+    mockSanitizer = {
+      bypassSecurityTrustResourceUrl: vi.fn().mockImplementation((url: string) => `safe:${url}`),
+    };
+
+    comp = new T10AnalyticsComponent(mockManagerService, mockSanitizer);
+  });
+
+  it('TC-T10-1: ngOnInit loads analytics summary and populates 4 KPI cards', () => {
+    comp.ngOnInit();
+    expect(mockManagerService.getAnalyticsSummary).toHaveBeenCalled();
+    expect(comp.summary()?.activeMotorcyclesCount).toBe(124);
+    expect(comp.summary()?.autoResolvedPercentage).toBe(78.5);
+    expect(comp.summary()?.currentHumanQueueSize).toBe(4);
+    expect(comp.summary()?.estimatedMechanicHoursSaved).toBe(36.2);
+    expect(comp.isLoading()).toBe(false);
+  });
+
+  it('TC-T10-2: Sanitizes lookerStudioEmbedUrl when present', () => {
+    comp.ngOnInit();
+    expect(mockSanitizer.bypassSecurityTrustResourceUrl).toHaveBeenCalledWith(
+      'https://lookerstudio.google.com/embed/reporting/mottu-smart-ops-bi'
+    );
+    expect(comp.safeEmbedUrl()).toBe(
+      'safe:https://lookerstudio.google.com/embed/reporting/mottu-smart-ops-bi'
+    );
+    expect(comp.isOfflineFallback()).toBe(false);
+  });
+
+  it('TC-T10-3: Activates offline fallback mode when lookerStudioEmbedUrl is null or empty', () => {
+    mockManagerService.getAnalyticsSummary.mockReturnValue(of(mockSummaryEmptyEmbed));
+    comp.loadSummary();
+
+    expect(comp.summary()?.activeMotorcyclesCount).toBe(88);
+    expect(comp.isOfflineFallback()).toBe(true);
+    expect(comp.safeEmbedUrl()).toBeNull();
+  });
+
+  it('TC-T10-4: Refresh button reloads summary data', () => {
+    comp.refresh();
+    expect(mockManagerService.getAnalyticsSummary).toHaveBeenCalled();
+  });
+
+  it('TC-T10-5: Handles error gracefully by setting errorMessage', () => {
+    mockManagerService.getAnalyticsSummary.mockReturnValue(throwError(() => new Error('Network error')));
+    comp.loadSummary();
+
+    expect(comp.errorMessage()).toContain('Erro ao carregar indicadores executivos');
+    expect(comp.isLoading()).toBe(false);
+  });
+});

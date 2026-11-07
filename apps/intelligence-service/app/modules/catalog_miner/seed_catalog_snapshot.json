@@ -1,0 +1,218 @@
+[
+  {
+    "vtex_sku": "SKU-SPT-001",
+    "motorcycle_model": "MOTTU_SPORT_110I",
+    "part_name": "Manete de Freio Direito",
+    "category": "Comandos",
+    "unit_price_brl": 25.00,
+    "is_natural_wear": false,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/manete-freio-sport.jpg"
+  },
+  {
+    "vtex_sku": "SKU-SPT-002",
+    "motorcycle_model": "MOTTU_SPORT_110I",
+    "part_name": "Espelho Retrovisor Direito",
+    "category": "Carenagem",
+    "unit_price_brl": 42.50,
+    "is_natural_wear": false,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/retrovisor-dir-sport.jpg"
+  },
+  {
+    "vtex_sku": "SKU-SPT-003",
+    "motorcycle_model": "MOTTU_SPORT_110I",
+    "part_name": "Lona de Freio Traseira",
+    "category": "Freios",
+    "unit_price_brl": 33.00,
+    "is_natural_wear": true,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/lona-freio-sport.jpg"
+  },
+  {
+    "vtex_sku": "SKU-SPT-004",
+    "motorcycle_model": "MOTTU_SPORT_110I",
+    "part_name": "Pneu Dianteiro 80/100-18",
+    "category": "Rodas e Pneus",
+    "unit_price_brl": 180.00,
+    "is_natural_wear": true,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/pneu-diant-sport.jpg"
+  },
+  {
+    "vtex_sku": "SKU-SPT-005",
+    "motorcycle_model": "MOTTU_SPORT_110I",
+    "part_name": "Vela de Ignição CPR8EA",
+    "category": "Motor",
+    "unit_price_brl": 28.00,
+    "is_natural_wear": true,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/vela-sport.jpg"
+  },
+  {
+    "vtex_sku": "SKU-SPT-006",
+    "motorcycle_model": "MOTTU_SPORT_110I",
+    "part_name": "Pedal de Câmbio",
+    "category": "Comandos",
+    "unit_price_brl": 38.00,
+    "is_natural_wear": false,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/pedal-cambio-sport.jpg"
+  },
+  {
+    "vtex_sku": "SKU-POP-001",
+    "motorcycle_model": "HONDA_POP_110I",
+    "part_name": "Manete de Freio Dianteiro",
+    "category": "Comandos",
+    "unit_price_brl": 22.00,
+    "is_natural_wear": false,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/manete-pop.jpg"
+  },
+  {
+    "vtex_sku": "SKU-POP-002",
+    "motorcycle_model": "HONDA_POP_110I",
+    "part_name": "Espelho Retrovisor Esquerdo",
+    "category": "Carenagem",
+    "unit_price_brl": 39.00,
+    "is_natural_wear": false,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/retrovisor-esq-pop.jpg"
+  },
+  {
+    "vtex_sku": "SKU-POP-003",
+    "motorcycle_model": "HONDA_POP_110I",
+    "part_name": "Lona de Freio Traseira Pop",
+    "category": "Freios",
+    "unit_price_brl": 31.00,
+    "is_natural_wear": true,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/lona-pop.jpg"
+  },
+  {
+    "vtex_sku": "SKU-POP-004",
+    "motorcycle_model": "HONDA_POP_110I",
+    "part_name": "Pneu Traseiro 80/100-14",
+    "category": "Rodas e Pneus",
+    "unit_price_brl": 165.00,
+    "is_natural_wear": true,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/pneu-tras-pop.jpg"
+  },
+  {
+    "vtex_sku": "SKU-POP-005",
+    "motorcycle_model": "HONDA_POP_110I",
+    "part_name": "Filtro de Ar Pop",
+    "category": "Motor",
+    "unit_price_brl": 24.00,
+    "is_natural_wear": true,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/filtro-pop.jpg"
+  },
+  {
+    "vtex_sku": "SKU-POP-006",
+    "motorcycle_model": "HONDA_POP_110I",
+    "part_name": "Pisca Traseiro Direito",
+    "category": "Elétrica",
+    "unit_price_brl": 29.00,
+    "is_natural_wear": false,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/pisca-pop.jpg"
+  },
+  {
+    "vtex_sku": "SKU-APA-001",
+    "motorcycle_model": "TVS_APACHE_160",
+    "part_name": "Manete de Embreagem",
+    "category": "Comandos",
+    "unit_price_brl": 32.00,
+    "is_natural_wear": false,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/manete-emb-apache.jpg"
+  },
+  {
+    "vtex_sku": "SKU-APA-002",
+    "motorcycle_model": "TVS_APACHE_160",
+    "part_name": "Espelho Retrovisor Esportivo",
+    "category": "Carenagem",
+    "unit_price_brl": 55.00,
+    "is_natural_wear": false,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/retrovisor-apache.jpg"
+  },
+  {
+    "vtex_sku": "SKU-APA-003",
+    "motorcycle_model": "TVS_APACHE_160",
+    "part_name": "Pastilha de Freio Dianteira",
+    "category": "Freios",
+    "unit_price_brl": 48.00,
+    "is_natural_wear": true,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/pastilha-apache.jpg"
+  },
+  {
+    "vtex_sku": "SKU-APA-004",
+    "motorcycle_model": "TVS_APACHE_160",
+    "part_name": "Pneu Traseiro 110/80-17",
+    "category": "Rodas e Pneus",
+    "unit_price_brl": 240.00,
+    "is_natural_wear": true,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/pneu-tras-apache.jpg"
+  },
+  {
+    "vtex_sku": "SKU-APA-005",
+    "motorcycle_model": "TVS_APACHE_160",
+    "part_name": "Kit Relação Completa Apache",
+    "category": "Transmissão",
+    "unit_price_brl": 145.00,
+    "is_natural_wear": true,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/relacao-apache.jpg"
+  },
+  {
+    "vtex_sku": "SKU-APA-006",
+    "motorcycle_model": "TVS_APACHE_160",
+    "part_name": "Pedal de Freio Traseiro",
+    "category": "Comandos",
+    "unit_price_brl": 45.00,
+    "is_natural_wear": false,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/pedal-freio-apache.jpg"
+  },
+  {
+    "vtex_sku": "SKU-RAI-001",
+    "motorcycle_model": "TVS_RAIDER_125",
+    "part_name": "Manete de Freio Raider",
+    "category": "Comandos",
+    "unit_price_brl": 28.00,
+    "is_natural_wear": false,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/manete-raider.jpg"
+  },
+  {
+    "vtex_sku": "SKU-RAI-002",
+    "motorcycle_model": "TVS_RAIDER_125",
+    "part_name": "Espelho Retrovisor Raider",
+    "category": "Carenagem",
+    "unit_price_brl": 46.00,
+    "is_natural_wear": false,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/retrovisor-raider.jpg"
+  },
+  {
+    "vtex_sku": "SKU-RAI-003",
+    "motorcycle_model": "TVS_RAIDER_125",
+    "part_name": "Pastilha de Freio Raider",
+    "category": "Freios",
+    "unit_price_brl": 42.00,
+    "is_natural_wear": true,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/pastilha-raider.jpg"
+  },
+  {
+    "vtex_sku": "SKU-RAI-004",
+    "motorcycle_model": "TVS_RAIDER_125",
+    "part_name": "Pneu Dianteiro 90/90-17",
+    "category": "Rodas e Pneus",
+    "unit_price_brl": 195.00,
+    "is_natural_wear": true,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/pneu-diant-raider.jpg"
+  },
+  {
+    "vtex_sku": "SKU-RAI-005",
+    "motorcycle_model": "TVS_RAIDER_125",
+    "part_name": "Óleo de Motor 10W30 4T",
+    "category": "Lubrificantes",
+    "unit_price_brl": 35.00,
+    "is_natural_wear": true,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/oleo-raider.jpg"
+  },
+  {
+    "vtex_sku": "SKU-RAI-006",
+    "motorcycle_model": "TVS_RAIDER_125",
+    "part_name": "Farol Principal LED",
+    "category": "Elétrica",
+    "unit_price_brl": 280.00,
+    "is_natural_wear": false,
+    "image_url": "https://www.loja.mottu.com.br/arquivos/farol-raider.jpg"
+  }
+]

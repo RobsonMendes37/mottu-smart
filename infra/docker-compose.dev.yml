@@ -1,0 +1,111 @@
+name: mottu-smart-ops-dev
+
+networks:
+  mottu-net:
+    driver: bridge
+
+volumes:
+  postgres_dev_data:
+  redis_dev_data:
+  minio_dev_data:
+  caddy_dev_data:
+  caddy_dev_config:
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: mottu-postgres-dev
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT_POSTGRES:-15432}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-mottu_ops}
+      POSTGRES_USER: ${POSTGRES_USER:-mottu}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mottu_dev_pass}
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./scripts/init-postgres.sql:/docker-entrypoint-initdb.d/01-init-extensions.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-mottu} -d $${POSTGRES_DB:-mottu_ops}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - mottu-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: mottu-redis-dev
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${HOST_PORT_REDIS:-16379}:6379"
+    volumes:
+      - redis_dev_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    networks:
+      - mottu-net
+
+  minio:
+    image: cgr.dev/chainguard/minio:latest
+    container_name: mottu-minio-dev
+    restart: unless-stopped
+    command: ["server", "/data", "--console-address", ":9001"]
+    ports:
+      - "${HOST_PORT_MINIO_API:-19000}:9000"
+      - "${HOST_PORT_MINIO_CONSOLE:-19001}:9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-minioadmin123}
+      MINIO_API_CORS_ALLOW_ORIGIN: "*"
+    volumes:
+      - minio_dev_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    networks:
+      - mottu-net
+
+  minio-create-buckets:
+    image: cgr.dev/chainguard/minio:latest
+    container_name: mottu-minio-create-buckets-dev
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        mc alias set myminio http://minio:9000 $${S3_ACCESS_KEY:-minioadmin} $${S3_SECRET_KEY:-minioadmin123}
+        mc mb --ignore-existing myminio/$${S3_BUCKET_NAME:-mottu-inspections}
+        mc anonymous set download myminio/$${S3_BUCKET_NAME:-mottu-inspections}
+        exit 0
+    environment:
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin123}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-mottu-inspections}
+    restart: "no"
+    networks:
+      - mottu-net
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: mottu-caddy-dev
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT_CADDY:-18088}:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_dev_data:/data
+      - caddy_dev_config:/config
+    networks:
+      - mottu-net

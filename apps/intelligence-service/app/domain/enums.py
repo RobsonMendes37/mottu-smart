@@ -1,0 +1,49 @@
+"""Pure Python domain enums for Mottu Smart Ops."""
+from enum import Enum
+
+
+class MotorcycleModel(str, Enum):
+    MOTTU_SPORT_110I = "MOTTU_SPORT_110I"
+    HONDA_POP_110I = "HONDA_POP_110I"
+    TVS_APACHE_160 = "TVS_APACHE_160"
+    TVS_RAIDER_125 = "TVS_RAIDER_125"
+
+
+class DamageVerdict(str, Enum):
+    PRE_EXISTENTE = "PRE_EXISTENTE"
+    DESGASTE_NATURAL = "DESGASTE_NATURAL"
+    MAU_USO = "MAU_USO"
+
+
+class SafetyRiskLevel(str, Enum):
+    SAFE_TO_RIDE = "SAFE_TO_RIDE"
+    CRITICAL_STOPPED = "CRITICAL_STOPPED"
+
+
+class ReportedOriginContext(str, Enum):
+    RECEIVED_LIKE_THIS = "RECEIVED_LIKE_THIS"
+    NORMAL_USE_WEAR = "NORMAL_USE_WEAR"
+    ACCIDENT_OR_DROP = "ACCIDENT_OR_DROP"
+
+
+class QueuePriorityReason(str, Enum):
+    CRITICAL_SAFETY = "CRITICAL_SAFETY"
+    RIDER_CONTESTATION = "RIDER_CONTESTATION"
+    LOW_AI_CONFIDENCE = "LOW_AI_CONFIDENCE"
+    FRAUD_SUSPICION = "FRAUD_SUSPICION"
+
+
+class InspectionStatus(str, Enum):
+    QUEUED_AI = "QUEUED_AI"
+    INVALID_IMAGE = "INVALID_IMAGE"
+    AWAITING_AI_RECOVERY = "AWAITING_AI_RECOVERY"
+    AUTO_RESOLVED = "AUTO_RESOLVED"
+    HUMAN_TRIAGE = "HUMAN_TRIAGE"
+    HUMAN_RESOLVED = "HUMAN_RESOLVED"
+    SCHEDULED = "SCHEDULED"
+    CLOSED = "CLOSED"
+
+
+class TriageOutcome(str, Enum):
+    SUCCESS = "SUCCESS"
+    AI_UNAVAILABLE = "AI_UNAVAILABLE"

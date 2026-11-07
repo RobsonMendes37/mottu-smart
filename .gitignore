@@ -1,0 +1,175 @@
+# ==============================================================================
+# Mottu Smart Ops — Monorepo .gitignore
+# Governs: Angular 19, Java 21 / Spring Boot 3.4, Python 3.12 / FastAPI,
+# Docker storage mounts, local secrets, and AI agent runtime metadata.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Operating System & Editor Artifacts
+# ------------------------------------------------------------------------------
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# Linux
+*~
+.directory
+
+# JetBrains / IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Vim / Emacs
+*.swp
+*.swo
+*.swn
+*~
+.#*
+
+# ------------------------------------------------------------------------------
+# 2. Environment Variables & Secrets (CRITICAL SECURITY)
+# ------------------------------------------------------------------------------
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.cert
+*.crt
+gcp-key.json
+credentials.json
+
+# Always track the canonical environment template
+!.env.example
+
+# ------------------------------------------------------------------------------
+# 3. Multi-Agent Teamwork Metadata (AGENTS.md / PROJECT.md Compliance)
+# Ephemeral execution briefings, task dispatches, and handoffs
+# ------------------------------------------------------------------------------
+.agents/teamwork/
+
+# ------------------------------------------------------------------------------
+# 4. Docker Volumes & Persistent Host Data Mounts
+# ------------------------------------------------------------------------------
+mottu_pgdata/
+mottu_miniodata/
+mottu_redisdata/
+postgres_data/
+minio_data/
+redis_data/
+caddy_data/
+caddy_config/
+
+# ------------------------------------------------------------------------------
+# 5. Front-End: Angular 19 / TypeScript / Vite / Node.js (apps/web-app)
+# ------------------------------------------------------------------------------
+node_modules/
+apps/web-app/node_modules/
+dist/
+apps/web-app/dist/
+.angular/
+.vite/
+.cache/
+.parcel-cache/
+.pnpm-store/
+
+# NPM / Yarn / PNPM debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ------------------------------------------------------------------------------
+# 6. Back-End Core: Java 21 / Spring Boot 3.4 / Maven (apps/core-api)
+# ------------------------------------------------------------------------------
+target/
+apps/core-api/target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# Exclude Maven Wrapper executable binary (preserve wrapper scripts and properties)
+**/.mvn/wrapper/maven-wrapper.jar
+!mvnw
+!mvnw.cmd
+!**/mvnw
+!**/mvnw.cmd
+
+# JVM Crash logs
+hs_err_pid*
+replay_pid*
+
+# ------------------------------------------------------------------------------
+# 7. AI & Scraper: Python 3.12 / FastAPI (apps/intelligence-service)
+# ------------------------------------------------------------------------------
+.venv/
+apps/intelligence-service/.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+.eggs/
+build/
+develop-eggs/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg
+.mypy_cache/
+.ruff_cache/
+
+# ------------------------------------------------------------------------------
+# 8. Testing, Code Coverage & Playwright Artifacts
+# ------------------------------------------------------------------------------
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# ------------------------------------------------------------------------------
+# 9. General Logs
+# ------------------------------------------------------------------------------
+*.log
+logs/

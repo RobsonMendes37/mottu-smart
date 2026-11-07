@@ -1,0 +1,246 @@
+name: mottu-smart-ops-prod
+
+networks:
+  mottu-net:
+    driver: bridge
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:
+  minio_prod_data:
+  caddy_prod_data:
+  caddy_prod_config:
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: mottu-postgres-prod
+    restart: always
+    ports:
+      - "${HOST_PORT_POSTGRES:-15432}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-mottu_ops}
+      POSTGRES_USER: ${POSTGRES_USER:-mottu}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mottu_dev_pass}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+      - ./scripts/init-postgres.sql:/docker-entrypoint-initdb.d/01-init-extensions.sql:ro
+    deploy:
+      resources:
+        limits:
+          memory: 220M
+        reservations:
+          memory: 128M
+    mem_limit: 220m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-mottu} -d $${POSTGRES_DB:-mottu_ops}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - mottu-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: mottu-redis-prod
+    restart: always
+    command: ["redis-server", "--maxmemory", "32mb", "--maxmemory-policy", "noeviction", "--appendonly", "yes"]
+    ports:
+      - "${HOST_PORT_REDIS:-16379}:6379"
+    volumes:
+      - redis_prod_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 40M
+        reservations:
+          memory: 20M
+    mem_limit: 40m
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    networks:
+      - mottu-net
+
+  minio:
+    image: cgr.dev/chainguard/minio:latest
+    container_name: mottu-minio-prod
+    restart: always
+    command: ["server", "/data", "--console-address", ":9001"]
+    ports:
+      - "${HOST_PORT_MINIO_API:-19000}:9000"
+      - "${HOST_PORT_MINIO_CONSOLE:-19001}:9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-minioadmin123}
+      MINIO_API_CORS_ALLOW_ORIGIN: "*"
+    volumes:
+      - minio_prod_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 120M
+        reservations:
+          memory: 64M
+    mem_limit: 120m
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    networks:
+      - mottu-net
+
+  minio-create-buckets:
+    image: cgr.dev/chainguard/minio:latest
+    container_name: mottu-minio-create-buckets-prod
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        mc alias set myminio http://minio:9000 $${S3_ACCESS_KEY:-minioadmin} $${S3_SECRET_KEY:-minioadmin123}
+        mc mb --ignore-existing myminio/$${S3_BUCKET_NAME:-mottu-inspections}
+        mc anonymous set download myminio/$${S3_BUCKET_NAME:-mottu-inspections}
+        exit 0
+    environment:
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin123}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-mottu-inspections}
+    restart: "no"
+    networks:
+      - mottu-net
+
+  core-api:
+    build:
+      context: ../apps/core-api
+      dockerfile: Dockerfile
+    image: mottu-smart-ops/core-api:latest
+    container_name: mottu-core-api-prod
+    restart: always
+    ports:
+      - "${HOST_PORT_CORE_API:-18080}:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-mottu_ops} # nosec
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-mottu}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-mottu_dev_pass}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-trocar-em-producao-minimo-32-bytes-mottu-smart-ops-2026}
+      JWT_EXPIRATION_SECONDS: ${JWT_EXPIRATION_SECONDS:-28800}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-internal-mottu-service-token-2026}
+      INTELLIGENCE_SERVICE_URL: ${INTELLIGENCE_SERVICE_URL:-http://intelligence-service:8000}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-mottu-inspections}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin123}
+      S3_INTERNAL_ENDPOINT: ${S3_INTERNAL_ENDPOINT:-http://minio:9000}
+      S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-http://localhost:19000}
+      BIGQUERY_ENABLED: ${BIGQUERY_ENABLED:-false}
+      PUBLIC_DEMO_MODE: ${PUBLIC_DEMO_MODE:-false}
+      JAVA_OPTS: "-XX:+UseVirtualThreads -XX:MaxRAMPercentage=75.0 -Xmx256m -Xms128m"
+    deploy:
+      resources:
+        limits:
+          memory: 450M
+        reservations:
+          memory: 256M
+    mem_limit: 450m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - mottu-net
+
+  intelligence-service:
+    build:
+      context: ../apps/intelligence-service
+      dockerfile: Dockerfile
+    image: mottu-smart-ops/intelligence-service:latest
+    container_name: mottu-intelligence-service-prod
+    restart: always
+    ports:
+      - "${HOST_PORT_INTELLIGENCE:-18000}:8000"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-mottu_ops}
+      POSTGRES_USER: ${POSTGRES_USER:-mottu}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mottu_dev_pass}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-internal-mottu-service-token-2026}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-mottu-inspections}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin123}
+      S3_INTERNAL_ENDPOINT: ${S3_INTERNAL_ENDPOINT:-http://minio:9000}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MOCK_MODE: ${GEMINI_MOCK_MODE:-true}
+      GEMINI_VISION_MODEL: ${GEMINI_VISION_MODEL:-gemini-2.5-flash}
+      GEMINI_EMBEDDING_MODEL: ${GEMINI_EMBEDDING_MODEL:-text-embedding-004}
+      VTEX_STORE_BASE_URL: ${VTEX_STORE_BASE_URL:-https://www.loja.mottu.com.br}
+    deploy:
+      resources:
+        limits:
+          memory: 280M
+        reservations:
+          memory: 96M
+    mem_limit: 280m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/health\")' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - mottu-net
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: mottu-caddy-prod
+    restart: always
+    ports:
+      - "${HOST_PORT_CADDY:-18088}:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ../apps/web-app/dist/web-app/browser:/srv:ro
+      - caddy_prod_data:/data
+      - caddy_prod_config:/config
+    deploy:
+      resources:
+        limits:
+          memory: 40M
+        reservations:
+          memory: 20M
+    mem_limit: 40m
+    depends_on:
+      core-api:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - mottu-net

@@ -1,0 +1,72 @@
+export enum UserRole {
+  RIDER = 'RIDER',
+  MECHANIC = 'MECHANIC',
+  MANAGER = 'MANAGER',
+}
+
+export enum AccountStatus {
+  PENDING_APPROVAL = 'PENDING_APPROVAL',
+  ACTIVE = 'ACTIVE',
+  REJECTED = 'REJECTED',
+}
+
+export enum MotorcycleModel {
+  MOTTU_SPORT_110I = 'MOTTU_SPORT_110I',
+  HONDA_POP_110I = 'HONDA_POP_110I',
+  TVS_APACHE_160 = 'TVS_APACHE_160',
+  TVS_RAIDER_125 = 'TVS_RAIDER_125',
+}
+
+export enum MotorcycleStatus {
+  AVAILABLE = 'AVAILABLE',
+  RENTED = 'RENTED',
+  IN_MAINTENANCE = 'IN_MAINTENANCE',
+  UNAVAILABLE = 'UNAVAILABLE',
+}
+
+export enum ReportedOriginContext {
+  RECEIVED_LIKE_THIS = 'RECEIVED_LIKE_THIS',
+  NORMAL_USE_WEAR = 'NORMAL_USE_WEAR',
+  ACCIDENT_OR_DROP = 'ACCIDENT_OR_DROP',
+}
+
+export enum SafetyRiskLevel {
+  SAFE_TO_RIDE = 'SAFE_TO_RIDE',
+  CRITICAL_STOPPED = 'CRITICAL_STOPPED',
+}
+
+export enum DamageVerdict {
+  PRE_EXISTENTE = 'PRE_EXISTENTE',
+  DESGASTE_NATURAL = 'DESGASTE_NATURAL',
+  MAU_USO = 'MAU_USO',
+}
+
+export enum QueuePriorityReason {
+  CRITICAL_SAFETY = 'CRITICAL_SAFETY',     // weight 1
+  RIDER_CONTESTATION = 'RIDER_CONTESTATION', // weight 2
+  LOW_AI_CONFIDENCE = 'LOW_AI_CONFIDENCE',   // weight 3
+  FRAUD_SUSPICION = 'FRAUD_SUSPICION',       // weight 4
+}
+
+export const PRIORITY_WEIGHTS: Record<QueuePriorityReason, number> = {
+  [QueuePriorityReason.CRITICAL_SAFETY]: 1,
+  [QueuePriorityReason.RIDER_CONTESTATION]: 2,
+  [QueuePriorityReason.LOW_AI_CONFIDENCE]: 3,
+  [QueuePriorityReason.FRAUD_SUSPICION]: 4,
+};
+
+export enum InspectionStatus {
+  QUEUED_AI = 'QUEUED_AI',
+  INVALID_IMAGE = 'INVALID_IMAGE',
+  AWAITING_AI_RECOVERY = 'AWAITING_AI_RECOVERY',
+  AUTO_RESOLVED = 'AUTO_RESOLVED',
+  HUMAN_TRIAGE = 'HUMAN_TRIAGE',
+  HUMAN_RESOLVED = 'HUMAN_RESOLVED',
+  SCHEDULED = 'SCHEDULED',
+  CLOSED = 'CLOSED',
+}
+
+export enum AppointmentShift {
+  MORNING = 'MORNING',
+  AFTERNOON = 'AFTERNOON',
+}

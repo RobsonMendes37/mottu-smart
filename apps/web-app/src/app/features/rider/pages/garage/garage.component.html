@@ -1,0 +1,144 @@
+<div class="min-h-screen bg-[#0A0E0D] text-[#F2F7F5] flex flex-col items-center px-4 py-6">
+  <div class="w-full max-w-[420px] flex flex-col gap-4">
+    <!-- Top Bar -->
+    <header class="flex items-center justify-between pt-2">
+      <div class="flex flex-col">
+        <span class="text-xs font-semibold text-[#94A39E] uppercase tracking-wider">Garagem do Entregador</span>
+        <h1 class="text-xl font-bold text-[#F2F7F5]">{{ riderGreeting() }}</h1>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div class="px-3 py-1.5 bg-[#1A2320] border border-[#26332E] rounded-full flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-[#00E676] animate-pulse"></span>
+          <span class="font-mono text-xs font-bold text-[#00E676]">
+            @if (openCount() > 0) {
+              EM ANÁLISE
+            } @else {
+              RODANDO NORMAL
+            }
+          </span>
+        </div>
+
+        <button
+          type="button"
+          (click)="onLogout()"
+          title="Sair da Conta"
+          class="p-2 text-[#94A39E] hover:text-[#F2F7F5] bg-[#121816] border border-[#26332E] rounded-lg transition"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Active Motorcycle Card -->
+    @if (motorcycle(); as bike) {
+      <div class="bg-[#121816] rounded-2xl p-5 border border-[#26332E] flex flex-col gap-3 shadow-lg relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-semibold text-[#94A39E]">{{ bike.model.replace('_', ' ') }}</span>
+          <span class="font-mono text-xs px-2 py-0.5 rounded bg-[#00E676]/10 text-[#00E676] border border-[#00E676]/30 font-bold">ALUGADA</span>
+        </div>
+
+        <div class="flex flex-col">
+          <span class="text-xs text-[#94A39E] uppercase font-mono tracking-wider">Placa</span>
+          <span class="font-mono text-4xl font-extrabold text-[#F2F7F5] tracking-wider">{{ bike.plate }}</span>
+        </div>
+
+        <div class="pt-2 border-t border-[#26332E] flex flex-col gap-1 font-mono text-xs text-[#94A39E]">
+          <div class="flex items-center justify-between">
+            <span>Hodômetro registrado:</span>
+            <span class="text-[#F2F7F5] font-bold">{{ bike.currentOdometerKm }} km</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span>Galpão de Origem:</span>
+            <span class="text-[#F2F7F5]">{{ bike.yardName || 'Butantã' }}</span>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <!-- Empty Contract State -->
+      <div class="bg-[#121816] rounded-2xl p-6 border border-[#26332E] text-center flex flex-col items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-[#1A2320] flex items-center justify-center text-[#94A39E]">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h3 class="text-base font-bold text-[#F2F7F5]">Nenhuma moto alugada no momento</h3>
+        <p class="text-xs text-[#94A39E] max-w-xs">Procure o galpão Mottu mais próximo para ativar seu contrato e retirar sua moto.</p>
+      </div>
+    }
+
+    <!-- Quota Warning Banner -->
+    @if (quotaWarningVisible() || hasReachedQuota()) {
+      <div class="bg-[#FFB300]/10 border border-[#FFB300]/30 rounded-xl p-3.5 flex items-start gap-2.5">
+        <svg class="w-5 h-5 text-[#FFB300] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <div class="flex flex-col text-xs text-[#FFB300]">
+          <span class="font-bold">Limite de 3 chamados em aberto atingido</span>
+          <span class="text-[#FFB300]/90">Aguarde a finalização dos chamados anteriores para abrir uma nova vistoria.</span>
+        </div>
+      </div>
+    }
+
+    <!-- Primary CTA: Nova Vistoria -->
+    <button
+      type="button"
+      (click)="onNewInspection()"
+      [disabled]="hasReachedQuota()"
+      [ngClass]="{
+        'opacity-50 cursor-not-allowed bg-[#1A2320] text-[#94A39E] border border-[#26332E]': hasReachedQuota(),
+        'bg-[#00E676] hover:bg-[#00C853] text-[#06120B] active:scale-[0.98] shadow-lg shadow-[#00E676]/20': !hasReachedQuota()
+      }"
+      class="w-full h-14 font-extrabold text-base rounded-xl flex items-center justify-center gap-2 transition"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      <span>Reportar Defeito / Nova Vistoria</span>
+    </button>
+
+    <!-- Recent Tickets Section -->
+    <div class="flex flex-col gap-3 mt-2">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-bold text-[#F2F7F5]">
+          Meus Chamados Recentes
+          <span class="text-xs font-mono font-normal text-[#94A39E]">({{ openCount() }}/3 abertos)</span>
+        </h2>
+      </div>
+
+      @if (store.garage()?.recentInspections; as recent) {
+        @if (recent.length === 0) {
+          <div class="bg-[#121816] rounded-xl p-4 border border-[#26332E] text-center text-xs text-[#94A39E]">
+            Nenhuma vistoria recente encontrada.
+          </div>
+        } @else {
+          <div class="flex flex-col gap-2.5">
+            @for (item of recent; track item.id) {
+              <div
+                (click)="onViewInspection(item.id)"
+                class="bg-[#121816] rounded-xl p-4 border border-[#26332E] hover:border-[#00E676]/40 flex flex-col gap-1.5 cursor-pointer transition active:scale-[0.99]"
+              >
+                <div class="flex items-center justify-between font-mono text-sm font-bold">
+                  <span class="text-[#F2F7F5]">Vistoria #{{ item.id.substring(0, 8) }}</span>
+                  @if (item.totalEstimatedBrl === 0 || item.finalVerdict === 'PRE_EXISTENTE' || item.finalVerdict === 'DESGASTE_NATURAL') {
+                    <span class="text-[#00E676]">R$ 0,00 (Sem Custo)</span>
+                  } @else {
+                    <span class="text-[#FFB300]">R$ {{ item.totalEstimatedBrl.toFixed(2) }}</span>
+                  }
+                </div>
+
+                <div class="flex items-center justify-between text-xs text-[#94A39E]">
+                  <span>Status: {{ item.status }}</span>
+                  <span>{{ item.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

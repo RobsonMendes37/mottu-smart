@@ -1,0 +1,58 @@
+server:
+  port: ${HOST_PORT_CORE_API:18080}
+  compression:
+    enabled: true
+
+spring:
+  application:
+    name: core-api
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:15432}/${POSTGRES_DB:mottu_ops}} # nosec
+    username: ${SPRING_DATASOURCE_USERNAME:${POSTGRES_USER:mottu}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${POSTGRES_PASSWORD:mottu_dev_pass}}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 30000
+      connection-timeout: 20000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:16379}
+      timeout: 2000ms
+
+mottu:
+  demo-mode: ${PUBLIC_DEMO_MODE:false}
+  jwt:
+    secret: ${JWT_SECRET:trocar-em-producao-minimo-32-bytes-mottu-smart-ops-2026}
+    expiration-seconds: ${JWT_EXPIRATION_SECONDS:28800}
+  internal:
+    token: ${INTERNAL_API_TOKEN:internal-mottu-service-token-2026}
+    intelligence-service-url: ${INTELLIGENCE_SERVICE_URL:http://localhost:18000}
+  s3:
+    bucket-name: ${S3_BUCKET_NAME:mottu-inspections}
+    access-key: ${S3_ACCESS_KEY:minioadmin}
+    secret-key: ${S3_SECRET_KEY:minioadmin123}
+    internal-endpoint: ${S3_INTERNAL_ENDPOINT:http://localhost:19000}
+    public-endpoint: ${S3_PUBLIC_ENDPOINT:http://localhost:19000}
+  bigquery:
+    enabled: ${BIGQUERY_ENABLED:false}
+    dataset: ${BIGQUERY_DATASET:mottu_ops_bi}
+    table: ${BIGQUERY_TABLE:fact_inspections}

@@ -1,0 +1,36 @@
+spring:
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:mottu_ops_test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ''
+  flyway:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+mottu:
+  demo-mode: false
+  jwt:
+    secret: test-secret-must-be-at-least-32-bytes-long-for-hmac-sha256-compliance
+    expiration-seconds: 3600
+  internal:
+    token: test-internal-token
+    intelligence-service-url: http://localhost:18000
+  s3:
+    bucket-name: mottu-inspections
+    access-key: minioadmin
+    secret-key: minioadmin123
+    internal-endpoint: http://localhost:19000
+    public-endpoint: http://localhost:19000
+  bigquery:
+    enabled: false

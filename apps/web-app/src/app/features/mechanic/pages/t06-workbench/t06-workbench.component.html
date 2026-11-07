@@ -1,0 +1,357 @@
+<div class="min-h-screen bg-[#0A0E0D] text-[#F2F7F5] flex flex-col">
+  <!-- Top Navigation Header -->
+  <header class="bg-[#121816] border-b border-[#26332E] px-4 lg:px-8 py-3.5 flex items-center justify-between sticky top-0 z-40">
+    <div class="flex items-center gap-4">
+      <button
+        type="button"
+        (click)="backToQueue()"
+        class="flex items-center gap-2 text-sm font-bold text-[#94A39E] hover:text-[#00E676] transition-colors"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        <span>Voltar para Fila</span>
+      </button>
+
+      <span class="text-[#26332E]">|</span>
+
+      <div class="flex items-center gap-2.5">
+        <span class="text-xs px-2 py-0.5 rounded-full bg-[#1A2320] text-[#00E676] border border-[#26332E] font-mono font-bold">
+          T06 • MESA DE DECISÃO
+        </span>
+        @if (details(); as d) {
+          <span class="text-sm font-mono font-extrabold text-[#F2F7F5]">{{ d.plate }}</span>
+          <span class="text-xs text-[#94A39E]">({{ formatModel(d.motorcycleModel) }})</span>
+        }
+      </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div>
+      @if (details(); as d) {
+        @if (d.status === 'HUMAN_RESOLVED') {
+          <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/40">
+            ✓ LAUDO FINALIZADO
+          </span>
+        } @else {
+          <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#FFB300]/15 text-[#FFB300] border border-[#FFB300]/40">
+            AGUARDANDO DECISÃO
+          </span>
+        }
+      }
+    </div>
+  </header>
+
+  <!-- Error Alert -->
+  @if (errorMessage()) {
+    <div class="max-w-7xl w-full mx-auto p-4">
+      <div class="bg-[#FF4D4F]/10 border border-[#FF4D4F]/30 rounded-lg p-4 text-[#FF4D4F] text-sm flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>{{ errorMessage() }}</span>
+        </div>
+        <button
+          type="button"
+          (click)="backToQueue()"
+          class="text-xs font-bold underline hover:no-underline"
+        >
+          Retornar à Fila
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="flex-1 flex flex-col items-center justify-center py-24 space-y-3">
+      <div class="w-10 h-10 border-2 border-[#00E676] border-t-transparent rounded-full animate-spin"></div>
+      <span class="text-sm text-[#94A39E] font-mono">Carregando evidências e laudo pericial...</span>
+    </div>
+  } @else {
+    @if (details(); as d) {
+      <!-- Main Workbench Split Screen (55% Evidence / 45% Decision) -->
+      <main class="flex-1 max-w-[1600px] w-full mx-auto p-4 lg:p-6">
+      <!-- Resolution Success Banner -->
+      @if (resolutionResult(); as res) {
+        <div class="mb-6 bg-[#00E676]/10 border border-[#00E676]/40 rounded-xl p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">✓</span>
+              <h3 class="text-lg font-bold text-[#00E676]">Laudo Definitivo Emitido com Sucesso!</h3>
+            </div>
+            <span class="font-mono text-sm text-[#00E676] font-bold">
+              Total: R$ {{ res.totalEstimatedBrl.toFixed(2) }}
+            </span>
+          </div>
+
+          <div class="bg-[#121816] rounded-lg p-3.5 border border-[#26332E]">
+            <span class="text-xs font-mono text-[#94A39E] block mb-1">
+              Feedback empático e educativo polido pela IA p/ o Entregador:
+            </span>
+            <p class="text-sm text-[#F2F7F5] italic leading-relaxed">
+              "{{ res.customerFeedbackText }}"
+            </p>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button
+              type="button"
+              (click)="backToQueue()"
+              class="px-5 py-2.5 rounded-lg bg-[#00E676] text-[#06120B] font-bold text-sm hover:bg-[#00C853] transition-colors"
+            >
+              Concluir e Voltar para Fila →
+            </button>
+          </div>
+        </div>
+      }
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- LEFT 55%: Visual Evidence & Telemetry Desk (col-span-12 lg:col-span-7) -->
+        <section class="lg:col-span-7 space-y-4">
+          <!-- Evidence Card -->
+          <div class="bg-[#121816] border border-[#26332E] rounded-xl p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-mono font-bold text-[#F2F7F5]">
+                  {{ d.plate }} • Foto de Alta Resolução (Lupa Ativa 2x a 4x)
+                </span>
+              </div>
+              <span class="text-xs text-[#94A39E] font-mono">
+                Passe o cursor sobre a foto para ampliar
+              </span>
+            </div>
+
+            <!-- Photo Zoom Lens Component -->
+            <app-photo-zoom-lens
+              [photoUrl]="d.photoDownloadUrl"
+              [boundingBoxes]="boundingBoxes()"
+            ></app-photo-zoom-lens>
+
+            <!-- Telemetry & Claim Card -->
+            <div class="bg-[#0A0E0D] border border-[#26332E] rounded-lg p-4 space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+                <div class="flex items-center gap-2">
+                  <span class="text-[#94A39E]">Contrato Retirada:</span>
+                  <span class="text-[#F2F7F5] font-bold">
+                    {{ d.hoursSincePickup ?? 0 }}h atrás ({{ d.kmDrivenSincePickup ?? 0 }} km rodados)
+                  </span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[#94A39E]">Hodômetro Informado:</span>
+                  <span class="text-[#F2F7F5] font-bold">{{ d.reportedOdometerKm }} km</span>
+                </div>
+              </div>
+
+              <!-- Contestation Warning -->
+              @if (d.contestedOnce) {
+                <div class="bg-[#FFB300]/10 border border-[#FFB300]/30 rounded-md p-3 text-xs space-y-1">
+                  <div class="flex items-center gap-1.5 font-bold text-[#FFB300]">
+                    <span>⚠️</span>
+                    <span>CONTESTAÇÃO DO ENTREGADOR:</span>
+                  </div>
+                  <p class="text-[#F2F7F5] italic font-sans pl-5">
+                    "{{ d.contestationReason || 'O entregador contestou o apontamento automático.' }}"
+                  </p>
+                </div>
+              }
+
+              <!-- Fraud Warning -->
+              @if (d.fraudSuspected) {
+                <div class="bg-[#29B6F6]/10 border border-[#29B6F6]/30 rounded-md p-3 text-xs space-y-1">
+                  <div class="flex items-center gap-1.5 font-bold text-[#29B6F6]">
+                    <span>ℹ️</span>
+                    <span>ALERTA DE FOTO REPETIDA (SHA-256 / dHash):</span>
+                  </div>
+                  <p class="text-[#F2F7F5] font-sans pl-5">
+                    {{ d.fraudReason || 'Imagem coincide com vistoria anterior já auditada.' }}
+                  </p>
+                </div>
+              }
+
+              <!-- Rider Observation -->
+              @if (d.riderNotes) {
+                <div class="text-xs space-y-1 pt-1 border-t border-[#26332E]">
+                  <span class="text-[#94A39E]">Relato do Entregador:</span>
+                  <p class="text-[#F2F7F5] font-sans italic">
+                    "{{ d.riderNotes }}"
+                  </p>
+                </div>
+              }
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT 45%: Decision Desk & Reactive Quotation (col-span-12 lg:col-span-5) -->
+        <section class="lg:col-span-5 space-y-4">
+          <div class="bg-[#121816] border border-[#26332E] rounded-xl p-5 space-y-5">
+            <!-- AI Recommendation Banner -->
+            <div class="bg-[#1A2320] border border-[#26332E] rounded-lg p-3.5 space-y-1.5">
+              <div class="flex items-center justify-between text-xs font-mono">
+                <span class="text-[#29B6F6] font-bold">
+                  Sugestão da IA ({{ ((d.aiConfidence || 0) * 100).toFixed(0) }}% confiança)
+                </span>
+                <span class="px-2 py-0.5 rounded bg-[#29B6F6]/15 text-[#29B6F6] font-bold">
+                  {{ d.aiSuggestedVerdict || 'EM ANÁLISE' }}
+                </span>
+              </div>
+              @if (d.aiTechnicalSummary) {
+                <p class="text-xs text-[#94A39E] font-sans leading-relaxed">
+                  {{ d.aiTechnicalSummary }}
+                </p>
+              }
+            </div>
+
+            <!-- Step 1: Veredito Oficial Definitivo -->
+            <div class="space-y-2.5">
+              <label class="block text-sm font-bold text-[#F2F7F5]">
+                1. Escolher Veredito Oficial Definitivo:
+              </label>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  (click)="setVerdict('PRE_EXISTENTE')"
+                  [disabled]="d.status === 'HUMAN_RESOLVED'"
+                  [class]="
+                    selectedVerdict() === 'PRE_EXISTENTE'
+                      ? 'py-3 px-2 rounded-lg text-xs font-mono font-bold bg-[#00E676] text-[#06120B] shadow-sm'
+                      : 'py-3 px-2 rounded-lg text-xs font-mono font-semibold bg-[#0A0E0D] text-[#F2F7F5] border border-[#26332E] hover:border-[#00E676]/50'
+                  "
+                >
+                  Pré-existente<br/><span class="text-[11px] opacity-80">R$ 0,00</span>
+                </button>
+
+                <button
+                  type="button"
+                  (click)="setVerdict('DESGASTE_NATURAL')"
+                  [disabled]="d.status === 'HUMAN_RESOLVED'"
+                  [class]="
+                    selectedVerdict() === 'DESGASTE_NATURAL'
+                      ? 'py-3 px-2 rounded-lg text-xs font-mono font-bold bg-[#00E676] text-[#06120B] shadow-sm'
+                      : 'py-3 px-2 rounded-lg text-xs font-mono font-semibold bg-[#0A0E0D] text-[#F2F7F5] border border-[#26332E] hover:border-[#00E676]/50'
+                  "
+                >
+                  Desgaste Natural<br/><span class="text-[11px] opacity-80">R$ 0,00</span>
+                </button>
+
+                <button
+                  type="button"
+                  (click)="setVerdict('MAU_USO')"
+                  [disabled]="d.status === 'HUMAN_RESOLVED'"
+                  [class]="
+                    selectedVerdict() === 'MAU_USO'
+                      ? 'py-3 px-2 rounded-lg text-xs font-mono font-bold bg-[#00E676] text-[#06120B] shadow-sm'
+                      : 'py-3 px-2 rounded-lg text-xs font-mono font-semibold bg-[#0A0E0D] text-[#F2F7F5] border border-[#26332E] hover:border-[#00E676]/50'
+                  "
+                >
+                  Mau Uso<br/><span class="text-[11px] opacity-80">Cobrança</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Step 2: Peças & Orçamento Reativo -->
+            <div class="space-y-3 pt-2 border-t border-[#26332E]">
+              <div class="flex items-center justify-between">
+                <label class="text-sm font-bold text-[#F2F7F5]">
+                  2. Peças do Catálogo Mottu:
+                </label>
+                <span class="text-xs text-[#94A39E] font-mono">
+                  Mão de Obra Fixa: R$ 35,00
+                </span>
+              </div>
+
+              <!-- Checklist of Parts -->
+              <div class="space-y-2">
+                @for (item of d.items; track item.catalogPartId) {
+                  <label
+                    class="flex items-center justify-between p-2.5 rounded-lg bg-[#0A0E0D] border border-[#26332E] cursor-pointer hover:border-[#00E676]/40 transition-colors"
+                  >
+                    <div class="flex items-center gap-2.5">
+                      <input
+                        type="checkbox"
+                        [checked]="selectedPartIds().has(item.catalogPartId)"
+                        (change)="togglePart(item.catalogPartId)"
+                        [disabled]="d.status === 'HUMAN_RESOLVED'"
+                        class="w-4 h-4 rounded text-[#00E676] focus:ring-0 bg-[#121816] border-[#26332E]"
+                      />
+                      <span class="text-xs font-medium text-[#F2F7F5]">{{ item.partName }}</span>
+                    </div>
+                    <span class="text-xs font-mono text-[#00E676] font-bold">
+                      R$ {{ item.unitPriceBrl.toFixed(2) }}
+                    </span>
+                  </label>
+                } @empty {
+                  <div class="p-3 bg-[#0A0E0D] border border-[#26332E] rounded-lg text-xs text-[#94A39E] text-center font-mono">
+                    Nenhuma peça pré-selecionada pela IA.
+                  </div>
+                }
+              </div>
+
+              <!-- Reactive Price Summary Box -->
+              <div class="bg-[#0A0E0D] border border-[#26332E] rounded-lg p-3.5 space-y-2 text-xs font-mono">
+                <div class="flex justify-between text-[#94A39E]">
+                  <span>Subtotal Peças:</span>
+                  <span class="text-[#F2F7F5]">R$ {{ partsCost().toFixed(2) }}</span>
+                </div>
+                <div class="flex justify-between text-[#94A39E]">
+                  <span>Mão de Obra Oficina:</span>
+                  <span class="text-[#F2F7F5]">R$ {{ laborCost().toFixed(2) }}</span>
+                </div>
+                <div class="pt-2 border-t border-[#26332E] flex justify-between items-center text-sm font-bold">
+                  <span class="text-[#F2F7F5]">Total Estimado Laudo:</span>
+                  <span class="text-[#00E676] text-base">
+                    R$ {{ totalEstimated().toFixed(2) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3: Anotação Técnica -->
+            <div class="space-y-2 pt-2 border-t border-[#26332E]">
+              <label class="block text-sm font-bold text-[#F2F7F5]">
+                3. Anotação Técnica do Mecânico:
+              </label>
+              <textarea
+                rows="3"
+                [ngModel]="mechanicNotes()"
+                (ngModelChange)="mechanicNotes.set($event)"
+                [disabled]="d.status === 'HUMAN_RESOLVED'"
+                placeholder="Ex: Ralado profundo com entortamento recente típico de queda lateral..."
+                class="w-full bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-lg p-3 text-xs text-[#F2F7F5] placeholder-[#94A39E] outline-none transition-colors"
+              ></textarea>
+              <span class="text-[11px] text-[#94A39E] block">
+                ℹ️ O assistente inteligente converterá este apontamento em uma comunicação empática e transparente para o entregador.
+              </span>
+            </div>
+
+            <!-- Final CTA Button (Height: 52px+ as mandated by Law 5) -->
+            <div class="pt-2">
+              @if (d.status === 'HUMAN_RESOLVED') {
+                <div class="h-[52px] bg-[#1A2320] border border-[#26332E] rounded-lg flex items-center justify-center text-sm font-mono text-[#00E676] font-bold">
+                  ✓ Este laudo já foi finalizado
+                </div>
+              } @else {
+                <button
+                  type="button"
+                  (click)="resolveInspection()"
+                  [disabled]="!canSubmit()"
+                  class="w-full h-[52px] rounded-lg bg-[#00E676] hover:bg-[#00C853] disabled:opacity-50 disabled:cursor-not-allowed text-[#06120B] font-extrabold text-base transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,230,118,0.2)]"
+                >
+                  @if (isSubmitting()) {
+                    <div class="w-5 h-5 border-2 border-[#06120B] border-t-transparent rounded-full animate-spin"></div>
+                    <span>Processando Laudo...</span>
+                  } @else {
+                    <span>Finalizar Laudo Definitivo</span>
+                  }
+                </button>
+              }
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    }
+  }
+</div>

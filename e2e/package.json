@@ -1,0 +1,21 @@
+{
+  "name": "mottu-smart-ops-e2e",
+  "version": "1.0.0",
+  "description": "Comprehensive 4-Tier E2E Test Suite for Mottu Smart Ops",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:tier1": "playwright test tests/tier1-features",
+    "test:tier2": "playwright test tests/tier2-boundaries",
+    "test:tier3": "playwright test tests/tier3-cross-feature",
+    "test:tier4": "playwright test tests/tier4-scenarios",
+    "test:mock": "cross-env E2E_CONTRACT_MODE=mock playwright test",
+    "test:live": "cross-env E2E_CONTRACT_MODE=live playwright test",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2"
+  }
+}

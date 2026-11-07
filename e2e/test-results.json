@@ -1,0 +1,5221 @@
+{
+  "config": {
+    "argv": [
+      "/home/robson/.nvm/versions/node/v22.19.0/bin/node",
+      "/home/robson/Projetos_Desenvolvimento/mattu-projeto-selecao/e2e/node_modules/.bin/playwright",
+      "test"
+    ],
+    "configFile": "/home/robson/Projetos_Desenvolvimento/mattu-projeto-selecao/e2e/playwright.config.ts",
+    "rootDir": "/home/robson/Projetos_Desenvolvimento/mattu-projeto-selecao/e2e/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/robson/Projetos_Desenvolvimento/mattu-projeto-selecao/e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/home/robson/Projetos_Desenvolvimento/mattu-projeto-selecao/e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/home/robson/Projetos_Desenvolvimento/mattu-projeto-selecao/e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "/home/robson/Projetos_Desenvolvimento/mattu-projeto-selecao/e2e/tests",
+        "snapshotDir": "/home/robson/Projetos_Desenvolvimento/mattu-projeto-selecao/e2e/tests",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://localhost:18088",
+          "trace": "off",
+          "video": "off",
+          "screenshot": "off"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.65.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "tier1-features/01-auth-rbac.spec.ts",
+      "file": "tier1-features/01-auth-rbac.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 1: Feature 01 - Authentication & RBAC",
+          "file": "tier1-features/01-auth-rbac.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC1.1: Register new RIDER with valid data creates user with PENDING_APPROVAL",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 95,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.189Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd78441dabd6a216cb58-0736fde09d28622355e0",
+              "file": "tier1-features/01-auth-rbac.spec.ts",
+              "line": 7,
+              "column": 3
+            },
+            {
+              "title": "TC1.2: Register new MECHANIC creates user with PENDING_APPROVAL",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 16,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.353Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd78441dabd6a216cb58-44c8bd95d213821e0553",
+              "file": "tier1-features/01-auth-rbac.spec.ts",
+              "line": 23,
+              "column": 3
+            },
+            {
+              "title": "TC1.3: Manager login with valid credentials returns JWT token and ACTIVE role",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 19,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.397Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd78441dabd6a216cb58-2e24ca4568392653b450",
+              "file": "tier1-features/01-auth-rbac.spec.ts",
+              "line": 37,
+              "column": 3
+            },
+            {
+              "title": "TC1.4: Login with PENDING_APPROVAL user returns 403 Forbidden with RFC 7807",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 45,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.440Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd78441dabd6a216cb58-6bde76783e4f2a833d84",
+              "file": "tier1-features/01-auth-rbac.spec.ts",
+              "line": 49,
+              "column": 3
+            },
+            {
+              "title": "TC1.5: Query public config returns publicDemoMode boolean",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.507Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd78441dabd6a216cb58-be01ba50ac0437f7d704",
+              "file": "tier1-features/01-auth-rbac.spec.ts",
+              "line": 70,
+              "column": 3
+            },
+            {
+              "title": "TC1.6: RBAC isolation: RIDER token cannot access Manager routes",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 16,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.542Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dd78441dabd6a216cb58-8c38bfad170375446a58",
+              "file": "tier1-features/01-auth-rbac.spec.ts",
+              "line": 76,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier1-features/02-yards-fleet.spec.ts",
+      "file": "tier1-features/02-yards-fleet.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 1: Feature 02 - Yards & Fleet Management",
+          "file": "tier1-features/02-yards-fleet.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC2.1: Get active operational yards returns Butantã & Guarulhos",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.591Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0f858957ca456b1dc7b3-31bd8e9e61883fc9db48",
+              "file": "tier1-features/02-yards-fleet.spec.ts",
+              "line": 6,
+              "column": 3
+            },
+            {
+              "title": "TC2.2: Get fleet motorcycles list returns seeded bikes with models & yards",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.624Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0f858957ca456b1dc7b3-f92aba631608b9699d34",
+              "file": "tier1-features/02-yards-fleet.spec.ts",
+              "line": 15,
+              "column": 3
+            },
+            {
+              "title": "TC2.3: Create new motorcycle in yard registers bike with AVAILABLE status",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.651Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0f858957ca456b1dc7b3-0af692c6fbc29e0a2e39",
+              "file": "tier1-features/02-yards-fleet.spec.ts",
+              "line": 25,
+              "column": 3
+            },
+            {
+              "title": "TC2.4: Query fleet returns valid PageResponse format",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.682Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0f858957ca456b1dc7b3-2a22e914ecb630e6a458",
+              "file": "tier1-features/02-yards-fleet.spec.ts",
+              "line": 42,
+              "column": 3
+            },
+            {
+              "title": "TC2.5: Unauthenticated access to yards is rejected",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.709Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0f858957ca456b1dc7b3-b47eecff0335695e4453",
+              "file": "tier1-features/02-yards-fleet.spec.ts",
+              "line": 51,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier1-features/03-rider-garage.spec.ts",
+      "file": "tier1-features/03-rider-garage.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 1: Feature 03 - Rider Garage & Active Contract",
+          "file": "tier1-features/03-rider-garage.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC3.1: Rider with active rental contract sees motorcycle telemetry in garage",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.740Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d29e2014b885fcf844ac-a61924ee91b50e75c97d",
+              "file": "tier1-features/03-rider-garage.spec.ts",
+              "line": 5,
+              "column": 3
+            },
+            {
+              "title": "TC3.2: Garage displays open inspections count as a non-negative integer",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.769Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d29e2014b885fcf844ac-18abce0ae957e0fed9dd",
+              "file": "tier1-features/03-rider-garage.spec.ts",
+              "line": 16,
+              "column": 3
+            },
+            {
+              "title": "TC3.3: Garage displays recent inspections array",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.792Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d29e2014b885fcf844ac-3bc1db61ed99ba7b7161",
+              "file": "tier1-features/03-rider-garage.spec.ts",
+              "line": 24,
+              "column": 3
+            },
+            {
+              "title": "TC3.4: Mechanic accessing rider garage receives 403 Forbidden",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.816Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d29e2014b885fcf844ac-24ab49b6d3f3ce79cbbe",
+              "file": "tier1-features/03-rider-garage.spec.ts",
+              "line": 30,
+              "column": 3
+            },
+            {
+              "title": "TC3.5: Manager accessing rider garage receives 403 Forbidden",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.838Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d29e2014b885fcf844ac-4667f51f2e644852d6d7",
+              "file": "tier1-features/03-rider-garage.spec.ts",
+              "line": 36,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier1-features/04-photo-upload-antifraud.spec.ts",
+      "file": "tier1-features/04-photo-upload-antifraud.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 1: Feature 04 - Photo S3 Upload & Pre-Validation",
+          "file": "tier1-features/04-photo-upload-antifraud.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC4.1: Request presigned upload URL for valid image/webp returns 200 OK with photoObjectKey",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.870Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5df2483114a02ae316f7-2f2e7296f5450c53db3c",
+              "file": "tier1-features/04-photo-upload-antifraud.spec.ts",
+              "line": 5,
+              "column": 3
+            },
+            {
+              "title": "TC4.2: Request presigned upload URL for valid image/jpeg returns 200 OK",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.894Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5df2483114a02ae316f7-ea3d4f40aa9771960b8e",
+              "file": "tier1-features/04-photo-upload-antifraud.spec.ts",
+              "line": 19,
+              "column": 3
+            },
+            {
+              "title": "TC4.3: Request presigned upload URL for valid image/png returns 200 OK",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.917Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5df2483114a02ae316f7-a3146ff47e1c4981723f",
+              "file": "tier1-features/04-photo-upload-antifraud.spec.ts",
+              "line": 29,
+              "column": 3
+            },
+            {
+              "title": "TC4.4: Reject unsupported content type (application/pdf) with 400 Bad Request",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.942Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5df2483114a02ae316f7-56bd49d637020498213b",
+              "file": "tier1-features/04-photo-upload-antifraud.spec.ts",
+              "line": 39,
+              "column": 3
+            },
+            {
+              "title": "TC4.5: Reject oversized file (> 10 MB = 10485760 bytes) with 400 Bad Request",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:22.973Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5df2483114a02ae316f7-b2cfaf3dec179ddb8906",
+              "file": "tier1-features/04-photo-upload-antifraud.spec.ts",
+              "line": 50,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier1-features/05-inspection-idempotency.spec.ts",
+      "file": "tier1-features/05-inspection-idempotency.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 1: Feature 05 - Inspection Ingestion & Idempotency",
+          "file": "tier1-features/05-inspection-idempotency.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC5.1: Create inspection with unique Idempotency-Key returns 202 Accepted and inspectionId",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.006Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "822bd380afe5a93c1f32-c6e642514f018aa0c7d3",
+              "file": "tier1-features/05-inspection-idempotency.spec.ts",
+              "line": 7,
+              "column": 3
+            },
+            {
+              "title": "TC5.2: Replaying identical request with same Idempotency-Key returns existing inspectionId without duplication",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 16,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.029Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "822bd380afe5a93c1f32-5f0095cd68b1a96ac38c",
+              "file": "tier1-features/05-inspection-idempotency.spec.ts",
+              "line": 22,
+              "column": 3
+            },
+            {
+              "title": "TC5.3: Request missing Idempotency-Key header is rejected with 400 Bad Request",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.061Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "822bd380afe5a93c1f32-712727ef4b3752128908",
+              "file": "tier1-features/05-inspection-idempotency.spec.ts",
+              "line": 44,
+              "column": 3
+            },
+            {
+              "title": "TC5.4: Enforce maximum of 3 open inspections per contract",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 17,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.085Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "822bd380afe5a93c1f32-f550e0156ba3514f6a58",
+              "file": "tier1-features/05-inspection-idempotency.spec.ts",
+              "line": 60,
+              "column": 3
+            },
+            {
+              "title": "TC5.5: Resolving an inspection decrements open inspections count",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 17,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.120Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "822bd380afe5a93c1f32-467459b7543ca65c5a59",
+              "file": "tier1-features/05-inspection-idempotency.spec.ts",
+              "line": 87,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier1-features/06-ai-triage-preexisting.spec.ts",
+      "file": "tier1-features/06-ai-triage-preexisting.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 1: Feature 06 - AI Triage & Pre-Existing Rule Engine",
+          "file": "tier1-features/06-ai-triage-preexisting.spec.ts",
+          "line": 9,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC6.1: Pre-existing damage claim under 48h and 100km is AUTO_RESOLVED with R$ 0.00 total",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.164Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f2aad9a2561dc093dc9a-3fa611de0b18bd6b9ade",
+              "file": "tier1-features/06-ai-triage-preexisting.spec.ts",
+              "line": 10,
+              "column": 3
+            },
+            {
+              "title": "TC6.2: Natural wear and tear claim is AUTO_RESOLVED with R$ 0.00 total and preventive replacement",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.190Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f2aad9a2561dc093dc9a-ebaaf0ab70d7dfb21185",
+              "file": "tier1-features/06-ai-triage-preexisting.spec.ts",
+              "line": 30,
+              "column": 3
+            },
+            {
+              "title": "TC6.3: Accident or drop claim calculates item price + standard labor fee (R$ 35.00)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.216Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f2aad9a2561dc093dc9a-0d928fc2afdc4fe84139",
+              "file": "tier1-features/06-ai-triage-preexisting.spec.ts",
+              "line": 48,
+              "column": 3
+            },
+            {
+              "title": "TC6.4: High confidence AI result (>= 0.80) completes automatically without human queue",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.245Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f2aad9a2561dc093dc9a-5ea47474ecb04ef1a650",
+              "file": "tier1-features/06-ai-triage-preexisting.spec.ts",
+              "line": 67,
+              "column": 3
+            },
+            {
+              "title": "TC6.5: Pre-existing claim exceeding 48h AND 100km diverts to HUMAN_TRIAGE for mechanic evaluation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.273Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f2aad9a2561dc093dc9a-9f886089eb5cfe4fa4a6",
+              "file": "tier1-features/06-ai-triage-preexisting.spec.ts",
+              "line": 82,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier1-features/07-ai-recovery-sla.spec.ts",
+      "file": "tier1-features/07-ai-recovery-sla.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 1: Feature 07 - AI Recovery Policy & SLA Escalation",
+          "file": "tier1-features/07-ai-recovery-sla.spec.ts",
+          "line": 9,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC7.1: AI temporary outage places job into recovery without overwhelming mechanic",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.307Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6ef403e5d1265f188268-bfe9514eaec977dd6450",
+              "file": "tier1-features/07-ai-recovery-sla.spec.ts",
+              "line": 10,
+              "column": 3
+            },
+            {
+              "title": "TC7.2: SAFE_TO_RIDE inspection remains in recovery queue through backoff intervals",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.324Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6ef403e5d1265f188268-335ec953095ea02ef6f3",
+              "file": "tier1-features/07-ai-recovery-sla.spec.ts",
+              "line": 30,
+              "column": 3
+            },
+            {
+              "title": "TC7.3: CRITICAL_STOPPED inspection in recovery queue >5 minutes escalates to HUMAN_TRIAGE with weight 1",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.340Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6ef403e5d1265f188268-d303a9f8df46c807913c",
+              "file": "tier1-features/07-ai-recovery-sla.spec.ts",
+              "line": 47,
+              "column": 3
+            },
+            {
+              "title": "TC7.4: Recovery backoff schedules next retry (30s -> 60s -> 300s)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.365Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6ef403e5d1265f188268-1983d67f601b87333d3e",
+              "file": "tier1-features/07-ai-recovery-sla.spec.ts",
+              "line": 72,
+              "column": 3
+            },
+            {
+              "title": "TC7.5: Successful recovery response transitions status away from AWAITING_AI_RECOVERY",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.382Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6ef403e5d1265f188268-6fb5436363f24130bd10",
+              "file": "tier1-features/07-ai-recovery-sla.spec.ts",
+              "line": 79,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier1-features/08-rider-contestation.spec.ts",
+      "file": "tier1-features/08-rider-contestation.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 1: Feature 08 - Rider Contestation (\"Discordo\")",
+          "file": "tier1-features/08-rider-contestation.spec.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC8.1: Contesting AUTO_RESOLVED inspection with valid reason transitions to HUMAN_TRIAGE with weight 2",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.407Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dfcb3520700603d57ae9-43b7707ec8b300b0e7b1",
+              "file": "tier1-features/08-rider-contestation.spec.ts",
+              "line": 11,
+              "column": 3
+            },
+            {
+              "title": "TC8.2: Contestation marks contestedOnce = true preventing repeat contestation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.434Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dfcb3520700603d57ae9-f89f4c245649d09a7665",
+              "file": "tier1-features/08-rider-contestation.spec.ts",
+              "line": 32,
+              "column": 3
+            },
+            {
+              "title": "TC8.3: Attempting contestation with reason shorter than 10 characters returns 400 Bad Request",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.459Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dfcb3520700603d57ae9-222edc762c3f6e3a4f5b",
+              "file": "tier1-features/08-rider-contestation.spec.ts",
+              "line": 51,
+              "column": 3
+            },
+            {
+              "title": "TC8.4: Attempting second contestation on already contested inspection returns 422 Unprocessable Entity",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.485Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dfcb3520700603d57ae9-0fb5049ce500ac8371b0",
+              "file": "tier1-features/08-rider-contestation.spec.ts",
+              "line": 70,
+              "column": 3
+            },
+            {
+              "title": "TC8.5: Attempting contestation on already HUMAN_RESOLVED inspection returns 422",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.511Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dfcb3520700603d57ae9-d1aa82349548e0451da9",
+              "file": "tier1-features/08-rider-contestation.spec.ts",
+              "line": 94,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier1-features/09-mechanic-workbench.spec.ts",
+      "file": "tier1-features/09-mechanic-workbench.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 1: Feature 09 - Mechanic Intelligent Queue & Workbench",
+          "file": "tier1-features/09-mechanic-workbench.spec.ts",
+          "line": 9,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC9.1: Mechanic queue returns exclusively inspections in HUMAN_TRIAGE status",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.554Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "75fb69b4d9e659e4b2bd-1648d15d97c37f23ff8e",
+              "file": "tier1-features/09-mechanic-workbench.spec.ts",
+              "line": 10,
+              "column": 3
+            },
+            {
+              "title": "TC9.2: Mechanic queue orders items strictly by priorityWeight ASC, then createdAt ASC",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.576Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "75fb69b4d9e659e4b2bd-59e14cc15dd9a0c0de0c",
+              "file": "tier1-features/09-mechanic-workbench.spec.ts",
+              "line": 38,
+              "column": 3
+            },
+            {
+              "title": "TC9.3: Mechanic retrieves detailed inspection view with full telemetry and AI summary",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.604Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "75fb69b4d9e659e4b2bd-64536c782d8fa4e62517",
+              "file": "tier1-features/09-mechanic-workbench.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "TC9.4: Mechanic resolves inspection overriding verdict to DESGASTE_NATURAL recalculating total to R$ 0.00",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.633Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "75fb69b4d9e659e4b2bd-8472ea7a56c16cfd5824",
+              "file": "tier1-features/09-mechanic-workbench.spec.ts",
+              "line": 129,
+              "column": 3
+            },
+            {
+              "title": "TC9.5: Mechanic resolution generates audit log entry and outbox event",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.655Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "75fb69b4d9e659e4b2bd-8959663c401c12cfd5e3",
+              "file": "tier1-features/09-mechanic-workbench.spec.ts",
+              "line": 155,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier1-features/10-yard-appointment.spec.ts",
+      "file": "tier1-features/10-yard-appointment.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 1: Feature 10 - Yard Appointment Scheduling",
+          "file": "tier1-features/10-yard-appointment.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC10.1: Schedule appointment for future date and MORNING shift returns 201 Created and status SCHEDULED",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.686Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d3d9e256730693248769-d1860e2453f68ad07f2a",
+              "file": "tier1-features/10-yard-appointment.spec.ts",
+              "line": 6,
+              "column": 3
+            },
+            {
+              "title": "TC10.2: Schedule appointment for AFTERNOON shift returns 201 Created",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.712Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d3d9e256730693248769-b29ea9c010d86dcae96a",
+              "file": "tier1-features/10-yard-appointment.spec.ts",
+              "line": 33,
+              "column": 3
+            },
+            {
+              "title": "TC10.3: Scheduling appointment for past date returns 400 Bad Request",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.740Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d3d9e256730693248769-62cec2f8d5f90fef61bd",
+              "file": "tier1-features/10-yard-appointment.spec.ts",
+              "line": 57,
+              "column": 3
+            },
+            {
+              "title": "TC10.4: Appointment associates active operational yard with valid yardName",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.767Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d3d9e256730693248769-e1f112882dc31f7f9a17",
+              "file": "tier1-features/10-yard-appointment.spec.ts",
+              "line": 82,
+              "column": 3
+            },
+            {
+              "title": "TC10.5: Scheduling appointment for non-existent inspection returns 404 Not Found",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.792Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d3d9e256730693248769-6e51c91ab8d07d77c48d",
+              "file": "tier1-features/10-yard-appointment.spec.ts",
+              "line": 106,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier1-features/11-catalog-vtex-sync.spec.ts",
+      "file": "tier1-features/11-catalog-vtex-sync.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 1: Feature 11 - Parts Catalog & VTEX Sync",
+          "file": "tier1-features/11-catalog-vtex-sync.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC11.1: Manager triggers VTEX store catalog sync returning 200 OK with syncedCount",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.823Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b48b46a320c99ed092ff-2c12df7ef15d73c1c3a8",
+              "file": "tier1-features/11-catalog-vtex-sync.spec.ts",
+              "line": 5,
+              "column": 3
+            },
+            {
+              "title": "TC11.2: Catalog query returns parts list with prices and categories",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.845Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b48b46a320c99ed092ff-8bc405a3e0b7f7cfaccb",
+              "file": "tier1-features/11-catalog-vtex-sync.spec.ts",
+              "line": 13,
+              "column": 3
+            },
+            {
+              "title": "TC11.3: Manager manually overrides part price setting priceOverridden = true",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.879Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b48b46a320c99ed092ff-02218deaefe1f3c14724",
+              "file": "tier1-features/11-catalog-vtex-sync.spec.ts",
+              "line": 23,
+              "column": 3
+            },
+            {
+              "title": "TC11.4: Subsequent catalog sync preserves manually overridden price without overwriting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.903Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b48b46a320c99ed092ff-b72f659a3ff58b9e4a7c",
+              "file": "tier1-features/11-catalog-vtex-sync.spec.ts",
+              "line": 37,
+              "column": 3
+            },
+            {
+              "title": "TC11.5: Non-manager cannot trigger catalog sync or edit prices",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.930Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b48b46a320c99ed092ff-d32230fbea4128b34c5e",
+              "file": "tier1-features/11-catalog-vtex-sync.spec.ts",
+              "line": 52,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier1-features/12-analytics-outbox.spec.ts",
+      "file": "tier1-features/12-analytics-outbox.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 1: Feature 12 - Executive Analytics & BigQuery Outbox Batch",
+          "file": "tier1-features/12-analytics-outbox.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC12.1: Manager queries analytics summary returning key operational KPIs",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.959Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "21bdd2a3eb0654ff4d6b-606dc538168766a7fcf3",
+              "file": "tier1-features/12-analytics-outbox.spec.ts",
+              "line": 4,
+              "column": 3
+            },
+            {
+              "title": "TC12.2: Analytics summary includes valid Looker Studio embed URL",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:23.982Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "21bdd2a3eb0654ff4d6b-87981f55b4fb478883bd",
+              "file": "tier1-features/12-analytics-outbox.spec.ts",
+              "line": 13,
+              "column": 3
+            },
+            {
+              "title": "TC12.3: Manager queries system settings returning standard labor fee",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.006Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "21bdd2a3eb0654ff4d6b-bd9d5bc60b48ba2d34ec",
+              "file": "tier1-features/12-analytics-outbox.spec.ts",
+              "line": 20,
+              "column": 3
+            },
+            {
+              "title": "TC12.4: Manager updates standard labor fee successfully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.029Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "21bdd2a3eb0654ff4d6b-08e3db33f8c5de4eb541",
+              "file": "tier1-features/12-analytics-outbox.spec.ts",
+              "line": 26,
+              "column": 3
+            },
+            {
+              "title": "TC12.5: Rider or Mechanic attempting to read executive analytics receives 403 Forbidden",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.056Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "21bdd2a3eb0654ff4d6b-a6fa8d3f292c30dc588b",
+              "file": "tier1-features/12-analytics-outbox.spec.ts",
+              "line": 35,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier2-boundaries/01-auth-boundaries.spec.ts",
+      "file": "tier2-boundaries/01-auth-boundaries.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 2: Boundary 01 - Auth & Access Boundaries",
+          "file": "tier2-boundaries/01-auth-boundaries.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TB1.1: Register with empty password is rejected with 400 Bad Request",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.088Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "da8de142137ae1224045-b54a9fed4d93b3130c24",
+              "file": "tier2-boundaries/01-auth-boundaries.spec.ts",
+              "line": 6,
+              "column": 3
+            },
+            {
+              "title": "TB1.2: Register with empty full name is rejected with 400 Bad Request",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.107Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "da8de142137ae1224045-3a76b0c7aaf83bd9d34e",
+              "file": "tier2-boundaries/01-auth-boundaries.spec.ts",
+              "line": 19,
+              "column": 3
+            },
+            {
+              "title": "TB1.3: Register attempting role = MANAGER is rejected with 400 Bad Request",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.125Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "da8de142137ae1224045-21b72ffc0aa22dac573c",
+              "file": "tier2-boundaries/01-auth-boundaries.spec.ts",
+              "line": 32,
+              "column": 3
+            },
+            {
+              "title": "TB1.4: Login with incorrect password returns 401 Unauthorized",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.146Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "da8de142137ae1224045-5eb61b759834b756f2af",
+              "file": "tier2-boundaries/01-auth-boundaries.spec.ts",
+              "line": 46,
+              "column": 3
+            },
+            {
+              "title": "TB1.5: Login with non-existent email returns 401 Unauthorized",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.164Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "da8de142137ae1224045-42e6b954d0b3eb809f98",
+              "file": "tier2-boundaries/01-auth-boundaries.spec.ts",
+              "line": 55,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier2-boundaries/02-fleet-boundaries.spec.ts",
+      "file": "tier2-boundaries/02-fleet-boundaries.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 2: Boundary 02 - Fleet & Motorcycle Boundaries",
+          "file": "tier2-boundaries/02-fleet-boundaries.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TB2.1: Negative odometer kilometer value (-1) is rejected",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.191Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "1c7a9f950c2de2a11687-62a1e3d2bca84bd1afa4",
+              "file": "tier2-boundaries/02-fleet-boundaries.spec.ts",
+              "line": 5,
+              "column": 3
+            },
+            {
+              "title": "TB2.2: Zero odometer kilometer value (0) is accepted for brand-new bike",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.213Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "1c7a9f950c2de2a11687-e97971af6dac265032e5",
+              "file": "tier2-boundaries/02-fleet-boundaries.spec.ts",
+              "line": 17,
+              "column": 3
+            },
+            {
+              "title": "TB2.3: Fleet pagination bounds: page 0 size 20 returns maximum 20 items",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.237Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "1c7a9f950c2de2a11687-95e5200eee635e95828b",
+              "file": "tier2-boundaries/02-fleet-boundaries.spec.ts",
+              "line": 29,
+              "column": 3
+            },
+            {
+              "title": "TB2.4: Query fleet with non-existent plate returns empty items list",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.259Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "1c7a9f950c2de2a11687-1a490045dcb17979778d",
+              "file": "tier2-boundaries/02-fleet-boundaries.spec.ts",
+              "line": 36,
+              "column": 3
+            },
+            {
+              "title": "TB2.5: Motorcycle status transitions preserve model and plate identity",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.279Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "1c7a9f950c2de2a11687-7dc92f3890481af5e97d",
+              "file": "tier2-boundaries/02-fleet-boundaries.spec.ts",
+              "line": 41,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier2-boundaries/03-garage-boundaries.spec.ts",
+      "file": "tier2-boundaries/03-garage-boundaries.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 2: Boundary 03 - Rider Garage & Isolation Boundaries",
+          "file": "tier2-boundaries/03-garage-boundaries.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TB3.1: Rider cannot access other rider inspection detail by ID (IDOR boundary)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.308Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5fdb4b152b9528824bd9-188d9b42c0e6a47ded28",
+              "file": "tier2-boundaries/03-garage-boundaries.spec.ts",
+              "line": 5,
+              "column": 3
+            },
+            {
+              "title": "TB3.2: Garage with zero recent inspections returns empty array without throwing error",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.328Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5fdb4b152b9528824bd9-6a3a81cacf68e20e248a",
+              "file": "tier2-boundaries/03-garage-boundaries.spec.ts",
+              "line": 23,
+              "column": 3
+            },
+            {
+              "title": "TB3.3: Initial odometer matches current odometer when 0 km driven",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.353Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5fdb4b152b9528824bd9-4d5dd8870139177ce76e",
+              "file": "tier2-boundaries/03-garage-boundaries.spec.ts",
+              "line": 30,
+              "column": 3
+            },
+            {
+              "title": "TB3.4: Query non-existent inspection returns 404 Problem Details",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.373Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5fdb4b152b9528824bd9-ccf712bf5149d860d74a",
+              "file": "tier2-boundaries/03-garage-boundaries.spec.ts",
+              "line": 47,
+              "column": 3
+            },
+            {
+              "title": "TB3.5: Garage contract contains valid ISO date timestamp for pickedUpAt",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.394Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5fdb4b152b9528824bd9-6453663e614145948458",
+              "file": "tier2-boundaries/03-garage-boundaries.spec.ts",
+              "line": 53,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier2-boundaries/04-upload-fraud-boundaries.spec.ts",
+      "file": "tier2-boundaries/04-upload-fraud-boundaries.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 2: Boundary 04 - Photo Upload & Fraud Boundaries",
+          "file": "tier2-boundaries/04-upload-fraud-boundaries.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TB4.1: Exact limit: fileSizeBytes = 10485760 (10.0 MB exact) is ACCEPTED",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.422Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cef0ef7d022855610151-29ee07fe41352a05459c",
+              "file": "tier2-boundaries/04-upload-fraud-boundaries.spec.ts",
+              "line": 6,
+              "column": 3
+            },
+            {
+              "title": "TB4.2: Exact limit: fileSizeBytes = 10485761 (10.0 MB + 1 byte) is REJECTED with 400 Bad Request",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.444Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cef0ef7d022855610151-9654c03376cbe4eb05d2",
+              "file": "tier2-boundaries/04-upload-fraud-boundaries.spec.ts",
+              "line": 15,
+              "column": 3
+            },
+            {
+              "title": "TB4.3: Exact limit: fileSizeBytes = 0 (empty file) is rejected",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.464Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cef0ef7d022855610151-d9e2e319f83fc757ddc6",
+              "file": "tier2-boundaries/04-upload-fraud-boundaries.spec.ts",
+              "line": 24,
+              "column": 3
+            },
+            {
+              "title": "TB4.4: Duplicate photo SHA-256 flagged as fraud routes directly to HUMAN_TRIAGE with weight 4",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.488Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cef0ef7d022855610151-d3eb8c3706c164279181",
+              "file": "tier2-boundaries/04-upload-fraud-boundaries.spec.ts",
+              "line": 33,
+              "column": 3
+            },
+            {
+              "title": "TB4.5: Presigned upload URL expires in positive number of seconds (<= 900)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.513Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cef0ef7d022855610151-b4d3073c1840907354fb",
+              "file": "tier2-boundaries/04-upload-fraud-boundaries.spec.ts",
+              "line": 48,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier2-boundaries/05-idempotency-limits-boundaries.spec.ts",
+      "file": "tier2-boundaries/05-idempotency-limits-boundaries.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 2: Boundary 05 - Idempotency & Concurrency Limits",
+          "file": "tier2-boundaries/05-idempotency-limits-boundaries.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TB5.1: Whitespace-only Idempotency-Key is rejected with 400 Bad Request",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.543Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "255bb08a1565c5afa305-41448feb2d39d1591f27",
+              "file": "tier2-boundaries/05-idempotency-limits-boundaries.spec.ts",
+              "line": 6,
+              "column": 3
+            },
+            {
+              "title": "TB5.2: Exactly 3 open inspections are permitted, 4th is blocked with 422",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 15,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.564Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "255bb08a1565c5afa305-447a3c8912d40aa7d7ec",
+              "file": "tier2-boundaries/05-idempotency-limits-boundaries.spec.ts",
+              "line": 17,
+              "column": 3
+            },
+            {
+              "title": "TB5.3: Long Idempotency-Key (80 chars) is processed safely",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.593Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "255bb08a1565c5afa305-82c5bb96c047177c6942",
+              "file": "tier2-boundaries/05-idempotency-limits-boundaries.spec.ts",
+              "line": 58,
+              "column": 3
+            },
+            {
+              "title": "TB5.4: Special characters in rider notes are stored safely without injection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.614Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "255bb08a1565c5afa305-bde1c5998455f2f03052",
+              "file": "tier2-boundaries/05-idempotency-limits-boundaries.spec.ts",
+              "line": 70,
+              "column": 3
+            },
+            {
+              "title": "TB5.5: Simultaneous parallel requests with identical Idempotency-Key return identical inspectionId",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 39,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.637Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "255bb08a1565c5afa305-98f42ba1a61243c78247",
+              "file": "tier2-boundaries/05-idempotency-limits-boundaries.spec.ts",
+              "line": 83,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier2-boundaries/06-preexisting-math-boundaries.spec.ts",
+      "file": "tier2-boundaries/06-preexisting-math-boundaries.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 2: Boundary 06 - Pre-Existing Math & AI Threshold Boundaries",
+          "file": "tier2-boundaries/06-preexisting-math-boundaries.spec.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TB6.1: EXACT boundary: 48.0h and 150km (hours <= 48.0 is TRUE) -> AUTO_RESOLVED R$ 0.00",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.699Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0e5accff816419c49284-1f01adda80d030429546",
+              "file": "tier2-boundaries/06-preexisting-math-boundaries.spec.ts",
+              "line": 11,
+              "column": 3
+            },
+            {
+              "title": "TB6.2: EXACT boundary: 72.0h and 100km (km <= 100 is TRUE) -> AUTO_RESOLVED R$ 0.00",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.724Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0e5accff816419c49284-5e39c225a69c40122a55",
+              "file": "tier2-boundaries/06-preexisting-math-boundaries.spec.ts",
+              "line": 29,
+              "column": 3
+            },
+            {
+              "title": "TB6.3: EXACT boundary: 48.1h AND 101km (BOTH exceeded) -> HUMAN_TRIAGE for mechanic review",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.752Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0e5accff816419c49284-b3ff76c12a06feb23b53",
+              "file": "tier2-boundaries/06-preexisting-math-boundaries.spec.ts",
+              "line": 47,
+              "column": 3
+            },
+            {
+              "title": "TB6.4: EXACT AI confidence boundary: confidence = 0.80 (>= 0.80) -> AUTO_RESOLVED",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.777Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0e5accff816419c49284-d3c5769295351d7dbb23",
+              "file": "tier2-boundaries/06-preexisting-math-boundaries.spec.ts",
+              "line": 63,
+              "column": 3
+            },
+            {
+              "title": "TB6.5: EXACT AI confidence boundary: confidence = 0.79 (< 0.80) -> HUMAN_TRIAGE (LOW_AI_CONFIDENCE)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.802Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0e5accff816419c49284-49acecf345bd8513ad05",
+              "file": "tier2-boundaries/06-preexisting-math-boundaries.spec.ts",
+              "line": 80,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier2-boundaries/07-recovery-sla-boundaries.spec.ts",
+      "file": "tier2-boundaries/07-recovery-sla-boundaries.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 2: Boundary 07 - AI Recovery & SLA Time Boundaries",
+          "file": "tier2-boundaries/07-recovery-sla-boundaries.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TB7.1: EXACT SLA limit: 4 min 59 sec (<= 300s) -> remains in AWAITING_AI_RECOVERY",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.834Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "963a163aabaaafcc39b9-22262aca5ea40938c142",
+              "file": "tier2-boundaries/07-recovery-sla-boundaries.spec.ts",
+              "line": 5,
+              "column": 3
+            },
+            {
+              "title": "TB7.2: EXACT SLA limit: 5 min 01 sec (> 300s) with CRITICAL_STOPPED -> escalates to HUMAN_TRIAGE weight 1",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.851Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "963a163aabaaafcc39b9-9f88c8a3716abe5c91a7",
+              "file": "tier2-boundaries/07-recovery-sla-boundaries.spec.ts",
+              "line": 21,
+              "column": 3
+            },
+            {
+              "title": "TB7.3: Non-critical SAFE_TO_RIDE after 10 min does not receive weight 1 priority",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.874Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "963a163aabaaafcc39b9-1b464436dfb815e295a2",
+              "file": "tier2-boundaries/07-recovery-sla-boundaries.spec.ts",
+              "line": 44,
+              "column": 3
+            },
+            {
+              "title": "TB7.4: Recovery retry count upper bounds at 3 without crashing",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.897Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "963a163aabaaafcc39b9-b5c6647fed5e05bab0dd",
+              "file": "tier2-boundaries/07-recovery-sla-boundaries.spec.ts",
+              "line": 66,
+              "column": 3
+            },
+            {
+              "title": "TB7.5: Processing zero items in recovery queue handles cleanly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.913Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "963a163aabaaafcc39b9-47a50742baa79a65f005",
+              "file": "tier2-boundaries/07-recovery-sla-boundaries.spec.ts",
+              "line": 74,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier2-boundaries/08-contestation-boundaries.spec.ts",
+      "file": "tier2-boundaries/08-contestation-boundaries.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 2: Boundary 08 - Contestation Length & Status Boundaries",
+          "file": "tier2-boundaries/08-contestation-boundaries.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TB8.1: EXACT text length boundary: reason with exactly 10 characters is ACCEPTED",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.949Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7e65830eca708a43cae5-9a85bb9ee9f665f27001",
+              "file": "tier2-boundaries/08-contestation-boundaries.spec.ts",
+              "line": 6,
+              "column": 3
+            },
+            {
+              "title": "TB8.2: EXACT text length boundary: reason with exactly 9 characters is REJECTED with 400 Bad Request",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.972Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7e65830eca708a43cae5-e2dcdf73ab0eac47753f",
+              "file": "tier2-boundaries/08-contestation-boundaries.spec.ts",
+              "line": 22,
+              "column": 3
+            },
+            {
+              "title": "TB8.3: Contestation reason with whitespace padding (10 spaces) is trimmed and rejected with 400",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:24.995Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7e65830eca708a43cae5-b58c186f406d55472374",
+              "file": "tier2-boundaries/08-contestation-boundaries.spec.ts",
+              "line": 38,
+              "column": 3
+            },
+            {
+              "title": "TB8.4: Contestation reason with exactly 500 characters (max limit) is accepted",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.023Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7e65830eca708a43cae5-4e7be82d7d9871400bb1",
+              "file": "tier2-boundaries/08-contestation-boundaries.spec.ts",
+              "line": 54,
+              "column": 3
+            },
+            {
+              "title": "TB8.5: Attempting contestation on inspection not in AUTO_RESOLVED status returns 422",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.050Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7e65830eca708a43cae5-0b97e1824c956b633821",
+              "file": "tier2-boundaries/08-contestation-boundaries.spec.ts",
+              "line": 69,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier2-boundaries/09-mechanic-queue-boundaries.spec.ts",
+      "file": "tier2-boundaries/09-mechanic-queue-boundaries.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 2: Boundary 09 - Mechanic Queue Sorting & Boundaries",
+          "file": "tier2-boundaries/09-mechanic-queue-boundaries.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TB9.1: Queue strictly orders weights 1 -> 2 -> 3 -> 4",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.086Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "21197fde993076b124f4-0320560268ad4667835b",
+              "file": "tier2-boundaries/09-mechanic-queue-boundaries.spec.ts",
+              "line": 5,
+              "column": 3
+            },
+            {
+              "title": "TB9.2: Identical priority weights tie-break by createdAt ASC (FIFO)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.108Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "21197fde993076b124f4-f19c904fc4c62aaec664",
+              "file": "tier2-boundaries/09-mechanic-queue-boundaries.spec.ts",
+              "line": 63,
+              "column": 3
+            },
+            {
+              "title": "TB9.3: Empty queue returns items: [] with totalElements: 0",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.131Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "21197fde993076b124f4-624af2c3870d9b0cfa1d",
+              "file": "tier2-boundaries/09-mechanic-queue-boundaries.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "TB9.4: Mechanic notes max length boundary: 500 characters accepted cleanly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.151Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "21197fde993076b124f4-b72a65f4a3a32c82124e",
+              "file": "tier2-boundaries/09-mechanic-queue-boundaries.spec.ts",
+              "line": 106,
+              "column": 3
+            },
+            {
+              "title": "TB9.5: Resolving already resolved inspection preserves finalVerdict",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.173Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "21197fde993076b124f4-6c254b2e3d60d8d39006",
+              "file": "tier2-boundaries/09-mechanic-queue-boundaries.spec.ts",
+              "line": 126,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier2-boundaries/10-appointment-boundaries.spec.ts",
+      "file": "tier2-boundaries/10-appointment-boundaries.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 2: Boundary 10 - Appointment Date & Shift Boundaries",
+          "file": "tier2-boundaries/10-appointment-boundaries.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TB10.1: EXACT date boundary: scheduledDate = TODAY is ACCEPTED",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.200Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "617551769dcc5f467748-30a3c23f7e6748b0b9c9",
+              "file": "tier2-boundaries/10-appointment-boundaries.spec.ts",
+              "line": 6,
+              "column": 3
+            },
+            {
+              "title": "TB10.2: EXACT date boundary: scheduledDate = YESTERDAY is REJECTED with 400 Bad Request",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.226Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "617551769dcc5f467748-960665c2a8ca69c28ae1",
+              "file": "tier2-boundaries/10-appointment-boundaries.spec.ts",
+              "line": 29,
+              "column": 3
+            },
+            {
+              "title": "TB10.3: EXACT date boundary: scheduledDate = TOMORROW is ACCEPTED",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.249Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "617551769dcc5f467748-5a5becd832057d7fe36c",
+              "file": "tier2-boundaries/10-appointment-boundaries.spec.ts",
+              "line": 52,
+              "column": 3
+            },
+            {
+              "title": "TB10.4: Appointment shift boundary: supports both MORNING and AFTERNOON enums",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.276Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "617551769dcc5f467748-6baca6729c90e479cc98",
+              "file": "tier2-boundaries/10-appointment-boundaries.spec.ts",
+              "line": 75,
+              "column": 3
+            },
+            {
+              "title": "TB10.5: Appointment on inspection transitions status to SCHEDULED",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.292Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "617551769dcc5f467748-dac8ea0c8efeee571e6a",
+              "file": "tier2-boundaries/10-appointment-boundaries.spec.ts",
+              "line": 80,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier2-boundaries/11-catalog-price-boundaries.spec.ts",
+      "file": "tier2-boundaries/11-catalog-price-boundaries.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 2: Boundary 11 - Parts Catalog Price & Override Boundaries",
+          "file": "tier2-boundaries/11-catalog-price-boundaries.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TB11.1: Unit price boundary: 0.00 BRL is valid for promotional/free replacement item",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.326Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a02486433cdcb5ffdadd-bb8130e0f50b05025a18",
+              "file": "tier2-boundaries/11-catalog-price-boundaries.spec.ts",
+              "line": 5,
+              "column": 3
+            },
+            {
+              "title": "TB11.2: Updating isNaturalWear toggles wear coverage classification",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.351Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a02486433cdcb5ffdadd-910fbe793670b8456112",
+              "file": "tier2-boundaries/11-catalog-price-boundaries.spec.ts",
+              "line": 18,
+              "column": 3
+            },
+            {
+              "title": "TB11.3: Update non-existent catalog part returns 404 Problem Details",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.377Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a02486433cdcb5ffdadd-8278cc4855aad6270196",
+              "file": "tier2-boundaries/11-catalog-price-boundaries.spec.ts",
+              "line": 31,
+              "column": 3
+            },
+            {
+              "title": "TB11.4: All supported motorcycle models are present in catalog schema",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.398Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a02486433cdcb5ffdadd-e318cbe5f3de38690221",
+              "file": "tier2-boundaries/11-catalog-price-boundaries.spec.ts",
+              "line": 38,
+              "column": 3
+            },
+            {
+              "title": "TB11.5: Seed catalog parts have non-negative prices and non-empty categories",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.415Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a02486433cdcb5ffdadd-5a7aa26547a7e5d10c07",
+              "file": "tier2-boundaries/11-catalog-price-boundaries.spec.ts",
+              "line": 46,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier2-boundaries/12-analytics-boundaries.spec.ts",
+      "file": "tier2-boundaries/12-analytics-boundaries.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 2: Boundary 12 - Analytics & Outbox Boundaries",
+          "file": "tier2-boundaries/12-analytics-boundaries.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TB12.1: autoResolvedPercentage is bounded between 0.0 and 100.0",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.448Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cc04d1897f2014ca8c3c-c958fce21a85548bb98c",
+              "file": "tier2-boundaries/12-analytics-boundaries.spec.ts",
+              "line": 4,
+              "column": 3
+            },
+            {
+              "title": "TB12.2: currentHumanQueueSize is non-negative integer",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.468Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cc04d1897f2014ca8c3c-5aa04fa5505eabe7b945",
+              "file": "tier2-boundaries/12-analytics-boundaries.spec.ts",
+              "line": 11,
+              "column": 3
+            },
+            {
+              "title": "TB12.3: activeMotorcyclesCount is positive integer",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.490Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cc04d1897f2014ca8c3c-bab9935237c1ae8c9cd2",
+              "file": "tier2-boundaries/12-analytics-boundaries.spec.ts",
+              "line": 18,
+              "column": 3
+            },
+            {
+              "title": "TB12.4: Standard labor fee cannot be negative",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.511Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cc04d1897f2014ca8c3c-67554eeacaacdee53ed5",
+              "file": "tier2-boundaries/12-analytics-boundaries.spec.ts",
+              "line": 25,
+              "column": 3
+            },
+            {
+              "title": "TB12.5: Looker Studio URL is valid HTTPS url string",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.533Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cc04d1897f2014ca8c3c-7eac66f13cf937f578d9",
+              "file": "tier2-boundaries/12-analytics-boundaries.spec.ts",
+              "line": 31,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier3-cross-feature/cross-feature-flows.spec.ts",
+      "file": "tier3-cross-feature/cross-feature-flows.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 3: Cross-Feature Combinations",
+          "file": "tier3-cross-feature/cross-feature-flows.spec.ts",
+          "line": 15,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC3.1: Pairwise: Auth + Fleet + Inspection + Mechanic Workbench + Appointment",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 29,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.566Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "facce7485ef34c359950-e6a6180defae5228eeb7",
+              "file": "tier3-cross-feature/cross-feature-flows.spec.ts",
+              "line": 16,
+              "column": 3
+            },
+            {
+              "title": "TC3.2: Multi-part calculation: Single labor fee charged regardless of parts count in MAU_USO",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.611Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "facce7485ef34c359950-926e08cf108c2008d57e",
+              "file": "tier3-cross-feature/cross-feature-flows.spec.ts",
+              "line": 88,
+              "column": 3
+            },
+            {
+              "title": "TC3.3: Price override persistence across manager edit and rider quote",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.638Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "facce7485ef34c359950-62a5f6bbd3544afd5376",
+              "file": "tier3-cross-feature/cross-feature-flows.spec.ts",
+              "line": 103,
+              "column": 3
+            },
+            {
+              "title": "TC3.4: Manager rejection blocks user login with RFC 7807 detail",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.667Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "facce7485ef34c359950-0f936b76feea47ac6181",
+              "file": "tier3-cross-feature/cross-feature-flows.spec.ts",
+              "line": 121,
+              "column": 3
+            },
+            {
+              "title": "TC3.5: Fleet creation and motorcycle status change on rental assignment",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 16,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.698Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "facce7485ef34c359950-c8102461e49ee7db835f",
+              "file": "tier3-cross-feature/cross-feature-flows.spec.ts",
+              "line": 145,
+              "column": 3
+            },
+            {
+              "title": "TC3.6: Anti-fraud duplicate photo denied automatic exemption despite <=12h contract",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.733Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "facce7485ef34c359950-9f5887f8781fadba847e",
+              "file": "tier3-cross-feature/cross-feature-flows.spec.ts",
+              "line": 185,
+              "column": 3
+            },
+            {
+              "title": "TC3.7: Priority leapfrog: Critical safety (weight 1) overtakes Contestation (weight 2) in queue",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.760Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "facce7485ef34c359950-fed0c46dd11a3daee7ca",
+              "file": "tier3-cross-feature/cross-feature-flows.spec.ts",
+              "line": 203,
+              "column": 3
+            },
+            {
+              "title": "TC3.8: SSE real-time stream endpoint is accessible with Bearer token",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.793Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "facce7485ef34c359950-e1eb081f97f7bd28c40e",
+              "file": "tier3-cross-feature/cross-feature-flows.spec.ts",
+              "line": 239,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier4-scenarios/journey-accident-and-contestation.spec.ts",
+      "file": "tier4-scenarios/journey-accident-and-contestation.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 4: Scenario 3 - Accidental Damage & Contestation Journey",
+          "file": "tier4-scenarios/journey-accident-and-contestation.spec.ts",
+          "line": 11,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Complete Journey: Bike dropped -> Quoted R$ 60.00 -> Rider contests -> Mechanic reviews & adjusts -> Appointment",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 31,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.869Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f057e15e4cabb4d1e215-5430029707a338f18f47",
+              "file": "tier4-scenarios/journey-accident-and-contestation.spec.ts",
+              "line": 12,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier4-scenarios/journey-critical-safety-sla.spec.ts",
+      "file": "tier4-scenarios/journey-critical-safety-sla.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 4: Scenario 5 - Gemini Outage & Critical Safety SLA Escalation Journey",
+          "file": "tier4-scenarios/journey-critical-safety-sla.spec.ts",
+          "line": 9,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Complete Journey: Critical bike stopped + Gemini temporary outage -> Recovery wait -> SLA job breaches 5 min -> Escalates to priority weight 1 -> Immediate mechanic desk resolution",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.924Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "44735242bb94f14205af-b61422cfa213cf0ab4ef",
+              "file": "tier4-scenarios/journey-critical-safety-sla.spec.ts",
+              "line": 10,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier4-scenarios/journey-manager-bi-catalog.spec.ts",
+      "file": "tier4-scenarios/journey-manager-bi-catalog.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 4: Scenario 6 - Manager Executive BI & Catalog Intelligence Journey",
+          "file": "tier4-scenarios/journey-manager-bi-catalog.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Complete Journey: Manager approves accounts -> Syncs VTEX catalog -> Edits parts -> Checks BI KPIs & Looker",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 28,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:25.958Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5c463774c7306279b1f3-ec4f44c1fe678f1c951c",
+              "file": "tier4-scenarios/journey-manager-bi-catalog.spec.ts",
+              "line": 5,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier4-scenarios/journey-photo-fraud-flagged.spec.ts",
+      "file": "tier4-scenarios/journey-photo-fraud-flagged.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 4: Scenario 4 - Photo Fraud & Perceptual Hash Quarantine Journey",
+          "file": "tier4-scenarios/journey-photo-fraud-flagged.spec.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Complete Journey: Malicious user submits duplicate photo -> Caught by SHA256/dHash -> Quarantined in mechanic queue weight 4 -> Denied auto-exemption",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 18,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:26.007Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b975001d2217a7d80e33-10b3a0c658fb108448c0",
+              "file": "tier4-scenarios/journey-photo-fraud-flagged.spec.ts",
+              "line": 11,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier4-scenarios/journey-preexisting-free.spec.ts",
+      "file": "tier4-scenarios/journey-preexisting-free.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 4: Scenario 1 - Pre-Existing Damage Autonomous Resolution Journey",
+          "file": "tier4-scenarios/journey-preexisting-free.spec.ts",
+          "line": 11,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Complete Journey: New Rider receives bike -> Reports scratch in 12h -> Auto-approved R$ 0.00 -> Schedules maintenance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 36,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:26.050Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "deaa0216cc59e449e67d-e31f3e402b5b5575712f",
+              "file": "tier4-scenarios/journey-preexisting-free.spec.ts",
+              "line": 12,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tier4-scenarios/journey-wear-and-tear.spec.ts",
+      "file": "tier4-scenarios/journey-wear-and-tear.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Tier 4: Scenario 2 - Normal Wear & Tear Preventive Journey",
+          "file": "tier4-scenarios/journey-wear-and-tear.spec.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Complete Journey: Veteran Rider with 5,000 km reports brake wear -> Auto-approved R$ 0.00 preventive exchange",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 20,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T11:04:26.111Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "269c7c83b92c82f58972-2e9cee6bd0998f437087",
+              "file": "tier4-scenarios/journey-wear-and-tear.spec.ts",
+              "line": 11,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-07T11:04:21.285Z",
+    "duration": 4912.677,
+    "expected": 135,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

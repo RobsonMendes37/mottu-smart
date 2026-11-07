@@ -1,0 +1,373 @@
+<div class="min-h-screen bg-[#0A0E0D] text-[#F2F7F5] p-6 lg:p-10 font-sans">
+  <div class="max-w-7xl mx-auto space-y-6">
+    <!-- Top Navigation & Header Bar -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#26332E] pb-6">
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-[#00E676]/10 text-[#00E676] border border-[#00E676]/30">
+            T09 • CATÁLOGO OFICIAL
+          </span>
+          <span class="text-xs font-mono text-[#94A39E]">PAINEL DO GESTOR</span>
+        </div>
+        <h1 class="text-2xl lg:text-3xl font-extrabold text-[#F2F7F5] mt-1 tracking-tight">
+          Catálogo de Peças e Mão de Obra
+        </h1>
+        <p class="text-sm text-[#94A39E] mt-1">
+          Preços base sincronizados com <strong class="text-[#F2F7F5]">loja.mottu.com.br</strong> com preservação garantida para alterações manuais.
+        </p>
+      </div>
+
+      <!-- Quick Manager Nav Links -->
+      <div class="flex items-center gap-2">
+        <a
+          routerLink="/manager/approvals"
+          class="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#121816] text-[#94A39E] hover:text-[#F2F7F5] border border-[#26332E] transition-colors"
+        >
+          Aprovações
+        </a>
+        <a
+          routerLink="/manager/catalog"
+          class="px-4 py-2.5 rounded-lg text-sm font-bold bg-[#1A2320] text-[#00E676] border border-[#00E676]/40 flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          Catálogo Oficial
+        </a>
+        <a
+          routerLink="/manager/analytics"
+          class="px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#121816] text-[#94A39E] hover:text-[#F2F7F5] border border-[#26332E] transition-colors"
+        >
+          Painel Executivo
+        </a>
+      </div>
+    </div>
+
+    <!-- Alert Banners -->
+    @if (successMessage()) {
+      <div class="p-4 rounded-xl bg-[#00E676]/10 border border-[#00E676]/40 text-[#00E676] flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span class="text-sm font-medium">{{ successMessage() }}</span>
+        </div>
+        <button (click)="successMessage.set(null)" class="text-[#00E676] hover:text-[#F2F7F5] text-sm">✕</button>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="p-4 rounded-xl bg-[#FF4D4F]/10 border border-[#FF4D4F]/40 text-[#FF4D4F] flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="text-sm font-medium">{{ errorMessage() }}</span>
+        </div>
+        <button (click)="errorMessage.set(null)" class="text-[#FF4D4F] hover:text-[#F2F7F5] text-sm">✕</button>
+      </div>
+    }
+
+    <!-- Top Action Cards: Sync Button & Standard Labor Fee -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Sync VTEX Action Card -->
+      <div class="lg:col-span-2 bg-[#121816] border border-[#26332E] rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono font-bold text-[#00E676]">SINCRONIZAÇÃO VTEX</span>
+            @if (syncResult()?.syncedAt) {
+              <span class="text-xs font-mono text-[#94A39E]">
+                • Última sinc: {{ syncResult()?.syncedAt | date:'dd/MM HH:mm' }}
+              </span>
+            }
+          </div>
+          <h3 class="text-base font-bold text-[#F2F7F5]">Sincronizar Catálogo com Loja Mottu</h3>
+          <p class="text-xs text-[#94A39E]">
+            Dispara raspagem automática em <code class="text-[#00E676]">loja.mottu.com.br</code>. Peças com override manual não são alteradas.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="syncMottuStore()"
+          [disabled]="isSyncing()"
+          class="min-h-[52px] px-6 py-3 rounded-xl text-sm font-extrabold bg-[#00E676] text-[#06120B] hover:brightness-110 active:scale-[0.98] disabled:opacity-50 transition-all flex items-center justify-center gap-2.5 shadow-[0_0_20px_rgba(0,230,118,0.25)] flex-shrink-0"
+        >
+          @if (isSyncing()) {
+            <div class="w-4 h-4 border-2 border-[#06120B] border-t-transparent rounded-full animate-spin"></div>
+            <span>Sincronizando...</span>
+          } @else {
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Atualizar Preços do Site da Mottu</span>
+          }
+        </button>
+      </div>
+
+      <!-- Standard Labor Fee Card -->
+      <div class="bg-[#121816] border border-[#26332E] rounded-2xl p-6 flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono font-bold text-[#29B6F6]">PARÂMETRO OPERACIONAL</span>
+          <button
+            type="button"
+            (click)="toggleEditLaborFee()"
+            class="text-xs font-mono text-[#00E676] hover:underline"
+          >
+            {{ isEditingLaborFee() ? 'Cancelar' : 'Alterar' }}
+          </button>
+        </div>
+
+        <div class="mt-2">
+          <span class="text-xs text-[#94A39E]">Taxa Padrão de Mão de Obra</span>
+          @if (!isEditingLaborFee()) {
+            <div class="text-2xl font-mono font-extrabold text-[#F2F7F5] mt-0.5">
+              R$ {{ standardLaborFee().toFixed(2).replace('.', ',') }}
+              <span class="text-xs text-[#94A39E] font-normal font-sans">/ laudo</span>
+            </div>
+          } @else {
+            <div class="flex items-center gap-2 mt-1.5">
+              <div class="relative flex-1">
+                <span class="absolute left-3 top-3 text-xs font-mono text-[#94A39E]">R$</span>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  [ngModel]="laborFeeInput()"
+                  (ngModelChange)="setLaborFeeInput($event)"
+                  class="w-full min-h-[44px] bg-[#1A2320] border border-[#26332E] focus:border-[#00E676] rounded-xl pl-9 pr-3 text-sm font-mono text-[#F2F7F5] outline-none"
+                />
+              </div>
+              <button
+                type="button"
+                (click)="saveLaborFee()"
+                class="min-h-[44px] px-4 rounded-xl text-xs font-bold bg-[#00E676] text-[#06120B] hover:brightness-110"
+              >
+                Salvar
+              </button>
+            </div>
+          }
+        </div>
+
+        <span class="text-[11px] text-[#94A39E]/80 mt-2 font-mono">
+          Cobrada automaticamente apenas em vereditos de MAU_USO.
+        </span>
+      </div>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-[#121816] border border-[#26332E] rounded-xl p-4">
+      <!-- Model Dropdown / Tabs -->
+      <div class="flex flex-wrap items-center gap-2">
+        @for (m of availableModels; track m.key) {
+          <button
+            type="button"
+            (click)="setModelFilter(m.key)"
+            [class]="selectedModel() === m.key
+              ? 'px-3.5 py-2 rounded-lg text-xs font-bold bg-[#00E676] text-[#06120B]'
+              : 'px-3.5 py-2 rounded-lg text-xs font-semibold bg-[#1A2320] text-[#94A39E] hover:text-[#F2F7F5] border border-[#26332E]'"
+          >
+            {{ m.label }}
+          </button>
+        }
+      </div>
+
+      <!-- Search Input -->
+      <div class="relative max-w-sm w-full">
+        <svg class="w-4 h-4 text-[#94A39E] absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Buscar por peça ou SKU..."
+          [ngModel]="searchTerm()"
+          (ngModelChange)="onSearch($event)"
+          class="w-full min-h-[44px] bg-[#1A2320] border border-[#26332E] focus:border-[#00E676] rounded-xl pl-10 pr-4 text-xs font-mono text-[#F2F7F5] placeholder-[#94A39E] outline-none"
+        />
+      </div>
+    </div>
+
+    <!-- Catalog Table Section -->
+    <div class="bg-[#121816] border border-[#26332E] rounded-2xl overflow-hidden shadow-lg">
+      <div class="p-4 border-b border-[#26332E] flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <h2 class="text-sm font-bold text-[#F2F7F5]">Peças Homologadas</h2>
+          <span class="text-xs font-mono text-[#94A39E]">({{ totalElements() }} itens cadastrados)</span>
+        </div>
+        <span class="text-xs font-mono text-[#94A39E]">Página {{ currentPage() + 1 }} de {{ totalPages() || 1 }}</span>
+      </div>
+
+      @if (isLoading()) {
+        <div class="flex flex-col items-center justify-center p-16 space-y-3">
+          <div class="w-8 h-8 border-4 border-[#00E676]/20 border-t-[#00E676] rounded-full animate-spin"></div>
+          <span class="text-xs font-mono text-[#94A39E]">Carregando catálogo...</span>
+        </div>
+      }
+
+      @if (!isLoading() && parts().length === 0) {
+        <div class="p-12 text-center text-[#94A39E] space-y-2">
+          <p class="font-bold text-[#F2F7F5]">Nenhuma peça encontrada</p>
+          <p class="text-xs">Tente ajustar os filtros ou clique no botão de sincronização no topo.</p>
+        </div>
+      }
+
+      @if (!isLoading() && parts().length > 0) {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-[#1A2320] text-[#94A39E] border-b border-[#26332E]">
+              <tr>
+                <th class="py-3 px-4">SKU VTEX</th>
+                <th class="py-3 px-4">Modelo da Moto</th>
+                <th class="py-3 px-4">Nome da Peça</th>
+                <th class="py-3 px-4">Categoria</th>
+                <th class="py-3 px-4">Preço Unitário</th>
+                <th class="py-3 px-4">Desgaste Natural</th>
+                <th class="py-3 px-4">Origem</th>
+                <th class="py-3 px-4 text-right">Ação</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#26332E]">
+              @for (part of parts(); track part.id) {
+                <tr class="hover:bg-[#1A2320]/40 transition-colors">
+                  <!-- SKU -->
+                  <td class="py-3.5 px-4 text-[#F2F7F5] font-bold">{{ part.vtexSku }}</td>
+
+                  <!-- Model -->
+                  <td class="py-3.5 px-4 text-[#94A39E]">{{ formatModelName(part.motorcycleModel) }}</td>
+
+                  <!-- Part Name -->
+                  <td class="py-3.5 px-4 text-[#F2F7F5] font-semibold">{{ part.partName }}</td>
+
+                  <!-- Category -->
+                  <td class="py-3.5 px-4 text-[#94A39E] uppercase">{{ part.category }}</td>
+
+                  <!-- Unit Price (with Inline Edit) -->
+                  <td class="py-3.5 px-4">
+                    @if (editingPartId() === part.id) {
+                      <div class="flex items-center gap-1">
+                        <span class="text-[#00E676]">R$</span>
+                        <input
+                          type="number"
+                          step="0.5"
+                          min="0"
+                          [(ngModel)]="editingPrice"
+                          class="w-24 bg-[#0A0E0D] border border-[#00E676] rounded px-2 py-1 text-xs font-mono text-[#F2F7F5] outline-none"
+                        />
+                      </div>
+                    } @else {
+                      <span class="text-[#00E676] font-bold">
+                        R$ {{ (+part.unitPriceBrl).toFixed(2).replace('.', ',') }}
+                      </span>
+                    }
+                  </td>
+
+                  <!-- Natural Wear (with Inline Edit) -->
+                  <td class="py-3.5 px-4">
+                    @if (editingPartId() === part.id) {
+                      <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          [(ngModel)]="editingNaturalWear"
+                          class="accent-[#00E676] w-4 h-4 rounded"
+                        />
+                        <span class="text-xs text-[#F2F7F5]">Grátis?</span>
+                      </label>
+                    } @else {
+                      @if (part.isNaturalWear) {
+                        <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/30">
+                          SIM (Grátis)
+                        </span>
+                      } @else {
+                        <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-[#26332E] text-[#F2F7F5]">
+                          NÃO (Cobrado)
+                        </span>
+                      }
+                    }
+                  </td>
+
+                  <!-- Status / Origin Badge -->
+                  <td class="py-3.5 px-4">
+                    @if (part.priceOverridden) {
+                      <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-[#FFB300]/15 text-[#FFB300] border border-[#FFB300]/30">
+                        Preço Manual
+                      </span>
+                    } @else {
+                      <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-[#1A2320] text-[#94A39E]">
+                        Oficial Mottu
+                      </span>
+                    }
+                  </td>
+
+                  <!-- Action Buttons -->
+                  <td class="py-3.5 px-4 text-right">
+                    @if (editingPartId() === part.id) {
+                      <div class="flex items-center justify-end gap-1.5">
+                        <button
+                          type="button"
+                          (click)="saveEditPart()"
+                          class="px-2.5 py-1 rounded bg-[#00E676] text-[#06120B] font-bold hover:brightness-110"
+                        >
+                          Salvar
+                        </button>
+                        <button
+                          type="button"
+                          (click)="cancelEdit()"
+                          class="px-2.5 py-1 rounded bg-[#1A2320] text-[#94A39E] hover:text-[#F2F7F5]"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    } @else {
+                      <button
+                        type="button"
+                        (click)="startEditPart(part)"
+                        class="px-3 py-1.5 rounded-lg bg-[#1A2320] border border-[#26332E] hover:border-[#00E676]/40 text-[#F2F7F5] hover:text-[#00E676] transition-colors"
+                      >
+                        [Editar]
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        @if (totalPages() > 1) {
+          <div class="p-4 border-t border-[#26332E] flex items-center justify-between">
+            <button
+              type="button"
+              (click)="goToPage(currentPage() - 1)"
+              [disabled]="currentPage() === 0"
+              class="px-3 py-1.5 rounded bg-[#1A2320] text-xs font-mono text-[#F2F7F5] disabled:opacity-30"
+            >
+              ← Anterior
+            </button>
+            <div class="flex items-center gap-1">
+              @for (pageIdx of [].constructor(totalPages()); track $index) {
+                <button
+                  type="button"
+                  (click)="goToPage($index)"
+                  [class]="$index === currentPage()
+                    ? 'w-7 h-7 rounded bg-[#00E676] text-[#06120B] font-bold text-xs'
+                    : 'w-7 h-7 rounded bg-[#1A2320] text-[#94A39E] text-xs hover:text-[#F2F7F5]'"
+                >
+                  {{ $index + 1 }}
+                </button>
+              }
+            </div>
+            <button
+              type="button"
+              (click)="goToPage(currentPage() + 1)"
+              [disabled]="currentPage() >= totalPages() - 1"
+              class="px-3 py-1.5 rounded bg-[#1A2320] text-xs font-mono text-[#F2F7F5] disabled:opacity-30"
+            >
+              Próxima →
+            </button>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

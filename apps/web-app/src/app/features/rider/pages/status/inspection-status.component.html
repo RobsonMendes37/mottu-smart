@@ -1,0 +1,354 @@
+<div class="min-h-screen bg-[#0A0E0D] text-[#F2F7F5] flex flex-col items-center px-4 py-6">
+  <div class="w-full max-w-[420px] flex flex-col gap-4">
+    <!-- Header with Back Button -->
+    <header class="flex items-center gap-3 pt-2">
+      <button
+        type="button"
+        (click)="onBack()"
+        title="Voltar para Garagem"
+        class="p-2 text-[#94A39E] hover:text-[#F2F7F5] bg-[#121816] border border-[#26332E] rounded-xl transition"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <div class="flex flex-col">
+        <span class="text-xs font-semibold text-[#94A39E] uppercase tracking-wider">Acompanhamento</span>
+        <h1 class="text-xl font-bold text-[#F2F7F5]">Resultado da Vistoria</h1>
+      </div>
+    </header>
+
+    <!-- 1. Live SSE Stepper Banner -->
+    <div class="bg-[#1A2320] rounded-xl p-3 border border-[#26332E] flex items-center gap-2.5">
+      @if (status() === 'QUEUED_AI') {
+        <span class="w-2.5 h-2.5 rounded-full bg-[#00E676] animate-pulse shrink-0"></span>
+        <span class="font-mono text-xs font-bold text-[#00E676]">
+          ✓ Foto enviada &rarr; ⏳ Analisando com Inteligência Artificial...
+        </span>
+      } @else if (status() === 'AWAITING_AI_RECOVERY') {
+        <span class="w-2.5 h-2.5 rounded-full bg-[#FFB300] animate-pulse shrink-0"></span>
+        <span class="font-mono text-xs font-bold text-[#FFB300]">
+          Aguardando recuperação da IA (tentando novamente)...
+        </span>
+      } @else if (isTriage()) {
+        <span class="w-2.5 h-2.5 rounded-full bg-[#FFB300] shrink-0"></span>
+        <span class="font-mono text-xs font-bold text-[#FFB300]">
+          ⚠️ Encaminhado para a mesa do mecânico
+        </span>
+      } @else if (isScheduled()) {
+        <span class="w-2.5 h-2.5 rounded-full bg-[#00E676] shrink-0"></span>
+        <span class="font-mono text-xs font-bold text-[#00E676]">
+          ✓ Vistoria Concluída &rarr; 📅 Visita ao Galpão Agendada
+        </span>
+      } @else if (isInvalid()) {
+        <span class="w-2.5 h-2.5 rounded-full bg-[#FF4D4F] shrink-0"></span>
+        <span class="font-mono text-xs font-bold text-[#FF4D4F]">
+          ❌ Foto Inválida • Não é uma moto ou peça ilegível
+        </span>
+      } @else {
+        <span class="w-2.5 h-2.5 rounded-full bg-[#00E676] shrink-0"></span>
+        <span class="font-mono text-xs font-bold text-[#00E676]">
+          ✓ Foto validada &rarr; ✓ Catálogo Mottu &rarr; ✓ Concluído
+        </span>
+      }
+    </div>
+
+    <!-- 2. Transparent Budget & Verdict Card -->
+    <div class="bg-[#121816] rounded-2xl p-5 border border-[#26332E] flex flex-col gap-3 shadow-lg">
+      <!-- Verdict Category Tag -->
+      <div class="flex items-center justify-between">
+        @if (isZeroCost()) {
+          <span class="font-mono text-xs font-bold text-[#00E676] px-2.5 py-1 rounded bg-[#00E676]/10 border border-[#00E676]/30">
+            DEFEITO PRÉ-EXISTENTE (COBERTO SEM CUSTO)
+          </span>
+        } @else if (isMauUso()) {
+          <span class="font-mono text-xs font-bold text-[#FFB300] px-2.5 py-1 rounded bg-[#FFB300]/10 border border-[#FFB300]/30">
+            REPARO POR IMPACTO / QUEDA (MAU USO)
+          </span>
+        } @else if (isInvalid()) {
+          <span class="font-mono text-xs font-bold text-[#FF4D4F] px-2.5 py-1 rounded bg-[#FF4D4F]/10 border border-[#FF4D4F]/30">
+            FOTO INVÁLIDA • NÃO É UMA MOTO
+          </span>
+        } @else {
+          <span class="font-mono text-xs font-bold text-[#FFB300] px-2.5 py-1 rounded bg-[#FFB300]/10 border border-[#FFB300]/30">
+            EM ANÁLISE TÉCNICA
+          </span>
+        }
+      </div>
+
+      <!-- Total Price -->
+      <div class="flex flex-col">
+        <span class="text-xs text-[#94A39E] uppercase font-mono tracking-wider">Custo para o Entregador</span>
+        <span
+          class="font-mono text-4xl font-extrabold tracking-tight"
+          [ngClass]="isZeroCost() ? 'text-[#00E676]' : (isTriage() ? 'text-[#FFB300]' : 'text-[#F2F7F5]')"
+        >
+          {{ totalPriceDisplay() }}
+        </span>
+      </div>
+
+      <!-- Parts Breakdown -->
+      @if (inspection()?.items; as items) {
+        @if (items.length > 0 || (isMauUso() && !isZeroCost())) {
+          <div class="pt-3 border-t border-[#26332E] flex flex-col gap-1.5 font-mono text-xs text-[#94A39E]">
+            <span class="font-bold text-[#F2F7F5]">Detalhamento de Custos:</span>
+            @for (item of items; track item.catalogPartId) {
+              <div class="flex items-center justify-between">
+                <span>• {{ item.partName }} (Loja Mottu):</span>
+                <span class="text-[#F2F7F5]">R$ {{ item.unitPriceBrl.toFixed(2).replace('.', ',') }}</span>
+              </div>
+            }
+            @if (inspection()?.laborFeeBrl; as labor) {
+              @if (labor > 0) {
+                <div class="flex items-center justify-between">
+                  <span>• Taxa Padrão Mão de Obra:</span>
+                  <span class="text-[#F2F7F5]">R$ {{ labor.toFixed(2).replace('.', ',') }}</span>
+                </div>
+              }
+            }
+          </div>
+        }
+      }
+
+      <!-- Empathetic Message / Explanation -->
+      @if (inspection()?.customerFeedbackText; as feedback) {
+        <div class="pt-2 text-sm text-[#F2F7F5] leading-relaxed border-t border-[#26332E]">
+          {{ feedback }}
+        </div>
+      } @else if (isZeroCost()) {
+        <div class="pt-2 text-sm text-[#F2F7F5] leading-relaxed border-t border-[#26332E]">
+          Identificamos desgaste natural ou defeito pré-existente no histórico da moto. Você não paga nada pelo reparo desta peça!
+        </div>
+      }
+    </div>
+
+    <!-- Scheduled Information Banner -->
+    @if (isScheduled()) {
+      <div class="bg-[#00E676]/10 border border-[#00E676]/30 rounded-xl p-4 flex flex-col gap-1 text-center font-mono text-xs text-[#00E676]">
+        <span class="font-bold">Agendamento Confirmado no Galpão!</span>
+        <span class="text-[#F2F7F5]">
+          Apresente esta tela na guarita do galpão no horário marcado para troca expressa.
+        </span>
+      </div>
+    }
+
+    <!-- 3. Primary Actions -->
+    <div class="flex flex-col gap-2.5 mt-1">
+      @if (isInvalid()) {
+        <!-- Action for Invalid Photo -->
+        <button
+          type="button"
+          (click)="onNewPhoto()"
+          class="w-full h-[52px] bg-[#00E676] hover:bg-[#00C853] text-[#06120B] font-extrabold text-base rounded-xl flex items-center justify-center gap-2 transition active:scale-[0.98] shadow-lg shadow-[#00E676]/20"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+          </svg>
+          <span>Tirar Nova Foto da Peça</span>
+        </button>
+      } @else if (isMauUso() && !isScheduled()) {
+        <!-- Action for Repair Needed -->
+        <button
+          type="button"
+          (click)="openAppointmentModal()"
+          class="w-full h-[52px] bg-[#00E676] hover:bg-[#00C853] text-[#06120B] font-extrabold text-base rounded-xl flex items-center justify-center gap-2 transition active:scale-[0.98] shadow-lg shadow-[#00E676]/20"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Agendar Ida ao Galpão</span>
+        </button>
+      } @else {
+        <!-- Action when Zero Cost or Scheduled -->
+        <button
+          type="button"
+          (click)="onBack()"
+          class="w-full h-[52px] bg-[#00E676] hover:bg-[#00C853] text-[#06120B] font-extrabold text-base rounded-xl flex items-center justify-center gap-2 transition active:scale-[0.98] shadow-lg shadow-[#00E676]/20"
+        >
+          <span>Voltar para Minha Moto</span>
+        </button>
+      }
+
+      <!-- 4. Secondary Action: 1-Click "Discordo" -->
+      @if (canContest()) {
+        <button
+          type="button"
+          (click)="openContestModal()"
+          class="w-full h-[48px] bg-[#1A2320] border border-[#FFB300]/30 hover:border-[#FFB300] text-[#FFB300] font-semibold text-sm rounded-xl flex items-center justify-center gap-2 transition active:scale-[0.98]"
+        >
+          <span>Discordo do resultado &mdash; pedir revisão humana</span>
+        </button>
+      } @else if (contestedOnce()) {
+        <div class="text-xs text-[#94A39E] text-center bg-[#121816] border border-[#26332E] rounded-xl p-3 flex items-center justify-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-[#FFB300]"></span>
+          <span>Revisão humana solicitada. Aguardando laudo do mecânico.</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Contestation Modal -->
+  @if (isContestModalOpen()) {
+    <div class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-[#121816] border border-[#26332E] rounded-2xl p-5 max-w-sm w-full flex flex-col gap-4 shadow-2xl">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-bold text-[#F2F7F5]">Pedir Revisão Humana</h2>
+          <button
+            type="button"
+            (click)="closeContestModal()"
+            class="text-[#94A39E] hover:text-[#F2F7F5] p-1"
+          >
+            ✕
+          </button>
+        </div>
+
+        <p class="text-xs text-[#94A39E] leading-relaxed">
+          Explique por que você discorda da classificação da IA. Um mecânico do galpão analisará as fotos detalhadamente.
+        </p>
+
+        <div class="flex flex-col gap-1.5">
+          <textarea
+            rows="3"
+            maxlength="300"
+            [(ngModel)]="contestReason"
+            placeholder="Descreva o motivo (mínimo 10 caracteres)..."
+            class="bg-[#0A0E0D] border border-[#26332E] rounded-xl p-3 text-sm text-[#F2F7F5] outline-none focus:border-[#FFB300] resize-none"
+          ></textarea>
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span [ngClass]="isContestReasonValid() ? 'text-[#00E676]' : 'text-[#FFB300]'">
+              Mínimo 10 caracteres
+            </span>
+            <span class="text-[#94A39E]">{{ contestReason().length }}/300</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2 pt-1">
+          <button
+            type="button"
+            (click)="onSubmitContestation()"
+            [disabled]="!isContestReasonValid() || store.isContesting()"
+            [ngClass]="{
+              'opacity-50 cursor-not-allowed bg-[#1A2320] text-[#94A39E]': !isContestReasonValid() || store.isContesting(),
+              'bg-[#FFB300] hover:bg-[#FFA000] text-[#06120B] font-bold': isContestReasonValid() && !store.isContesting()
+            }"
+            class="w-full h-[52px] rounded-xl flex items-center justify-center text-sm transition"
+          >
+            @if (store.isContesting()) {
+              <span>Enviando Contestação...</span>
+            } @else {
+              <span>Confirmar Pedido de Revisão</span>
+            }
+          </button>
+
+          <button
+            type="button"
+            (click)="closeContestModal()"
+            class="w-full h-10 text-xs text-[#94A39E] hover:text-[#F2F7F5] transition"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Appointment Booking Modal -->
+  @if (isAppointmentModalOpen()) {
+    <div class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-[#121816] border border-[#26332E] rounded-2xl p-5 max-w-sm w-full flex flex-col gap-4 shadow-2xl">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-bold text-[#F2F7F5]">Agendar Ida ao Galpão</h2>
+          <button
+            type="button"
+            (click)="closeAppointmentModal()"
+            class="text-[#94A39E] hover:text-[#F2F7F5] p-1"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Yard Choice -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-[#94A39E] uppercase tracking-wider">Escolha o Galpão:</label>
+          <select
+            [(ngModel)]="selectedYardId"
+            class="bg-[#0A0E0D] border border-[#26332E] rounded-xl p-3 text-sm text-[#F2F7F5] outline-none focus:border-[#00E676]"
+          >
+            @for (yard of store.yards(); track yard.id) {
+              <option [value]="yard.id">{{ yard.name }} - {{ yard.city }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Date Choice (Locked to Today+) -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-[#94A39E] uppercase tracking-wider">Data da Visita:</label>
+          <input
+            type="date"
+            [min]="todayDate"
+            [(ngModel)]="selectedDate"
+            class="bg-[#0A0E0D] border border-[#26332E] rounded-xl p-3 text-sm text-[#F2F7F5] outline-none focus:border-[#00E676] font-mono"
+          />
+        </div>
+
+        <!-- Shift Choice -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-[#94A39E] uppercase tracking-wider">Turno:</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              (click)="selectedShift.set('MORNING')"
+              [ngClass]="{
+                'border-[#00E676] bg-[#1A2320] text-[#00E676] font-bold': selectedShift() === 'MORNING',
+                'border-[#26332E] bg-[#0A0E0D] text-[#94A39E]': selectedShift() !== 'MORNING'
+              }"
+              class="h-11 rounded-xl border text-xs flex items-center justify-center transition"
+            >
+              Manhã (08h às 12h)
+            </button>
+            <button
+              type="button"
+              (click)="selectedShift.set('AFTERNOON')"
+              [ngClass]="{
+                'border-[#00E676] bg-[#1A2320] text-[#00E676] font-bold': selectedShift() === 'AFTERNOON',
+                'border-[#26332E] bg-[#0A0E0D] text-[#94A39E]': selectedShift() !== 'AFTERNOON'
+              }"
+              class="h-11 rounded-xl border text-xs flex items-center justify-center transition"
+            >
+              Tarde (13h às 18h)
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit Appointment Button -->
+        <div class="flex flex-col gap-2 pt-1">
+          <button
+            type="button"
+            (click)="onSubmitAppointment()"
+            [disabled]="!selectedYardId() || !selectedDate() || store.isBookingAppointment()"
+            [ngClass]="{
+              'opacity-50 cursor-not-allowed bg-[#1A2320] text-[#94A39E]': !selectedYardId() || !selectedDate() || store.isBookingAppointment(),
+              'bg-[#00E676] hover:bg-[#00C853] text-[#06120B] font-bold': selectedYardId() && selectedDate() && !store.isBookingAppointment()
+            }"
+            class="w-full h-[52px] rounded-xl flex items-center justify-center text-sm transition"
+          >
+            @if (store.isBookingAppointment()) {
+              <span>Confirmando Agendamento...</span>
+            } @else {
+              <span>Confirmar Agendamento</span>
+            }
+          </button>
+
+          <button
+            type="button"
+            (click)="closeAppointmentModal()"
+            class="w-full h-10 text-xs text-[#94A39E] hover:text-[#F2F7F5] transition"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

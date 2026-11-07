@@ -1,0 +1,416 @@
+<div class="min-h-screen bg-[#0A0E0D] text-[#F2F7F5] flex flex-col">
+  <!-- Top Navigation Header -->
+  <header class="bg-[#121816] border-b border-[#26332E] px-4 lg:px-8 py-3.5 flex items-center justify-between sticky top-0 z-40">
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-[#00E676] flex items-center justify-center font-bold text-[#06120B] text-base">
+          M
+        </div>
+        <span class="font-extrabold text-lg tracking-tight text-[#F2F7F5]">Mottu Smart Ops</span>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-[#1A2320] text-[#00E676] border border-[#26332E] font-mono font-bold">
+          OFICINA
+        </span>
+      </div>
+
+      <nav class="hidden md:flex items-center gap-1">
+        <a
+          routerLink="/mechanic/queue"
+          class="px-3.5 py-1.5 rounded-md text-sm font-semibold text-[#94A39E] hover:text-[#F2F7F5] hover:bg-[#1A2320]/60 transition-colors"
+        >
+          Fila Inteligente
+        </a>
+        <a
+          routerLink="/mechanic/fleet"
+          class="px-3.5 py-1.5 rounded-md text-sm font-bold bg-[#1A2320] text-[#00E676] border border-[#26332E]"
+        >
+          Controle de Frota
+        </a>
+      </nav>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-mono text-[#94A39E]">Total de Motos:</span>
+      <span class="text-xs sm:text-sm font-mono font-bold text-[#00E676]">
+        {{ totalElements() }} unidades
+      </span>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-6">
+    <!-- Feedback Alerts -->
+    @if (successMessage()) {
+      <div class="bg-[#00E676]/10 border border-[#00E676]/40 rounded-lg p-4 text-[#00E676] text-sm flex items-center gap-3">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span>{{ successMessage() }}</span>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="bg-[#FF4D4F]/10 border border-[#FF4D4F]/30 rounded-lg p-4 text-[#FF4D4F] text-sm flex items-center gap-3">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <!-- Page Header & Action CTA -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl lg:text-3xl font-extrabold text-[#F2F7F5] tracking-tight">
+          Motos do Galpão • Controle de Pátio e Status
+        </h1>
+        <p class="text-sm text-[#94A39E] mt-1">
+          Inventário em tempo real por galpão, controle de manutenção e cadastro de novas motocicletas.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="openCreateModal()"
+        class="h-[52px] sm:h-auto px-5 py-2.5 rounded-lg bg-[#00E676] hover:bg-[#00C853] text-[#06120B] font-extrabold text-sm transition-all flex items-center justify-center gap-2 shadow-[0_0_16px_rgba(0,230,118,0.25)] flex-shrink-0"
+      >
+        <span class="text-base font-bold">+</span>
+        <span>Cadastrar Nova Moto</span>
+      </button>
+    </div>
+
+    <!-- Filter & Search Controls -->
+    <div class="bg-[#121816] border border-[#26332E] rounded-xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <!-- Status Filter Pills -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          (click)="setStatusFilter('')"
+          [class]="
+            statusFilter() === ''
+              ? 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#00E676] text-[#06120B]'
+              : 'px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-[#94A39E] bg-[#1A2320] hover:text-[#F2F7F5] border border-[#26332E]'
+          "
+        >
+          TODAS ({{ totalElements() }})
+        </button>
+        <button
+          type="button"
+          (click)="setStatusFilter('AVAILABLE')"
+          [class]="
+            statusFilter() === 'AVAILABLE'
+              ? 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#00E676] text-[#06120B]'
+              : 'px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-[#00E676] bg-[#00E676]/10 hover:bg-[#00E676]/20 border border-[#00E676]/30'
+          "
+        >
+          DISPONÍVEL
+        </button>
+        <button
+          type="button"
+          (click)="setStatusFilter('RENTED')"
+          [class]="
+            statusFilter() === 'RENTED'
+              ? 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#F2F7F5] text-[#06120B]'
+              : 'px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-[#F2F7F5] bg-[#1A2320] hover:bg-[#1A2320]/80 border border-[#26332E]'
+          "
+        >
+          ALUGADA
+        </button>
+        <button
+          type="button"
+          (click)="setStatusFilter('IN_MAINTENANCE')"
+          [class]="
+            statusFilter() === 'IN_MAINTENANCE'
+              ? 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#FFB300] text-[#06120B]'
+              : 'px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-[#FFB300] bg-[#FFB300]/10 hover:bg-[#FFB300]/20 border border-[#FFB300]/30'
+          "
+        >
+          NA OFICINA
+        </button>
+        <button
+          type="button"
+          (click)="setStatusFilter('UNAVAILABLE')"
+          [class]="
+            statusFilter() === 'UNAVAILABLE'
+              ? 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#FF4D4F] text-[#06120B]'
+              : 'px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-[#FF4D4F] bg-[#FF4D4F]/10 hover:bg-[#FF4D4F]/20 border border-[#FF4D4F]/30'
+          "
+        >
+          INDISPONÍVEL
+        </button>
+      </div>
+
+      <!-- Yard Dropdown & Plate Search -->
+      <div class="flex flex-col sm:flex-row items-center gap-3">
+        <!-- Yard Filter -->
+        <select
+          [ngModel]="yardFilter()"
+          (ngModelChange)="onYardFilter($event)"
+          class="w-full sm:w-48 bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-md px-3 py-2 text-sm text-[#F2F7F5] outline-none font-mono"
+        >
+          <option value="">Todos os Galpões</option>
+          @for (y of yards(); track y.id) {
+            <option [value]="y.id">{{ y.name }} ({{ y.city }})</option>
+          }
+        </select>
+
+        <!-- Search Input -->
+        <div class="relative w-full sm:w-56">
+          <input
+            type="text"
+            [ngModel]="plateFilter()"
+            (ngModelChange)="onPlateFilter($event)"
+            placeholder="Buscar por placa..."
+            class="w-full bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-md px-3 py-2 text-sm text-[#F2F7F5] placeholder-[#94A39E] outline-none font-mono transition-colors"
+          />
+          <svg
+            class="w-4 h-4 text-[#94A39E] absolute right-3 top-2.5 pointer-events-none"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="bg-[#121816] border border-[#26332E] rounded-xl overflow-hidden">
+      @if (isLoading()) {
+        <div class="flex flex-col items-center justify-center py-16 space-y-3">
+          <div class="w-8 h-8 border-2 border-[#00E676] border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-sm text-[#94A39E] font-mono">Carregando frota de motocicletas...</span>
+        </div>
+      } @else if (motorcycles().length === 0) {
+        <div class="p-12 text-center flex flex-col items-center justify-center space-y-3">
+          <svg class="w-12 h-12 text-[#26332E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+          </svg>
+          <span class="text-sm text-[#94A39E] font-mono">Nenhuma motocicleta encontrada com os filtros informados.</span>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-[#26332E] bg-[#1A2320]/60 text-xs font-mono text-[#94A39E]">
+                <th class="py-3.5 px-4 font-bold">PLACA</th>
+                <th class="py-3.5 px-4 font-bold">MODELO</th>
+                <th class="py-3.5 px-4 font-bold">GALPÃO</th>
+                <th class="py-3.5 px-4 font-bold">HODÔMETRO</th>
+                <th class="py-3.5 px-4 font-bold">STATUS ATUAL</th>
+                <th class="py-3.5 px-4 font-bold text-right">AÇÕES RÁPIDAS</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#26332E] text-sm">
+              @for (moto of motorcycles(); track moto.id) {
+                @let badge = getStatusBadge(moto.status);
+                <tr class="hover:bg-[#1A2320]/40 transition-colors">
+                  <!-- Placa -->
+                  <td class="py-3.5 px-4 font-mono font-extrabold text-[#F2F7F5] tracking-wider">
+                    {{ moto.plate }}
+                  </td>
+
+                  <!-- Modelo -->
+                  <td class="py-3.5 px-4 text-[#F2F7F5]">
+                    {{ formatModel(moto.model) }}
+                  </td>
+
+                  <!-- Galpão -->
+                  <td class="py-3.5 px-4 text-[#94A39E]">
+                    {{ moto.yardName }}
+                  </td>
+
+                  <!-- Hodômetro -->
+                  <td class="py-3.5 px-4 font-mono text-[#F2F7F5]">
+                    {{ moto.currentOdometerKm.toLocaleString('pt-BR') }} km
+                  </td>
+
+                  <!-- Status Badge -->
+                  <td class="py-3.5 px-4">
+                    <span
+                      class="px-2.5 py-1 rounded-full text-xs font-mono font-bold inline-flex items-center gap-1.5 border"
+                      [class]="badge.badgeBg + ' ' + badge.colorClass + ' ' + badge.borderColor"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full" [class]="badge.colorClass.replace('text-', 'bg-')"></span>
+                      {{ badge.label }}
+                      @if (moto.status === 'RENTED' && moto.activeRiderName) {
+                        <span class="text-[#94A39E] font-normal">({{ moto.activeRiderName }})</span>
+                      }
+                    </span>
+                  </td>
+
+                  <!-- Ações Rápidas -->
+                  <td class="py-3.5 px-4 text-right">
+                    <div class="flex items-center justify-end gap-1.5">
+                      @if (moto.status !== 'AVAILABLE' && moto.status !== 'RENTED') {
+                        <button
+                          type="button"
+                          (click)="quickToggleStatus(moto.id, 'AVAILABLE')"
+                          title="Liberar moto para o pátio"
+                          class="px-2.5 py-1 rounded bg-[#00E676]/15 text-[#00E676] hover:bg-[#00E676]/30 border border-[#00E676]/40 text-xs font-mono font-bold transition-colors"
+                        >
+                          Disponibilizar
+                        </button>
+                      }
+
+                      @if (moto.status !== 'IN_MAINTENANCE' && moto.status !== 'RENTED') {
+                        <button
+                          type="button"
+                          (click)="quickToggleStatus(moto.id, 'IN_MAINTENANCE')"
+                          title="Mover moto para manutenção"
+                          class="px-2.5 py-1 rounded bg-[#FFB300]/15 text-[#FFB300] hover:bg-[#FFB300]/30 border border-[#FFB300]/40 text-xs font-mono font-bold transition-colors"
+                        >
+                          Oficina
+                        </button>
+                      }
+
+                      @if (moto.status !== 'UNAVAILABLE' && moto.status !== 'RENTED') {
+                        <button
+                          type="button"
+                          (click)="quickToggleStatus(moto.id, 'UNAVAILABLE')"
+                          title="Marcar como indisponível"
+                          class="px-2.5 py-1 rounded bg-[#FF4D4F]/15 text-[#FF4D4F] hover:bg-[#FF4D4F]/30 border border-[#FF4D4F]/40 text-xs font-mono font-bold transition-colors"
+                        >
+                          Indisponível
+                        </button>
+                      }
+
+                      @if (moto.status === 'RENTED') {
+                        <span class="text-xs text-[#94A39E] font-mono italic">
+                          Em locação ativa
+                        </span>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </main>
+
+  <!-- Modal: Cadastrar Nova Moto -->
+  @if (isModalOpen()) {
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-[#121816] border border-[#26332E] rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-[0_16px_48px_rgba(0,0,0,0.9)] animate-in fade-in zoom-in-95 duration-150">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between border-b border-[#26332E] pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#00E676]"></span>
+            <h2 class="text-lg font-bold text-[#F2F7F5]">Cadastrar Nova Motocicleta</h2>
+          </div>
+          <button
+            type="button"
+            (click)="closeCreateModal()"
+            class="text-[#94A39E] hover:text-[#F2F7F5] text-lg font-bold p-1"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Modal Error Alert -->
+        @if (modalError()) {
+          <div class="bg-[#FF4D4F]/10 border border-[#FF4D4F]/30 rounded-lg p-3 text-[#FF4D4F] text-xs flex items-center gap-2">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>{{ modalError() }}</span>
+          </div>
+        }
+
+        <!-- Modal Form Fields -->
+        <form (ngSubmit)="submitCreateMotorcycle()" class="space-y-4">
+          <!-- Placa -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-mono font-bold text-[#F2F7F5]">
+              PLACA DO VEÍCULO (MERCOSUL):
+            </label>
+            <input
+              type="text"
+              [ngModel]="newPlate()"
+              (ngModelChange)="newPlate.set($event)"
+              name="newPlate"
+              placeholder="Ex: MOT8K11"
+              maxlength="7"
+              class="w-full h-[52px] bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-lg px-4 text-base font-mono font-bold text-[#F2F7F5] placeholder-[#94A39E] outline-none tracking-widest uppercase transition-colors"
+            />
+          </div>
+
+          <!-- Modelo -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-mono font-bold text-[#F2F7F5]">
+              MODELO:
+            </label>
+            <select
+              [ngModel]="newModel()"
+              (ngModelChange)="newModel.set($event)"
+              name="newModel"
+              class="w-full h-[52px] bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-lg px-4 text-sm text-[#F2F7F5] outline-none transition-colors"
+            >
+              @for (m of availableModels; track m.value) {
+                <option [value]="m.value">{{ m.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Galpão -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-mono font-bold text-[#F2F7F5]">
+              GALPÃO / PÁTIO DE ORIGEM:
+            </label>
+            <select
+              [ngModel]="newYardId()"
+              (ngModelChange)="newYardId.set($event)"
+              name="newYardId"
+              class="w-full h-[52px] bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-lg px-4 text-sm text-[#F2F7F5] outline-none font-mono transition-colors"
+            >
+              @for (y of yards(); track y.id) {
+                <option [value]="y.id">{{ y.name }} ({{ y.city }})</option>
+              }
+            </select>
+          </div>
+
+          <!-- Hodômetro Inicial -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-mono font-bold text-[#F2F7F5]">
+              HODÔMETRO INICIAL (KM):
+            </label>
+            <input
+              type="number"
+              [ngModel]="newOdometer()"
+              (ngModelChange)="newOdometer.set($event)"
+              name="newOdometer"
+              min="0"
+              class="w-full h-[52px] bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-lg px-4 text-sm font-mono text-[#F2F7F5] outline-none transition-colors"
+            />
+          </div>
+
+          <!-- Modal Action Buttons (Height 52px) -->
+          <div class="flex items-center gap-3 pt-3 border-t border-[#26332E]">
+            <button
+              type="button"
+              (click)="closeCreateModal()"
+              class="flex-1 h-[52px] rounded-lg bg-[#1A2320] hover:bg-[#1A2320]/80 text-[#F2F7F5] border border-[#26332E] font-bold text-sm transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              [disabled]="isSubmittingModal()"
+              class="flex-1 h-[52px] rounded-lg bg-[#00E676] hover:bg-[#00C853] disabled:opacity-50 text-[#06120B] font-extrabold text-sm transition-all flex items-center justify-center gap-2"
+            >
+              @if (isSubmittingModal()) {
+                <div class="w-4 h-4 border-2 border-[#06120B] border-t-transparent rounded-full animate-spin"></div>
+                <span>Cadastrando...</span>
+              } @else {
+                <span>Cadastrar Moto</span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

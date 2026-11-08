@@ -17,6 +17,9 @@ jobs:
     name: Continuous Deployment to Cloud VM
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
 
     steps:
       - name: Checkout Repository
@@ -107,6 +110,28 @@ jobs:
           echo '```text' >> "$GITHUB_STEP_SUMMARY"
           tail -n 100 /tmp/deploy.log >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+          # Publica o log do deploy como commit comment acessível publicamente via API
+          python3 -c "
+          import urllib.request, json, os
+          token = os.environ.get('GITHUB_TOKEN')
+          repo = os.environ.get('GITHUB_REPOSITORY')
+          sha = os.environ.get('GITHUB_SHA')
+          if token and repo and sha and os.path.exists('/tmp/deploy.log'):
+              with open('/tmp/deploy.log', 'r', errors='ignore') as f:
+                  log_content = f.read()[-3000:]
+              url = f'https://api.github.com/repos/{repo}/commits/{sha}/comments'
+              req = urllib.request.Request(
+                  url,
+                  data=json.dumps({'body': f'### 🚀 Mottu Smart Ops Deploy Log\n\`\`\`text\n{log_content}\n\`\`\`'}).encode(),
+                  headers={'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json', 'User-Agent': 'Actions'}
+              )
+              try:
+                  urllib.request.urlopen(req)
+                  print('✅ Log postado nos comentários do commit com sucesso!')
+              except Exception as e:
+                  print('Aviso ao postar comentário de commit:', e)
+          " || true
 
           if [ "$DEPLOY_EXIT" -ne 0 ]; then
             echo "❌ Deployment command exited with status $DEPLOY_EXIT"

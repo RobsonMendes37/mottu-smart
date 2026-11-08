@@ -69,13 +69,15 @@ jobs:
           ssh-keygen -l -f ~/.ssh/id_rsa
 
           echo "🚀 Conectando via SSH à VM ($SSH_USER@$SSH_HOST:$SSH_PORT)..."
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" bash << 'EOF'
+          set -o pipefail
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" bash << 'EOF' 2>&1 | tee /tmp/deploy.log
             set -e
+            trap 'echo "❌ FALHA NO DEPLOY NA LINHA $LINENO"; docker compose -f infra/docker-compose.prod.yml logs --tail=50 || true; docker compose -f infra/docker-compose.prod.yml ps -a || true' ERR
+
             echo "🚀 Atualizando repositório na VM..."
             cd /home/ubuntu/mottu-smart-ops || cd ~/mottu-smart-ops
             git fetch origin main
             git reset --hard origin/main
-            # Garante que S3_PUBLIC_ENDPOINT aponte para a porta 18088 sem o prefixo /storage (compatibilidade SigV4 MinIO)
             if grep -q "^S3_PUBLIC_ENDPOINT=" .env 2>/dev/null; then
               sed -i 's|^S3_PUBLIC_ENDPOINT=.*|S3_PUBLIC_ENDPOINT=http://161.153.2.148:18088|' .env
             else
@@ -83,13 +85,22 @@ jobs:
             fi
             rm -f infra/.env
             cp -f .env infra/.env
-            echo "🚀 Limpando imagens órfãs para liberar espaço em disco..."
-            docker system prune -f || true
+
             echo "🚀 Fazendo build e reiniciando containers via Docker Compose..."
             docker compose -f infra/docker-compose.prod.yml build
             docker compose -f infra/docker-compose.prod.yml up -d --remove-orphans
+
             echo "⏳ Aguardando inicialização dos serviços (25s)..."
             sleep 25
             docker compose -f infra/docker-compose.prod.yml ps
+            docker compose -f infra/docker-compose.prod.yml logs --tail=20
             echo "✅ Mottu Smart Ops atualizado e operando com sucesso!"
           EOF
+          DEPLOY_EXIT=${PIPESTATUS[0]}
+
+          echo "### 🚀 Mottu Smart Ops Deploy Execution Log" >> "$GITHUB_STEP_SUMMARY"
+          echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          tail -n 80 /tmp/deploy.log >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+          exit $DEPLOY_EXIT

@@ -91,12 +91,15 @@ jobs:
 
             echo "🚀 Fazendo build e reiniciando containers via Docker Compose..."
             docker compose -f infra/docker-compose.prod.yml build
+            docker compose -f infra/docker-compose.prod.yml down --remove-orphans || true
             docker compose -f infra/docker-compose.prod.yml up -d --remove-orphans
 
             echo "⏳ Aguardando inicialização dos serviços (25s)..."
             sleep 25
             docker compose -f infra/docker-compose.prod.yml ps
             docker compose -f infra/docker-compose.prod.yml logs --tail=30
+            echo "🚀 Validando conectividade do Caddy e Core API..."
+            curl -sf http://127.0.0.1:18088/api/v1/auth/public-config || curl -sf http://localhost:18088/api/v1/auth/public-config
             echo "✅ Mottu Smart Ops atualizado e operando com sucesso!"
           EOF
           DEPLOY_EXIT=$?

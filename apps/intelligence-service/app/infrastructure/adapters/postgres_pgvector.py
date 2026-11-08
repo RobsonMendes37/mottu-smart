@@ -49,7 +49,7 @@ class PostgresPgVectorAdapter(CatalogRepositoryPort):
                     INSERT INTO catalog_parts (
                         vtex_sku, motorcycle_model, part_name, category, unit_price_brl,
                         is_natural_wear, price_overridden, image_url, embedding, updated_at
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::vector, NOW())
                     ON CONFLICT (vtex_sku, motorcycle_model) DO UPDATE
                     SET part_name = EXCLUDED.part_name,
                         category = EXCLUDED.category,

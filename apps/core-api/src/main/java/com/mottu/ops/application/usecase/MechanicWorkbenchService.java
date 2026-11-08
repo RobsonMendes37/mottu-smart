@@ -282,17 +282,17 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
 
     private void saveAnalyticsOutbox(InspectionJpaEntity entity, boolean aiMatchedMechanic, Instant resolvedAt) {
         try {
-            Map<String, Object> payload = Map.of(
-                    "inspectionId", entity.getId().toString(),
-                    "riderId", entity.getRiderId().toString(),
-                    "motorcycleId", entity.getMotorcycleId().toString(),
-                    "aiVerdict", entity.getAiVerdict() != null ? entity.getAiVerdict().name() : null,
-                    "finalVerdict", entity.getFinalVerdict().name(),
-                    "aiMatchedMechanic", aiMatchedMechanic,
-                    "totalEstimatedBrl", entity.getTotalEstimatedBrl(),
-                    "laborFeeBrl", entity.getLaborFeeBrl(),
-                    "resolvedAt", resolvedAt.toString()
-            );
+            Map<String, Object> payload = new java.util.HashMap<>();
+            payload.put("inspectionId", entity.getId().toString());
+            payload.put("riderId", entity.getRiderId().toString());
+            payload.put("motorcycleId", entity.getMotorcycleId().toString());
+            payload.put("aiVerdict", entity.getAiVerdict() != null ? entity.getAiVerdict().name() : "NONE");
+            payload.put("finalVerdict", entity.getFinalVerdict() != null ? entity.getFinalVerdict().name() : "NONE");
+            payload.put("aiMatchedMechanic", aiMatchedMechanic);
+            payload.put("totalEstimatedBrl", entity.getTotalEstimatedBrl());
+            payload.put("laborFeeBrl", entity.getLaborFeeBrl());
+            payload.put("resolvedAt", resolvedAt.toString());
+
             String payloadJson = objectMapper.writeValueAsString(payload);
             outboxRepository.save(new AnalyticsOutboxJpaEntity(
                     UUID.randomUUID(),

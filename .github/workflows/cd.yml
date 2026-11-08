@@ -69,10 +69,10 @@ jobs:
           ssh-keygen -l -f ~/.ssh/id_rsa
 
           echo "🚀 Conectando via SSH à VM ($SSH_USER@$SSH_HOST:$SSH_PORT)..."
-          set -o pipefail
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" bash << 'EOF' 2>&1 | tee /tmp/deploy.log
-            set -e
-            trap 'echo "❌ FALHA NO DEPLOY NA LINHA $LINENO"; docker compose -f infra/docker-compose.prod.yml logs --tail=50 || true; docker compose -f infra/docker-compose.prod.yml ps -a || true' ERR
+          set +e
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" bash << 'EOF' > /tmp/deploy.log 2>&1
+            set -ex
+            trap 'echo "❌ FALHA NO DEPLOY NA LINHA $LINENO"; docker compose -f infra/docker-compose.prod.yml logs --tail=100 || true; docker compose -f infra/docker-compose.prod.yml ps -a || true' ERR
 
             echo "🚀 Atualizando repositório na VM..."
             cd /home/ubuntu/mottu-smart-ops || cd ~/mottu-smart-ops
@@ -93,14 +93,29 @@ jobs:
             echo "⏳ Aguardando inicialização dos serviços (25s)..."
             sleep 25
             docker compose -f infra/docker-compose.prod.yml ps
-            docker compose -f infra/docker-compose.prod.yml logs --tail=20
+            docker compose -f infra/docker-compose.prod.yml logs --tail=30
             echo "✅ Mottu Smart Ops atualizado e operando com sucesso!"
           EOF
-          DEPLOY_EXIT=${PIPESTATUS[0]}
+          DEPLOY_EXIT=$?
+          set -e
+
+          echo "==================== DEPLOY OUTPUT ===================="
+          cat /tmp/deploy.log
+          echo "======================================================="
 
           echo "### 🚀 Mottu Smart Ops Deploy Execution Log" >> "$GITHUB_STEP_SUMMARY"
           echo '```text' >> "$GITHUB_STEP_SUMMARY"
-          tail -n 80 /tmp/deploy.log >> "$GITHUB_STEP_SUMMARY"
+          tail -n 100 /tmp/deploy.log >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
-          exit $DEPLOY_EXIT
+          if [ "$DEPLOY_EXIT" -ne 0 ]; then
+            echo "❌ Deployment command exited with status $DEPLOY_EXIT"
+            exit $DEPLOY_EXIT
+          fi
+
+      - name: Upload Deployment Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-logs
+          path: /tmp/deploy.log

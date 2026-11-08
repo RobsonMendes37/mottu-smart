@@ -4,11 +4,26 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { ManagerService } from '../../services/manager.service';
 import { AnalyticsSummaryResponseDto } from '../../models/manager.models';
+import { DesktopShellComponent } from '../../../../shared/layout/desktop-shell/desktop-shell.component';
+
+export interface DailyInspectionBar {
+  day: string;
+  directPct: number;
+  workshopPct: number;
+  totalCount: number;
+}
+
+export interface VerdictBreakdownRow {
+  label: string;
+  subtitle: string;
+  percentage: number;
+  barClass: string;
+}
 
 @Component({
   selector: 'app-t10-analytics',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, DesktopShellComponent],
   templateUrl: './t10-analytics.component.html',
 })
 export class T10AnalyticsComponent implements OnInit {
@@ -20,6 +35,37 @@ export class T10AnalyticsComponent implements OnInit {
   isOfflineFallback = signal<boolean>(false);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+
+  readonly dailyVolumeBars: DailyInspectionBar[] = [
+    { day: 'Seg', directPct: 76, workshopPct: 24, totalCount: 42 },
+    { day: 'Ter', directPct: 80, workshopPct: 20, totalCount: 38 },
+    { day: 'Qua', directPct: 79, workshopPct: 21, totalCount: 45 },
+    { day: 'Qui', directPct: 82, workshopPct: 18, totalCount: 51 },
+    { day: 'Sex', directPct: 78, workshopPct: 22, totalCount: 49 },
+    { day: 'Sáb', directPct: 84, workshopPct: 16, totalCount: 33 },
+    { day: 'Dom', directPct: 86, workshopPct: 14, totalCount: 24 },
+  ];
+
+  readonly verdictBreakdown: VerdictBreakdownRow[] = [
+    {
+      label: 'Desgaste natural de uso (R$ 0,00)',
+      subtitle: 'Pastilhas, cabos e relação cobertos pelo plano',
+      percentage: 46,
+      barClass: 'bg-[#05944F]',
+    },
+    {
+      label: 'Pré-existente na retirada (R$ 0,00)',
+      subtitle: 'Protegido pela janela de 48h ou 100 km',
+      percentage: 29,
+      barClass: 'bg-[#141414]',
+    },
+    {
+      label: 'Dano por queda ou colisão',
+      subtitle: 'Orçado pela tabela oficial da Loja Mottu',
+      percentage: 25,
+      barClass: 'bg-[#D97706]',
+    },
+  ];
 
   constructor(managerService?: ManagerService, sanitizer?: DomSanitizer) {
     try {

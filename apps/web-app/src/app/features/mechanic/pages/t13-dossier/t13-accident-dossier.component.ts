@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccidentMechanicService } from '../../services/accident-mechanic.service';
 import { MechanicAccidentDetailsResponse } from '../../models/accident-dossier.models';
+import { DesktopShellComponent } from '../../../../shared/layout/desktop-shell/desktop-shell.component';
 
 @Component({
   selector: 'app-t13-accident-dossier',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DesktopShellComponent],
   templateUrl: './t13-accident-dossier.component.html',
 })
 export class T13AccidentDossierComponent implements OnInit {

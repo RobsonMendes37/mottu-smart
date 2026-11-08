@@ -50,6 +50,20 @@ describe('AppRoutes Configuration', () => {
       const quoteComp = await (quoteRoute!.loadComponent as any)();
       expect(quoteComp.name).toBe('AccidentQuoteComponent');
     });
+
+    it('TC-ROUTE-RIDER-3: Rider self-service account and rental routes are configured', async () => {
+      const children = riderRoute.children || [];
+      const accountRoute = children.find((c) => c.path === 'account');
+      const rentalRoute = children.find((c) => c.path === 'rental');
+
+      expect(accountRoute).toBeDefined();
+      const accountComp = await (accountRoute!.loadComponent as any)();
+      expect(accountComp.name).toBe('RiderAccountComponent');
+
+      expect(rentalRoute).toBeDefined();
+      const rentalComp = await (rentalRoute!.loadComponent as any)();
+      expect(rentalComp.name).toBe('RiderRentalComponent');
+    });
   });
 
   describe('Mechanic Routes & Accident Dossier', () => {
@@ -69,6 +83,20 @@ describe('AppRoutes Configuration', () => {
       expect(typeof dossierRoute?.loadComponent).toBe('function');
       const dossierComp = await (dossierRoute!.loadComponent as any)();
       expect(dossierComp.name).toBe('T13AccidentDossierComponent');
+    });
+
+    it('TC-ROUTE-MECH-3: Mechanic operations and account routes load cleanly', async () => {
+      const children = mechanicRoute.children || [];
+      const opsRoute = children.find((c) => c.path === 'operations');
+      const accountRoute = children.find((c) => c.path === 'account');
+
+      expect(opsRoute).toBeDefined();
+      const opsComp = await (opsRoute!.loadComponent as any)();
+      expect(opsComp.name).toBe('MechanicOperationsComponent');
+
+      expect(accountRoute).toBeDefined();
+      const accountComp = await (accountRoute!.loadComponent as any)();
+      expect(accountComp.name).toBe('StaffAccountComponent');
     });
   });
 
@@ -120,6 +148,16 @@ describe('AppRoutes Configuration', () => {
       expect(typeof analyticsRoute?.loadComponent).toBe('function');
       const analyticsComp = await (analyticsRoute!.loadComponent as any)();
       expect(analyticsComp.name).toBe('T10AnalyticsComponent');
+
+      const billingRoute = children.find((c) => c.path === 'billing');
+      expect(billingRoute).toBeDefined();
+      const billingComp = await (billingRoute!.loadComponent as any)();
+      expect(billingComp.name).toBe('T12BillingComponent');
+
+      const accountRoute = children.find((c) => c.path === 'account');
+      expect(accountRoute).toBeDefined();
+      const accountComp = await (accountRoute!.loadComponent as any)();
+      expect(accountComp.name).toBe('StaffAccountComponent');
     });
   });
 });

@@ -77,4 +77,12 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
     expect(comp.errorMessage()).toContain('Erro ao carregar indicadores executivos');
     expect(comp.isLoading()).toBe(false);
   });
+
+  it('TC-T10-6: Exposes daily volume bars and verdict breakdown adhering to Purple Ban', () => {
+    expect(comp.dailyVolumeBars.length).toBe(7);
+    expect(comp.verdictBreakdown.length).toBe(3);
+    for (const item of comp.verdictBreakdown) {
+      expect(item.barClass).not.toMatch(/purple|violet|indigo/);
+    }
+  });
 });

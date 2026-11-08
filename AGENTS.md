@@ -28,7 +28,7 @@
 4. **Respeito Estrito de Pasta (`Ownership`):**
    * Quando estiver executando uma tarefa do `mottu-smart-ops.md`, altere **apenas** os arquivos dentro do campo `Pasta Permitida` daquela tarefa. Isso evita conflito quando vários agentes rodam em paralelo.
 5. **Fidelidade Visual (`DESIGN.md` + `.pen`) e Legibilidade Solar:**
-   * Siga fielmente `design/mottu-smart-ops.pen` e os tokens de `DESIGN.md` (Fundo `#0A0E0D`, Verde Mottu `#00E676` com texto escuro `#06120B`).
+   * Siga fielmente `design/mottu-smart-ops.pen` e os tokens de `DESIGN.md` v2.0 (*Mottu Clean Fleet — Uber Base Web*: Fundo `#F6F6F6`, Superfícies `#FFFFFF`, Texto `#141414`, Verde Mottu `#05944F` com texto `#FFFFFF`; fundos escuros `#1C1F1E` apenas em visores de câmera/vídeo).
    * **PROIBIDO usar cores roxas/violetas/índigo** em qualquer lugar (`Purple Ban`).
    * **Sobreposição sobre `frontend-specialist.md`:** Este é um sistema operacional de rua e oficina — **NUNCA** use textos sobrepostos ilegíveis ou layouts caóticos; priorize contraste extremo e botões de `52px+`.
 6. **Travas Anti-Alucinação de Stack (Sobreposição sobre `.agents/agent/*.md`):**

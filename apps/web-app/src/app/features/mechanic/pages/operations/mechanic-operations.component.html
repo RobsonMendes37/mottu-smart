@@ -1,0 +1,203 @@
+<app-desktop-shell
+  sectionLabel="Operação da unidade"
+  pageTitle="Ordens de serviço e estoque"
+  [activeNav]="activeTab() === 'stock' ? 'workbench' : 'operations'"
+  searchPlaceholder="Buscar OS, placa ou gaveta..."
+  (globalSearch)="stockSearch.set($event)"
+>
+  <div class="space-y-5">
+    <!-- Top Header & Segmented Switch -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        <h2 class="text-xl font-bold text-[#141414]">Operação de baia e almoxarifado</h2>
+        <p class="text-sm text-[#545454]">
+          Acompanhe os reparos presenciais na oficina e consulte a localização física das peças no galpão.
+        </p>
+      </div>
+
+      <div class="bg-[#E2E2E2]/60 p-1 rounded-md inline-grid grid-cols-2 gap-1 self-start">
+        <button
+          type="button"
+          (click)="setTab('orders')"
+          class="px-4 h-9 rounded-sm text-xs font-bold transition-all"
+          [class.bg-white]="activeTab() === 'orders'"
+          [class.text-[#141414]]="activeTab() === 'orders'"
+          [class.shadow-sm]="activeTab() === 'orders'"
+          [class.text-[#545454]]="activeTab() !== 'orders'"
+        >
+          Ordens de serviço ({{ serviceOrders().length }})
+        </button>
+        <button
+          type="button"
+          (click)="setTab('stock')"
+          class="px-4 h-9 rounded-sm text-xs font-bold transition-all"
+          [class.bg-white]="activeTab() === 'stock'"
+          [class.text-[#141414]]="activeTab() === 'stock'"
+          [class.shadow-sm]="activeTab() === 'stock'"
+          [class.text-[#545454]]="activeTab() !== 'stock'"
+        >
+          Estoque do galpão ({{ stockItems().length }})
+        </button>
+      </div>
+    </div>
+
+    @if (feedbackBanner()) {
+      <div role="status" class="p-3.5 rounded-lg bg-[#E6F4EE] border border-[#05944F]/30 text-xs font-medium text-[#046C3A] flex items-center justify-between">
+        <span>{{ feedbackBanner() }}</span>
+        <button type="button" (click)="feedbackBanner.set(null)" class="font-bold text-[#046C3A] px-2">Fechar</button>
+      </div>
+    }
+
+    @if (activeTab() === 'orders') {
+      <!-- KPI Summary Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
+          <span class="text-xs font-medium text-[#757575]">Em reparo na baia</span>
+          <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">{{ inRepairCount() }}</p>
+        </div>
+        <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
+          <span class="text-xs font-medium text-[#757575]">Aguardando entrada</span>
+          <p class="text-2xl font-extrabold font-mono text-[#D97706] mt-1">{{ waitingBayCount() }}</p>
+        </div>
+        <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
+          <span class="text-xs font-medium text-[#757575]">Prontas para entrega</span>
+          <p class="text-2xl font-extrabold font-mono text-[#046C3A] mt-1">{{ readyPickupCount() }}</p>
+        </div>
+      </div>
+
+      <!-- Service Orders Cards / Table -->
+      <div class="bg-white border border-[#E2E2E2] rounded-lg overflow-hidden">
+        <div class="divide-y divide-[#EEEEEE]">
+          @for (order of serviceOrders(); track order.id) {
+            <div class="p-4 lg:px-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-[#F6F6F6]/60 transition-colors">
+              <div class="space-y-1 min-w-0">
+                <div class="flex items-center gap-2.5 flex-wrap">
+                  <span class="font-mono text-xs font-bold text-[#141414] px-2 py-0.5 rounded bg-[#F3F3F3]">
+                    {{ order.plate }}
+                  </span>
+                  <span class="font-mono text-xs text-[#757575]">{{ order.code }}</span>
+                  <span class="text-xs font-semibold text-[#545454]">• {{ order.bay }}</span>
+                </div>
+                <p class="text-sm font-bold text-[#141414]">{{ order.serviceTitle }}</p>
+                <p class="text-xs text-[#757575]">{{ order.model }} • {{ order.originLabel }}</p>
+              </div>
+
+              <div class="flex items-center justify-between lg:justify-end gap-3 shrink-0">
+                @switch (order.status) {
+                  @case ('WAITING_BAY') {
+                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#92400E] bg-[#FEF3C7] px-2.5 py-1 rounded-full">
+                      <span class="w-2 h-2 rounded-full bg-[#D97706]"></span>
+                      Aguardando baia
+                    </span>
+                    <button
+                      type="button"
+                      (click)="advanceOrderStatus(order.id)"
+                      class="h-10 px-4 rounded-md bg-[#141414] hover:opacity-90 text-white text-xs font-bold transition-opacity"
+                    >
+                      Iniciar reparo
+                    </button>
+                  }
+                  @case ('IN_REPAIR') {
+                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#334155] bg-[#EEF2F6] px-2.5 py-1 rounded-full">
+                      <span class="w-2 h-2 rounded-full bg-[#0284C7]"></span>
+                      Em bancada ({{ order.slaMinutes }} min)
+                    </span>
+                    <button
+                      type="button"
+                      (click)="advanceOrderStatus(order.id)"
+                      class="h-10 px-4 rounded-md bg-[#05944F] hover:bg-[#047840] text-white text-xs font-bold transition-colors"
+                    >
+                      Liberar moto
+                    </button>
+                  }
+                  @case ('READY_PICKUP') {
+                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#046C3A] bg-[#E6F4EE] px-2.5 py-1 rounded-full">
+                      <span class="w-2 h-2 rounded-full bg-[#05944F]"></span>
+                      Liberada no pátio
+                    </span>
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    } @else {
+      <!-- Local Warehouse Bin Lookup -->
+      <div class="bg-white border border-[#E2E2E2] rounded-lg overflow-hidden">
+        <div class="p-4 border-b border-[#EEEEEE] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-sm font-bold text-[#141414]">Almoxarifado local — Unidade Butantã</h3>
+            <p class="text-xs text-[#757575]">Localização rápida de corredor e gaveta para retirada na bancada.</p>
+          </div>
+          <input
+            type="search"
+            [ngModel]="stockSearch()"
+            (ngModelChange)="stockSearch.set($event)"
+            placeholder="Filtrar por SKU, peça ou corredor..."
+            aria-label="Filtrar estoque local"
+            class="w-full sm:w-72 h-10 px-3.5 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-xs text-[#141414] focus:outline-none"
+          />
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-[#F3F3F3] text-[#757575] text-xs font-semibold border-b border-[#E2E2E2]">
+                <th class="py-3 px-4">SKU</th>
+                <th class="py-3 px-4">Peça e aplicação</th>
+                <th class="py-3 px-4">Localização física</th>
+                <th class="py-3 px-4">Saldo</th>
+                <th class="py-3 px-4 text-right">Baixa rápida</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#EEEEEE] text-sm">
+              @for (item of filteredStockItems(); track item.sku) {
+                <tr class="hover:bg-[#F6F6F6]/70">
+                  <td class="py-3.5 px-4 font-mono text-xs font-semibold text-[#141414]">{{ item.sku }}</td>
+                  <td class="py-3.5 px-4">
+                    <p class="font-semibold text-[#141414]">{{ item.partName }}</p>
+                    <p class="text-xs text-[#757575]">{{ item.model }} • R$ {{ item.unitPriceBrl.toFixed(2).replace('.', ',') }}</p>
+                  </td>
+                  <td class="py-3.5 px-4 font-mono text-xs text-[#545454]">{{ item.aisleBin }}</td>
+                  <td class="py-3.5 px-4">
+                    <span class="inline-flex items-center gap-2 font-mono text-xs font-bold text-[#141414]">
+                      <span
+                        class="w-2 h-2 rounded-full"
+                        [class.bg-[#05944F]]="item.quantity >= item.minQuantity"
+                        [class.bg-[#D97706]]="item.quantity > 0 && item.quantity < item.minQuantity"
+                        [class.bg-[#DC2626]]="item.quantity === 0"
+                      ></span>
+                      {{ item.quantity }} un.
+                    </span>
+                  </td>
+                  <td class="py-3.5 px-4 text-right">
+                    <div class="inline-flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        (click)="adjustStock(item.sku, -1)"
+                        aria-label="Retirar 1 unidade"
+                        class="w-8 h-8 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] font-bold text-sm text-[#141414]"
+                      >
+                        -
+                      </button>
+                      <button
+                        type="button"
+                        (click)="adjustStock(item.sku, 1)"
+                        aria-label="Repor 1 unidade"
+                        class="w-8 h-8 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] font-bold text-sm text-[#141414]"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</app-desktop-shell>
+

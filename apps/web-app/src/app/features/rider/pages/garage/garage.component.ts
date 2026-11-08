@@ -1,13 +1,14 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { RiderStore } from '../../state/rider.store';
 import { AuthService } from '../../../../core/services/auth.service';
+import { MobileShellComponent } from '../../../../shared/layout/mobile-shell/mobile-shell.component';
 
 @Component({
   selector: 'app-rider-garage',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, MobileShellComponent],
   templateUrl: './garage.component.html',
 })
 export class GarageComponent implements OnInit {

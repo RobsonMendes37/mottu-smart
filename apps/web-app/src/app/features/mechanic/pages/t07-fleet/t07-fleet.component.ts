@@ -1,7 +1,6 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { FleetService, FleetFilter } from '../../services/fleet.service';
 import {
   CreateMotorcycleCommand,
@@ -10,18 +9,20 @@ import {
   MotorcycleStatus,
   YardResponse,
 } from '../../models/mechanic.models';
+import { DesktopShellComponent } from '../../../../shared/layout/desktop-shell/desktop-shell.component';
 
 export interface StatusBadgeInfo {
   label: string;
   colorClass: string;
   badgeBg: string;
   borderColor: string;
+  dotColor: string;
 }
 
 @Component({
   selector: 'app-t07-fleet',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, DesktopShellComponent],
   templateUrl: './t07-fleet.component.html',
 })
 export class T07FleetComponent implements OnInit {
@@ -40,10 +41,21 @@ export class T07FleetComponent implements OnInit {
   currentPage = signal<number>(0);
   pageSize = signal<number>(20);
 
-  // Modal State
+  // Slide-over Drawer States (Create & Inspect)
   isModalOpen = signal<boolean>(false);
   isSubmittingModal = signal<boolean>(false);
   modalError = signal<string | null>(null);
+  selectedMotorcycle = signal<FleetMotorcycleResponse | null>(null);
+
+  availableCount = computed(
+    () => this.motorcycles().filter((m) => m.status === 'AVAILABLE').length
+  );
+  rentedCount = computed(
+    () => this.motorcycles().filter((m) => m.status === 'RENTED').length
+  );
+  maintenanceCount = computed(
+    () => this.motorcycles().filter((m) => m.status === 'IN_MAINTENANCE').length
+  );
 
   // Modal Form Signals
   newPlate = signal<string>('');
@@ -199,36 +211,49 @@ export class T07FleetComponent implements OnInit {
     });
   }
 
+  openInspectDrawer(moto: FleetMotorcycleResponse): void {
+    this.isModalOpen.set(false);
+    this.selectedMotorcycle.set(moto);
+  }
+
+  closeInspectDrawer(): void {
+    this.selectedMotorcycle.set(null);
+  }
+
   getStatusBadge(status: MotorcycleStatus): StatusBadgeInfo {
     switch (status) {
       case 'AVAILABLE':
         return {
-          label: 'DISPONÍVEL NO PÁTIO',
-          colorClass: 'text-[#00E676]',
-          badgeBg: 'bg-[#00E676]/15',
-          borderColor: 'border-[#00E676]/40',
+          label: 'Disponível no pátio',
+          colorClass: 'text-[#046C3A]',
+          badgeBg: 'bg-[#E6F4EE]',
+          borderColor: 'border-[#05944F]/30',
+          dotColor: 'bg-[#05944F]',
         };
       case 'RENTED':
         return {
-          label: 'ALUGADA',
-          colorClass: 'text-[#F2F7F5]',
-          badgeBg: 'bg-[#1A2320]',
-          borderColor: 'border-[#26332E]',
+          label: 'Alugada em rota',
+          colorClass: 'text-[#141414]',
+          badgeBg: 'bg-[#F3F3F3]',
+          borderColor: 'border-[#E2E2E2]',
+          dotColor: 'bg-[#141414]',
         };
       case 'IN_MAINTENANCE':
         return {
-          label: 'NA OFICINA',
-          colorClass: 'text-[#FFB300]',
-          badgeBg: 'bg-[#FFB300]/15',
-          borderColor: 'border-[#FFB300]/40',
+          label: 'Na oficina',
+          colorClass: 'text-[#92400E]',
+          badgeBg: 'bg-[#FEF3C7]',
+          borderColor: 'border-[#D97706]/30',
+          dotColor: 'bg-[#D97706]',
         };
       case 'UNAVAILABLE':
       default:
         return {
-          label: 'INDISPONÍVEL',
-          colorClass: 'text-[#FF4D4F]',
-          badgeBg: 'bg-[#FF4D4F]/15',
-          borderColor: 'border-[#FF4D4F]/40',
+          label: 'Indisponível',
+          colorClass: 'text-[#B91C1C]',
+          badgeBg: 'bg-[#FEE2E2]',
+          borderColor: 'border-[#DC2626]/30',
+          dotColor: 'bg-[#DC2626]',
         };
     }
   }

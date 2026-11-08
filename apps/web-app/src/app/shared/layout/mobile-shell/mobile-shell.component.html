@@ -111,7 +111,12 @@
                 </svg>
               }
             }
-            <span class="text-[11px] leading-none">{{ tab.label }}</span>
+            <span class="text-[11px] leading-none flex items-center gap-0.5">
+              {{ tab.label }}
+              @if (tab.isMock) {
+                <span class="text-[8px] font-bold text-[#D97706] bg-[#FEF3C7] px-1 py-0.2 rounded leading-none">Breve</span>
+              }
+            </span>
           </a>
         }
       </div>

@@ -10,6 +10,7 @@ export interface MobileTabItem {
   label: string;
   route: string;
   queryParams?: Record<string, string>;
+  isMock?: boolean;
 }
 
 @Component({
@@ -33,8 +34,8 @@ export class MobileShellComponent {
   readonly tabs: MobileTabItem[] = [
     { key: 'home', label: 'Início', route: '/rider/garage' },
     { key: 'inspections', label: 'Vistorias', route: '/rider/inspections/new' },
-    { key: 'rental', label: 'Aluguel', route: '/rider/rental' },
-    { key: 'deliveries', label: 'Entregas', route: '/rider/rental', queryParams: { tab: 'deliveries' } },
+    { key: 'rental', label: 'Aluguel', route: '/rider/rental', isMock: true },
+    { key: 'deliveries', label: 'Entregas', route: '/rider/rental', queryParams: { tab: 'deliveries' }, isMock: true },
     { key: 'account', label: 'Conta', route: '/rider/account' },
   ];
 

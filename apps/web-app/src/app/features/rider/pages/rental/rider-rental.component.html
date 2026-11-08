@@ -9,25 +9,39 @@
       <button
         type="button"
         (click)="setSection('rental')"
-        class="h-10 rounded-sm text-xs font-bold transition-all"
+        class="h-10 rounded-sm text-xs font-bold transition-all flex items-center justify-center gap-1.5"
         [class.bg-white]="activeSection() === 'rental'"
         [class.text-[#141414]]="activeSection() === 'rental'"
         [class.shadow-sm]="activeSection() === 'rental'"
         [class.text-[#545454]]="activeSection() !== 'rental'"
       >
-        Fatura semanal
+        <span>Fatura semanal</span>
+        <span class="text-[9px] font-bold text-[#D97706] bg-[#FEF3C7] px-1 py-0.2 rounded leading-none">Breve</span>
       </button>
       <button
         type="button"
         (click)="setSection('deliveries')"
-        class="h-10 rounded-sm text-xs font-bold transition-all"
+        class="h-10 rounded-sm text-xs font-bold transition-all flex items-center justify-center gap-1.5"
         [class.bg-white]="activeSection() === 'deliveries'"
         [class.text-[#141414]]="activeSection() === 'deliveries'"
         [class.shadow-sm]="activeSection() === 'deliveries'"
         [class.text-[#545454]]="activeSection() !== 'deliveries'"
       >
-        Entregas da semana
+        <span>Entregas da semana</span>
+        <span class="text-[9px] font-bold text-[#D97706] bg-[#FEF3C7] px-1 py-0.2 rounded leading-none">Breve</span>
       </button>
+    </div>
+
+    <!-- Mock Notice Alert -->
+    <div role="status" class="p-3 rounded-lg bg-[#FEF3C7] border border-[#F59E0B]/30 text-xs text-[#92400E]">
+      <div class="flex items-start gap-2">
+        <span class="font-bold text-[10px] font-mono bg-[#F59E0B]/20 text-[#B45309] px-1.5 py-0.5 rounded shrink-0 mt-0.5">MOCK</span>
+        @if (activeSection() === 'rental') {
+          <span><strong>Tela demonstrativa:</strong> O faturamento semanal com débito Pix automático está em desenvolvimento no roadmap da plataforma.</span>
+        } @else {
+          <span><strong>Tela demonstrativa:</strong> A integração de telemetria com as corridas do app Mottu Entregas está em desenvolvimento no roadmap.</span>
+        }
+      </div>
     </div>
 
     @if (activeSection() === 'rental') {

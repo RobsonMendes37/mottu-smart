@@ -9,8 +9,13 @@
     <!-- Top Header & Segmented Switch -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div>
-        <h2 class="text-xl font-bold text-[#141414]">Operação de baia e almoxarifado</h2>
-        <p class="text-sm text-[#545454]">
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <h2 class="text-xl font-bold text-[#141414]">Operação de baia e almoxarifado</h2>
+          <span class="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-[#FEF3C7] text-[#92400E] border border-[#F59E0B]/30">
+            MOCK • EM BREVE
+          </span>
+        </div>
+        <p class="text-sm text-[#545454] mt-1">
           Acompanhe os reparos presenciais na oficina e consulte a localização física das peças no galpão.
         </p>
       </div>
@@ -38,6 +43,14 @@
         >
           Estoque do galpão ({{ stockItems().length }})
         </button>
+      </div>
+    </div>
+
+    <!-- Mock Notice Alert -->
+    <div role="status" class="p-3.5 rounded-lg bg-[#FEF3C7] border border-[#F59E0B]/30 text-xs text-[#92400E] flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <span class="font-bold shrink-0">⚠️ Demonstração de Interface:</span>
+        <span>A gestão física de baias operacionais e consulta de estoque WMS em tempo real está em desenvolvimento. A tabela abaixo exibe dados ilustrativos.</span>
       </div>
     </div>
 

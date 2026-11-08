@@ -24,5 +24,5 @@ EXPOSE 8080
 HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=30s \
   CMD curl -f http://localhost:8080/api/v1/auth/public-config || exit 1
 
-ENTRYPOINT ["java", "-XX:+UseSerialGC", "-Xmx220m", "-Xms64m", "-XX:MaxMetaspaceSize=96m", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-XX:+UseSerialGC", "-Xmx220m", "-Xms64m", "-XX:MaxMetaspaceSize=220m", "-jar", "app.jar"]
 

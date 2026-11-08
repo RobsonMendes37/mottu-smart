@@ -83,11 +83,13 @@ jobs:
             fi
             rm -f infra/.env
             cp -f .env infra/.env
+            echo "🚀 Limpando imagens órfãs para liberar espaço em disco..."
+            docker system prune -f || true
             echo "🚀 Fazendo build e reiniciando containers via Docker Compose..."
             docker compose -f infra/docker-compose.prod.yml build
             docker compose -f infra/docker-compose.prod.yml up -d --remove-orphans
-            echo "⏳ Aguardando healthchecks..."
-            sleep 10
+            echo "⏳ Aguardando inicialização dos serviços (25s)..."
+            sleep 25
             docker compose -f infra/docker-compose.prod.yml ps
             echo "✅ Mottu Smart Ops atualizado e operando com sucesso!"
           EOF

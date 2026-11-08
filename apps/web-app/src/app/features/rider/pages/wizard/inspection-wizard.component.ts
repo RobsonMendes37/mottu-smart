@@ -132,14 +132,19 @@ export class InspectionWizardComponent implements OnInit {
     this.store.riderNotes.set(notes);
   }
 
+  triggerFileInput(input: HTMLInputElement): void {
+    input.value = '';
+    input.click();
+  }
+
   onFileSelected(event: Event, targetSlot?: 'damage' | 'odometer' | 'front' | 'detail'): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
       const slot = targetSlot || this.activeSlot();
       this.processSelectedFile(file, slot);
-      input.value = ''; // Reset input to allow re-selection of the same file
     }
+    input.value = ''; // Always clear after selection or cancel!
   }
 
   async processSelectedFile(
@@ -156,13 +161,8 @@ export class InspectionWizardComponent implements OnInit {
         result.compression.dataUrl,
         result.compression.averageLuminance
       );
-
-      // Auto-advance to next empty slot if available
-      const slots = this.store.photoSlots();
-      const nextEmpty = slots.find((s) => !s.photoObjectKey && s.slot !== slot);
-      if (nextEmpty) {
-        this.activeSlot.set(nextEmpty.slot);
-      }
+      // Keep on current slot so user sees their photo confirmed without screen flashing
+      this.activeSlot.set(slot);
     } catch (err: any) {
       this.uploadErrorMessage.set(err.message || 'Falha ao processar e enviar foto');
     } finally {
@@ -171,8 +171,13 @@ export class InspectionWizardComponent implements OnInit {
   }
 
   onRemoveSlotPhoto(slot: 'damage' | 'odometer' | 'front' | 'detail', event?: Event): void {
-    if (event) event.stopPropagation();
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.store.clearSlot(slot);
+    this.activeSlot.set(slot);
+    this.uploadErrorMessage.set(null);
   }
 
   async onSubmit(): Promise<void> {

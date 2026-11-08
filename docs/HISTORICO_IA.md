@@ -873,3 +873,25 @@
     * Clique no botão 1-clique **"Mecânico"** -> API 200 -> Rota protegida `/mechanic/queue` carregada com sucesso.
     * Clique no botão 1-clique **"Entregador"** -> API 200 -> Rota protegida `/rider/garage` carregada com sucesso.
   - **Bateria Playwright E2E Completa (`e2e/specs/`):** **148/148 testes aprovados (100% de sucesso)** cobrindo todos os fluxos de ponta a ponta, SLAs, contestações, sinistros, orçamentos e deflexão por IA.
+
+### [2026-11-08 00:30] — `HOTFIX-CATALOG-FILTER-AND-IMAGE-CAPTURE`: Resolução do Filtro por Modelo no Catálogo e Estabilidade de Captura/Cancelamento de Fotos e Vídeos
+- **Agente / Modelo:** `@frontend-specialist` + `@backend-specialist`
+- **Diagnóstico:**
+  1. **Filtro de Peças por Moto no Catálogo Vazio:** O Flyway `V2__seed_data.sql` havia inserido apenas 4 peças no catálogo e todas com o modelo `MOTTU_SPORT_110I`. Ao selecionar `HONDA_POP_110I`, `TVS_APACHE_160` ou `TVS_RAIDER_125`, a consulta SQL não encontrava registros cadastrados para esses modelos no banco de dados.
+  2. **Piscar e Bloqueio na Captura de Imagens:** 
+     - No template do `inspection-wizard` e `accident-wizard`, a tag `<input type="file" class="hidden">` estava envolvida diretamente em um `<label>`. Em navegadores Chromium, o clique disparava duplo despacho de evento com re-renderização do DOM, causando um piscar na tela.
+     - Além disso, o `input.value` não era resetado quando o usuário cancelava a janela de seleção de arquivo. Com o valor "sujo", o evento `change` subsequente não disparava ao tentar selecionar a mesma foto ou tentar de novo.
+     - Ao concluir o upload de uma foto, o componente avançava automaticamente para o próximo slot vazio, trocando o retículo e dando a sensação de que a foto havia sumido ou piscado.
+- **Solução Implementada:**
+  1. **Seed Completo do Catálogo Multi-Modelo (`apps/core-api/src/main/resources/db/migration/V4__seed_full_motorcycle_catalog.sql`):**
+     - Inserção de todas as 24 peças canônicas do ecossistema Mottu cobrindo todos os 4 modelos suportados (`HONDA_POP_110I` 6 peças, `TVS_APACHE_160` 6 peças, `TVS_RAIDER_125` 6 peças e complementos para `MOTTU_SPORT_110I`), com SKUs, categorias, preços reais e fotos oficiais do CDN VTEX.
+  2. **Desacoplamento e Resiliência de Input de Arquivo no Frontend:**
+     - Desacoplado `<input #fileInput>` de qualquer tag `<label>`. Disparo agora via método seguro `triggerFileInput(input)` que limpa `input.value = ''` antes e após a seleção/cancelamento.
+     - Botões dedicados e claros de "Trocar foto deste ângulo" e "Remover", sem travar a interface e permitindo trocar quantas vezes o usuário desejar.
+     - Mantido o foco no slot atual após a conclusão do upload para que o entregador veja a confirmação visual da sua foto sem sustos.
+     - Correção da semântica HTML nas miniaturas (div com atributos de acessibilidade em vez de tags `<button>` aninhadas).
+     - Aplicado o mesmo padrão seguro para o assistente de sinistro (`accident-wizard.component.html/ts`) para vídeos e fotos de detalhe com remoção limpa.
+- **Verificação Executada:**
+  - `apps/web-app`: **203/203 testes unitários aprovados com 100% de sucesso** (`npm run test:ci`).
+  - `apps/core-api`: Compilação e testes de integração com banco de dados aprovados (`./mvnw test-compile` e `AuthAndApprovalIntegrationTest` 15/15).
+  - `e2e`: **148/148 testes Playwright aprovados**.

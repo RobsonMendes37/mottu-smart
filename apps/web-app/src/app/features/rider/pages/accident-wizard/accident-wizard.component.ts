@@ -53,9 +53,18 @@ export class AccidentWizardComponent {
     this.router?.navigate(['/rider/garage']);
   }
 
+  triggerInput(input: HTMLInputElement): void {
+    if (this.isSubmitting()) return;
+    input.value = '';
+    input.click();
+  }
+
   async onVideoSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
+    if (!input.files || input.files.length === 0) {
+      input.value = '';
+      return;
+    }
 
     const file = input.files[0];
     this.errorMessage.set(null);
@@ -65,16 +74,21 @@ export class AccidentWizardComponent {
       this.errorMessage.set(check.error || 'Vídeo inválido');
       this.videoFile.set(null);
       this.videoDuration.set(0);
+      input.value = '';
       return;
     }
 
     this.videoFile.set(file);
     this.videoDuration.set(check.durationSeconds);
+    input.value = '';
   }
 
   onPhotoSelected(event: Event, index: number): void {
     const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
+    if (!input.files || input.files.length === 0) {
+      input.value = '';
+      return;
+    }
 
     const file = input.files[0];
     const updatedFiles = [...this.photoFiles()];
@@ -88,6 +102,21 @@ export class AccidentWizardComponent {
       this.photoPreviews.set(updatedPreviews);
     };
     reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  onRemovePhoto(index: number, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    const updatedFiles = [...this.photoFiles()];
+    updatedFiles[index] = null as any;
+    this.photoFiles.set(updatedFiles);
+
+    const updatedPreviews = [...this.photoPreviews()];
+    updatedPreviews[index] = null as any;
+    this.photoPreviews.set(updatedPreviews);
   }
 
   toggleInjuries(): void {

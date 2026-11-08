@@ -73,26 +73,53 @@
 
         <!-- Capture Trigger -->
         <div class="absolute bottom-3 inset-x-3 flex items-center justify-between gap-2">
-          <label
-            class="flex-1 h-12 rounded-md bg-white hover:bg-[#F3F3F3] text-[#141414] font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors shadow"
-          >
-            @if (isUploading()) {
-              <span>Comprimindo e enviando foto...</span>
-            } @else if (activeSlotState()?.photoObjectKey) {
-              <span>Tirar outra foto deste ângulo</span>
-            } @else {
-              <span>Abrir câmera / enviar foto</span>
-            }
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              aria-label="Capturar ou enviar foto da vistoria"
-              class="hidden"
+          <input
+            #fileInput
+            type="file"
+            accept="image/*"
+            capture="environment"
+            aria-label="Capturar ou enviar foto da vistoria"
+            class="hidden"
+            [disabled]="isUploading()"
+            (change)="onFileSelected($event)"
+          />
+
+          @if (activeSlotState()?.photoObjectKey) {
+            <button
+              type="button"
+              (click)="triggerFileInput(fileInput)"
               [disabled]="isUploading()"
-              (change)="onFileSelected($event)"
-            />
-          </label>
+              class="flex-1 h-12 rounded-md bg-white hover:bg-[#F3F3F3] text-[#141414] font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow disabled:opacity-50 cursor-pointer"
+            >
+              @if (isUploading()) {
+                <span>Comprimindo e enviando...</span>
+              } @else {
+                <span>Trocar foto deste ângulo</span>
+              }
+            </button>
+            <button
+              type="button"
+              (click)="onRemoveSlotPhoto(activeSlot())"
+              [disabled]="isUploading()"
+              class="h-12 px-4 rounded-md bg-[#FEE2E2] hover:bg-[#FECACA] text-[#B91C1C] font-bold text-xs flex items-center justify-center transition-colors shadow cursor-pointer"
+              aria-label="Remover foto deste ângulo"
+            >
+              Remover
+            </button>
+          } @else {
+            <button
+              type="button"
+              (click)="triggerFileInput(fileInput)"
+              [disabled]="isUploading()"
+              class="flex-1 h-12 rounded-md bg-white hover:bg-[#F3F3F3] text-[#141414] font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow disabled:opacity-50 cursor-pointer"
+            >
+              @if (isUploading()) {
+                <span>Comprimindo e enviando foto...</span>
+              } @else {
+                <span>Abrir câmera / enviar foto</span>
+              }
+            </button>
+          }
         </div>
       </div>
     </section>
@@ -112,10 +139,13 @@
 
       <div class="grid grid-cols-4 gap-2">
         @for (s of slots(); track s.slot) {
-          <button
-            type="button"
+          <div
+            role="button"
+            tabindex="0"
             (click)="setActiveSlot(s.slot)"
-            class="relative h-16 rounded-md border overflow-hidden flex flex-col items-center justify-center p-1 text-center transition-all"
+            (keydown.enter)="setActiveSlot(s.slot)"
+            (keydown.space)="setActiveSlot(s.slot)"
+            class="relative h-16 rounded-md border overflow-hidden flex flex-col items-center justify-center p-1 text-center transition-all cursor-pointer select-none"
             [class.border-[#141414]]="activeSlot() === s.slot"
             [class.border-2]="activeSlot() === s.slot"
             [class.border-[#E2E2E2]]="activeSlot() !== s.slot"
@@ -126,20 +156,20 @@
               <span class="relative z-10 px-1.5 py-0.5 rounded bg-[#05944F] text-white text-[10px] font-bold">
                 OK
               </span>
-              <span
+              <button
+                type="button"
                 (click)="onRemoveSlotPhoto(s.slot, $event)"
-                role="button"
                 aria-label="Remover foto"
-                class="absolute top-0.5 right-0.5 z-10 w-4 h-4 rounded-full bg-black/70 text-white text-[10px] flex items-center justify-center"
+                class="absolute top-0.5 right-0.5 z-10 w-5 h-5 rounded-full bg-black/80 hover:bg-black text-white text-xs flex items-center justify-center cursor-pointer"
               >
                 ×
-              </span>
+              </button>
             } @else {
               <span class="text-[10px] font-semibold text-[#545454] leading-tight line-clamp-2">
                 {{ s.slot === 'damage' ? '1. Avaria*' : s.slot === 'odometer' ? '2. Painel' : s.slot === 'front' ? '3. Frente' : '4. Detalhe' }}
               </span>
             }
-          </button>
+          </div>
         }
       </div>
     </section>

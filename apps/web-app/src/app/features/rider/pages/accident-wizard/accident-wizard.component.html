@@ -53,21 +53,27 @@
         Caminhe devagar ao redor da moto mostrando frente, laterais, guidão e escapamento em um único vídeo de 15 a 30 segundos.
       </p>
 
-      <label class="w-full h-12 rounded-md bg-white hover:bg-[#F3F3F3] text-[#141414] font-bold text-xs flex items-center justify-center cursor-pointer transition-colors">
+      <input
+        #videoInput
+        type="file"
+        accept="video/*"
+        capture="environment"
+        aria-label="Selecionar vídeo do acidente"
+        class="hidden"
+        (change)="onVideoSelected($event)"
+      />
+      <button
+        type="button"
+        (click)="triggerInput(videoInput)"
+        [disabled]="isSubmitting()"
+        class="w-full h-12 rounded-md bg-white hover:bg-[#F3F3F3] text-[#141414] font-bold text-xs flex items-center justify-center cursor-pointer transition-colors shadow disabled:opacity-50"
+      >
         @if (videoFile()) {
-          <span>Vídeo selecionado ({{ videoFile()!.name }}) — trocar</span>
+          <span>Vídeo selecionado ({{ videoFile()!.name }}) — trocar vídeo</span>
         } @else {
           <span>Gravar ou escolher vídeo (máx. 30s)</span>
         }
-        <input
-          type="file"
-          accept="video/*"
-          capture="environment"
-          aria-label="Selecionar vídeo do acidente"
-          class="hidden"
-          (change)="onVideoSelected($event)"
-        />
-      </label>
+      </button>
     </section>
 
     <!-- Optional Detail Photos -->
@@ -79,21 +85,37 @@
 
       <div class="grid grid-cols-3 gap-2">
         @for (preview of photoPreviews(); track $index; let idx = $index) {
-          <label class="relative h-20 rounded-md border border-[#E2E2E2] bg-[#F3F3F3] overflow-hidden flex items-center justify-center cursor-pointer">
+          <input
+            #photoInput
+            type="file"
+            accept="image/*"
+            capture="environment"
+            aria-label="Selecionar foto de detalhe do acidente"
+            class="hidden"
+            (change)="onPhotoSelected($event, idx)"
+          />
+          <div
+            role="button"
+            tabindex="0"
+            (click)="triggerInput(photoInput)"
+            (keydown.enter)="triggerInput(photoInput)"
+            (keydown.space)="triggerInput(photoInput)"
+            class="relative h-20 rounded-md border border-[#E2E2E2] bg-[#F3F3F3] overflow-hidden flex items-center justify-center cursor-pointer select-none"
+          >
             @if (preview) {
               <img [src]="preview" alt="Detalhe do acidente" class="w-full h-full object-cover" />
+              <button
+                type="button"
+                (click)="onRemovePhoto(idx, $event)"
+                aria-label="Remover foto"
+                class="absolute top-1 right-1 z-10 w-5 h-5 rounded-full bg-black/80 hover:bg-black text-white text-xs flex items-center justify-center cursor-pointer"
+              >
+                ×
+              </button>
             } @else {
               <span class="text-[11px] font-semibold text-[#545454]">+ Foto {{ idx + 1 }}</span>
             }
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              aria-label="Selecionar foto de detalhe do acidente"
-              class="hidden"
-              (change)="onPhotoSelected($event, idx)"
-            />
-          </label>
+          </div>
         }
       </div>
     </section>

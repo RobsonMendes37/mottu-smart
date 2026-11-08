@@ -895,3 +895,20 @@
   - `apps/web-app`: **203/203 testes unitários aprovados com 100% de sucesso** (`npm run test:ci`).
   - `apps/core-api`: Compilação e testes de integração com banco de dados aprovados (`./mvnw test-compile` e `AuthAndApprovalIntegrationTest` 15/15).
   - `e2e`: **148/148 testes Playwright aprovados**.
+
+### [2026-11-08 00:45] — `VERIFICACAO-FLUXO-MECANICO-FOTOS-VIDEOS-S3`: Validação Real de Vídeos no MinIO/S3, Dossiê do Mecânico e Roteamento por Dúvida da IA
+- **Agente / Modelo:** `@qa-engineer` + `@backend-specialist` + `@frontend-specialist`
+- **Validações e Melhorias Executadas:**
+  1. **Armazenamento e Reprodução de Vídeo no S3/MinIO:**
+     - Testado ponta a ponta na nuvem o fluxo de envio de vídeo de sinistro: geração de presigned upload URL, gravação do binário via PUT no bucket `mottu-inspections`, persistência da chave `videoObjectKey`, listagem na fila do mecânico e abertura do dossiê (`/mechanic/accidents/:id`).
+     - A URL de download presigned do S3 gerada pelo backend foi baixada via script e validada byte a byte (100% idêntica ao original enviado pelo entregador).
+     - No frontend (`T13AccidentDossierComponent`), adicionada galeria de fotos complementares caso o entregador anexe fotos de detalhe além do vídeo 360°.
+  2. **Recebimento de Fotos e Dúvida da IA na Bancada do Mecânico:**
+     - Se o entregador submete com foto: a foto é salva no S3 e sua URL de alta definição é disponibilizada para a bancada do mecânico com suporte a lupa de zoom óptico (2x, 3x, 4x).
+     - Quando a IA tem dúvida (`confidence < 0.80`) ou identifica risco crítico/contestação/fraude: o chamado é roteado para `HUMAN_TRIAGE` com a tag de motivo (`LOW_AI_CONFIDENCE`, `CRITICAL_SAFETY`, etc.) e o resumo técnico da IA exibido para apoiar a decisão do mecânico.
+     - Se o chamado não possui foto (ou foto vazia): adicionada trava defensiva em `buildPhotoDownloadUrl` retornando `null` em vez de string literal `"null"`, fazendo o componente `app-photo-zoom-lens` renderizar o placeholder amigável "Nenhuma imagem carregada" sem falhas de carregamento no navegador.
+  3. **Loop de Consumo de Resultados de Triagem da IA (`queue:ai_triage_results`):**
+     - Adicionado listener agendado `@Scheduled(fixedDelay = 2000)` em `AiTriageResultConsumerService` para ler resultados do Redis de forma contínua em paridade com o serviço de acidentes.
+- **Testes Executados:**
+  - `MechanicWorkbenchIntegrationTest`: 11/11 testes aprovados com sucesso.
+  - Testes do Angular: 203/203 aprovados com sucesso.

@@ -43,6 +43,28 @@
             ></video>
           </section>
 
+          @if (det.photoDownloadUrls && det.photoDownloadUrls.length > 0) {
+            <section class="bg-white border border-[#E2E2E2] rounded-lg p-4 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-[#141414]">Fotos complementares de detalhe</span>
+                <span class="text-[11px] text-[#757575]">{{ det.photoDownloadUrls.length }} foto(s)</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2">
+                @for (photo of det.photoDownloadUrls; track photo) {
+                  <a
+                    [href]="photo"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="relative h-24 rounded-md border border-[#E2E2E2] overflow-hidden group block bg-[#F3F3F3]"
+                    title="Clique para abrir imagem original"
+                  >
+                    <img [src]="photo" alt="Foto adicional de detalhe" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                  </a>
+                }
+              </div>
+            </section>
+          }
+
           @if (det.structuralRiskAlert) {
             <div role="alert" class="p-4 rounded-lg bg-[#FEE2E2] border border-[#DC2626]/30 text-xs text-[#B91C1C]">
               <p class="font-bold">Alerta de estrutura / chassi</p>

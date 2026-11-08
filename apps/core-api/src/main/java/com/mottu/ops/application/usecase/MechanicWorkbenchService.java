@@ -255,6 +255,9 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
     }
 
     private String buildPhotoDownloadUrl(String objectKey) {
+        if (objectKey == null || objectKey.isBlank() || "null".equalsIgnoreCase(objectKey.trim())) {
+            return null;
+        }
         String base = storageProperties.getPublicEndpoint();
         if (base.endsWith("/")) {
             base = base.substring(0, base.length() - 1);

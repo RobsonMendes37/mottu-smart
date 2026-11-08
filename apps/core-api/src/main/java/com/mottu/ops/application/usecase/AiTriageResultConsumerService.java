@@ -27,6 +27,9 @@ import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDat
 import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataRentalContractRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +42,7 @@ import java.util.*;
 public class AiTriageResultConsumerService implements AiTriageResultConsumerUseCase {
 
     private static final Logger log = LoggerFactory.getLogger(AiTriageResultConsumerService.class);
+    public static final String TRIAGE_RESULTS_QUEUE = "queue:ai_triage_results";
 
     private final SpringDataInspectionRepository inspectionRepository;
     private final SpringDataInspectionItemRepository inspectionItemRepository;
@@ -46,6 +50,7 @@ public class AiTriageResultConsumerService implements AiTriageResultConsumerUseC
     private final SpringDataAnalyticsOutboxRepository outboxRepository;
     private final SpringDataRentalContractRepository rentalContractRepository;
     private final SseEmitterRegistry sseEmitterRegistry;
+    private final ObjectProvider<StringRedisTemplate> redisTemplateProvider;
     private final ObjectMapper objectMapper;
 
     public AiTriageResultConsumerService(
@@ -55,6 +60,7 @@ public class AiTriageResultConsumerService implements AiTriageResultConsumerUseC
             SpringDataAnalyticsOutboxRepository outboxRepository,
             SpringDataRentalContractRepository rentalContractRepository,
             SseEmitterRegistry sseEmitterRegistry,
+            ObjectProvider<StringRedisTemplate> redisTemplateProvider,
             ObjectMapper objectMapper
     ) {
         this.inspectionRepository = inspectionRepository;
@@ -63,6 +69,7 @@ public class AiTriageResultConsumerService implements AiTriageResultConsumerUseC
         this.outboxRepository = outboxRepository;
         this.rentalContractRepository = rentalContractRepository;
         this.sseEmitterRegistry = sseEmitterRegistry;
+        this.redisTemplateProvider = redisTemplateProvider;
         this.objectMapper = objectMapper;
     }
 
@@ -287,6 +294,23 @@ public class AiTriageResultConsumerService implements AiTriageResultConsumerUseC
             ));
         } catch (JsonProcessingException e) {
             log.error("Failed to record analytics outbox for inspection {}", entity.getId(), e);
+        }
+    }
+
+    @Scheduled(fixedDelay = 2000)
+    public void pollResultsQueue() {
+        try {
+            StringRedisTemplate redisTemplate = redisTemplateProvider.getIfAvailable();
+            if (redisTemplate == null) {
+                return;
+            }
+            String rawJson = redisTemplate.opsForList().rightPop(TRIAGE_RESULTS_QUEUE);
+            if (rawJson != null && !rawJson.isBlank()) {
+                TriageResultPayloadDto payload = objectMapper.readValue(rawJson, TriageResultPayloadDto.class);
+                processAiResult(payload);
+            }
+        } catch (Exception e) {
+            log.debug("Error or timeout polling Redis triage results: {}", e.getMessage());
         }
     }
 }

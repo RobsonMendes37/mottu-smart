@@ -94,13 +94,19 @@ jobs:
             docker compose -f infra/docker-compose.prod.yml down --remove-orphans || true
             docker compose -f infra/docker-compose.prod.yml up -d --remove-orphans
 
-            echo "⏳ Aguardando estabilização dos serviços (30s)..."
-            sleep 30
+            echo "🚀 Aguardando Core API inicializar e ficar pronta..."
+            for i in $(seq 1 30); do
+              if curl -sf http://127.0.0.1:18088/api/v1/auth/public-config >/dev/null 2>&1; then
+                echo "✅ Core API respondendo com sucesso na tentativa $i!"
+                break
+              fi
+              echo "⏳ Aguardando Core API... tentativa $i/30"
+              sleep 3
+            done
+
             docker compose -f infra/docker-compose.prod.yml ps
             docker compose -f infra/docker-compose.prod.yml logs core-api --tail=30
             echo "🚀 Validando conectividade do Caddy e Core API..."
-            curl -sf http://127.0.0.1:18088/api/v1/auth/public-config
-            sleep 5
             curl -sf http://127.0.0.1:18088/api/v1/auth/public-config
             echo "✅ Mottu Smart Ops atualizado e operando com estabilidade!"
           EOF

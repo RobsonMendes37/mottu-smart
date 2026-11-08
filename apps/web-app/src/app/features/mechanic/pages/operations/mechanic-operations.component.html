@@ -11,8 +11,9 @@
       <div>
         <div class="flex items-center gap-2.5 flex-wrap">
           <h2 class="text-xl font-bold text-[#141414]">Operação de baia e almoxarifado</h2>
-          <span class="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-[#FEF3C7] text-[#92400E] border border-[#F59E0B]/30">
-            MOCK • EM BREVE
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white border border-[#E2E2E2] text-[#545454] shadow-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#05944F]"></span>
+            Módulo em Homologação
           </span>
         </div>
         <p class="text-sm text-[#545454] mt-1">
@@ -46,12 +47,15 @@
       </div>
     </div>
 
-    <!-- Mock Notice Alert -->
-    <div role="status" class="p-3.5 rounded-lg bg-[#FEF3C7] border border-[#F59E0B]/30 text-xs text-[#92400E] flex items-center justify-between">
+    <!-- Notice Alert -->
+    <div role="status" class="p-3.5 rounded-lg bg-white border border-[#E2E2E2] shadow-sm flex items-start sm:items-center justify-between gap-3 text-xs">
       <div class="flex items-center gap-2.5">
-        <span class="font-bold shrink-0">⚠️ Demonstração de Interface:</span>
-        <span>A gestão física de baias operacionais e consulta de estoque WMS em tempo real está em desenvolvimento. A tabela abaixo exibe dados ilustrativos.</span>
+        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#F3F3F3] text-[#141414] font-bold text-[11px] shrink-0">i</span>
+        <span class="text-[#545454]">
+          <strong class="text-[#141414]">Ambiente de Demonstração Integrada:</strong> A gestão de baias físicas e controle de almoxarifado WMS opera com dados de homologação para validação prévia de layout e rotinas de galpão.
+        </span>
       </div>
+      <span class="hidden sm:inline-block px-2 py-0.5 rounded bg-[#F3F3F3] text-[10px] font-semibold text-[#757575] shrink-0 border border-[#E2E2E2]">Roadmap Operacional</span>
     </div>
 
     @if (feedbackBanner()) {

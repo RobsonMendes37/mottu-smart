@@ -912,3 +912,18 @@
 - **Testes Executados:**
   - `MechanicWorkbenchIntegrationTest`: 11/11 testes aprovados com sucesso.
   - Testes do Angular: 203/203 aprovados com sucesso.
+
+### [2026-11-08 01:25] — `FEAT-PROFESSIONAL-ROADMAP-INDICATORS`: Elevação dos Indicadores de Roadmap e Homologação
+- **Agente / Modelo:** `@frontend-specialist` + `@frontend-design`
+- **Contexto e Motivação:**
+  - Substituição de termos informais e técnicos como "MOCK", "EM BREVE", badges amarelas gritantes e alertas chamativos por componentes de design corporativos de alto nível, aderentes aos padrões Uber Base Web e ao Design System Mottu.
+- **Arquivos Alterados:**
+  - `apps/web-app/src/app/shared/layout/desktop-shell/desktop-shell.component.html`: Menus "Ordens e estoque" e "Contratos e faturas" com badge pill sutil `Piloto` (`#545454`, borda `#E2E2E2`, fundo `#F3F3F3`).
+  - `apps/web-app/src/app/shared/layout/mobile-shell/mobile-shell.component.html`: Tab bar inferior atualizada com pill `Piloto`.
+  - `apps/web-app/src/app/features/mechanic/pages/operations/mechanic-operations.component.html`: Header com pill de status `Módulo em Homologação` (dot verde `#05944F`) e banner corporativo de `Ambiente de Demonstração Integrada` com tag `Roadmap Operacional`.
+  - `apps/web-app/src/app/features/manager/pages/t12-billing/t12-billing.component.html`: Header com pill `Módulo em Homologação` e banner `Ambiente de Demonstração Financeira` com tag `Roadmap Financeiro`.
+  - `apps/web-app/src/app/features/rider/pages/rental/rider-rental.component.html`: Sub-abas e banner descritivo sutil `Versão Prévia de Fatura / Corridas` informando homologação operacional de conciliação Pix e telemetria.
+  - `apps/web-app/src/app/features/rider/pages/account/rider-account.component.html` e `apps/web-app/src/app/features/shared/account/staff-account.component.html`: Seção de segurança e credenciais atualizada para badge `Em Homologação`.
+- **Testes Executados:**
+  - Vitest Unit Tests (`apps/web-app`): **38 arquivos de teste / 203 testes aprovados (100% de sucesso)**.
+

@@ -805,3 +805,12 @@
   - `npm run test:ci` (`vitest run`): **38/38 arquivos de teste, 203/203 testes verdes**
   - `npx playwright test` (`e2e/`): **148/148 testes E2E aprovados**
   - `ux_audit.py` & `accessibility_checker.py`: **PASS (0 issues)** e **Purple Ban 100% limpo**.
+
+
+### [2026-11-07 21:45] — `HOTFIX-MINIO-SIGV4`: Roteamento Canônico do Bucket MinIO no Caddy (`/mottu-inspections/*`)
+- **Agente / Modelo:** `@devops-engineer`
+- **Problema:** Ao fazer upload de fotos/vídeos na VM pública via `uploadUrl` gerado pelo `S3Presigner`, o MinIO retornava `403 SignatureDoesNotMatch` porque o Caddy aplicava `handle_path /storage/*` (removendo o prefixo `/storage` antes de entregar ao MinIO), causando divergência entre a Canonical URI assinada pelo AWS SDK e a URI recebida pelo MinIO.
+- **Solução:**
+  1. Configurado o Caddy com rota canônica direta `handle /mottu-inspections/* { reverse_proxy minio:9000 }` (preservando o path e Host originais) e mantido `handle_path /storage/*` para compatibilidade retroativa.
+  2. Ajustado o script de CD no GitHub Actions (`.github/workflows/cd.yml`) para normalizar `S3_PUBLIC_ENDPOINT=http://161.153.2.148:18088` no `.env` da VM, garantindo que o `S3Presigner` gere assinaturas 100% compatíveis com o MinIO.
+- **Verificação:** Testes de presigning unitários/integração Java no `MinioStorageIntegrationTest` aprovados com `BUILD SUCCESS`.

@@ -23,7 +23,12 @@
 		}
 	}
 
-	# MinIO S3 Object Storage (Strip /storage prefix)
+	# MinIO S3 Object Storage Bucket (Direct bucket path for AWS SigV4 compliance)
+	handle /mottu-inspections/* {
+		reverse_proxy minio:9000
+	}
+
+	# MinIO S3 Object Storage (Strip /storage prefix for legacy paths)
 	handle_path /storage/* {
 		reverse_proxy minio:9000
 	}

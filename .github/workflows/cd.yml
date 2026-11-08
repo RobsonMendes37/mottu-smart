@@ -75,6 +75,12 @@ jobs:
             cd /home/ubuntu/mottu-smart-ops || cd ~/mottu-smart-ops
             git fetch origin main
             git reset --hard origin/main
+            # Garante que S3_PUBLIC_ENDPOINT aponte para a porta 18088 sem o prefixo /storage (compatibilidade SigV4 MinIO)
+            if grep -q "^S3_PUBLIC_ENDPOINT=" .env 2>/dev/null; then
+              sed -i 's|^S3_PUBLIC_ENDPOINT=.*|S3_PUBLIC_ENDPOINT=http://161.153.2.148:18088|' .env
+            else
+              echo "S3_PUBLIC_ENDPOINT=http://161.153.2.148:18088" >> .env
+            fi
             rm -f infra/.env
             cp -f .env infra/.env
             echo "🚀 Fazendo build e reiniciando containers via Docker Compose..."

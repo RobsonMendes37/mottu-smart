@@ -70,7 +70,7 @@ LOOKER_STUDIO_EMBED_URL=https://lookerstudio.google.com/embed/reporting/placehol
 ```
 
 ### Como resolver a armadilha do `MinIO` no Docker + Anti-Fraude (`IMPORTANTE!`)
-1. **Assinatura de Upload (`S3Presigner`):** O navegador/celular do usuário não enxerga o hostname interno `minio:9000`. Por isso, o `core-api` usa **`S3_PUBLIC_ENDPOINT`** (em dev `http://localhost:19000`, em prod `https://seu-dominio/storage` via Caddy) exclusivamente no `S3Presigner` para gerar o `uploadUrl` (`PUT`), garantindo que a assinatura criptográfica AWS S3 V4 nunca dê erro `403 SignatureDoesNotMatch`.
+1. **Assinatura de Upload (`S3Presigner`):** O navegador/celular do usuário não enxerga o hostname interno `minio:9000`. Por isso, o `core-api` usa **`S3_PUBLIC_ENDPOINT`** (em dev `http://localhost:19000`, em prod `http://161.153.2.148:18088` via proxy reverso Caddy com roteamento canônico `/mottu-inspections/*`) exclusivamente no `S3Presigner` para gerar o `uploadUrl` (`PUT`), garantindo que a assinatura criptográfica AWS S3 V4 nunca dê erro `403 SignatureDoesNotMatch`.
 2. **Leitura Interna de Bytes para Anti-Fraude (`S3Client`):** Quando o celular termina o `PUT` da foto e chama `POST /api/v1/rider/inspections`, o `core-api` lê os bytes do arquivo usando **`S3_INTERNAL_ENDPOINT` (`http://minio:9000`)** para:
    * Confirmar que o arquivo existe e tem `<= 10 MB` (`JPG`, `PNG` ou `WEBP`);
    * Calcular no servidor o **`photo_sha256`** real e um hash visual simples (`dHash` 64 bits em hexadecimal);

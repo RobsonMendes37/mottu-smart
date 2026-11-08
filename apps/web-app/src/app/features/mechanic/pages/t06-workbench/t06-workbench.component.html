@@ -1,357 +1,272 @@
-<div class="min-h-screen bg-[#0A0E0D] text-[#F2F7F5] flex flex-col">
-  <!-- Top Navigation Header -->
-  <header class="bg-[#121816] border-b border-[#26332E] px-4 lg:px-8 py-3.5 flex items-center justify-between sticky top-0 z-40">
-    <div class="flex items-center gap-4">
-      <button
-        type="button"
-        (click)="backToQueue()"
-        class="flex items-center gap-2 text-sm font-bold text-[#94A39E] hover:text-[#00E676] transition-colors"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-        </svg>
-        <span>Voltar para Fila</span>
-      </button>
-
-      <span class="text-[#26332E]">|</span>
-
-      <div class="flex items-center gap-2.5">
-        <span class="text-xs px-2 py-0.5 rounded-full bg-[#1A2320] text-[#00E676] border border-[#26332E] font-mono font-bold">
-          T06 • MESA DE DECISÃO
-        </span>
-        @if (details(); as d) {
-          <span class="text-sm font-mono font-extrabold text-[#F2F7F5]">{{ d.plate }}</span>
-          <span class="text-xs text-[#94A39E]">({{ formatModel(d.motorcycleModel) }})</span>
-        }
+<app-desktop-shell
+  sectionLabel="Vistorias e oficina"
+  pageTitle="Bancada de análise"
+  activeNav="workbench"
+>
+  <div class="space-y-5">
+    <!-- Subheader -->
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          (click)="backToQueue()"
+          class="px-3.5 h-9 rounded-md bg-white border border-[#E2E2E2] hover:bg-[#F3F3F3] text-xs font-semibold text-[#141414]"
+        >
+          ← Fila da oficina
+        </button>
+        <div>
+          <h2 class="text-lg font-bold text-[#141414]">
+            @if (details(); as d) {
+              Análise de avaria • <span class="font-mono">{{ d.plate }}</span>
+            } @else {
+              Bancada de análise
+            }
+          </h2>
+          <p class="text-xs text-[#757575] font-mono">Protocolo #{{ inspectionId().slice(0, 8) }}</p>
+        </div>
       </div>
     </div>
 
-    <!-- Status Badge -->
-    <div>
-      @if (details(); as d) {
-        @if (d.status === 'HUMAN_RESOLVED') {
-          <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/40">
-            ✓ LAUDO FINALIZADO
-          </span>
-        } @else {
-          <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#FFB300]/15 text-[#FFB300] border border-[#FFB300]/40">
-            AGUARDANDO DECISÃO
-          </span>
-        }
-      }
-    </div>
-  </header>
+    @if (errorMessage()) {
+      <div role="alert" class="p-4 rounded-lg bg-[#FEE2E2] border border-[#DC2626]/30 text-xs font-medium text-[#B91C1C]">
+        {{ errorMessage() }}
+      </div>
+    }
 
-  <!-- Error Alert -->
-  @if (errorMessage()) {
-    <div class="max-w-7xl w-full mx-auto p-4">
-      <div class="bg-[#FF4D4F]/10 border border-[#FF4D4F]/30 rounded-lg p-4 text-[#FF4D4F] text-sm flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          <span>{{ errorMessage() }}</span>
+    @if (resolutionResult(); as res) {
+      <div role="status" class="p-4 rounded-lg bg-[#E6F4EE] border border-[#05944F]/30 text-sm text-[#046C3A] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <p class="font-bold">Parecer emitido com sucesso ({{ res.finalVerdict }})</p>
+          <p class="text-xs mt-0.5">{{ res.customerFeedbackText }}</p>
         </div>
         <button
           type="button"
           (click)="backToQueue()"
-          class="text-xs font-bold underline hover:no-underline"
+          class="px-4 h-9 rounded-md bg-[#05944F] text-white text-xs font-bold shrink-0"
         >
-          Retornar à Fila
+          Próximo da fila
         </button>
       </div>
-    </div>
-  }
+    }
 
-  <!-- Loading State -->
-  @if (isLoading()) {
-    <div class="flex-1 flex flex-col items-center justify-center py-24 space-y-3">
-      <div class="w-10 h-10 border-2 border-[#00E676] border-t-transparent rounded-full animate-spin"></div>
-      <span class="text-sm text-[#94A39E] font-mono">Carregando evidências e laudo pericial...</span>
-    </div>
-  } @else {
-    @if (details(); as d) {
-      <!-- Main Workbench Split Screen (55% Evidence / 45% Decision) -->
-      <main class="flex-1 max-w-[1600px] w-full mx-auto p-4 lg:p-6">
-      <!-- Resolution Success Banner -->
-      @if (resolutionResult(); as res) {
-        <div class="mb-6 bg-[#00E676]/10 border border-[#00E676]/40 rounded-xl p-5 space-y-3">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="text-xl">✓</span>
-              <h3 class="text-lg font-bold text-[#00E676]">Laudo Definitivo Emitido com Sucesso!</h3>
-            </div>
-            <span class="font-mono text-sm text-[#00E676] font-bold">
-              Total: R$ {{ res.totalEstimatedBrl.toFixed(2) }}
-            </span>
-          </div>
-
-          <div class="bg-[#121816] rounded-lg p-3.5 border border-[#26332E]">
-            <span class="text-xs font-mono text-[#94A39E] block mb-1">
-              Feedback empático e educativo polido pela IA p/ o Entregador:
-            </span>
-            <p class="text-sm text-[#F2F7F5] italic leading-relaxed">
-              "{{ res.customerFeedbackText }}"
-            </p>
-          </div>
-
-          <div class="flex justify-end pt-2">
-            <button
-              type="button"
-              (click)="backToQueue()"
-              class="px-5 py-2.5 rounded-lg bg-[#00E676] text-[#06120B] font-bold text-sm hover:bg-[#00C853] transition-colors"
-            >
-              Concluir e Voltar para Fila →
-            </button>
-          </div>
-        </div>
-      }
-
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        <!-- LEFT 55%: Visual Evidence & Telemetry Desk (col-span-12 lg:col-span-7) -->
-        <section class="lg:col-span-7 space-y-4">
-          <!-- Evidence Card -->
-          <div class="bg-[#121816] border border-[#26332E] rounded-xl p-5 space-y-4">
+    @if (isLoading()) {
+      <div class="bg-white border border-[#E2E2E2] rounded-lg p-10 text-center text-sm text-[#757575]">
+        Carregando dossiê fotográfico e histórico do contrato...
+      </div>
+    } @else {
+      @if (details(); as d) {
+      <!-- 55% / 45% Split Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <!-- Left 55% (7 cols): Optical Inspection & Telemetry -->
+        <div class="lg:col-span-7 space-y-4">
+          <section class="bg-white border border-[#E2E2E2] rounded-lg p-4 space-y-3">
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-mono font-bold text-[#F2F7F5]">
-                  {{ d.plate }} • Foto de Alta Resolução (Lupa Ativa 2x a 4x)
-                </span>
-              </div>
-              <span class="text-xs text-[#94A39E] font-mono">
-                Passe o cursor sobre a foto para ampliar
-              </span>
+              <span class="text-xs font-bold text-[#141414]">Inspeção óptica (passe o cursor para zoom)</span>
+              <span class="font-mono text-xs text-[#757575]">{{ d.reportedOdometerKm }} km informados</span>
             </div>
 
-            <!-- Photo Zoom Lens Component -->
             <app-photo-zoom-lens
               [photoUrl]="d.photoDownloadUrl"
               [boundingBoxes]="boundingBoxes()"
             ></app-photo-zoom-lens>
+          </section>
 
-            <!-- Telemetry & Claim Card -->
-            <div class="bg-[#0A0E0D] border border-[#26332E] rounded-lg p-4 space-y-3">
-              <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-                <div class="flex items-center gap-2">
-                  <span class="text-[#94A39E]">Contrato Retirada:</span>
-                  <span class="text-[#F2F7F5] font-bold">
-                    {{ d.hoursSincePickup ?? 0 }}h atrás ({{ d.kmDrivenSincePickup ?? 0 }} km rodados)
-                  </span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[#94A39E]">Hodômetro Informado:</span>
-                  <span class="text-[#F2F7F5] font-bold">{{ d.reportedOdometerKm }} km</span>
-                </div>
+          <!-- Contract & Pickup Telemetry -->
+          <section class="bg-white border border-[#E2E2E2] rounded-lg p-4 space-y-3">
+            <h3 class="text-xs font-bold text-[#141414]">Contexto do contrato e relato do entregador</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div class="bg-[#F3F3F3] rounded-md p-2.5">
+                <span class="block text-[11px] text-[#757575]">Entregador</span>
+                <span class="block text-xs font-bold text-[#141414] truncate mt-0.5">{{ d.riderName }}</span>
               </div>
-
-              <!-- Contestation Warning -->
-              @if (d.contestedOnce) {
-                <div class="bg-[#FFB300]/10 border border-[#FFB300]/30 rounded-md p-3 text-xs space-y-1">
-                  <div class="flex items-center gap-1.5 font-bold text-[#FFB300]">
-                    <span>⚠️</span>
-                    <span>CONTESTAÇÃO DO ENTREGADOR:</span>
-                  </div>
-                  <p class="text-[#F2F7F5] italic font-sans pl-5">
-                    "{{ d.contestationReason || 'O entregador contestou o apontamento automático.' }}"
-                  </p>
-                </div>
-              }
-
-              <!-- Fraud Warning -->
-              @if (d.fraudSuspected) {
-                <div class="bg-[#29B6F6]/10 border border-[#29B6F6]/30 rounded-md p-3 text-xs space-y-1">
-                  <div class="flex items-center gap-1.5 font-bold text-[#29B6F6]">
-                    <span>ℹ️</span>
-                    <span>ALERTA DE FOTO REPETIDA (SHA-256 / dHash):</span>
-                  </div>
-                  <p class="text-[#F2F7F5] font-sans pl-5">
-                    {{ d.fraudReason || 'Imagem coincide com vistoria anterior já auditada.' }}
-                  </p>
-                </div>
-              }
-
-              <!-- Rider Observation -->
-              @if (d.riderNotes) {
-                <div class="text-xs space-y-1 pt-1 border-t border-[#26332E]">
-                  <span class="text-[#94A39E]">Relato do Entregador:</span>
-                  <p class="text-[#F2F7F5] font-sans italic">
-                    "{{ d.riderNotes }}"
-                  </p>
-                </div>
-              }
-            </div>
-          </div>
-        </section>
-
-        <!-- RIGHT 45%: Decision Desk & Reactive Quotation (col-span-12 lg:col-span-5) -->
-        <section class="lg:col-span-5 space-y-4">
-          <div class="bg-[#121816] border border-[#26332E] rounded-xl p-5 space-y-5">
-            <!-- AI Recommendation Banner -->
-            <div class="bg-[#1A2320] border border-[#26332E] rounded-lg p-3.5 space-y-1.5">
-              <div class="flex items-center justify-between text-xs font-mono">
-                <span class="text-[#29B6F6] font-bold">
-                  Sugestão da IA ({{ ((d.aiConfidence || 0) * 100).toFixed(0) }}% confiança)
-                </span>
-                <span class="px-2 py-0.5 rounded bg-[#29B6F6]/15 text-[#29B6F6] font-bold">
-                  {{ d.aiSuggestedVerdict || 'EM ANÁLISE' }}
+              <div class="bg-[#F3F3F3] rounded-md p-2.5">
+                <span class="block text-[11px] text-[#757575]">Modelo</span>
+                <span class="block text-xs font-bold text-[#141414] truncate mt-0.5">{{ formatModel(d.motorcycleModel) }}</span>
+              </div>
+              <div class="bg-[#F3F3F3] rounded-md p-2.5">
+                <span class="block text-[11px] text-[#757575]">Tempo pós-retirada</span>
+                <span
+                  class="block text-xs font-bold font-mono mt-0.5"
+                  [class.text-[#046C3A]]="(d.hoursSincePickup ?? 999) <= 48"
+                  [class.text-[#141414]]="(d.hoursSincePickup ?? 999) > 48"
+                >
+                  {{ d.hoursSincePickup ?? '—' }}h
                 </span>
               </div>
-              @if (d.aiTechnicalSummary) {
-                <p class="text-xs text-[#94A39E] font-sans leading-relaxed">
-                  {{ d.aiTechnicalSummary }}
-                </p>
-              }
+              <div class="bg-[#F3F3F3] rounded-md p-2.5">
+                <span class="block text-[11px] text-[#757575]">Rodados no contrato</span>
+                <span
+                  class="block text-xs font-bold font-mono mt-0.5"
+                  [class.text-[#046C3A]]="(d.kmDrivenSincePickup ?? 999) <= 100"
+                  [class.text-[#141414]]="(d.kmDrivenSincePickup ?? 999) > 100"
+                >
+                  {{ d.kmDrivenSincePickup ?? '—' }} km
+                </span>
+              </div>
             </div>
 
-            <!-- Step 1: Veredito Oficial Definitivo -->
-            <div class="space-y-2.5">
-              <label class="block text-sm font-bold text-[#F2F7F5]">
-                1. Escolher Veredito Oficial Definitivo:
-              </label>
+            @if (d.riderNotes) {
+              <div class="p-3 rounded-md bg-[#F6F6F6] text-xs text-[#545454]">
+                <span class="font-bold text-[#141414]">Relato do entregador:</span> "{{ d.riderNotes }}"
+              </div>
+            }
 
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            @if (d.contestedOnce && d.contestationReason) {
+              <div class="p-3 rounded-md bg-[#FEF3C7] text-xs text-[#92400E]">
+                <span class="font-bold">Motivo do pedido de revisão:</span> "{{ d.contestationReason }}"
+              </div>
+            }
+
+            @if (d.fraudSuspected) {
+              <div class="p-3 rounded-md bg-[#EEF2F6] text-xs text-[#334155]">
+                <span class="font-bold">Atenção:</span> {{ d.fraudReason || 'Esta foto coincide com envio anterior no histórico.' }}
+              </div>
+            }
+          </section>
+        </div>
+
+        <!-- Right 45% (5 cols): Decision Desk -->
+        <div class="lg:col-span-5 space-y-4">
+          <section class="bg-white border border-[#E2E2E2] rounded-lg p-5 space-y-5">
+            @if (d.aiTechnicalSummary) {
+              <div class="p-3 rounded-md bg-[#F6F6F6] border border-[#EEEEEE] text-xs text-[#545454]">
+                <span class="font-bold text-[#141414] block mb-0.5">Observação técnica preliminar</span>
+                {{ d.aiTechnicalSummary }}
+              </div>
+            }
+
+            <!-- 1. Verdict Classification -->
+            <div>
+              <span class="block text-xs font-bold text-[#141414] mb-2">1. Classificação da avaria</span>
+              <div class="space-y-2">
                 <button
                   type="button"
                   (click)="setVerdict('PRE_EXISTENTE')"
-                  [disabled]="d.status === 'HUMAN_RESOLVED'"
-                  [class]="
-                    selectedVerdict() === 'PRE_EXISTENTE'
-                      ? 'py-3 px-2 rounded-lg text-xs font-mono font-bold bg-[#00E676] text-[#06120B] shadow-sm'
-                      : 'py-3 px-2 rounded-lg text-xs font-mono font-semibold bg-[#0A0E0D] text-[#F2F7F5] border border-[#26332E] hover:border-[#00E676]/50'
-                  "
+                  class="w-full p-3 rounded-md border text-left flex items-center justify-between transition-colors"
+                  [class.border-[#141414]]="selectedVerdict() === 'PRE_EXISTENTE'"
+                  [class.bg-white]="selectedVerdict() === 'PRE_EXISTENTE'"
+                  [class.border-transparent]="selectedVerdict() !== 'PRE_EXISTENTE'"
+                  [class.bg-[#F3F3F3]]="selectedVerdict() !== 'PRE_EXISTENTE'"
                 >
-                  Pré-existente<br/><span class="text-[11px] opacity-80">R$ 0,00</span>
+                  <div>
+                    <span class="text-xs font-bold text-[#141414] block">Pré-existente na retirada</span>
+                    <span class="text-[11px] text-[#757575]">Dentro da garantia de 48h ou 100 km</span>
+                  </div>
+                  <span class="font-mono text-xs font-bold text-[#046C3A]">R$ 0,00</span>
                 </button>
 
                 <button
                   type="button"
                   (click)="setVerdict('DESGASTE_NATURAL')"
-                  [disabled]="d.status === 'HUMAN_RESOLVED'"
-                  [class]="
-                    selectedVerdict() === 'DESGASTE_NATURAL'
-                      ? 'py-3 px-2 rounded-lg text-xs font-mono font-bold bg-[#00E676] text-[#06120B] shadow-sm'
-                      : 'py-3 px-2 rounded-lg text-xs font-mono font-semibold bg-[#0A0E0D] text-[#F2F7F5] border border-[#26332E] hover:border-[#00E676]/50'
-                  "
+                  class="w-full p-3 rounded-md border text-left flex items-center justify-between transition-colors"
+                  [class.border-[#141414]]="selectedVerdict() === 'DESGASTE_NATURAL'"
+                  [class.bg-white]="selectedVerdict() === 'DESGASTE_NATURAL'"
+                  [class.border-transparent]="selectedVerdict() !== 'DESGASTE_NATURAL'"
+                  [class.bg-[#F3F3F3]]="selectedVerdict() !== 'DESGASTE_NATURAL'"
                 >
-                  Desgaste Natural<br/><span class="text-[11px] opacity-80">R$ 0,00</span>
+                  <div>
+                    <span class="text-xs font-bold text-[#141414] block">Desgaste natural de uso</span>
+                    <span class="text-[11px] text-[#757575]">Manutenção coberta pelo plano Mottu</span>
+                  </div>
+                  <span class="font-mono text-xs font-bold text-[#046C3A]">R$ 0,00</span>
                 </button>
 
                 <button
                   type="button"
                   (click)="setVerdict('MAU_USO')"
-                  [disabled]="d.status === 'HUMAN_RESOLVED'"
-                  [class]="
-                    selectedVerdict() === 'MAU_USO'
-                      ? 'py-3 px-2 rounded-lg text-xs font-mono font-bold bg-[#00E676] text-[#06120B] shadow-sm'
-                      : 'py-3 px-2 rounded-lg text-xs font-mono font-semibold bg-[#0A0E0D] text-[#F2F7F5] border border-[#26332E] hover:border-[#00E676]/50'
-                  "
+                  class="w-full p-3 rounded-md border text-left flex items-center justify-between transition-colors"
+                  [class.border-[#141414]]="selectedVerdict() === 'MAU_USO'"
+                  [class.bg-white]="selectedVerdict() === 'MAU_USO'"
+                  [class.border-transparent]="selectedVerdict() !== 'MAU_USO'"
+                  [class.bg-[#F3F3F3]]="selectedVerdict() !== 'MAU_USO'"
                 >
-                  Mau Uso<br/><span class="text-[11px] opacity-80">Cobrança</span>
+                  <div>
+                    <span class="text-xs font-bold text-[#141414] block">Dano por queda / mau uso</span>
+                    <span class="text-[11px] text-[#757575]">Peças de tabela Loja Mottu + mão de obra</span>
+                  </div>
+                  <span class="font-mono text-xs font-bold text-[#141414]">Tabelado</span>
                 </button>
               </div>
             </div>
 
-            <!-- Step 2: Peças & Orçamento Reativo -->
-            <div class="space-y-3 pt-2 border-t border-[#26332E]">
-              <div class="flex items-center justify-between">
-                <label class="text-sm font-bold text-[#F2F7F5]">
-                  2. Peças do Catálogo Mottu:
-                </label>
-                <span class="text-xs text-[#94A39E] font-mono">
-                  Mão de Obra Fixa: R$ 35,00
-                </span>
-              </div>
-
-              <!-- Checklist of Parts -->
-              <div class="space-y-2">
-                @for (item of d.items; track item.catalogPartId) {
-                  <label
-                    class="flex items-center justify-between p-2.5 rounded-lg bg-[#0A0E0D] border border-[#26332E] cursor-pointer hover:border-[#00E676]/40 transition-colors"
-                  >
-                    <div class="flex items-center gap-2.5">
-                      <input
-                        type="checkbox"
-                        [checked]="selectedPartIds().has(item.catalogPartId)"
-                        (change)="togglePart(item.catalogPartId)"
-                        [disabled]="d.status === 'HUMAN_RESOLVED'"
-                        class="w-4 h-4 rounded text-[#00E676] focus:ring-0 bg-[#121816] border-[#26332E]"
-                      />
-                      <span class="text-xs font-medium text-[#F2F7F5]">{{ item.partName }}</span>
-                    </div>
-                    <span class="text-xs font-mono text-[#00E676] font-bold">
-                      R$ {{ item.unitPriceBrl.toFixed(2) }}
-                    </span>
-                  </label>
-                } @empty {
-                  <div class="p-3 bg-[#0A0E0D] border border-[#26332E] rounded-lg text-xs text-[#94A39E] text-center font-mono">
-                    Nenhuma peça pré-selecionada pela IA.
-                  </div>
+            <!-- 2. Parts Checklist -->
+            @if (selectedVerdict() === 'MAU_USO') {
+              <div class="border-t border-[#EEEEEE] pt-4 space-y-2">
+                <span class="block text-xs font-bold text-[#141414]">2. Peças para substituição</span>
+                @if (d.items.length === 0) {
+                  <p class="text-xs text-[#757575]">Nenhuma peça vinculada automaticamente.</p>
+                } @else {
+                  @for (item of d.items; track item.catalogPartId) {
+                    @if (item.catalogPartId) {
+                      <label class="flex items-center justify-between p-2.5 rounded-md bg-[#F3F3F3] cursor-pointer text-xs">
+                        <span class="flex items-center gap-2 font-medium text-[#141414]">
+                          <input
+                            type="checkbox"
+                            aria-label="Selecionar peça para substituição"
+                            [checked]="selectedPartIds().has(item.catalogPartId)"
+                            (change)="togglePart(item.catalogPartId)"
+                            class="w-4 h-4 accent-[#05944F]"
+                          />
+                          {{ item.partName }}
+                        </span>
+                        <span class="font-mono font-semibold text-[#141414]">
+                          R$ {{ item.unitPriceBrl.toFixed(2).replace('.', ',') }}
+                        </span>
+                      </label>
+                    }
+                  }
                 }
               </div>
+            }
 
-              <!-- Reactive Price Summary Box -->
-              <div class="bg-[#0A0E0D] border border-[#26332E] rounded-lg p-3.5 space-y-2 text-xs font-mono">
-                <div class="flex justify-between text-[#94A39E]">
-                  <span>Subtotal Peças:</span>
-                  <span class="text-[#F2F7F5]">R$ {{ partsCost().toFixed(2) }}</span>
-                </div>
-                <div class="flex justify-between text-[#94A39E]">
-                  <span>Mão de Obra Oficina:</span>
-                  <span class="text-[#F2F7F5]">R$ {{ laborCost().toFixed(2) }}</span>
-                </div>
-                <div class="pt-2 border-t border-[#26332E] flex justify-between items-center text-sm font-bold">
-                  <span class="text-[#F2F7F5]">Total Estimado Laudo:</span>
-                  <span class="text-[#00E676] text-base">
-                    R$ {{ totalEstimated().toFixed(2) }}
-                  </span>
-                </div>
+            <!-- 3. Mechanic Notes -->
+            <div class="border-t border-[#EEEEEE] pt-4">
+              <label for="mechNotes" class="block text-xs font-bold text-[#141414] mb-1.5">
+                3. Observação técnica para o entregador
+              </label>
+              <textarea
+                id="mechNotes"
+                rows="2"
+                [ngModel]="mechanicNotes()"
+                (ngModelChange)="mechanicNotes.set($event)"
+                placeholder="Explique de forma clara e respeitosa o parecer da oficina..."
+                class="w-full p-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-xs text-[#141414] focus:outline-none"
+              ></textarea>
+            </div>
+
+            <!-- Financial Summary Box -->
+            <div class="bg-[#F6F6F6] rounded-md p-3.5 space-y-1.5 text-xs">
+              <div class="flex justify-between text-[#545454]">
+                <span>Subtotal de peças</span>
+                <span class="font-mono">R$ {{ partsCost().toFixed(2).replace('.', ',') }}</span>
+              </div>
+              <div class="flex justify-between text-[#545454]">
+                <span>Mão de obra fixa</span>
+                <span class="font-mono">R$ {{ laborCost().toFixed(2).replace('.', ',') }}</span>
+              </div>
+              <div class="pt-2 border-t border-[#E2E2E2] flex justify-between font-bold text-sm text-[#141414]">
+                <span>Total final</span>
+                <span class="font-mono text-base">R$ {{ totalEstimated().toFixed(2).replace('.', ',') }}</span>
               </div>
             </div>
 
-            <!-- Step 3: Anotação Técnica -->
-            <div class="space-y-2 pt-2 border-t border-[#26332E]">
-              <label class="block text-sm font-bold text-[#F2F7F5]">
-                3. Anotação Técnica do Mecânico:
-              </label>
-              <textarea
-                rows="3"
-                [ngModel]="mechanicNotes()"
-                (ngModelChange)="mechanicNotes.set($event)"
-                [disabled]="d.status === 'HUMAN_RESOLVED'"
-                placeholder="Ex: Ralado profundo com entortamento recente típico de queda lateral..."
-                class="w-full bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-lg p-3 text-xs text-[#F2F7F5] placeholder-[#94A39E] outline-none transition-colors"
-              ></textarea>
-              <span class="text-[11px] text-[#94A39E] block">
-                ℹ️ O assistente inteligente converterá este apontamento em uma comunicação empática e transparente para o entregador.
-              </span>
-            </div>
-
-            <!-- Final CTA Button (Height: 52px+ as mandated by Law 5) -->
-            <div class="pt-2">
-              @if (d.status === 'HUMAN_RESOLVED') {
-                <div class="h-[52px] bg-[#1A2320] border border-[#26332E] rounded-lg flex items-center justify-center text-sm font-mono text-[#00E676] font-bold">
-                  ✓ Este laudo já foi finalizado
-                </div>
+            <!-- Single Primary Green CTA -->
+            <button
+              type="button"
+              [disabled]="!canSubmit()"
+              (click)="resolveInspection()"
+              class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] disabled:bg-[#F3F3F3] disabled:text-[#757575] text-white font-bold text-sm transition-colors"
+            >
+              @if (isSubmitting()) {
+                <span>Registrando parecer...</span>
               } @else {
-                <button
-                  type="button"
-                  (click)="resolveInspection()"
-                  [disabled]="!canSubmit()"
-                  class="w-full h-[52px] rounded-lg bg-[#00E676] hover:bg-[#00C853] disabled:opacity-50 disabled:cursor-not-allowed text-[#06120B] font-extrabold text-base transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,230,118,0.2)]"
-                >
-                  @if (isSubmitting()) {
-                    <div class="w-5 h-5 border-2 border-[#06120B] border-t-transparent rounded-full animate-spin"></div>
-                    <span>Processando Laudo...</span>
-                  } @else {
-                    <span>Finalizar Laudo Definitivo</span>
-                  }
-                </button>
+                <span>Confirmar e enviar parecer</span>
               }
-            </div>
-          </div>
-        </section>
+            </button>
+          </section>
+        </div>
       </div>
-    </main>
+      }
     }
-  }
-</div>
+  </div>
+</app-desktop-shell>

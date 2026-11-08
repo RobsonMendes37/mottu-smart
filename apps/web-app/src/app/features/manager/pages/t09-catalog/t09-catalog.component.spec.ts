@@ -190,4 +190,13 @@ describe('T09CatalogComponent (Screen T09 - Official Parts Catalog & Sync)', () 
     expect(comp.standardLaborFee()).toBe(40.0);
     expect(comp.successMessage()).toContain('Taxa padrão de mão de obra atualizada');
   });
+
+  it('TC-T09-10: Exposes editingPart computed for right 400px Slide-over Drawer', () => {
+    comp.ngOnInit();
+    comp.startEditPart(mockParts[0]);
+    expect(comp.editingPart()?.vtexSku).toBe('SKU-1001');
+
+    comp.cancelEdit();
+    expect(comp.editingPart()).toBeNull();
+  });
 });

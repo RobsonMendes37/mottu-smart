@@ -1,18 +1,18 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { ManagerService } from '../../services/manager.service';
 import {
   CatalogPartResponseDto,
   MotorcycleModel,
   SyncCatalogResponseDto,
 } from '../../models/manager.models';
+import { DesktopShellComponent } from '../../../../shared/layout/desktop-shell/desktop-shell.component';
 
 @Component({
   selector: 'app-t09-catalog',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, DesktopShellComponent],
   templateUrl: './t09-catalog.component.html',
 })
 export class T09CatalogComponent implements OnInit {
@@ -40,10 +40,18 @@ export class T09CatalogComponent implements OnInit {
   laborFeeInput = signal<number>(35.0);
   isEditingLaborFee = signal<boolean>(false);
 
-  // Inline Part Edit
+  // Slide-over Drawer Part Edit
   editingPartId = signal<string | null>(null);
   editingPrice = signal<number>(0);
   editingNaturalWear = signal<boolean>(false);
+
+  editingPart = computed<CatalogPartResponseDto | null>(() => {
+    const id = this.editingPartId();
+    if (!id) return null;
+    return this.parts().find((p) => p.id === id) ?? null;
+  });
+
+  naturalWearCount = computed(() => this.parts().filter((p) => p.isNaturalWear).length);
 
   readonly availableModels: { key: MotorcycleModel | ''; label: string }[] = [
     { key: '', label: 'Todas as Motos' },

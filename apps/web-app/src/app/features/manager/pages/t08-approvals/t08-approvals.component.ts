@@ -1,17 +1,17 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { ManagerService } from '../../services/manager.service';
 import {
   PendingUserResponseDto,
   AvailableMotorcycleOption,
 } from '../../models/manager.models';
+import { DesktopShellComponent } from '../../../../shared/layout/desktop-shell/desktop-shell.component';
 
 @Component({
   selector: 'app-t08-approvals',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, DesktopShellComponent],
   templateUrl: './t08-approvals.component.html',
 })
 export class T08ApprovalsComponent implements OnInit {
@@ -26,19 +26,30 @@ export class T08ApprovalsComponent implements OnInit {
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
+  // Slide-over Drawer state
+  drawerUser = signal<PendingUserResponseDto | null>(null);
+
   // Reject Modal state
   rejectingUser = signal<PendingUserResponseDto | null>(null);
   rejectReason = signal<string>('');
   rejectValidationError = signal<string | null>(null);
 
-  // Filter state ('ALL' | 'RIDER' | 'MECHANIC')
+  // Filter & Search state
   activeFilter = signal<'ALL' | 'RIDER' | 'MECHANIC'>('ALL');
+  searchTerm = signal<string>('');
 
   filteredUsers = computed(() => {
     const filter = this.activeFilter();
-    const users = this.pendingUsers();
-    if (filter === 'ALL') return users;
-    return users.filter((u) => u.role === filter);
+    const q = this.searchTerm().trim().toLowerCase();
+    return this.pendingUsers().filter((u) => {
+      const roleMatch = filter === 'ALL' || u.role === filter;
+      const queryMatch =
+        !q ||
+        u.fullName.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q) ||
+        u.cpf.toLowerCase().includes(q);
+      return roleMatch && queryMatch;
+    });
   });
 
   riderCount = computed(() => this.pendingUsers().filter((u) => u.role === 'RIDER').length);
@@ -181,7 +192,23 @@ export class T08ApprovalsComponent implements OnInit {
     this.activeFilter.set(filter);
   }
 
+  onSearch(query: string): void {
+    this.searchTerm.set(query);
+  }
+
+  openUserDrawer(user: PendingUserResponseDto): void {
+    this.drawerUser.set(user);
+    this.errorMessage.set(null);
+  }
+
+  closeUserDrawer(): void {
+    this.drawerUser.set(null);
+  }
+
   private removeUserFromList(userId: string): void {
     this.pendingUsers.update((users) => users.filter((u) => u.id !== userId));
+    if (this.drawerUser()?.id === userId) {
+      this.drawerUser.set(null);
+    }
   }
 }

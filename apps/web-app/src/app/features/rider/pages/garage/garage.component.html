@@ -1,156 +1,208 @@
-<div class="min-h-screen bg-[#0A0E0D] text-[#F2F7F5] flex flex-col items-center px-4 py-6">
-  <div class="w-full max-w-[420px] flex flex-col gap-4">
-    <!-- Top Bar -->
-    <header class="flex items-center justify-between pt-2">
-      <div class="flex flex-col">
-        <span class="text-xs font-semibold text-[#94A39E] uppercase tracking-wider">Garagem do Entregador</span>
-        <h1 class="text-xl font-bold text-[#F2F7F5]">{{ riderGreeting() }}</h1>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <div class="px-3 py-1.5 bg-[#1A2320] border border-[#26332E] rounded-full flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-[#00E676] animate-pulse"></span>
-          <span class="font-mono text-xs font-bold text-[#00E676]">
-            @if (openCount() > 0) {
-              EM ANÁLISE
-            } @else {
-              RODANDO NORMAL
-            }
-          </span>
+<app-mobile-shell
+  [title]="riderGreeting()"
+  [subtitle]="motorcycle() ? 'Unidade ' + motorcycle()!.yardName + ' • Contrato ativo' : 'Minha moto Mottu'"
+  activeTab="home"
+>
+  <div class="space-y-4">
+    <!-- Loading State -->
+    @if (store.isLoadingGarage()) {
+      <div class="bg-white border border-[#E2E2E2] rounded-lg p-5 animate-pulse space-y-3">
+        <div class="h-4 w-32 bg-[#F3F3F3] rounded"></div>
+        <div class="h-8 w-44 bg-[#F3F3F3] rounded"></div>
+        <div class="grid grid-cols-2 gap-3 pt-1">
+          <div class="h-14 bg-[#F3F3F3] rounded-md"></div>
+          <div class="h-14 bg-[#F3F3F3] rounded-md"></div>
         </div>
+      </div>
+    }
 
+    <!-- Error Alert -->
+    @if (store.garageError()) {
+      <div
+        role="alert"
+        class="p-4 rounded-lg bg-[#FEE2E2] border border-[#DC2626]/30 text-sm text-[#B91C1C]"
+      >
+        <p class="font-bold">Não foi possível atualizar os dados da sua moto</p>
+        <p class="text-xs mt-1">{{ store.garageError() }}</p>
         <button
           type="button"
-          (click)="onLogout()"
-          title="Sair da Conta"
-          class="p-2 text-[#94A39E] hover:text-[#F2F7F5] bg-[#121816] border border-[#26332E] rounded-lg transition"
+          (click)="store.loadGarage()"
+          class="mt-3 px-3.5 py-2 rounded-md bg-white border border-[#E2E2E2] text-xs font-bold text-[#141414]"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
+          Tentar novamente
         </button>
       </div>
-    </header>
+    }
 
     <!-- Active Motorcycle Card -->
     @if (motorcycle(); as bike) {
-      <div class="bg-[#121816] rounded-2xl p-5 border border-[#26332E] flex flex-col gap-3 shadow-lg relative overflow-hidden">
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-semibold text-[#94A39E]">{{ bike.model.replace('_', ' ') }}</span>
-          <span class="font-mono text-xs px-2 py-0.5 rounded bg-[#00E676]/10 text-[#00E676] border border-[#00E676]/30 font-bold">ALUGADA</span>
+      <section class="bg-white border border-[#E2E2E2] rounded-lg p-5 space-y-4">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#E6F4EE] text-[#046C3A] text-xs font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#05944F]"></span>
+              Contrato em dia
+            </span>
+            <h2 class="text-2xl font-extrabold font-mono text-[#141414] tracking-tight mt-2">
+              {{ bike.plate }}
+            </h2>
+            <p class="text-xs text-[#545454] mt-0.5">
+              {{ bike.model.replaceAll('_', ' ') }} • Galpão {{ bike.yardName }}
+            </p>
+          </div>
+
+          <div class="w-11 h-11 rounded-lg bg-[#F3F3F3] flex items-center justify-center text-[#141414] shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0M9 17h6m-9-4l2-5h7l3 5" />
+            </svg>
+          </div>
         </div>
 
-        <div class="flex flex-col">
-          <span class="text-xs text-[#94A39E] uppercase font-mono tracking-wider">Placa</span>
-          <span class="font-mono text-4xl font-extrabold text-[#F2F7F5] tracking-wider">{{ bike.plate }}</span>
+        <!-- Telemetry Boxes -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <div class="bg-[#F3F3F3] rounded-md p-3">
+            <span class="block text-[11px] font-medium text-[#757575]">Quilometragem</span>
+            <span class="block text-base font-bold font-mono text-[#141414] mt-0.5">
+              {{ bike.currentOdometerKm }} km
+            </span>
+          </div>
+          <div class="bg-[#F3F3F3] rounded-md p-3">
+            <span class="block text-[11px] font-medium text-[#757575]">Vistorias abertas</span>
+            <span
+              class="block text-base font-bold font-mono mt-0.5"
+              [class.text-[#141414]]="openCount() < 3"
+              [class.text-[#D97706]]="openCount() >= 3"
+            >
+              {{ openCount() }} de 3
+            </span>
+          </div>
         </div>
 
-        <div class="pt-2 border-t border-[#26332E] flex flex-col gap-1 font-mono text-xs text-[#94A39E]">
-          <div class="flex items-center justify-between">
-            <span>Hodômetro registrado:</span>
-            <span class="text-[#F2F7F5] font-bold">{{ bike.currentOdometerKm }} km</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span>Galpão de Origem:</span>
-            <span class="text-[#F2F7F5]">{{ bike.yardName || 'Butantã' }}</span>
-          </div>
+        <!-- 48h / 100km Protection Note -->
+        <div class="rounded-md bg-[#E6F4EE] px-3.5 py-2.5 text-xs text-[#046C3A] leading-relaxed">
+          <span class="font-bold">Garantia de retirada:</span> avarias existentes nas primeiras 48h ou 100 km e peças de desgaste natural têm custo zero.
         </div>
-      </div>
-    } @else {
-      <!-- Empty Contract State -->
-      <div class="bg-[#121816] rounded-2xl p-6 border border-[#26332E] text-center flex flex-col items-center gap-3">
-        <div class="w-12 h-12 rounded-full bg-[#1A2320] flex items-center justify-center text-[#94A39E]">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+
+        <!-- Quota Warning -->
+        @if (quotaWarningVisible() || hasReachedQuota()) {
+          <div
+            role="alert"
+            class="p-3 rounded-md bg-[#FEF3C7] border border-[#D97706]/30 text-xs text-[#92400E]"
+          >
+            <p class="font-bold">Limite de 3 vistorias em andamento atingido</p>
+            <p class="mt-0.5">Aguarde a conclusão de uma vistoria abaixo antes de abrir um novo chamado.</p>
+          </div>
+        }
+
+        <!-- Primary Action (Single Brand Green CTA) -->
+        <button
+          type="button"
+          (click)="onNewInspection()"
+          [disabled]="hasReachedQuota()"
+          class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] disabled:bg-[#F3F3F3] disabled:text-[#757575] text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8a2 2 0 012-2h2.2l1.4-2h6.8l1.4 2H19a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+            <circle cx="12" cy="13" r="3.5" />
           </svg>
-        </div>
-        <h3 class="text-base font-bold text-[#F2F7F5]">Nenhuma moto alugada no momento</h3>
-        <p class="text-xs text-[#94A39E] max-w-xs">Procure o galpão Mottu mais próximo para ativar seu contrato e retirar sua moto.</p>
-      </div>
+          <span>Fazer vistoria rápida</span>
+        </button>
+
+        <!-- Secondary Emergency Action -->
+        <button
+          type="button"
+          (click)="onReportAccident()"
+          class="w-full h-12 rounded-md bg-[#FEE2E2] hover:opacity-90 text-[#B91C1C] font-bold text-xs flex items-center justify-center gap-2 transition-opacity"
+        >
+          <span>Sofreu queda ou colisão? Relatar acidente em vídeo</span>
+        </button>
+      </section>
+
+      <!-- Quick Ecosystem Shortcuts -->
+      <section class="grid grid-cols-2 gap-3">
+        <a
+          routerLink="/rider/rental"
+          class="bg-white border border-[#E2E2E2] hover:border-[#141414] rounded-lg p-3.5 transition-colors block"
+        >
+          <span class="text-xs font-bold text-[#141414] block">Aluguel e Pix</span>
+          <span class="text-[11px] text-[#757575] block mt-0.5">Ver fatura semanal e descontos</span>
+        </a>
+        <a
+          routerLink="/rider/account"
+          class="bg-white border border-[#E2E2E2] hover:border-[#141414] rounded-lg p-3.5 transition-colors block"
+        >
+          <span class="text-xs font-bold text-[#141414] block">Meus dados</span>
+          <span class="text-[11px] text-[#757575] block mt-0.5">WhatsApp, chave Pix e unidade</span>
+        </a>
+      </section>
+    } @else if (!store.isLoadingGarage() && !store.garageError()) {
+      <section class="bg-white border border-[#E2E2E2] rounded-lg p-6 text-center space-y-2">
+        <h2 class="text-base font-bold text-[#141414]">Nenhuma moto vinculada no momento</h2>
+        <p class="text-xs text-[#545454]">
+          Compareça à recepção da unidade para retirar sua moto e ativar seu contrato semanal.
+        </p>
+      </section>
     }
 
-    <!-- Quota Warning Banner -->
-    @if (quotaWarningVisible() || hasReachedQuota()) {
-      <div class="bg-[#FFB300]/10 border border-[#FFB300]/30 rounded-xl p-3.5 flex items-start gap-2.5">
-        <svg class="w-5 h-5 text-[#FFB300] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-        <div class="flex flex-col text-xs text-[#FFB300]">
-          <span class="font-bold">Limite de 3 chamados em aberto atingido</span>
-          <span class="text-[#FFB300]/90">Aguarde a finalização dos chamados anteriores para abrir uma nova vistoria.</span>
+    <!-- Recent Inspections List -->
+    @if (store.garage()?.recentInspections; as recents) {
+      <section class="bg-white border border-[#E2E2E2] rounded-lg overflow-hidden">
+        <div class="px-4 py-3 border-b border-[#EEEEEE] flex items-center justify-between">
+          <h3 class="text-sm font-bold text-[#141414]">Vistorias recentes</h3>
+          <span class="text-xs text-[#757575]">{{ recents.length }} registros</span>
         </div>
-      </div>
-    }
 
-    <!-- Primary CTA: Nova Vistoria -->
-    <button
-      type="button"
-      (click)="onNewInspection()"
-      [disabled]="hasReachedQuota()"
-      [ngClass]="{
-        'opacity-50 cursor-not-allowed bg-[#1A2320] text-[#94A39E] border border-[#26332E]': hasReachedQuota(),
-        'bg-[#00E676] hover:bg-[#00C853] text-[#06120B] active:scale-[0.98] shadow-lg shadow-[#00E676]/20': !hasReachedQuota()
-      }"
-      class="w-full h-14 font-extrabold text-base rounded-xl flex items-center justify-center gap-2 transition"
-    >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
-      <span>Reportar Defeito / Nova Vistoria</span>
-    </button>
-
-    <!-- Secondary CTA: Relatar Acidente / Sinistro (T02) -->
-    <button
-      type="button"
-      (click)="onReportAccident()"
-      class="w-full h-12 font-bold text-sm rounded-xl flex items-center justify-center gap-2 bg-[#FF4D4F]/10 hover:bg-[#FF4D4F]/20 text-[#FF4D4F] border border-[#FF4D4F]/30 active:scale-[0.98] transition cursor-pointer"
-    >
-      <svg class="w-5 h-5 text-[#FF4D4F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
-      <span>🚨 Relatar Acidente / Sinistro</span>
-    </button>
-
-    <!-- Recent Tickets Section -->
-    <div class="flex flex-col gap-3 mt-2">
-      <div class="flex items-center justify-between">
-        <h2 class="text-base font-bold text-[#F2F7F5]">
-          Meus Chamados Recentes
-          <span class="text-xs font-mono font-normal text-[#94A39E]">({{ openCount() }}/3 abertos)</span>
-        </h2>
-      </div>
-
-      @if (store.garage()?.recentInspections; as recent) {
-        @if (recent.length === 0) {
-          <div class="bg-[#121816] rounded-xl p-4 border border-[#26332E] text-center text-xs text-[#94A39E]">
-            Nenhuma vistoria recente encontrada.
+        @if (recents.length === 0) {
+          <div class="p-6 text-center text-xs text-[#757575]">
+            Você ainda não enviou nenhuma vistoria neste contrato.
           </div>
         } @else {
-          <div class="flex flex-col gap-2.5">
-            @for (item of recent; track item.id) {
-              <div
+          <div class="divide-y divide-[#EEEEEE]">
+            @for (item of recents; track item.id) {
+              <button
+                type="button"
                 (click)="onViewInspection(item.id)"
-                class="bg-[#121816] rounded-xl p-4 border border-[#26332E] hover:border-[#00E676]/40 flex flex-col gap-1.5 cursor-pointer transition active:scale-[0.99]"
+                class="w-full px-4 py-3.5 hover:bg-[#F6F6F6] flex items-center justify-between text-left transition-colors"
               >
-                <div class="flex items-center justify-between font-mono text-sm font-bold">
-                  <span class="text-[#F2F7F5]">Vistoria #{{ item.id.substring(0, 8) }}</span>
-                  @if (item.totalEstimatedBrl === 0 || item.finalVerdict === 'PRE_EXISTENTE' || item.finalVerdict === 'DESGASTE_NATURAL') {
-                    <span class="text-[#00E676]">R$ 0,00 (Sem Custo)</span>
-                  } @else {
-                    <span class="text-[#FFB300]">R$ {{ item.totalEstimatedBrl.toFixed(2) }}</span>
-                  }
+                <div class="min-w-0 pr-3">
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="w-2 h-2 rounded-full shrink-0"
+                      [class.bg-[#05944F]]="item.status === 'AUTO_RESOLVED' || item.status === 'HUMAN_RESOLVED' || item.status === 'SCHEDULED'"
+                      [class.bg-[#D97706]]="item.status === 'HUMAN_TRIAGE' || item.status === 'QUEUED_AI'"
+                      [class.bg-[#DC2626]]="item.status === 'INVALID_IMAGE'"
+                    ></span>
+                    <span class="text-xs font-semibold text-[#141414] truncate">
+                      @switch (item.status) {
+                        @case ('AUTO_RESOLVED') { Vistoria concluída }
+                        @case ('HUMAN_RESOLVED') { Avaliada pela oficina }
+                        @case ('HUMAN_TRIAGE') { Em análise na oficina }
+                        @case ('SCHEDULED') { Visita agendada }
+                        @case ('INVALID_IMAGE') { Refazer foto }
+                        @default { Em andamento }
+                      }
+                    </span>
+                  </div>
+                  <p class="text-[11px] text-[#757575] font-mono mt-0.5">
+                    Protocolo #{{ item.id.slice(0, 8) }} • {{ item.createdAt | date: 'dd/MM HH:mm' }}
+                  </p>
                 </div>
 
-                <div class="flex items-center justify-between text-xs text-[#94A39E]">
-                  <span>Status: {{ item.status }}</span>
-                  <span>{{ item.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                <div class="text-right shrink-0">
+                  <span
+                    class="font-mono text-sm font-bold block"
+                    [class.text-[#046C3A]]="item.totalEstimatedBrl === 0"
+                    [class.text-[#141414]]="item.totalEstimatedBrl > 0"
+                  >
+                    R$ {{ item.totalEstimatedBrl.toFixed(2).replace('.', ',') }}
+                  </span>
+                  <span class="text-[11px] text-[#757575]">Abrir →</span>
                 </div>
-              </div>
+              </button>
             }
           </div>
         }
-      }
-    </div>
+      </section>
+    }
   </div>
-</div>
+</app-mobile-shell>

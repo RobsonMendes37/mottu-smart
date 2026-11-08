@@ -1,272 +1,303 @@
-<div class="min-h-screen bg-[#0A0E0D] flex flex-col justify-center items-center px-4 py-8 sm:px-6">
-  <div class="w-full max-w-[420px] flex flex-col gap-5">
-    
-    <!-- Brand Header (frame: t01_brand_header) -->
-    <header class="flex flex-col gap-1.5 text-left">
-      <div class="flex items-center justify-between">
-        <span class="text-[#00E676] font-mono text-[13px] font-bold tracking-wider uppercase">
-          MOTTU SMART OPS
-        </span>
-        <span class="bg-[#121816] text-[#00E676] border border-[#26332E] px-2 py-0.5 rounded font-mono text-[11px] font-bold">
-          v2.2.0
-        </span>
+<div class="min-h-screen bg-[#F6F6F6] text-[#141414] flex flex-col justify-between">
+  <!-- Institutional Top Header -->
+  <header class="h-14 bg-white border-b border-[#EEEEEE] px-4 sm:px-8 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-md bg-[#05944F] flex items-center justify-center text-white font-extrabold text-base">
+        M
       </div>
-      <h1 class="text-[#F2F7F5] font-sans text-[28px] font-extrabold leading-tight tracking-tight">
-        Vistoria Rápida sem Fila
-      </h1>
-      <p class="text-[#94A39E] font-sans text-[14px] font-normal">
-        Acesse sua moto ou solicite liberação de conta.
-      </p>
-    </header>
-
-    <!-- Auth Mode Tabs (frame: t01_tabs) -->
-    <nav class="w-full h-12 bg-[#121816] rounded-[10px] p-1 flex gap-1.5 border border-[#26332E]">
-      <button
-        type="button"
-        (click)="setTab('LOGIN')"
-        [class.bg-[#1A2320]]="activeTab() === 'LOGIN'"
-        [class.text-[#00E676]]="activeTab() === 'LOGIN'"
-        [class.text-[#94A39E]]="activeTab() !== 'LOGIN'"
-        class="flex-1 h-10 rounded-[8px] font-sans text-[15px] font-bold flex items-center justify-center transition-all cursor-pointer">
-        Entrar
-      </button>
-      <button
-        type="button"
-        (click)="setTab('REGISTER')"
-        [class.bg-[#1A2320]]="activeTab() === 'REGISTER'"
-        [class.text-[#00E676]]="activeTab() === 'REGISTER'"
-        [class.text-[#94A39E]]="activeTab() !== 'REGISTER'"
-        class="flex-1 h-10 rounded-[8px] font-sans text-[15px] font-semibold flex items-center justify-center transition-all cursor-pointer">
-        Criar Conta
-      </button>
-    </nav>
-
-    <!-- Error Alert -->
-    @if (errorMessage()) {
-      <div class="bg-[#1A2320] border border-[#FF4D4F] rounded-[10px] p-4 text-[#FF4D4F] font-sans text-[13px] flex items-center gap-2">
-        <span class="font-bold">Aviso:</span> {{ errorMessage() }}
+      <div class="flex items-center gap-2">
+        <span class="text-base font-extrabold tracking-tight text-[#141414]">Mottu</span>
+        <span class="text-[#E2E2E2]">•</span>
+        <span class="text-xs font-medium text-[#545454]">Operações e aluguel</span>
       </div>
-    }
+    </div>
+    <span class="text-xs font-medium text-[#757575] hidden sm:inline">
+      Suporte 24h • Unidade Butantã (SP-04)
+    </span>
+  </header>
 
-    <!-- Success Alert -->
-    @if (successMessage()) {
-      <div class="bg-[#121816] border border-[#00E676] rounded-[10px] p-4 text-[#00E676] font-sans text-[13px] flex items-center gap-2">
-        <span class="font-bold">Sucesso:</span> {{ successMessage() }}
-      </div>
-    }
-
-    <!-- Pending Approval Banner (frame: t01_pending_notice) -->
-    @if (pendingApprovalNotice()) {
-      <aside class="bg-[#1A2320] border border-[#26332E] rounded-[10px] p-4 flex flex-col gap-1">
-        <h3 class="text-[#FFB300] font-sans text-[13px] font-bold">
-          Conta nova? Aprovação do Gestor
-        </h3>
-        <p class="text-[#94A39E] font-sans text-[13px] font-normal leading-relaxed">
-          Entregadores e mecânicos entram após validação da filial.
-        </p>
-      </aside>
-    }
-
-    <!-- Tab Content: ENTRAR -->
-    @if (activeTab() === 'LOGIN') {
-      <form (ngSubmit)="onLogin()" class="bg-[#121816] border border-[#26332E] rounded-[14px] p-5 flex flex-col gap-4">
-        
-        <div class="flex flex-col gap-1.5">
-          <label class="text-[#F2F7F5] font-sans text-[14px] font-semibold">
-            E-mail cadastrado
-          </label>
-          <input
-            type="email"
-            name="email"
-            [ngModel]="loginEmail()"
-            (ngModelChange)="loginEmail.set($event)"
-            placeholder="entregador@mottu-ops.local"
-            class="w-full h-[52px] min-h-[52px] bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-[10px] px-4 text-[#F2F7F5] font-mono text-[14px] outline-none transition-colors"
-            required />
+  <!-- Centered Auth Container -->
+  <main class="flex-1 flex flex-col items-center justify-center px-4 py-8">
+    <div class="w-full max-w-[420px] space-y-4">
+      <!-- Main White Card -->
+      <section class="bg-white border border-[#E2E2E2] rounded-lg p-6 shadow-sm">
+        <div class="mb-5">
+          <h1 class="text-xl font-bold text-[#141414] tracking-tight">
+            @if (activeTab() === 'LOGIN') {
+              Acesse sua conta
+            } @else {
+              Solicitar acesso à unidade
+            }
+          </h1>
+          <p class="text-xs text-[#545454] mt-1">
+            Vistorias rápidas, contratos semanais e operação de oficina em um só lugar.
+          </p>
         </div>
 
-        <div class="flex flex-col gap-1.5">
-          <label class="text-[#F2F7F5] font-sans text-[14px] font-semibold">
-            Senha
-          </label>
-          <input
-            type="password"
-            name="password"
-            [ngModel]="loginPassword()"
-            (ngModelChange)="loginPassword.set($event)"
-            placeholder="••••••••••••"
-            class="w-full h-[52px] min-h-[52px] bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-[10px] px-4 text-[#F2F7F5] font-mono text-[16px] outline-none transition-colors"
-            required />
+        <!-- Segmented Control -->
+        <div class="grid grid-cols-2 bg-[#F3F3F3] rounded-md p-1 mb-5">
+          <button
+            type="button"
+            (click)="setTab('LOGIN')"
+            class="h-10 rounded-sm text-xs font-bold transition-all"
+            [class.bg-white]="activeTab() === 'LOGIN'"
+            [class.text-[#141414]]="activeTab() === 'LOGIN'"
+            [class.shadow-sm]="activeTab() === 'LOGIN'"
+            [class.text-[#545454]]="activeTab() !== 'LOGIN'"
+          >
+            Entrar
+          </button>
+          <button
+            type="button"
+            (click)="setTab('REGISTER')"
+            class="h-10 rounded-sm text-xs font-bold transition-all"
+            [class.bg-white]="activeTab() === 'REGISTER'"
+            [class.text-[#141414]]="activeTab() === 'REGISTER'"
+            [class.shadow-sm]="activeTab() === 'REGISTER'"
+            [class.text-[#545454]]="activeTab() !== 'REGISTER'"
+          >
+            Criar cadastro
+          </button>
         </div>
 
-        <button
-          type="submit"
-          [disabled]="isLoading()"
-          class="w-full h-[52px] min-h-[52px] bg-[#00E676] hover:bg-[#00C853] text-[#06120B] font-sans text-[16px] font-bold rounded-[10px] flex items-center justify-center transition-all active:scale-[0.98] disabled:opacity-50 mt-1 cursor-pointer">
-          @if (isLoading()) {
-            <span>Entrando...</span>
-          } @else {
-            <span>Entrar no Sistema</span>
-          }
-        </button>
-      </form>
-    }
+        <!-- Pending Approval Notice (403) -->
+        @if (pendingApprovalNotice()) {
+          <div
+            role="status"
+            class="mb-4 p-3.5 rounded-md bg-[#FEF3C7] border border-[#D97706]/30 text-xs text-[#92400E]"
+          >
+            <p class="font-bold mb-0.5">Cadastro aguardando liberação</p>
+            <p class="leading-relaxed">
+              Seus dados foram recebidos. Assim que o gestor da unidade vincular seu contrato ou bancada, seu acesso será liberado.
+            </p>
+          </div>
+        }
 
-    <!-- Tab Content: CRIAR CONTA -->
-    @if (activeTab() === 'REGISTER') {
-      <form (ngSubmit)="onRegister()" class="bg-[#121816] border border-[#26332E] rounded-[14px] p-5 flex flex-col gap-4">
-        
-        <!-- Role Selection -->
-        <div class="flex flex-col gap-1.5">
-          <label class="text-[#F2F7F5] font-sans text-[14px] font-semibold">
-            Perfil de Acesso
-          </label>
-          <div class="grid grid-cols-2 gap-2">
+        <!-- Registration Success Banner -->
+        @if (successMessage()) {
+          <div
+            role="status"
+            class="mb-4 p-3.5 rounded-md bg-[#E6F4EE] border border-[#05944F]/30 text-xs font-medium text-[#046C3A]"
+          >
+            {{ successMessage() }}
+          </div>
+        }
+
+        <!-- Error Alert -->
+        @if (errorMessage()) {
+          <div
+            role="alert"
+            class="mb-4 p-3.5 rounded-md bg-[#FEE2E2] border border-[#DC2626]/30 text-xs font-medium text-[#B91C1C]"
+          >
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <!-- LOGIN FORM -->
+        @if (activeTab() === 'LOGIN') {
+          <form (ngSubmit)="onLogin()" class="space-y-4">
+            <div>
+              <label for="loginEmail" class="block text-xs font-semibold text-[#545454] mb-1.5">
+                E-mail cadastrado
+              </label>
+              <input
+                id="loginEmail"
+                name="loginEmail"
+                type="email"
+                autocomplete="username"
+                [ngModel]="loginEmail()"
+                (ngModelChange)="loginEmail.set($event)"
+                placeholder="seu.email@mottu.com.br"
+                class="w-full h-touch px-3.5 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm text-[#141414] placeholder-[#757575] focus:outline-none transition-colors"
+              />
+            </div>
+
+            <div>
+              <label for="loginPassword" class="block text-xs font-semibold text-[#545454] mb-1.5">
+                Senha
+              </label>
+              <input
+                id="loginPassword"
+                name="loginPassword"
+                type="password"
+                autocomplete="current-password"
+                [ngModel]="loginPassword()"
+                (ngModelChange)="loginPassword.set($event)"
+                placeholder="••••••••"
+                class="w-full h-touch px-3.5 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm text-[#141414] placeholder-[#757575] focus:outline-none transition-colors"
+              />
+            </div>
+
             <button
-              type="button"
-              (click)="registerRole.set('RIDER')"
-              [class.border-[#00E676]]="registerRole() === 'RIDER'"
-              [class.bg-[#1A2320]]="registerRole() === 'RIDER'"
-              [class.text-[#00E676]]="registerRole() === 'RIDER'"
-              [class.text-[#94A39E]]="registerRole() !== 'RIDER'"
-              class="h-[52px] min-h-[52px] rounded-[10px] border border-[#26332E] font-sans text-[14px] font-bold transition-all cursor-pointer">
-              Sou Entregador
+              type="submit"
+              [disabled]="isLoading()"
+              class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white font-bold text-sm transition-colors flex items-center justify-center"
+            >
+              @if (isLoading()) {
+                <span>Autenticando...</span>
+              } @else {
+                <span>Continuar</span>
+              }
             </button>
+          </form>
+        }
+
+        <!-- REGISTER FORM -->
+        @if (activeTab() === 'REGISTER') {
+          <form (ngSubmit)="onRegister()" class="space-y-3.5">
+            <div>
+              <span class="block text-xs font-semibold text-[#545454] mb-1.5">Perfil de atuação</span>
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  (click)="registerRole.set('RIDER')"
+                  class="h-11 rounded-md border text-xs font-bold transition-colors"
+                  [class.border-[#141414]]="registerRole() === 'RIDER'"
+                  [class.bg-[#141414]]="registerRole() === 'RIDER'"
+                  [class.text-white]="registerRole() === 'RIDER'"
+                  [class.border-[#E2E2E2]]="registerRole() !== 'RIDER'"
+                  [class.bg-[#F3F3F3]]="registerRole() !== 'RIDER'"
+                  [class.text-[#545454]]="registerRole() !== 'RIDER'"
+                >
+                  Entregador
+                </button>
+                <button
+                  type="button"
+                  (click)="registerRole.set('MECHANIC')"
+                  class="h-11 rounded-md border text-xs font-bold transition-colors"
+                  [class.border-[#141414]]="registerRole() === 'MECHANIC'"
+                  [class.bg-[#141414]]="registerRole() === 'MECHANIC'"
+                  [class.text-white]="registerRole() === 'MECHANIC'"
+                  [class.border-[#E2E2E2]]="registerRole() !== 'MECHANIC'"
+                  [class.bg-[#F3F3F3]]="registerRole() !== 'MECHANIC'"
+                  [class.text-[#545454]]="registerRole() !== 'MECHANIC'"
+                >
+                  Mecânico
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label for="regName" class="block text-xs font-semibold text-[#545454] mb-1">Nome completo</label>
+              <input
+                id="regName"
+                name="regName"
+                type="text"
+                [ngModel]="registerFullName()"
+                (ngModelChange)="registerFullName.set($event)"
+                placeholder="Ex.: Carlos Eduardo Silva"
+                class="w-full h-12 px-3.5 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm text-[#141414] placeholder-[#757575] focus:outline-none"
+              />
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label for="regCpf" class="block text-xs font-semibold text-[#545454] mb-1">CPF</label>
+                <input
+                  id="regCpf"
+                  name="regCpf"
+                  type="text"
+                  [ngModel]="registerCpf()"
+                  (ngModelChange)="registerCpf.set($event)"
+                  placeholder="000.000.000-00"
+                  class="w-full h-12 px-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm font-mono text-[#141414] placeholder-[#757575] focus:outline-none"
+                />
+              </div>
+              <div>
+                <label for="regPhone" class="block text-xs font-semibold text-[#545454] mb-1">WhatsApp</label>
+                <input
+                  id="regPhone"
+                  name="regPhone"
+                  type="tel"
+                  [ngModel]="registerPhone()"
+                  (ngModelChange)="registerPhone.set($event)"
+                  placeholder="(11) 99999-9999"
+                  class="w-full h-12 px-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm font-mono text-[#141414] placeholder-[#757575] focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label for="regEmail" class="block text-xs font-semibold text-[#545454] mb-1">E-mail</label>
+              <input
+                id="regEmail"
+                name="regEmail"
+                type="email"
+                [ngModel]="registerEmail()"
+                (ngModelChange)="registerEmail.set($event)"
+                placeholder="nome@email.com"
+                class="w-full h-12 px-3.5 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm text-[#141414] placeholder-[#757575] focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label for="regPassword" class="block text-xs font-semibold text-[#545454] mb-1">Criar senha</label>
+              <input
+                id="regPassword"
+                name="regPassword"
+                type="password"
+                [ngModel]="registerPassword()"
+                (ngModelChange)="registerPassword.set($event)"
+                placeholder="Mínimo 8 caracteres"
+                class="w-full h-12 px-3.5 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm text-[#141414] placeholder-[#757575] focus:outline-none"
+              />
+            </div>
+
             <button
-              type="button"
-              (click)="registerRole.set('MECHANIC')"
-              [class.border-[#00E676]]="registerRole() === 'MECHANIC'"
-              [class.bg-[#1A2320]]="registerRole() === 'MECHANIC'"
-              [class.text-[#00E676]]="registerRole() === 'MECHANIC'"
-              [class.text-[#94A39E]]="registerRole() !== 'MECHANIC'"
-              class="h-[52px] min-h-[52px] rounded-[10px] border border-[#26332E] font-sans text-[14px] font-bold transition-all cursor-pointer">
-              Sou Mecânico
+              type="submit"
+              [disabled]="isLoading()"
+              class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white font-bold text-sm transition-colors mt-1"
+            >
+              @if (isLoading()) {
+                <span>Enviando solicitação...</span>
+              } @else {
+                <span>Solicitar cadastro</span>
+              }
             </button>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-1.5">
-          <label class="text-[#F2F7F5] font-sans text-[14px] font-semibold">
-            Nome Completo
-          </label>
-          <input
-            type="text"
-            name="fullName"
-            [ngModel]="registerFullName()"
-            (ngModelChange)="registerFullName.set($event)"
-            placeholder="Ex: Carlos Oliveira"
-            class="w-full h-[52px] min-h-[52px] bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-[10px] px-4 text-[#F2F7F5] font-sans text-[14px] outline-none"
-            required />
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[#F2F7F5] font-sans text-[14px] font-semibold">
-              CPF
-            </label>
-            <input
-              type="text"
-              name="cpf"
-              [ngModel]="registerCpf()"
-              (ngModelChange)="registerCpf.set($event)"
-              placeholder="000.000.000-00"
-              class="w-full h-[52px] min-h-[52px] bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-[10px] px-4 text-[#F2F7F5] font-mono text-[14px] outline-none"
-              required />
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[#F2F7F5] font-sans text-[14px] font-semibold">
-              Telefone
-            </label>
-            <input
-              type="tel"
-              name="phone"
-              [ngModel]="registerPhone()"
-              (ngModelChange)="registerPhone.set($event)"
-              placeholder="(11) 99999-0000"
-              class="w-full h-[52px] min-h-[52px] bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-[10px] px-4 text-[#F2F7F5] font-mono text-[14px] outline-none"
-              required />
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-1.5">
-          <label class="text-[#F2F7F5] font-sans text-[14px] font-semibold">
-            E-mail
-          </label>
-          <input
-            type="email"
-            name="regEmail"
-            [ngModel]="registerEmail()"
-            (ngModelChange)="registerEmail.set($event)"
-            placeholder="seu.email@exemplo.com"
-            class="w-full h-[52px] min-h-[52px] bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-[10px] px-4 text-[#F2F7F5] font-mono text-[14px] outline-none"
-            required />
-        </div>
-
-        <div class="flex flex-col gap-1.5">
-          <label class="text-[#F2F7F5] font-sans text-[14px] font-semibold">
-            Senha de Acesso
-          </label>
-          <input
-            type="password"
-            name="regPassword"
-            [ngModel]="registerPassword()"
-            (ngModelChange)="registerPassword.set($event)"
-            placeholder="Mínimo 6 caracteres"
-            class="w-full h-[52px] min-h-[52px] bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-[10px] px-4 text-[#F2F7F5] font-mono text-[16px] outline-none"
-            required />
-        </div>
-
-        <button
-          type="submit"
-          [disabled]="isLoading()"
-          class="w-full h-[52px] min-h-[52px] bg-[#00E676] hover:bg-[#00C853] text-[#06120B] font-sans text-[16px] font-bold rounded-[10px] flex items-center justify-center transition-all active:scale-[0.98] disabled:opacity-50 mt-1 cursor-pointer">
-          Solicitar Cadastro
-        </button>
-      </form>
-    }
-
-    <!-- Demo Mode Fast Switch Section -->
-    @if (publicDemoMode()) {
-      <section class="bg-[#121816] border border-[#26332E] rounded-[14px] p-4 flex flex-col gap-2.5">
-        <div class="flex items-center justify-between">
-          <span class="text-[#FFB300] font-mono text-[12px] font-bold uppercase tracking-wider flex items-center gap-1.5">
-            ⚡ Modo Demonstração (1-Clique)
-          </span>
-          <span class="text-[#94A39E] text-[11px] font-mono">seed Mottu&#64;2026!</span>
-        </div>
-        <div class="grid grid-cols-3 gap-2">
-          <button
-            type="button"
-            (click)="onDemoLogin('RIDER')"
-            [disabled]="isLoading()"
-            class="h-[52px] min-h-[52px] bg-[#1A2320] hover:bg-[#26332E] text-[#00E676] border border-[#26332E] rounded-[8px] font-sans text-[13px] font-bold flex items-center justify-center transition-all active:scale-95 cursor-pointer">
-            Entregador
-          </button>
-          <button
-            type="button"
-            (click)="onDemoLogin('MECHANIC')"
-            [disabled]="isLoading()"
-            class="h-[52px] min-h-[52px] bg-[#1A2320] hover:bg-[#26332E] text-[#00E676] border border-[#26332E] rounded-[8px] font-sans text-[13px] font-bold flex items-center justify-center transition-all active:scale-95 cursor-pointer">
-            Mecânico
-          </button>
-          <button
-            type="button"
-            (click)="onDemoLogin('MANAGER')"
-            [disabled]="isLoading()"
-            class="h-[52px] min-h-[52px] bg-[#1A2320] hover:bg-[#26332E] text-[#00E676] border border-[#26332E] rounded-[8px] font-sans text-[13px] font-bold flex items-center justify-center transition-all active:scale-95 cursor-pointer">
-            Gestor
-          </button>
-        </div>
+          </form>
+        }
       </section>
-    }
 
-    <!-- Version Info Footer -->
-    <footer class="text-center pt-2">
-      <p class="text-[#94A39E] font-mono text-[11px]">
-        Mottu Smart Ops <span class="text-[#00E676] font-bold">v2.2.0</span> • Operação &amp; Telemetria em Produção
-      </p>
-    </footer>
+      <!-- Quick Profile Access (Demo Mode) -->
+      @if (publicDemoMode()) {
+        <section class="bg-white border border-[#E2E2E2] rounded-lg p-4">
+          <div class="flex items-center justify-between mb-2.5">
+            <span class="text-xs font-semibold text-[#545454]">Acesso rápido de avaliação</span>
+            <span class="text-[11px] text-[#757575]">Ambiente demonstrativo</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              type="button"
+              [disabled]="isLoading()"
+              (click)="onDemoLogin('RIDER')"
+              class="h-11 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-xs font-semibold text-[#141414] transition-colors"
+            >
+              Entregador
+            </button>
+            <button
+              type="button"
+              [disabled]="isLoading()"
+              (click)="onDemoLogin('MECHANIC')"
+              class="h-11 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-xs font-semibold text-[#141414] transition-colors"
+            >
+              Mecânico
+            </button>
+            <button
+              type="button"
+              [disabled]="isLoading()"
+              (click)="onDemoLogin('MANAGER')"
+              class="h-11 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-xs font-semibold text-[#141414] transition-colors"
+            >
+              Gestor
+            </button>
+          </div>
+        </section>
+      }
+    </div>
+  </main>
 
-  </div>
+  <!-- Legal & Institutional Footer -->
+  <footer class="py-4 px-6 border-t border-[#EEEEEE] bg-white text-center text-xs text-[#757575]">
+    © 2026 Mottu Tecnologia Ltda. • Termos de uso • Política de privacidade e LGPD
+  </footer>
 </div>

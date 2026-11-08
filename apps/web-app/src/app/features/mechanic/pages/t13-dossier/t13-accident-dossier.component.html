@@ -1,287 +1,195 @@
-<div class="min-h-screen bg-[#0A0E0D] text-[#F2F7F5] p-6 flex flex-col items-center">
-  <div class="w-full max-w-[1400px] flex flex-col gap-6">
-    <!-- Top Navigation -->
-    <header class="flex items-center justify-between border-b border-[#26332E] pb-4">
-      <div class="flex items-center gap-4">
-        <button
-          type="button"
-          (click)="onBackToQueue()"
-          title="Voltar para a fila"
-          class="p-2 text-[#94A39E] hover:text-[#F2F7F5] bg-[#121816] border border-[#26332E] rounded-lg transition"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <div class="flex flex-col">
-          <span class="text-xs font-mono font-bold text-[#FF4D4F] uppercase tracking-wider">Mesa de Sinistro & Oficina (T13)</span>
-          <h1 class="text-2xl font-black text-[#F2F7F5] flex items-center gap-3">
-            <span>Dossiê de Acidente por Vídeo</span>
-            @if (details(); as det) {
-              <span class="font-mono text-sm px-3 py-1 rounded-full bg-[#1A2320] border border-[#26332E] text-[#00E676]">
-                {{ det.plate }}
-              </span>
-            }
-          </h1>
-        </div>
-      </div>
-
-      <!-- Status Badge -->
-      @if (details(); as det) {
-        <div class="flex items-center gap-2">
-          @if (det.status === 'WORKSHOP_CONFIRMED') {
-            <span class="font-mono text-xs font-bold px-3 py-1.5 rounded-full bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/30">
-              ✓ OFICINA CONFIRMADA
-            </span>
+<app-desktop-shell
+  sectionLabel="Vistorias e oficina"
+  pageTitle="Dossiê de sinistro em vídeo"
+  activeNav="workbench"
+>
+  <div class="space-y-5">
+    <div class="flex items-center gap-3">
+      <button
+        type="button"
+        (click)="onBackToQueue()"
+        class="px-3.5 h-9 rounded-md bg-white border border-[#E2E2E2] hover:bg-[#F3F3F3] text-xs font-semibold text-[#141414]"
+      >
+        ← Fila da oficina
+      </button>
+      <div>
+        <h2 class="text-lg font-bold text-[#141414]">
+          @if (details(); as d) {
+            Conferência de acidente • <span class="font-mono">{{ d.plate }}</span>
           } @else {
-            <span class="font-mono text-xs font-bold px-3 py-1.5 rounded-full bg-[#FFB300]/15 text-[#FFB300] border border-[#FFB300]/30 animate-pulse">
-              PENDENTE DE CONFERÊNCIA
-            </span>
+            Dossiê de acidente
           }
-        </div>
-      }
-    </header>
+        </h2>
+        <p class="text-xs text-[#757575]">Validação física das peças novas na recepção da moto</p>
+      </div>
+    </div>
 
     @if (isLoading()) {
-      <div class="w-full h-96 flex flex-col items-center justify-center gap-3 bg-[#121816] rounded-2xl border border-[#26332E]">
-        <svg class="w-8 h-8 animate-spin text-[#00E676]" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-        </svg>
-        <span class="text-sm text-[#94A39E]">Carregando dossiê de vídeo da moto...</span>
+      <div class="bg-white border border-[#E2E2E2] rounded-lg p-10 text-center text-sm text-[#757575]">
+        Carregando vídeo 360° e checklist de peças...
       </div>
     } @else {
       @if (details(); as det) {
-      <!-- Main Asymmetric Workspace (55% Left / 45% Right) -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        <!-- Left Panel: Video Player, Timeline & Telemetry (7 cols = ~58%) -->
-        <div class="lg:col-span-7 flex flex-col gap-5">
-          <!-- Telemetry Bar -->
-          <div class="bg-[#121816] rounded-2xl p-4 border border-[#26332E] grid grid-cols-4 gap-3 text-xs font-mono">
-            <div class="flex flex-col">
-              <span class="text-[#94A39E] uppercase text-[10px]">Entregador</span>
-              <span class="text-[#F2F7F5] font-bold truncate">{{ det.riderName }}</span>
-              <span class="text-[11px] text-[#94A39E]">{{ det.riderPhone }}</span>
-            </div>
-            <div class="flex flex-col">
-              <span class="text-[#94A39E] uppercase text-[10px]">Modelo</span>
-              <span class="text-[#F2F7F5] font-bold">{{ det.model.replace('_', ' ') }}</span>
-            </div>
-            <div class="flex flex-col">
-              <span class="text-[#94A39E] uppercase text-[10px]">Hodômetro</span>
-              <span class="text-[#F2F7F5] font-bold">{{ det.reportedOdometerKm }} km</span>
-            </div>
-            <div class="flex flex-col">
-              <span class="text-[#94A39E] uppercase text-[10px]">Condição</span>
-              @if (det.drivability === 'NEEDS_TOWING') {
-                <span class="text-[#FF4D4F] font-bold">🚨 GUINCHO</span>
-              } @else {
-                <span class="text-[#00E676] font-bold">RODANDO</span>
-              }
-            </div>
-          </div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <!-- Left 7 Cols: Dark Video Player + Telemetry -->
+        <div class="lg:col-span-7 space-y-4">
+          <section class="rounded-xl overflow-hidden bg-[#1C1F1E] border border-[#E2E2E2]">
+            <video
+              #videoPlayer
+              [src]="det.videoDownloadUrl"
+              controls
+              playsinline
+              class="w-full aspect-video object-contain bg-[#1C1F1E]"
+            ></video>
+          </section>
 
-          <!-- Video Player Container -->
-          <div class="bg-[#121816] rounded-2xl p-4 border border-[#26332E] flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-              <h2 class="text-sm font-bold text-[#F2F7F5] flex items-center gap-2">
-                <svg class="w-5 h-5 text-[#00E676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                <span>Vídeo do Sinistro (30s Gravado em Campo)</span>
-              </h2>
-            </div>
-
-            @if (det.videoDownloadUrl) {
-              <video
-                #videoPlayer
-                controls
-                playsinline
-                [src]="det.videoDownloadUrl"
-                class="w-full rounded-xl bg-black aspect-video object-contain"
-              ></video>
-            } @else {
-              <div class="w-full aspect-video bg-[#1A2320] rounded-xl flex items-center justify-center text-xs text-[#94A39E]">
-                Vídeo não disponível
-              </div>
-            }
-
-            <!-- Detections Timeline Markers -->
-            <div class="flex flex-col gap-2 pt-2 border-t border-[#26332E]">
-              <span class="text-xs font-mono font-bold text-[#94A39E]">TIMELINE DE AVARIAS DETECTADAS:</span>
-              <div class="flex flex-wrap gap-2">
-                @for (item of det.items; track item.partName) {
-                  @if (item.videoTimestampSeconds !== undefined && item.videoTimestampSeconds !== null) {
-                    <button
-                      type="button"
-                      (click)="jumpToSecond(item.videoTimestampSeconds)"
-                      class="px-3 py-1.5 rounded-lg bg-[#1A2320] hover:bg-[#00E676]/20 border border-[#26332E] hover:border-[#00E676]/40 text-xs font-mono flex items-center gap-1.5 transition text-[#F2F7F5] cursor-pointer"
-                    >
-                      <span class="text-[#00E676] font-bold">▶ {{ formatTime(item.videoTimestampSeconds) }}</span>
-                      <span>{{ item.partName }}</span>
-                    </button>
-                  }
-                }
-              </div>
-            </div>
-          </div>
-
-          <!-- Close Photos Gallery if any -->
-          @if (det.photoDownloadUrls && det.photoDownloadUrls.length > 0) {
-            <div class="bg-[#121816] rounded-2xl p-4 border border-[#26332E] flex flex-col gap-3">
-              <span class="text-xs font-bold text-[#F2F7F5]">Fotos Complementares de Close:</span>
-              <div class="grid grid-cols-3 gap-3">
-                @for (photoUrl of det.photoDownloadUrls; track photoUrl) {
-                  <a [href]="photoUrl" target="_blank" class="h-28 rounded-xl border border-[#26332E] overflow-hidden hover:opacity-90 transition block">
-                    <img [src]="photoUrl" alt="Foto close" class="w-full h-full object-cover" />
-                  </a>
-                }
-              </div>
+          @if (det.structuralRiskAlert) {
+            <div role="alert" class="p-4 rounded-lg bg-[#FEE2E2] border border-[#DC2626]/30 text-xs text-[#B91C1C]">
+              <p class="font-bold">Alerta de estrutura / chassi</p>
+              <p class="mt-0.5">Verifique alinhamento de bengala, mesa e quadro no gabarito antes de liberar.</p>
             </div>
           }
 
-          <!-- Rider Notes & Emergency Flags -->
-          <div class="bg-[#121816] rounded-2xl p-4 border border-[#26332E] flex flex-col gap-3 text-xs">
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-[#94A39E]">Relato do Entregador:</span>
-              @if (det.hasInjuries) {
-                <span class="text-[#FF4D4F] font-bold bg-[#FF4D4F]/10 px-2 py-0.5 rounded border border-[#FF4D4F]/30">⚠️ FERIDOS REPORTADOS</span>
-              }
-              @if (det.involvesThirdParty) {
-                <span class="text-[#FFB300] font-bold bg-[#FFB300]/10 px-2 py-0.5 rounded border border-[#FFB300]/30">
-                  BO: {{ det.policeReportNumber || 'NÃO INFORMADO' }}
+          <section class="bg-white border border-[#E2E2E2] rounded-lg p-4 space-y-3">
+            <h3 class="text-xs font-bold text-[#141414]">Dados da ocorrência e relato</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+              <div class="bg-[#F3F3F3] rounded-md p-2.5">
+                <span class="block text-[11px] text-[#757575]">Entregador</span>
+                <span class="font-bold text-[#141414] mt-0.5 block truncate">{{ det.riderName }}</span>
+              </div>
+              <div class="bg-[#F3F3F3] rounded-md p-2.5">
+                <span class="block text-[11px] text-[#757575]">Telefone</span>
+                <span class="font-mono font-semibold text-[#141414] mt-0.5 block">{{ det.riderPhone }}</span>
+              </div>
+              <div class="bg-[#F3F3F3] rounded-md p-2.5">
+                <span class="block text-[11px] text-[#757575]">Hodômetro</span>
+                <span class="font-mono font-bold text-[#141414] mt-0.5 block">{{ det.reportedOdometerKm }} km</span>
+              </div>
+              <div class="bg-[#F3F3F3] rounded-md p-2.5">
+                <span class="block text-[11px] text-[#757575]">Locomoção</span>
+                <span class="font-bold text-[#141414] mt-0.5 block">
+                  {{ det.drivability === 'NEEDS_TOWING' ? 'Guincho' : 'Rodando' }}
                 </span>
-              }
+              </div>
             </div>
-            <p class="text-[#F2F7F5] bg-[#1A2320] p-3 rounded-xl border border-[#26332E] italic">
-              "{{ det.riderNotes || 'Sem observações adicionais gravadas.' }}"
-            </p>
 
-            @if (det.riderToMechanicNotes) {
-              <div class="flex flex-col gap-1">
-                <span class="font-bold text-[#94A39E]">Recado Direto para a Oficina:</span>
-                <p class="text-[#00E676] bg-[#1A2320] p-3 rounded-xl border border-[#26332E] font-mono">
-                  "{{ det.riderToMechanicNotes }}"
-                </p>
+            @if (det.aiTechnicalSummary) {
+              <div class="p-3 rounded-md bg-[#F6F6F6] text-xs text-[#545454]">
+                <span class="font-bold text-[#141414]">Análise preliminar do vídeo:</span> {{ det.aiTechnicalSummary }}
               </div>
             }
-          </div>
+
+            @if (det.riderToMechanicNotes) {
+              <div class="p-3 rounded-md bg-[#FEF3C7] text-xs text-[#92400E]">
+                <span class="font-bold">Recado do entregador:</span> "{{ det.riderToMechanicNotes }}"
+              </div>
+            }
+          </section>
         </div>
 
-        <!-- Right Panel: AI Assessment & Physical Workshop Confirmation (5 cols = ~42%) -->
-        <div class="lg:col-span-5 flex flex-col gap-5">
-          <!-- Gemini AI Assessment Card -->
-          <div class="bg-[#121816] rounded-2xl p-4 border border-[#26332E] flex flex-col gap-3">
+        <!-- Right 5 Cols: Physical Checklist & Confirmation -->
+        <div class="lg:col-span-5 space-y-4">
+          <section class="bg-white border border-[#E2E2E2] rounded-lg p-5 space-y-4">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-mono font-bold text-[#94A39E]">LAUDO PRELIMINAR IA GEMINI</span>
-              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/30">
-                Confiança: {{ ((det.aiConfidence || 0.92) * 100).toFixed(0) }}%
+              <h3 class="text-sm font-bold text-[#141414]">Checklist físico na baia</h3>
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
+                [class.bg-[#E6F4EE]]="det.status === 'WORKSHOP_CONFIRMED'"
+                [class.text-[#046C3A]]="det.status === 'WORKSHOP_CONFIRMED'"
+                [class.bg-[#FEF3C7]]="det.status !== 'WORKSHOP_CONFIRMED'"
+                [class.text-[#92400E]]="det.status !== 'WORKSHOP_CONFIRMED'"
+              >
+                {{ det.status === 'WORKSHOP_CONFIRMED' ? 'Confirmado' : 'Pendente conferência' }}
               </span>
             </div>
 
-            @if (det.structuralRiskAlert) {
-              <div class="bg-[#FF4D4F]/15 border border-[#FF4D4F] rounded-xl p-3 flex items-start gap-2 text-xs text-[#FF4D4F] font-bold">
-                <span>⚠️ ALERTA DE RISCO ESTRUTURAL: Inspeção do chassi, mesa ou bengala necessária antes da liberação!</span>
-              </div>
-            }
-
-            <p class="text-xs text-[#F2F7F5] bg-[#1A2320] p-3 rounded-xl border border-[#26332E]">
-              {{ det.aiTechnicalSummary || 'Avarias superficiais e peças de reposição detectadas no vídeo.' }}
-            </p>
-          </div>
-
-          <!-- Physical Checklist in Workshop -->
-          <div class="bg-[#121816] rounded-2xl p-4 border border-[#26332E] flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-              <h2 class="text-sm font-bold text-[#F2F7F5]">Conferência Física das Peças</h2>
-              <span class="text-xs font-mono text-[#94A39E]">Marque as confirmadas</span>
-            </div>
-
-            <div class="flex flex-col gap-2">
+            <div class="space-y-2">
               @for (item of det.items; track item.partName) {
-                <label class="bg-[#1A2320] p-3 rounded-xl border border-[#26332E] flex items-center justify-between cursor-pointer hover:border-[#00E676]/40 transition">
-                  <div class="flex items-center gap-3">
+                @let key = item.catalogPartId || item.partName;
+                <div class="p-3 rounded-md bg-[#F3F3F3] flex items-center justify-between gap-2 text-xs">
+                  <label class="flex items-center gap-2.5 cursor-pointer min-w-0">
                     <input
                       type="checkbox"
-                      [checked]="isPartConfirmed(item.catalogPartId || item.partName)"
-                      (change)="togglePartConfirmation(item.catalogPartId || item.partName)"
-                      class="w-4 h-4 rounded text-[#00E676] bg-[#0A0E0D] border-[#26332E] focus:ring-0"
+                      aria-label="Confirmar peça na conferência física"
+                      [checked]="isPartConfirmed(key)"
+                      (change)="togglePartConfirmation(key)"
+                      class="w-4 h-4 accent-[#05944F] shrink-0"
                     />
-                    <div class="flex flex-col">
-                      <span class="text-xs font-bold text-[#F2F7F5]">{{ item.partName }}</span>
-                      <span class="text-[11px] font-mono text-[#94A39E]">1 unid • Catálogo Mottu</span>
-                    </div>
+                    <span class="font-medium text-[#141414] truncate">{{ item.partName }}</span>
+                  </label>
+
+                  <div class="flex items-center gap-2 shrink-0">
+                    @if (item.videoTimestampSeconds !== undefined) {
+                      <button
+                        type="button"
+                        (click)="jumpToSecond(item.videoTimestampSeconds!)"
+                        class="px-2 py-0.5 rounded bg-[#141414] text-white font-mono text-[10px] font-bold"
+                      >
+                        {{ formatTime(item.videoTimestampSeconds) }}
+                      </button>
+                    }
+                    <span class="font-mono font-semibold text-[#141414]">
+                      R$ {{ (item.unitPriceBrl * item.quantity).toFixed(2).replace('.', ',') }}
+                    </span>
                   </div>
-                  <span class="font-mono text-xs font-bold text-[#00E676]">R$ {{ item.unitPriceBrl.toFixed(2) }}</span>
-                </label>
+                </div>
               }
             </div>
 
-            <!-- Mechanic Notes -->
-            <div class="flex flex-col gap-1 pt-2">
-              <label class="text-xs font-bold text-[#F2F7F5]">Parecer Técnico Final do Mecânico</label>
+            <div>
+              <label for="dossierNotes" class="block text-xs font-bold text-[#141414] mb-1">
+                Parecer presencial da bancada
+              </label>
               <textarea
-                rows="3"
+                id="dossierNotes"
+                rows="2"
                 [value]="mechanicNotes()"
                 (input)="onMechanicNotesInput($event)"
-                placeholder="Ex: Confirmadas avarias de impacto lateral. Alinhamento de guidão e troca efetuada..."
-                class="w-full bg-[#1A2320] border border-[#26332E] rounded-xl p-3 text-xs text-[#F2F7F5] outline-none focus:border-[#00E676]"
+                placeholder="Anote detalhes da conferência física no galpão..."
+                class="w-full p-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-xs text-[#141414] focus:outline-none"
               ></textarea>
             </div>
-          </div>
 
-          <!-- Total Budget Preview -->
-          <div class="bg-[#121816] rounded-2xl p-4 border border-[#26332E] flex flex-col gap-2 font-mono text-xs">
-            <span class="text-xs font-sans font-bold text-[#F2F7F5]">Resumo Orçamentário Final</span>
-
-            <div class="flex items-center justify-between text-[#94A39E]">
-              <span>Subtotal Peças Confirmadas:</span>
-              <span class="text-[#F2F7F5]">R$ {{ calculateConfirmedSubtotal().toFixed(2) }}</span>
+            <!-- Financial Summary -->
+            <div class="bg-[#F6F6F6] rounded-md p-3.5 space-y-1.5 text-xs">
+              <div class="flex justify-between text-[#545454]">
+                <span>Subtotal de peças confirmadas</span>
+                <span class="font-mono">R$ {{ calculateConfirmedSubtotal().toFixed(2).replace('.', ',') }}</span>
+              </div>
+              <div class="flex justify-between text-[#545454]">
+                <span>Mão de obra escalonada</span>
+                <span class="font-mono">R$ {{ calculateConfirmedLabor().toFixed(2).replace('.', ',') }}</span>
+              </div>
+              @if (det.towingFeeBrl > 0) {
+                <div class="flex justify-between text-[#545454]">
+                  <span>Taxa de recolha</span>
+                  <span class="font-mono">R$ {{ det.towingFeeBrl.toFixed(2).replace('.', ',') }}</span>
+                </div>
+              }
+              <div class="pt-2 border-t border-[#E2E2E2] flex justify-between font-bold text-sm text-[#141414]">
+                <span>Total confirmado</span>
+                <span class="font-mono text-base">R$ {{ calculateConfirmedTotal().toFixed(2).replace('.', ',') }}</span>
+              </div>
             </div>
 
-            <div class="flex items-center justify-between text-[#94A39E]">
-              <span>Mão de Obra Oficina:</span>
-              <span class="text-[#F2F7F5]">R$ {{ calculateConfirmedLabor().toFixed(2) }}</span>
-            </div>
-
-            <div class="flex items-center justify-between text-[#94A39E]">
-              <span>Taxa de Guincho:</span>
-              <span class="text-[#F2F7F5]">R$ {{ det.towingFeeBrl.toFixed(2) }}</span>
-            </div>
-
-            <div class="pt-2 border-t border-[#26332E] flex items-center justify-between text-base font-bold">
-              <span class="text-[#F2F7F5]">Total da Manutenção:</span>
-              <span class="text-xl text-[#00E676]">R$ {{ calculateConfirmedTotal().toFixed(2) }}</span>
-            </div>
-          </div>
-
-          <!-- Action CTA -->
-          @if (det.status !== 'WORKSHOP_CONFIRMED') {
             <button
               type="button"
+              [disabled]="isConfirming() || det.status === 'WORKSHOP_CONFIRMED'"
               (click)="onConfirmAccident()"
-              [disabled]="isConfirming()"
-              class="w-full h-14 rounded-xl bg-[#00E676] hover:bg-[#00C853] text-[#06120B] font-extrabold text-base flex items-center justify-center gap-2 transition active:scale-[0.98] shadow-lg shadow-[#00E676]/20 cursor-pointer disabled:opacity-50"
+              class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] disabled:bg-[#F3F3F3] disabled:text-[#757575] text-white font-bold text-sm transition-colors"
             >
-              @if (isConfirming()) {
-                <svg class="w-5 h-5 animate-spin text-[#06120B]" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <span>Confirmando no Galpão...</span>
+              @if (det.status === 'WORKSHOP_CONFIRMED') {
+                <span>Orçamento confirmado na oficina</span>
+              } @else if (isConfirming()) {
+                <span>Confirmando orçamento...</span>
               } @else {
-                <span>✓ Confirmar e Liberar Manutenção</span>
+                <span>Confirmar orçamento presencial</span>
               }
             </button>
-          } @else {
-            <div class="p-4 rounded-xl bg-[#00E676]/10 border border-[#00E676]/30 text-center flex flex-col items-center gap-1">
-              <span class="text-xs font-mono font-bold text-[#00E676]">✓ LAUDO CONCLUÍDO E CONFIRMADO</span>
-              <span class="text-[11px] text-[#94A39E]">Orçamento registrado na analytics outbox para auditoria.</span>
-            </div>
-          }
+          </section>
         </div>
       </div>
+      }
     }
-  }
   </div>
-</div>
+</app-desktop-shell>

@@ -1,0 +1,240 @@
+<app-desktop-shell
+  sectionLabel="Operação da unidade"
+  pageTitle="Contratos e faturamento semanal"
+  activeNav="billing"
+  searchPlaceholder="Buscar contrato, placa ou entregador..."
+  (globalSearch)="onSearch($event)"
+>
+  <div class="space-y-5">
+    <!-- Page Header -->
+    <div>
+      <h2 class="text-xl font-bold text-[#141414]">Contratos e conciliação Pix semanal</h2>
+      <p class="text-sm text-[#545454]">
+        Visão consolidada dos planos semanais integrados automaticamente aos orçamentos de vistoria da oficina.
+      </p>
+    </div>
+
+    <!-- 4 KPI Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
+        <span class="text-xs font-medium text-[#757575]">Contratos na carteira</span>
+        <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">{{ contracts().length }}</p>
+      </div>
+      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
+        <span class="text-xs font-medium text-[#757575]">Quitados no ciclo</span>
+        <p class="text-2xl font-extrabold font-mono text-[#046C3A] mt-1">
+          {{ paidCount() }} / {{ contracts().length }}
+        </p>
+      </div>
+      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
+        <span class="text-xs font-medium text-[#757575]">Faturamento da semana</span>
+        <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">
+          R$ {{ totalWeeklyRevenueBrl().toFixed(2).replace('.', ',') }}
+        </p>
+      </div>
+      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
+        <span class="text-xs font-medium text-[#757575]">Com avaria vinculada</span>
+        <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">
+          {{ withInspectionChargeCount() }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Uber Clean Table Card -->
+    <div class="bg-white border border-[#E2E2E2] rounded-lg overflow-hidden">
+      <!-- Filter Bar -->
+      <div class="p-4 border-b border-[#EEEEEE] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            (click)="setFilter('ALL')"
+            class="px-3.5 h-9 rounded-full text-xs font-semibold transition-colors"
+            [class.bg-[#141414]]="activeFilter() === 'ALL'"
+            [class.text-white]="activeFilter() === 'ALL'"
+            [class.bg-[#F3F3F3]]="activeFilter() !== 'ALL'"
+            [class.text-[#545454]]="activeFilter() !== 'ALL'"
+          >
+            Todos ({{ contracts().length }})
+          </button>
+          <button
+            type="button"
+            (click)="setFilter('PAID')"
+            class="px-3.5 h-9 rounded-full text-xs font-semibold transition-colors"
+            [class.bg-[#141414]]="activeFilter() === 'PAID'"
+            [class.text-white]="activeFilter() === 'PAID'"
+            [class.bg-[#F3F3F3]]="activeFilter() !== 'PAID'"
+            [class.text-[#545454]]="activeFilter() !== 'PAID'"
+          >
+            Em dia
+          </button>
+          <button
+            type="button"
+            (click)="setFilter('PENDING_PIX')"
+            class="px-3.5 h-9 rounded-full text-xs font-semibold transition-colors"
+            [class.bg-[#141414]]="activeFilter() === 'PENDING_PIX'"
+            [class.text-white]="activeFilter() === 'PENDING_PIX'"
+            [class.bg-[#F3F3F3]]="activeFilter() !== 'PENDING_PIX'"
+            [class.text-[#545454]]="activeFilter() !== 'PENDING_PIX'"
+          >
+            Aguardando Pix
+          </button>
+          <button
+            type="button"
+            (click)="setFilter('OVERDUE')"
+            class="px-3.5 h-9 rounded-full text-xs font-semibold transition-colors"
+            [class.bg-[#141414]]="activeFilter() === 'OVERDUE'"
+            [class.text-white]="activeFilter() === 'OVERDUE'"
+            [class.bg-[#F3F3F3]]="activeFilter() !== 'OVERDUE'"
+            [class.text-[#545454]]="activeFilter() !== 'OVERDUE'"
+          >
+            Em atraso
+          </button>
+        </div>
+
+        <input
+          type="search"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearch($event)"
+          placeholder="Filtrar contrato ou placa..."
+          aria-label="Filtrar contratos"
+          class="w-full sm:w-64 h-9 px-3.5 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-xs text-[#141414] focus:outline-none"
+        />
+      </div>
+
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-[#F3F3F3] text-[#757575] text-xs font-semibold border-b border-[#E2E2E2]">
+              <th class="py-3 px-4">Contrato / Entregador</th>
+              <th class="py-3 px-4">Veículo</th>
+              <th class="py-3 px-4">Aluguel base</th>
+              <th class="py-3 px-4">Avarias oficina</th>
+              <th class="py-3 px-4">Total líquido</th>
+              <th class="py-3 px-4">Situação Pix</th>
+              <th class="py-3 px-4 text-right">Detalhes</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#EEEEEE] text-sm">
+            @for (c of filteredContracts(); track c.contractCode) {
+              <tr class="hover:bg-[#F6F6F6]/70 transition-colors">
+                <td class="py-3.5 px-4">
+                  <p class="font-semibold text-[#141414]">{{ c.riderName }}</p>
+                  <p class="font-mono text-xs text-[#757575]">{{ c.contractCode }}</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="font-mono text-xs font-bold text-[#141414] bg-[#F3F3F3] px-2 py-0.5 rounded">
+                    {{ c.plate }}
+                  </span>
+                  <span class="block text-xs text-[#757575] mt-0.5">{{ c.model }}</span>
+                </td>
+                <td class="py-3.5 px-4 font-mono text-xs text-[#545454]">
+                  R$ {{ c.weeklyPlanBrl.toFixed(2).replace('.', ',') }}
+                </td>
+                <td class="py-3.5 px-4 font-mono text-xs" [class.text-[#141414]]="c.inspectionChargesBrl > 0" [class.text-[#757575]]="c.inspectionChargesBrl === 0">
+                  R$ {{ c.inspectionChargesBrl.toFixed(2).replace('.', ',') }}
+                </td>
+                <td class="py-3.5 px-4 font-mono text-sm font-bold text-[#141414]">
+                  R$ {{ netTotal(c).toFixed(2).replace('.', ',') }}
+                </td>
+                <td class="py-3.5 px-4">
+                  @switch (c.paymentStatus) {
+                    @case ('PAID') {
+                      <span class="inline-flex items-center gap-2 text-xs font-medium text-[#141414]">
+                        <span class="w-2 h-2 rounded-full bg-[#05944F]"></span>
+                        {{ c.dueDateLabel }}
+                      </span>
+                    }
+                    @case ('PENDING_PIX') {
+                      <span class="inline-flex items-center gap-2 text-xs font-medium text-[#141414]">
+                        <span class="w-2 h-2 rounded-full bg-[#D97706]"></span>
+                        {{ c.dueDateLabel }}
+                      </span>
+                    }
+                    @case ('OVERDUE') {
+                      <span class="inline-flex items-center gap-2 text-xs font-medium text-[#B91C1C]">
+                        <span class="w-2 h-2 rounded-full bg-[#DC2626]"></span>
+                        {{ c.dueDateLabel }}
+                      </span>
+                    }
+                  }
+                </td>
+                <td class="py-3.5 px-4 text-right">
+                  <button
+                    type="button"
+                    (click)="openDrawer(c)"
+                    class="px-3 h-8 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-xs font-semibold text-[#141414] transition-colors"
+                  >
+                    Ver fatura
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right 400px Slide-over Drawer -->
+  @if (selectedContract(); as sel) {
+    <div class="fixed inset-0 z-40 flex justify-end bg-black/30" (click)="closeDrawer()">
+      <aside
+        class="w-full max-w-[400px] bg-white h-full border-l border-[#E2E2E2] shadow-xl flex flex-col justify-between p-6 overflow-y-auto"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="space-y-5">
+          <div class="flex items-start justify-between gap-3 pb-4 border-b border-[#EEEEEE]">
+            <div>
+              <span class="font-mono text-xs text-[#757575]">{{ sel.contractCode }}</span>
+              <h3 class="text-lg font-bold text-[#141414]">{{ sel.riderName }}</h3>
+            </div>
+            <button
+              type="button"
+              (click)="closeDrawer()"
+              class="w-8 h-8 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-sm font-bold text-[#141414]"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div class="bg-[#F6F6F6] rounded-lg p-4 space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-[#545454]">Veículo vinculado</span>
+              <span class="font-mono font-bold text-[#141414]">{{ sel.plate }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-[#545454]">Plano semanal</span>
+              <span class="font-mono text-[#141414]">R$ {{ sel.weeklyPlanBrl.toFixed(2).replace('.', ',') }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-[#545454]">Avarias confirmadas na oficina</span>
+              <span class="font-mono text-[#141414]">R$ {{ sel.inspectionChargesBrl.toFixed(2).replace('.', ',') }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-[#046C3A]">Desconto pontualidade</span>
+              <span class="font-mono text-[#046C3A]">- R$ {{ sel.discountBrl.toFixed(2).replace('.', ',') }}</span>
+            </div>
+            <div class="pt-2 border-t border-[#E2E2E2] flex justify-between font-bold text-base">
+              <span class="text-[#141414]">Total da fatura</span>
+              <span class="font-mono text-[#141414]">R$ {{ netTotal(sel).toFixed(2).replace('.', ',') }}</span>
+            </div>
+          </div>
+
+          <p class="text-xs text-[#757575] leading-relaxed">
+            Os lançamentos de avaria são gerados somente após conclusão do laudo com peças de tabela oficial da Loja Mottu.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="closeDrawer()"
+          class="w-full h-11 rounded-md bg-[#05944F] hover:bg-[#047840] text-white font-bold text-sm transition-colors"
+        >
+          Concluir conferência
+        </button>
+      </aside>
+    </div>
+  }
+</app-desktop-shell>
+

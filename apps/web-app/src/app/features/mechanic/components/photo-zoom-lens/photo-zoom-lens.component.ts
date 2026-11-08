@@ -16,7 +16,7 @@ import { DamageBoundingBox } from '../../models/mechanic.models';
   template: `
     <div
       #container
-      class="relative w-full h-[480px] bg-[#0A0E0D] rounded-[10px] overflow-hidden select-none cursor-crosshair border border-[#26332E] flex items-center justify-center"
+      class="relative w-full h-[460px] bg-[#1C1F1E] rounded-lg overflow-hidden select-none cursor-crosshair border border-[#E2E2E2] flex items-center justify-center"
       (mousemove)="onMouseMove($event)"
       (mouseenter)="isHovering.set(true)"
       (mouseleave)="isHovering.set(false)"
@@ -29,31 +29,31 @@ import { DamageBoundingBox } from '../../models/mechanic.models';
         <img
           #baseImage
           [src]="photoUrlSignal()"
-          alt="Foto da Avaria em Alta Resolução"
+          alt="Foto da avaria em alta resolução"
           class="w-full h-full object-contain pointer-events-none"
         />
       } @else {
-        <div class="flex flex-col items-center justify-center text-[#94A39E] gap-2">
-          <svg class="w-12 h-12 text-[#26332E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex flex-col items-center justify-center text-white/60 gap-2">
+          <svg class="w-10 h-10 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
           </svg>
-          <span class="text-sm font-mono">Nenhuma imagem carregada</span>
+          <span class="text-xs font-medium">Nenhuma imagem carregada</span>
         </div>
       }
 
-      <!-- AI Damage Bounding Boxes / Overlays -->
+      <!-- Highlighted Part Markers -->
       @for (box of boundingBoxesSignal(); track box.label) {
         <div
-          class="absolute border-2 border-dashed border-[#00E676] bg-[#00E676]/10 pointer-events-none transition-all z-10"
+          class="absolute border-2 border-dashed border-white/85 bg-white/10 pointer-events-none transition-all z-10 rounded-sm"
           [style.left.%]="box.x"
           [style.top.%]="box.y"
           [style.width.%]="box.width"
           [style.height.%]="box.height"
         >
           <span
-            class="absolute -top-6 left-0 bg-[#00E676] text-[#06120B] text-xs font-mono font-bold px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap"
+            class="absolute -top-6 left-0 bg-white text-[#141414] text-[11px] font-semibold px-2 py-0.5 rounded shadow whitespace-nowrap"
           >
-            {{ box.label }} ({{ box.confidence }}%)
+            {{ box.label }}
           </span>
         </div>
       }
@@ -61,7 +61,7 @@ import { DamageBoundingBox } from '../../models/mechanic.models';
       <!-- Magnifying Loupe (2x - 4x) -->
       @if (isHovering() && photoUrlSignal()) {
         <div
-          class="absolute rounded-full pointer-events-none border-2 border-[#00E676] shadow-[0_0_24px_rgba(0,230,118,0.35),0_8px_32px_rgba(0,0,0,0.85)] z-20 overflow-hidden"
+          class="absolute rounded-full pointer-events-none border-2 border-white shadow-2xl z-20 overflow-hidden"
           [style.width.px]="loupeSize"
           [style.height.px]="loupeSize"
           [style.left.px]="loupeLeft()"
@@ -71,27 +71,26 @@ import { DamageBoundingBox } from '../../models/mechanic.models';
           [style.background-size]="bgSize()"
           [style.background-position]="bgPosition()"
         >
-          <!-- Center Reticle Crosshair -->
           <div class="absolute inset-0 flex items-center justify-center opacity-50">
-            <div class="w-full h-[1px] bg-[#00E676]"></div>
-            <div class="h-full w-[1px] bg-[#00E676] absolute"></div>
+            <div class="w-full h-[1px] bg-white"></div>
+            <div class="h-full w-[1px] bg-white absolute"></div>
           </div>
         </div>
       }
 
-      <!-- Zoom Level Badge & Controls -->
+      <!-- Zoom Level Controls -->
       <div
-        class="absolute bottom-3 right-3 flex items-center gap-1.5 bg-[#121816]/90 border border-[#26332E] rounded-md px-2 py-1 z-30 backdrop-blur-sm"
+        class="absolute bottom-3 right-3 flex items-center gap-1 bg-black/75 border border-white/15 rounded-md px-2 py-1 z-30"
       >
-        <span class="text-xs font-mono text-[#94A39E] mr-1">Lupa:</span>
+        <span class="text-[11px] font-medium text-white/75 mr-1">Lupa</span>
         @for (level of [2, 3, 4]; track level) {
           <button
             type="button"
             (click)="setZoom(level, $event)"
             [class]="
               zoomLevel() === level
-                ? 'px-2 py-0.5 text-xs font-mono font-bold bg-[#00E676] text-[#06120B] rounded'
-                : 'px-2 py-0.5 text-xs font-mono text-[#F2F7F5] hover:text-[#00E676] hover:bg-[#1A2320] rounded transition-colors'
+                ? 'px-2 py-0.5 text-xs font-mono font-bold bg-white text-[#141414] rounded-sm'
+                : 'px-2 py-0.5 text-xs font-mono text-white/80 hover:text-white rounded-sm transition-colors'
             "
           >
             {{ level }}x

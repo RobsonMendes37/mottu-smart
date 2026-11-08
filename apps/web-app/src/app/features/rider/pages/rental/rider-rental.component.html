@@ -1,0 +1,160 @@
+<app-mobile-shell
+  [title]="activeSection() === 'deliveries' ? 'Entregas e ganhos' : 'Aluguel e fatura'"
+  [subtitle]="'Placa ' + activePlate() + ' • Ciclo semanal'"
+  [activeTab]="shellActiveTab()"
+>
+  <div class="space-y-4">
+    <!-- Segmented Switcher -->
+    <div class="bg-[#F3F3F3] p-1 rounded-md grid grid-cols-2 gap-1">
+      <button
+        type="button"
+        (click)="setSection('rental')"
+        class="h-10 rounded-sm text-xs font-bold transition-all"
+        [class.bg-white]="activeSection() === 'rental'"
+        [class.text-[#141414]]="activeSection() === 'rental'"
+        [class.shadow-sm]="activeSection() === 'rental'"
+        [class.text-[#545454]]="activeSection() !== 'rental'"
+      >
+        Fatura semanal
+      </button>
+      <button
+        type="button"
+        (click)="setSection('deliveries')"
+        class="h-10 rounded-sm text-xs font-bold transition-all"
+        [class.bg-white]="activeSection() === 'deliveries'"
+        [class.text-[#141414]]="activeSection() === 'deliveries'"
+        [class.shadow-sm]="activeSection() === 'deliveries'"
+        [class.text-[#545454]]="activeSection() !== 'deliveries'"
+      >
+        Entregas da semana
+      </button>
+    </div>
+
+    @if (activeSection() === 'rental') {
+      <!-- Weekly Invoice Hero Card -->
+      <section class="bg-white border border-[#E2E2E2] rounded-lg p-4 space-y-4">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <span class="text-xs font-medium text-[#757575]">Vencimento na segunda-feira</span>
+            <p class="text-2xl font-extrabold font-mono text-[#141414] mt-0.5">
+              R$ {{ weeklyTotalBrl().toFixed(2).replace('.', ',') }}
+            </p>
+          </div>
+          <span class="px-2.5 py-1 rounded-full bg-[#E6F4EE] text-[#046C3A] text-xs font-semibold">
+            Aberta • Em dia
+          </span>
+        </div>
+
+        <!-- Itemized Invoice Breakdown -->
+        <div class="border-t border-[#EEEEEE] pt-3 space-y-2.5 text-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-[#545454]">Plano Minha Mottu Semanal</span>
+            <span class="font-mono font-semibold text-[#141414]">R$ 196,00</span>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-[#046C3A]">Desconto pontualidade em dia</span>
+            <span class="font-mono font-semibold text-[#046C3A]">- R$ 15,00</span>
+          </div>
+
+          @if (chargedInspections().length > 0) {
+            @for (ins of chargedInspections(); track ins.id) {
+              <div class="flex items-center justify-between">
+                <a
+                  [routerLink]="['/rider/inspections', ins.id]"
+                  class="text-[#545454] underline decoration-[#E2E2E2] hover:text-[#141414]"
+                >
+                  Reparo de avaria (#{{ ins.id.slice(0, 6) }})
+                </a>
+                <span class="font-mono font-semibold text-[#141414]">
+                  R$ {{ ins.totalEstimatedBrl.toFixed(2).replace('.', ',') }}
+                </span>
+              </div>
+            }
+          } @else {
+            <div class="flex items-center justify-between text-xs text-[#757575]">
+              <span>Avarias de vistoria nesta semana</span>
+              <span class="font-mono font-semibold text-[#046C3A]">R$ 0,00</span>
+            </div>
+          }
+        </div>
+
+        <!-- Single Primary Green Action -->
+        <button
+          type="button"
+          (click)="copyPixCode()"
+          class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors"
+        >
+          @if (pixCopied()) {
+            <span>Código Pix copiado!</span>
+          } @else {
+            <span>Copiar código Pix da semana</span>
+          }
+        </button>
+
+        <p class="text-[11px] text-[#757575] text-center">
+          Baixa imediata no contrato após o pagamento via Pix.
+        </p>
+      </section>
+
+      <!-- Protection Info Card -->
+      <section class="bg-white border border-[#E2E2E2] rounded-lg p-4 space-y-2">
+        <h3 class="text-sm font-bold text-[#141414]">Transparência na cobrança</h3>
+        <p class="text-xs text-[#545454] leading-relaxed">
+          Itens de desgaste natural (pastilha, relação, pneu no limite) e avarias registradas nas primeiras 48h ou 100 km da retirada têm custo zero na sua fatura.
+        </p>
+      </section>
+    } @else {
+      <!-- Deliveries & Bonus Summary -->
+      <section class="bg-white border border-[#E2E2E2] rounded-lg p-4 space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-[#F3F3F3] rounded-md p-3">
+            <span class="text-[11px] text-[#757575] block">Entregas concluídas</span>
+            <span class="text-xl font-extrabold font-mono text-[#141414] mt-0.5 block">
+              {{ weeklyDeliveriesTotal() }}
+            </span>
+          </div>
+          <div class="bg-[#F3F3F3] rounded-md p-3">
+            <span class="text-[11px] text-[#757575] block">Ganhos acumulados</span>
+            <span class="text-xl font-extrabold font-mono text-[#046C3A] mt-0.5 block">
+              R$ {{ weeklyDeliveryEarningsBrl().toFixed(2).replace('.', ',') }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Weekly Goal Bar -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-[#141414]">Meta semanal (118 / 120 entregas)</span>
+            <span class="font-mono font-bold text-[#046C3A]">+ R$ 40,00 bônus</span>
+          </div>
+          <div class="w-full h-2.5 rounded-full bg-[#F3F3F3] overflow-hidden">
+            <div class="h-full bg-[#05944F] rounded-full" style="width: 98%"></div>
+          </div>
+          <p class="text-[11px] text-[#757575]">
+            Faltam apenas 2 entregas até domingo para abater R$ 40,00 no seu próximo aluguel.
+          </p>
+        </div>
+      </section>
+
+      <!-- Daily List -->
+      <section class="bg-white border border-[#E2E2E2] rounded-lg divide-y divide-[#EEEEEE]">
+        <div class="px-4 py-3">
+          <h3 class="text-sm font-bold text-[#141414]">Histórico diário</h3>
+        </div>
+        @for (day of deliveryDays; track day.dayLabel) {
+          <div class="px-4 py-3 flex items-center justify-between">
+            <div>
+              <p class="text-sm font-semibold text-[#141414]">{{ day.dayLabel }}</p>
+              <p class="text-xs text-[#757575]">{{ day.completedCount }} rotas • Pontualidade {{ day.onTimeRate }}</p>
+            </div>
+            <span class="font-mono text-sm font-bold text-[#141414]">
+              R$ {{ day.earningsBrl.toFixed(2).replace('.', ',') }}
+            </span>
+          </div>
+        }
+      </section>
+    }
+  </div>
+</app-mobile-shell>
+

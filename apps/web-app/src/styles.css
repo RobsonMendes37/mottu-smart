@@ -3,14 +3,14 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
   margin: 0;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  background-color: #0A0E0D;
-  color: #F2F7F5;
+  background-color: #F6F6F6;
+  color: #141414;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

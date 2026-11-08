@@ -1,26 +1,28 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MechanicService } from '../../services/mechanic.service';
 import {
   MechanicQueueItemDto,
   MotorcycleModel,
   QueuePriorityReason,
 } from '../../models/mechanic.models';
+import { DesktopShellComponent } from '../../../../shared/layout/desktop-shell/desktop-shell.component';
 
 export interface PriorityBadgeInfo {
   label: string;
   colorClass: string;
   badgeBg: string;
   borderColor: string;
+  dotColor: string;
   actionText: string;
 }
 
 @Component({
   selector: 'app-t05-queue',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, DesktopShellComponent],
   templateUrl: './t05-queue.component.html',
 })
 export class T05QueueComponent implements OnInit {
@@ -37,6 +39,13 @@ export class T05QueueComponent implements OnInit {
   totalElements = signal<number>(0);
   currentPage = signal<number>(0);
   pageSize = signal<number>(20);
+
+  criticalCount = computed(
+    () => this.queueItems().filter((i) => i.priorityReason === 'CRITICAL_SAFETY').length
+  );
+  contestationCount = computed(
+    () => this.queueItems().filter((i) => i.priorityReason === 'RIDER_CONTESTATION').length
+  );
 
   constructor(mechanicService?: MechanicService, router?: Router) {
     try {
@@ -93,40 +102,44 @@ export class T05QueueComponent implements OnInit {
     this.router.navigate(['/mechanic/workbench', inspectionId]);
   }
 
-  getPriorityBadge(reason: QueuePriorityReason, priorityWeight: number): PriorityBadgeInfo {
+  getPriorityBadge(reason: QueuePriorityReason, _priorityWeight: number): PriorityBadgeInfo {
     switch (reason) {
       case 'CRITICAL_SAFETY':
         return {
-          label: 'P1 • RISCO SEGURANÇA / MOTO PARADA',
-          colorClass: 'text-[#FF4D4F]',
-          badgeBg: 'bg-[#FF4D4F]/15',
-          borderColor: 'border-[#FF4D4F]/40',
-          actionText: 'Avaliar Agora →',
+          label: 'P1 • Moto parada / segurança',
+          colorClass: 'text-[#B91C1C]',
+          badgeBg: 'bg-[#FEE2E2]',
+          borderColor: 'border-[#DC2626]/30',
+          dotColor: 'bg-[#DC2626]',
+          actionText: 'Avaliar agora',
         };
       case 'RIDER_CONTESTATION':
         return {
-          label: 'P2 • CONTESTAÇÃO DO ENTREGADOR',
-          colorClass: 'text-[#FFB300]',
-          badgeBg: 'bg-[#FFB300]/15',
-          borderColor: 'border-[#FFB300]/40',
-          actionText: 'Revisar Contestação →',
+          label: 'P2 • Pedido de revisão',
+          colorClass: 'text-[#92400E]',
+          badgeBg: 'bg-[#FEF3C7]',
+          borderColor: 'border-[#D97706]/30',
+          dotColor: 'bg-[#D97706]',
+          actionText: 'Revisar pedido',
         };
       case 'LOW_AI_CONFIDENCE':
         return {
-          label: 'P3 • DÚVIDA DA IA (<80%)',
-          colorClass: 'text-[#FFB300]',
-          badgeBg: 'bg-[#FFB300]/15',
-          borderColor: 'border-[#FFB300]/40',
-          actionText: 'Inspecionar →',
+          label: 'P3 • Conferência visual',
+          colorClass: 'text-[#92400E]',
+          badgeBg: 'bg-[#FEF3C7]',
+          borderColor: 'border-[#D97706]/30',
+          dotColor: 'bg-[#D97706]',
+          actionText: 'Abrir bancada',
         };
       case 'FRAUD_SUSPICION':
       default:
         return {
-          label: 'P4 • ALERTA FOTO REPETIDA SHA-256',
-          colorClass: 'text-[#29B6F6]',
-          badgeBg: 'bg-[#29B6F6]/15',
-          borderColor: 'border-[#29B6F6]/40',
-          actionText: 'Auditar Foto →',
+          label: 'P4 • Foto repetida',
+          colorClass: 'text-[#334155]',
+          badgeBg: 'bg-[#EEF2F6]',
+          borderColor: 'border-[#334155]/25',
+          dotColor: 'bg-[#0284C7]',
+          actionText: 'Conferir foto',
         };
     }
   }

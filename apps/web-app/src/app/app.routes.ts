@@ -56,6 +56,20 @@ export const routes: Routes = [
             (m) => m.AccidentQuoteComponent
           ),
       },
+      {
+        path: 'rental',
+        loadComponent: () =>
+          import('./features/rider/pages/rental/rider-rental.component').then(
+            (m) => m.RiderRentalComponent
+          ),
+      },
+      {
+        path: 'account',
+        loadComponent: () =>
+          import('./features/rider/pages/account/rider-account.component').then(
+            (m) => m.RiderAccountComponent
+          ),
+      },
     ],
   },
   {
@@ -95,6 +109,20 @@ export const routes: Routes = [
             (m) => m.T07FleetComponent
           ),
       },
+      {
+        path: 'operations',
+        loadComponent: () =>
+          import('./features/mechanic/pages/operations/mechanic-operations.component').then(
+            (m) => m.MechanicOperationsComponent
+          ),
+      },
+      {
+        path: 'account',
+        loadComponent: () =>
+          import('./features/shared/account/staff-account.component').then(
+            (m) => m.StaffAccountComponent
+          ),
+      },
     ],
   },
   {
@@ -130,6 +158,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/manager/pages/t10-analytics/t10-analytics.component').then(
             (m) => m.T10AnalyticsComponent
+          ),
+      },
+      {
+        path: 'billing',
+        loadComponent: () =>
+          import('./features/manager/pages/t12-billing/t12-billing.component').then(
+            (m) => m.T12BillingComponent
+          ),
+      },
+      {
+        path: 'account',
+        loadComponent: () =>
+          import('./features/shared/account/staff-account.component').then(
+            (m) => m.StaffAccountComponent
           ),
       },
     ],

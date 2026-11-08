@@ -187,17 +187,27 @@ describe('T07FleetComponent (Screen T07 - Yard Fleet Management Table)', () => {
     expect(comp.successMessage()).toContain('Moto MOT9Z99 cadastrada com sucesso!');
   });
 
-  it('TC-T07-6: getStatusBadge adheres strictly to Purple Ban', () => {
+  it('TC-T07-6: getStatusBadge adheres strictly to DESIGN.md v2.0 tokens and Purple Ban', () => {
     const available = comp.getStatusBadge('AVAILABLE');
-    expect(available.colorClass).toContain('text-[#00E676]');
+    expect(available.colorClass).toContain('text-[#046C3A]');
     expect(available.colorClass).not.toMatch(/purple|violet|indigo/);
 
     const maintenance = comp.getStatusBadge('IN_MAINTENANCE');
-    expect(maintenance.colorClass).toContain('text-[#FFB300]');
+    expect(maintenance.colorClass).toContain('text-[#92400E]');
     expect(maintenance.colorClass).not.toMatch(/purple|violet|indigo/);
 
     const unavailable = comp.getStatusBadge('UNAVAILABLE');
-    expect(unavailable.colorClass).toContain('text-[#FF4D4F]');
+    expect(unavailable.colorClass).toContain('text-[#B91C1C]');
     expect(unavailable.colorClass).not.toMatch(/purple|violet|indigo/);
+  });
+
+  it('TC-T07-7: Opens and closes right Slide-over Drawer for inspecting a fleet motorcycle', () => {
+    comp.ngOnInit();
+    const target = comp.motorcycles()[0];
+    comp.openInspectDrawer(target);
+    expect(comp.selectedMotorcycle()?.plate).toBe('MOT1A23');
+
+    comp.closeInspectDrawer();
+    expect(comp.selectedMotorcycle()).toBeNull();
   });
 });

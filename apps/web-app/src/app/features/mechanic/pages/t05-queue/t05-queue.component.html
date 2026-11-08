@@ -1,242 +1,230 @@
-<div class="min-h-screen bg-[#0A0E0D] text-[#F2F7F5] flex flex-col">
-  <!-- Top Navigation Header -->
-  <header class="bg-[#121816] border-b border-[#26332E] px-4 lg:px-8 py-3.5 flex items-center justify-between sticky top-0 z-40">
-    <div class="flex items-center gap-6">
-      <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-lg bg-[#00E676] flex items-center justify-center font-bold text-[#06120B] text-base">
-          M
-        </div>
-        <span class="font-extrabold text-lg tracking-tight text-[#F2F7F5]">Mottu Smart Ops</span>
-        <span class="text-xs px-2 py-0.5 rounded-full bg-[#1A2320] text-[#00E676] border border-[#26332E] font-mono font-bold">
-          OFICINA
-        </span>
-      </div>
-
-      <nav class="hidden md:flex items-center gap-1">
-        <a
-          routerLink="/mechanic/queue"
-          class="px-3.5 py-1.5 rounded-md text-sm font-bold bg-[#1A2320] text-[#00E676] border border-[#26332E]"
-        >
-          Fila Inteligente
-        </a>
-        <a
-          routerLink="/mechanic/fleet"
-          class="px-3.5 py-1.5 rounded-md text-sm font-semibold text-[#94A39E] hover:text-[#F2F7F5] hover:bg-[#1A2320]/60 transition-colors"
-        >
-          Controle de Frota
-        </a>
-      </nav>
-    </div>
-
-    <!-- AI Deflection Stat -->
-    <div class="flex items-center gap-2 bg-[#0A0E0D] border border-[#26332E] px-3.5 py-1.5 rounded-lg">
-      <div class="w-2 h-2 rounded-full bg-[#00E676] animate-pulse"></div>
-      <span class="text-xs font-mono text-[#94A39E] hidden sm:inline">Deflexão IA:</span>
-      <span class="text-xs sm:text-sm font-mono font-bold text-[#00E676]">
-        {{ aiDeflectionRate() }}% resolvidos automaticamente hoje
-      </span>
-    </div>
-  </header>
-
-  <!-- Main Content -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-6">
-    <!-- Page Header & Quick Stats -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<app-desktop-shell
+  sectionLabel="Vistorias e oficina"
+  pageTitle="Fila da oficina"
+  activeNav="queue"
+  searchPlaceholder="Buscar placa na fila..."
+  (globalSearch)="onSearchPlate($event)"
+>
+  <div class="space-y-5">
+    <!-- Top Header Row -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div>
-        <h1 class="text-2xl lg:text-3xl font-extrabold text-[#F2F7F5] tracking-tight">
-          Fila da Oficina • Triagem Inteligente
-        </h1>
-        <p class="text-sm text-[#94A39E] mt-1">
-          Casos que exigem validação pericial do mecânico organizados por ordem estrita de risco (P1 → P4).
+        <h2 class="text-xl font-bold text-[#141414]">Fila de vistorias da unidade</h2>
+        <p class="text-sm text-[#545454]">
+          Chamados ordenados por urgência de segurança na rua e pedidos de revisão do entregador.
         </p>
       </div>
 
-      <div class="flex items-center gap-3">
-        <button
-          type="button"
-          (click)="loadQueue()"
-          class="flex items-center gap-2 px-4 py-2.5 bg-[#121816] hover:bg-[#1A2320] text-[#F2F7F5] border border-[#26332E] rounded-md text-sm font-semibold transition-colors"
-        >
-          <svg class="w-4 h-4 text-[#00E676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-          </svg>
-          Atualizar Fila
-        </button>
+      <button
+        type="button"
+        (click)="loadQueue()"
+        class="self-start sm:self-auto px-4 h-10 rounded-md bg-white border border-[#E2E2E2] hover:bg-[#F3F3F3] text-xs font-semibold text-[#141414] transition-colors"
+      >
+        Atualizar fila
+      </button>
+    </div>
+
+    <!-- 4 KPI Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
+        <span class="text-xs font-medium text-[#757575]">Aguardando bancada</span>
+        <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">{{ totalElements() }}</p>
+      </div>
+      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
+        <span class="text-xs font-medium text-[#757575]">Motos paradas (P1)</span>
+        <p class="text-2xl font-extrabold font-mono text-[#DC2626] mt-1">{{ criticalCount() }}</p>
+      </div>
+      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
+        <span class="text-xs font-medium text-[#757575]">Pedidos de revisão</span>
+        <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">{{ contestationCount() }}</p>
+      </div>
+      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
+        <span class="text-xs font-medium text-[#757575]">Resolvidas sem fila</span>
+        <p class="text-2xl font-extrabold font-mono text-[#046C3A] mt-1">{{ aiDeflectionRate() }}%</p>
       </div>
     </div>
 
-    <!-- Filter & Search Bar -->
-    <div class="bg-[#121816] border border-[#26332E] rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <!-- Priority Filters -->
-      <div class="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          (click)="setReason('')"
-          [class]="
-            selectedReason() === ''
-              ? 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#00E676] text-[#06120B]'
-              : 'px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-[#94A39E] bg-[#1A2320] hover:text-[#F2F7F5] border border-[#26332E]'
-          "
-        >
-          TODAS ({{ totalElements() }})
-        </button>
-        <button
-          type="button"
-          (click)="setReason('CRITICAL_SAFETY')"
-          [class]="
-            selectedReason() === 'CRITICAL_SAFETY'
-              ? 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#FF4D4F] text-[#06120B]'
-              : 'px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-[#FF4D4F] bg-[#FF4D4F]/10 hover:bg-[#FF4D4F]/20 border border-[#FF4D4F]/30'
-          "
-        >
-          P1 • RISCO SEGURANÇA
-        </button>
-        <button
-          type="button"
-          (click)="setReason('RIDER_CONTESTATION')"
-          [class]="
-            selectedReason() === 'RIDER_CONTESTATION'
-              ? 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#FFB300] text-[#06120B]'
-              : 'px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-[#FFB300] bg-[#FFB300]/10 hover:bg-[#FFB300]/20 border border-[#FFB300]/30'
-          "
-        >
-          P2 • CONTESTAÇÃO
-        </button>
-        <button
-          type="button"
-          (click)="setReason('LOW_AI_CONFIDENCE')"
-          [class]="
-            selectedReason() === 'LOW_AI_CONFIDENCE'
-              ? 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#FFB300] text-[#06120B]'
-              : 'px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-[#FFB300] bg-[#FFB300]/10 hover:bg-[#FFB300]/20 border border-[#FFB300]/30'
-          "
-        >
-          P3 • DÚVIDA DA IA
-        </button>
-        <button
-          type="button"
-          (click)="setReason('FRAUD_SUSPICION')"
-          [class]="
-            selectedReason() === 'FRAUD_SUSPICION'
-              ? 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#29B6F6] text-[#06120B]'
-              : 'px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-[#29B6F6] bg-[#29B6F6]/10 hover:bg-[#29B6F6]/20 border border-[#29B6F6]/30'
-          "
-        >
-          P4 • FOTO REPETIDA
-        </button>
-      </div>
-
-      <!-- Search Input -->
-      <div class="relative w-full md:w-64">
-        <input
-          type="text"
-          [ngModel]="searchPlate()"
-          (ngModelChange)="onSearchPlate($event)"
-          placeholder="Buscar por placa..."
-          class="w-full bg-[#0A0E0D] border border-[#26332E] focus:border-[#00E676] rounded-md px-3 py-2 text-sm text-[#F2F7F5] placeholder-[#94A39E] outline-none font-mono transition-colors"
-        />
-        <svg
-          class="w-4 h-4 text-[#94A39E] absolute right-3 top-2.5 pointer-events-none"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-        </svg>
-      </div>
-    </div>
-
-    <!-- Error Banner -->
     @if (errorMessage()) {
-      <div class="bg-[#FF4D4F]/10 border border-[#FF4D4F]/30 rounded-lg p-4 text-[#FF4D4F] text-sm flex items-center gap-3">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <span>{{ errorMessage() }}</span>
+      <div role="alert" class="p-4 rounded-lg bg-[#FEE2E2] border border-[#DC2626]/30 text-xs font-medium text-[#B91C1C]">
+        {{ errorMessage() }}
       </div>
     }
 
-    <!-- Loading State -->
-    @if (isLoading()) {
-      <div class="flex flex-col items-center justify-center py-16 space-y-3">
-        <div class="w-8 h-8 border-2 border-[#00E676] border-t-transparent rounded-full animate-spin"></div>
-        <span class="text-sm text-[#94A39E] font-mono">Carregando vistorias pendentes...</span>
-      </div>
-    } @else if (queueItems().length === 0) {
-      <!-- Empty State -->
-      <div class="bg-[#121816] border border-[#26332E] rounded-xl p-12 text-center flex flex-col items-center justify-center space-y-4">
-        <div class="w-16 h-16 rounded-full bg-[#00E676]/10 border border-[#00E676]/30 flex items-center justify-center text-[#00E676]">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-          </svg>
-        </div>
-        <div class="space-y-1">
-          <h3 class="text-lg font-bold text-[#F2F7F5]">Fila de Oficina Vazia</h3>
-          <p class="text-sm text-[#94A39E] max-w-md">
-            Excelente! Nenhuma moto aguardando triagem humana no momento. Todas as vistorias recentes foram resolvidas automaticamente pela IA.
-          </p>
-        </div>
-      </div>
-    } @else {
-      <!-- Priority Queue Items List -->
-      <div class="space-y-3">
-        @for (item of queueItems(); track item.inspectionId) {
-          @let badge = getPriorityBadge(item.priorityReason, item.priorityWeight);
-          <div
-            class="bg-[#121816] hover:bg-[#1A2320] border border-[#26332E] rounded-xl p-4 sm:p-5 transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+    <!-- Uber Clean Table & Mobile List Card -->
+    <section class="bg-white border border-[#E2E2E2] rounded-lg overflow-hidden">
+      <!-- Filter Pills & Search -->
+      <div class="p-4 border-b border-[#EEEEEE] flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div class="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            (click)="setReason('')"
+            class="px-3.5 h-9 rounded-full text-xs font-semibold transition-colors"
+            [class.bg-[#141414]]="selectedReason() === ''"
+            [class.text-white]="selectedReason() === ''"
+            [class.bg-[#F3F3F3]]="selectedReason() !== ''"
+            [class.text-[#545454]]="selectedReason() !== ''"
           >
-            <!-- Left Info Block -->
-            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-              <!-- Priority Indicator Pill -->
-              <div
-                class="px-3 py-1 rounded-md border text-xs font-mono font-bold inline-flex items-center gap-1.5 self-start sm:self-center"
-                [class]="badge.badgeBg + ' ' + badge.colorClass + ' ' + badge.borderColor"
-              >
-                <span class="w-1.5 h-1.5 rounded-full" [class]="item.priorityReason === 'CRITICAL_SAFETY' ? 'bg-[#FF4D4F]' : (item.priorityReason === 'FRAUD_SUSPICION' ? 'bg-[#29B6F6]' : 'bg-[#FFB300]')"></span>
-                {{ badge.label }}
-              </div>
+            Todas ({{ totalElements() }})
+          </button>
+          <button
+            type="button"
+            (click)="setReason('CRITICAL_SAFETY')"
+            class="px-3.5 h-9 rounded-full text-xs font-semibold transition-colors"
+            [class.bg-[#141414]]="selectedReason() === 'CRITICAL_SAFETY'"
+            [class.text-white]="selectedReason() === 'CRITICAL_SAFETY'"
+            [class.bg-[#F3F3F3]]="selectedReason() !== 'CRITICAL_SAFETY'"
+            [class.text-[#545454]]="selectedReason() !== 'CRITICAL_SAFETY'"
+          >
+            Moto parada
+          </button>
+          <button
+            type="button"
+            (click)="setReason('RIDER_CONTESTATION')"
+            class="px-3.5 h-9 rounded-full text-xs font-semibold transition-colors"
+            [class.bg-[#141414]]="selectedReason() === 'RIDER_CONTESTATION'"
+            [class.text-white]="selectedReason() === 'RIDER_CONTESTATION'"
+            [class.bg-[#F3F3F3]]="selectedReason() !== 'RIDER_CONTESTATION'"
+            [class.text-[#545454]]="selectedReason() !== 'RIDER_CONTESTATION'"
+          >
+            Revisão pedida
+          </button>
+          <button
+            type="button"
+            (click)="setReason('LOW_AI_CONFIDENCE')"
+            class="px-3.5 h-9 rounded-full text-xs font-semibold transition-colors"
+            [class.bg-[#141414]]="selectedReason() === 'LOW_AI_CONFIDENCE'"
+            [class.text-white]="selectedReason() === 'LOW_AI_CONFIDENCE'"
+            [class.bg-[#F3F3F3]]="selectedReason() !== 'LOW_AI_CONFIDENCE'"
+            [class.text-[#545454]]="selectedReason() !== 'LOW_AI_CONFIDENCE'"
+          >
+            Conferência visual
+          </button>
+          <button
+            type="button"
+            (click)="setReason('FRAUD_SUSPICION')"
+            class="px-3.5 h-9 rounded-full text-xs font-semibold transition-colors"
+            [class.bg-[#141414]]="selectedReason() === 'FRAUD_SUSPICION'"
+            [class.text-white]="selectedReason() === 'FRAUD_SUSPICION'"
+            [class.bg-[#F3F3F3]]="selectedReason() !== 'FRAUD_SUSPICION'"
+            [class.text-[#545454]]="selectedReason() !== 'FRAUD_SUSPICION'"
+          >
+            Foto repetida
+          </button>
+        </div>
 
-              <!-- Moto & Rider Telemetry -->
-              <div>
-                <div class="flex items-center gap-3">
-                  <span class="text-lg font-mono font-extrabold text-[#F2F7F5] tracking-wider">
-                    {{ item.plate }}
-                  </span>
-                  <span class="text-sm text-[#94A39E]">
-                    • {{ formatModel(item.motorcycleModel) }}
-                  </span>
-                </div>
-                <div class="flex items-center gap-2 mt-1 text-xs text-[#94A39E]">
-                  <span>Entregador: <strong class="text-[#F2F7F5]">{{ item.riderName }}</strong></span>
-                  <span>•</span>
-                  <span>Sugestão IA: <strong class="text-[#00E676]">{{ formatVerdict(item.aiSuggestedVerdict) }} ({{ (item.aiConfidence * 100).toFixed(0) }}%)</strong></span>
-                </div>
-              </div>
-            </div>
+        <input
+          type="search"
+          [ngModel]="searchPlate()"
+          (ngModelChange)="onSearchPlate($event)"
+          placeholder="Buscar placa (ex.: MOT1A23)..."
+          aria-label="Filtrar fila por placa"
+          class="w-full lg:w-64 h-10 px-3.5 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] font-mono text-xs text-[#141414] uppercase focus:outline-none"
+        />
+      </div>
 
-            <!-- Right Action CTA Block -->
-            <div class="flex items-center justify-between lg:justify-end gap-3 pt-2 lg:pt-0 border-t lg:border-t-0 border-[#26332E]">
-              <span class="text-xs font-mono text-[#94A39E]">
-                {{ item.createdAt | date:'HH:mm:ss dd/MM' }}
-              </span>
+      @if (isLoading()) {
+        <div class="p-8 text-center text-sm text-[#757575]">Atualizando chamados da oficina...</div>
+      } @else if (queueItems().length === 0) {
+        <div class="p-10 text-center space-y-1">
+          <p class="text-sm font-bold text-[#141414]">Nenhuma vistoria pendente nesta visão</p>
+          <p class="text-xs text-[#757575]">As vistorias rotineiras seguem resolvidas sem fila humana.</p>
+        </div>
+      } @else {
+        <!-- Desktop Table View -->
+        <div class="hidden md:block overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-[#F3F3F3] text-[#757575] text-xs font-semibold border-b border-[#E2E2E2]">
+                <th class="py-3 px-4">Prioridade / Motivo</th>
+                <th class="py-3 px-4">Veículo</th>
+                <th class="py-3 px-4">Entregador</th>
+                <th class="py-3 px-4">Pré-análise</th>
+                <th class="py-3 px-4">Entrada</th>
+                <th class="py-3 px-4 text-right">Ação</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#EEEEEE] text-sm">
+              @for (item of queueItems(); track item.inspectionId; let first = $first) {
+                @let badge = getPriorityBadge(item.priorityReason, item.priorityWeight);
+                <tr class="hover:bg-[#F6F6F6]/70 transition-colors">
+                  <td class="py-3.5 px-4">
+                    <span class="inline-flex items-center gap-2 text-xs font-semibold text-[#141414]">
+                      <span class="w-2 h-2 rounded-full shrink-0" [ngClass]="badge.dotColor"></span>
+                      {{ badge.label }}
+                    </span>
+                  </td>
+                  <td class="py-3.5 px-4">
+                    <span class="font-mono text-xs font-bold text-[#141414] bg-[#F3F3F3] px-2 py-0.5 rounded">
+                      {{ item.plate }}
+                    </span>
+                    <span class="block text-xs text-[#757575] mt-0.5">
+                      {{ formatModel(item.motorcycleModel) }}
+                    </span>
+                  </td>
+                  <td class="py-3.5 px-4 font-medium text-[#141414]">{{ item.riderName }}</td>
+                  <td class="py-3.5 px-4 text-xs text-[#545454]">
+                    {{ item.aiSuggestedVerdict ? formatVerdict(item.aiSuggestedVerdict) : 'Aguardando parecer' }}
+                  </td>
+                  <td class="py-3.5 px-4 font-mono text-xs text-[#757575]">
+                    {{ item.createdAt | date: 'dd/MM HH:mm' }}
+                  </td>
+                  <td class="py-3.5 px-4 text-right">
+                    <button
+                      type="button"
+                      (click)="openWorkbench(item.inspectionId)"
+                      class="px-3.5 h-9 rounded-md text-xs font-bold transition-colors"
+                      [class.bg-[#05944F]]="first || item.priorityReason === 'CRITICAL_SAFETY'"
+                      [class.hover:bg-[#047840]]="first || item.priorityReason === 'CRITICAL_SAFETY'"
+                      [class.text-white]="first || item.priorityReason === 'CRITICAL_SAFETY'"
+                      [class.bg-[#F3F3F3]]="!first && item.priorityReason !== 'CRITICAL_SAFETY'"
+                      [class.hover:bg-[#E2E2E2]]="!first && item.priorityReason !== 'CRITICAL_SAFETY'"
+                      [class.text-[#141414]]="!first && item.priorityReason !== 'CRITICAL_SAFETY'"
+                    >
+                      {{ badge.actionText }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Yard Cards (< md) -->
+        <div class="md:hidden divide-y divide-[#EEEEEE]">
+          @for (item of queueItems(); track item.inspectionId; let first = $first) {
+            @let badge = getPriorityBadge(item.priorityReason, item.priorityWeight);
+            <div class="p-4 space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-semibold" [ngClass]="badge.colorClass">
+                    <span class="w-2 h-2 rounded-full" [ngClass]="badge.dotColor"></span>
+                    {{ badge.label }}
+                  </span>
+                  <p class="font-mono text-lg font-extrabold text-[#141414] mt-1">{{ item.plate }}</p>
+                  <p class="text-xs text-[#545454]">
+                    {{ formatModel(item.motorcycleModel) }} • {{ item.riderName }}
+                  </p>
+                </div>
+                <span class="font-mono text-[11px] text-[#757575]">
+                  {{ item.createdAt | date: 'HH:mm' }}
+                </span>
+              </div>
 
               <button
                 type="button"
                 (click)="openWorkbench(item.inspectionId)"
-                [class]="
-                  item.priorityReason === 'CRITICAL_SAFETY'
-                    ? 'px-4 py-2.5 rounded-lg text-sm font-bold bg-[#FF4D4F] text-[#06120B] hover:bg-[#FF4D4F]/90 transition-colors flex items-center gap-1.5 shadow-sm'
-                    : (item.priorityReason === 'FRAUD_SUSPICION'
-                        ? 'px-4 py-2.5 rounded-lg text-sm font-bold bg-[#29B6F6] text-[#06120B] hover:bg-[#29B6F6]/90 transition-colors flex items-center gap-1.5 shadow-sm'
-                        : 'px-4 py-2.5 rounded-lg text-sm font-bold bg-[#00E676] text-[#06120B] hover:bg-[#00C853] transition-colors flex items-center gap-1.5 shadow-sm')
-                "
+                class="w-full h-12 rounded-md text-xs font-bold transition-colors"
+                [class.bg-[#05944F]]="first || item.priorityReason === 'CRITICAL_SAFETY'"
+                [class.text-white]="first || item.priorityReason === 'CRITICAL_SAFETY'"
+                [class.bg-[#141414]]="!first && item.priorityReason !== 'CRITICAL_SAFETY'"
+                [class.text-white]="true"
               >
                 {{ badge.actionText }}
               </button>
             </div>
-          </div>
-        }
-      </div>
-    }
-  </main>
-</div>
+          }
+        </div>
+      }
+    </section>
+  </div>
+</app-desktop-shell>

@@ -1,274 +1,287 @@
-<div class="min-h-screen bg-[#0A0E0D] text-[#F2F7F5] flex flex-col items-center px-4 py-6">
-  <div class="w-full max-w-[420px] flex flex-col gap-5">
-    <!-- Header with Back Button -->
-    <header class="flex items-center gap-3 pt-2">
+<div class="min-h-screen bg-[#F6F6F6] text-[#141414] flex flex-col">
+  <!-- Sticky Top Wizard Header -->
+  <header class="sticky top-0 z-30 bg-white border-b border-[#EEEEEE]">
+    <div class="max-w-md mx-auto px-4 h-14 flex items-center justify-between gap-3">
       <button
         type="button"
         (click)="onBack()"
-        title="Voltar para Garagem"
-        class="p-2 text-[#94A39E] hover:text-[#F2F7F5] bg-[#121816] border border-[#26332E] rounded-xl transition"
+        class="h-9 px-3 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-xs font-semibold text-[#141414] flex items-center gap-1.5 transition-colors"
       >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
+        <span>←</span>
+        <span>Voltar</span>
       </button>
-
-      <div class="flex flex-col">
-        <span class="text-xs font-semibold text-[#94A39E] uppercase tracking-wider">Passo a Passo</span>
-        <h1 class="text-xl font-bold text-[#F2F7F5]">Nova Vistoria • Foto e Contexto</h1>
+      <div class="text-center">
+        <h1 class="text-sm font-bold text-[#141414]">Nova vistoria</h1>
+        <p class="text-[11px] text-[#757575]">Tire fotos nítidas em local iluminado</p>
       </div>
-    </header>
-
-    <!-- 4 Photo Slots Grid (Multi-slot staging) -->
-    <div class="flex flex-col gap-2">
-      <span class="text-xs font-bold text-[#94A39E] uppercase tracking-wider">Slots de Fotos (1 Obrigatória)</span>
-      <div class="grid grid-cols-2 gap-2.5">
-        @for (slot of slots(); track slot.slot) {
-          <div
-            (click)="setActiveSlot(slot.slot)"
-            [ngClass]="{
-              'border-[#00E676] bg-[#1A2320] shadow-sm shadow-[#00E676]/20': activeSlot() === slot.slot,
-              'border-[#26332E] bg-[#121816] opacity-90': activeSlot() !== slot.slot
-            }"
-            class="rounded-xl p-3 border flex flex-col gap-1.5 cursor-pointer transition min-h-[76px] relative"
-          >
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold truncate max-w-[120px]" [ngClass]="activeSlot() === slot.slot ? 'text-[#00E676]' : 'text-[#F2F7F5]'">
-                {{ slot.label.split('.')[1] || slot.label }}
-              </span>
-              @if (slot.photoObjectKey) {
-                <span class="text-[#00E676] font-mono text-xs font-bold">✓</span>
-              } @else if (slot.slot === 'damage') {
-                <span class="text-[#FFB300] font-mono text-[10px]">*Obrig.</span>
-              }
-            </div>
-
-            @if (slot.previewUrl) {
-              <div class="flex items-center justify-between mt-auto">
-                <span class="text-[11px] font-mono text-[#94A39E]">Pronta</span>
-                <button
-                  type="button"
-                  (click)="onRemoveSlotPhoto(slot.slot, $event)"
-                  title="Remover foto"
-                  class="text-[11px] text-[#FF4D4F] hover:underline"
-                >
-                  Trocar
-                </button>
-              </div>
-            } @else {
-              <span class="text-[11px] text-[#94A39E] mt-auto">Toque p/ enviar</span>
-            }
-          </div>
-        }
-      </div>
+      <span class="w-14 text-right font-mono text-xs font-semibold text-[#545454]">
+        @if (isPrimaryPhotoReady()) { Pronta } @else { Passo 1 }
+      </span>
     </div>
 
-    <!-- Active Camera Guide & Upload Box -->
-    <div class="bg-[#121816] rounded-2xl p-4 border border-[#26332E] flex flex-col gap-3">
-      <!-- Slot Title & Luminance Status -->
-      <div class="flex flex-col gap-1">
-        <span class="text-xs text-[#94A39E]">Slot selecionado: <strong class="text-[#F2F7F5]">{{ activeSlotLabel() }}</strong></span>
-
-        @if (activeSlotState()?.isDark) {
-          <div class="flex items-center gap-1.5 text-[#FFB300] font-mono text-xs font-bold">
-            <span class="w-2 h-2 rounded-full bg-[#FFB300] animate-ping"></span>
-            <span>AMBIENTE MUITO ESCURO • LIGUE O FLASH OU ILUMINE A PEÇA</span>
-          </div>
-        } @else {
-          <div class="flex items-center gap-1.5 text-[#00E676] font-mono text-xs font-bold">
-            <span class="w-2 h-2 rounded-full bg-[#00E676]"></span>
-            <span>ILUMINAÇÃO BOA • ENQUADRE A PEÇA NO CENTRO</span>
-          </div>
-        }
-      </div>
-
-      <!-- Dashed Guide Focus Target Box -->
-      <div
-        (click)="fileInput.click()"
-        class="h-36 rounded-xl border-2 border-dashed border-[#00E676]/40 flex flex-col items-center justify-center bg-[#1A2320] cursor-pointer hover:border-[#00E676] transition relative overflow-hidden"
-      >
-        <input
-          #fileInput
-          type="file"
-          accept="image/*"
-          capture="environment"
-          (change)="onFileSelected($event)"
-          class="hidden"
-        />
-
-        @if (isUploading()) {
-          <div class="flex flex-col items-center gap-2 text-[#00E676]">
-            <div class="w-7 h-7 border-2 border-[#00E676] border-t-transparent rounded-full animate-spin"></div>
-            <span class="text-xs font-mono font-bold">Comprimindo WebP & Enviando...</span>
-          </div>
-        } @else if (activeSlotState()?.previewUrl) {
-          <img [src]="activeSlotState()!.previewUrl" alt="Preview da peça" class="w-full h-full object-cover rounded-lg" />
-          <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition">
-            <span class="text-xs font-bold bg-[#121816]/90 px-3 py-1.5 rounded-lg text-[#F2F7F5]">Toque para trocar foto</span>
-          </div>
-        } @else {
-          <div class="flex flex-col items-center gap-2 text-center p-3">
-            <svg class="w-8 h-8 text-[#00E676]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span class="text-sm font-semibold text-[#F2F7F5]">[ Tirar Foto / Escolher Imagem &le; 10MB ]</span>
-            <span class="text-[11px] text-[#94A39E]">Compressão WebP automática &le; 500 KB</span>
-          </div>
-        }
-      </div>
-
-      @if (uploadErrorMessage()) {
-        <span class="text-xs text-[#FF4D4F] font-semibold">{{ uploadErrorMessage() }}</span>
+    <!-- Step Progress Bars -->
+    <div class="max-w-md mx-auto px-4 pb-2.5 grid grid-cols-4 gap-1.5">
+      @for (s of slots(); track s.slot) {
+        <div
+          class="h-1 rounded-full transition-colors"
+          [class.bg-[#05944F]]="!!s.photoObjectKey"
+          [class.bg-[#141414]]="!s.photoObjectKey && activeSlot() === s.slot"
+          [class.bg-[#E2E2E2]]="!s.photoObjectKey && activeSlot() !== s.slot"
+        ></div>
       }
     </div>
+  </header>
 
-    <!-- Passo 2: Contexto e Origem -->
-    <div class="flex flex-col gap-3">
-      <label class="text-sm font-bold text-[#F2F7F5]">Como aconteceu?</label>
-      <div class="flex flex-col gap-2">
-        <button
-          type="button"
-          (click)="setContext('RECEIVED_LIKE_THIS')"
-          [ngClass]="{
-            'border-[#00E676] bg-[#1A2320] text-[#00E676]': reportedContext() === 'RECEIVED_LIKE_THIS',
-            'border-[#26332E] bg-[#121816] text-[#F2F7F5]': reportedContext() !== 'RECEIVED_LIKE_THIS'
-          }"
-          class="min-h-[48px] rounded-xl px-4 border text-left flex items-center justify-between text-sm font-semibold transition active:scale-[0.99]"
-        >
-          <span>● Já recebi a moto assim (&le; 48h ou 100 km)</span>
-          @if (reportedContext() === 'RECEIVED_LIKE_THIS') {
-            <span class="text-xs font-mono font-bold">SELECIONADO</span>
-          }
-        </button>
-
-        <button
-          type="button"
-          (click)="setContext('NORMAL_USE_WEAR')"
-          [ngClass]="{
-            'border-[#00E676] bg-[#1A2320] text-[#00E676]': reportedContext() === 'NORMAL_USE_WEAR',
-            'border-[#26332E] bg-[#121816] text-[#F2F7F5]': reportedContext() !== 'NORMAL_USE_WEAR'
-          }"
-          class="min-h-[48px] rounded-xl px-4 border text-left flex items-center justify-between text-sm font-semibold transition active:scale-[0.99]"
-        >
-          <span>● Gastou no uso normal / Peça de desgaste</span>
-          @if (reportedContext() === 'NORMAL_USE_WEAR') {
-            <span class="text-xs font-mono font-bold">SELECIONADO</span>
-          }
-        </button>
-
-        <button
-          type="button"
-          (click)="setContext('ACCIDENT_OR_DROP')"
-          [ngClass]="{
-            'border-[#00E676] bg-[#1A2320] text-[#00E676]': reportedContext() === 'ACCIDENT_OR_DROP',
-            'border-[#26332E] bg-[#121816] text-[#F2F7F5]': reportedContext() !== 'ACCIDENT_OR_DROP'
-          }"
-          class="min-h-[48px] rounded-xl px-4 border text-left flex items-center justify-between text-sm font-semibold transition active:scale-[0.99]"
-        >
-          <span>● Tive queda / batida / impacto</span>
-          @if (reportedContext() === 'ACCIDENT_OR_DROP') {
-            <span class="text-xs font-mono font-bold">SELECIONADO</span>
-          }
-        </button>
-      </div>
-    </div>
-
-    <!-- Safety Risk Toggle -->
-    <div class="flex flex-col gap-2">
-      <label class="text-sm font-bold text-[#F2F7F5]">Condição da Moto:</label>
-      <div class="grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          (click)="setSafetyRisk('SAFE_TO_RIDE')"
-          [ngClass]="{
-            'border-[#00E676] bg-[#1A2320] text-[#00E676] font-bold': safetyRisk() === 'SAFE_TO_RIDE',
-            'border-[#26332E] bg-[#121816] text-[#94A39E]': safetyRisk() !== 'SAFE_TO_RIDE'
-          }"
-          class="min-h-[48px] rounded-xl p-3 border text-xs text-center transition flex items-center justify-center"
-        >
-          Consigo continuar rodando
-        </button>
-
-        <button
-          type="button"
-          (click)="setSafetyRisk('CRITICAL_STOPPED')"
-          [ngClass]="{
-            'border-[#FF4D4F] bg-[#FF4D4F]/10 text-[#FF4D4F] font-bold': safetyRisk() === 'CRITICAL_STOPPED',
-            'border-[#26332E] bg-[#121816] text-[#94A39E]': safetyRisk() !== 'CRITICAL_STOPPED'
-          }"
-          class="min-h-[48px] rounded-xl p-3 border text-xs text-center transition flex items-center justify-center"
-        >
-          Risco / Moto parada
-        </button>
-      </div>
-    </div>
-
-    <!-- Odometer Input Box -->
-    <div class="flex flex-col gap-1.5">
-      <div class="h-[52px] bg-[#121816] rounded-xl px-4 flex items-center justify-between border" [ngClass]="isOdometerInvalid() ? 'border-[#FF4D4F]' : 'border-[#26332E]'">
-        <label for="odometerInput" class="text-sm text-[#94A39E]">Km no painel agora:</label>
-        <div class="flex items-center gap-1.5">
-          <input
-            id="odometerInput"
-            type="number"
-            [ngModel]="reportedOdometer()"
-            (ngModelChange)="onOdometerChange($event)"
-            class="font-mono text-base font-bold text-[#F2F7F5] bg-transparent text-right outline-none w-28"
+  <main class="flex-1 w-full max-w-md mx-auto px-4 py-4 pb-28 space-y-4">
+    <!-- Dark Camera Viewfinder (Intentional Dark Exception per DESIGN.md) -->
+    <section class="rounded-xl overflow-hidden bg-[#1C1F1E] text-white border border-[#E2E2E2] shadow-sm">
+      <div class="relative aspect-[4/3] w-full flex flex-col items-center justify-center p-4">
+        @if (activeSlotState()?.previewUrl; as preview) {
+          <img
+            [src]="preview"
+            alt="Prévia da foto capturada"
+            [attr.aria-label]="activeSlotLabel()"
+            class="absolute inset-0 w-full h-full object-cover"
           />
-          <span class="font-mono text-xs text-[#94A39E]">km</span>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/35"></div>
+        } @else {
+          <!-- Clean Framing Reticle -->
+          <div class="absolute inset-5 border border-dashed border-white/35 rounded-lg pointer-events-none"></div>
+          <div class="z-10 text-center space-y-1.5 px-4">
+            <div class="w-12 h-12 rounded-full bg-white/10 mx-auto flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8a2 2 0 012-2h2.2l1.4-2h6.8l1.4 2H19a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+                <circle cx="12" cy="13" r="3.5" />
+              </svg>
+            </div>
+            <p class="text-sm font-bold text-white">{{ activeSlotLabel() }}</p>
+            <p class="text-xs text-white/70">Centralize a peça dentro da moldura antes de capturar</p>
+          </div>
+        }
+
+        <!-- Active Slot Pill -->
+        <div class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-black/65 text-[11px] font-semibold text-white">
+          {{ activeSlotLabel() }}
+        </div>
+
+        <!-- Low Luminance Warning -->
+        @if (activeSlotState()?.isDark) {
+          <div class="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-[#FEF3C7] text-[#92400E] text-[11px] font-bold">
+            Foto com pouca luz
+          </div>
+        }
+
+        <!-- Capture Trigger -->
+        <div class="absolute bottom-3 inset-x-3 flex items-center justify-between gap-2">
+          <label
+            class="flex-1 h-12 rounded-md bg-white hover:bg-[#F3F3F3] text-[#141414] font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors shadow"
+          >
+            @if (isUploading()) {
+              <span>Comprimindo e enviando foto...</span>
+            } @else if (activeSlotState()?.photoObjectKey) {
+              <span>Tirar outra foto deste ângulo</span>
+            } @else {
+              <span>Abrir câmera / enviar foto</span>
+            }
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              aria-label="Capturar ou enviar foto da vistoria"
+              class="hidden"
+              [disabled]="isUploading()"
+              (change)="onFileSelected($event)"
+            />
+          </label>
         </div>
       </div>
+    </section>
 
-      @if (odometerErrorMessage()) {
-        <span class="text-xs text-[#FF4D4F] px-1 font-semibold">{{ odometerErrorMessage() }}</span>
-      }
-    </div>
-
-    <!-- Rider Notes (Optional) -->
-    <div class="flex flex-col gap-1.5">
-      <div class="flex items-center justify-between">
-        <label for="notesInput" class="text-xs font-semibold text-[#94A39E]">Observações adicionais (opcional):</label>
-        <span class="text-xs font-mono text-[#94A39E]">{{ riderNotes().length }}/300</span>
-      </div>
-      <textarea
-        id="notesInput"
-        rows="2"
-        maxlength="300"
-        [ngModel]="riderNotes()"
-        (ngModelChange)="onNotesChange($event)"
-        placeholder="Descreva detalhes que ajudem a IA e o mecânico..."
-        class="bg-[#121816] border border-[#26332E] rounded-xl p-3 text-sm text-[#F2F7F5] outline-none focus:border-[#00E676] resize-none"
-      ></textarea>
-    </div>
-
-    <!-- Error Alert Banner -->
-    @if (submitErrorMessage()) {
-      <div class="bg-[#FF4D4F]/10 border border-[#FF4D4F]/30 rounded-xl p-3.5 flex items-start gap-2 text-xs text-[#FF4D4F]">
-        <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span>{{ submitErrorMessage() }}</span>
+    @if (uploadErrorMessage()) {
+      <div role="alert" class="p-3.5 rounded-lg bg-[#FEE2E2] border border-[#DC2626]/30 text-xs font-medium text-[#B91C1C]">
+        {{ uploadErrorMessage() }}
       </div>
     }
 
-    <!-- Submit CTA -->
-    <button
-      type="button"
-      (click)="onSubmit()"
-      [disabled]="!canSubmit()"
-      [ngClass]="{
-        'opacity-50 cursor-not-allowed bg-[#1A2320] text-[#94A39E] border border-[#26332E]': !canSubmit(),
-        'bg-[#00E676] hover:bg-[#00C853] text-[#06120B] active:scale-[0.98] shadow-lg shadow-[#00E676]/20': canSubmit()
-      }"
-      class="w-full h-[52px] font-extrabold text-base rounded-xl flex items-center justify-center gap-2 transition"
-    >
-      @if (store.isSubmittingInspection()) {
-        <div class="w-5 h-5 border-2 border-[#06120B] border-t-transparent rounded-full animate-spin"></div>
-        <span>Enviando para Análise...</span>
-      } @else {
-        <span>Enviar para Análise</span>
-      }
-    </button>
-  </div>
+    <!-- 4 Angle Slots Selector Card -->
+    <section class="bg-white border border-[#E2E2E2] rounded-lg p-4 space-y-2.5">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xs font-bold text-[#141414]">Ângulos da vistoria</h2>
+        <span class="text-[11px] text-[#757575]">Ângulo 1 obrigatório</span>
+      </div>
+
+      <div class="grid grid-cols-4 gap-2">
+        @for (s of slots(); track s.slot) {
+          <button
+            type="button"
+            (click)="setActiveSlot(s.slot)"
+            class="relative h-16 rounded-md border overflow-hidden flex flex-col items-center justify-center p-1 text-center transition-all"
+            [class.border-[#141414]]="activeSlot() === s.slot"
+            [class.border-2]="activeSlot() === s.slot"
+            [class.border-[#E2E2E2]]="activeSlot() !== s.slot"
+            [class.bg-[#F3F3F3]]="!s.previewUrl"
+          >
+            @if (s.previewUrl) {
+              <img [src]="s.previewUrl" alt="Miniatura do ângulo capturado" [attr.aria-label]="s.label" class="absolute inset-0 w-full h-full object-cover" />
+              <span class="relative z-10 px-1.5 py-0.5 rounded bg-[#05944F] text-white text-[10px] font-bold">
+                OK
+              </span>
+              <span
+                (click)="onRemoveSlotPhoto(s.slot, $event)"
+                role="button"
+                aria-label="Remover foto"
+                class="absolute top-0.5 right-0.5 z-10 w-4 h-4 rounded-full bg-black/70 text-white text-[10px] flex items-center justify-center"
+              >
+                ×
+              </span>
+            } @else {
+              <span class="text-[10px] font-semibold text-[#545454] leading-tight line-clamp-2">
+                {{ s.slot === 'damage' ? '1. Avaria*' : s.slot === 'odometer' ? '2. Painel' : s.slot === 'front' ? '3. Frente' : '4. Detalhe' }}
+              </span>
+            }
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- Condition & Context Card -->
+    <section class="bg-white border border-[#E2E2E2] rounded-lg p-4 space-y-4">
+      <div>
+        <span class="block text-xs font-bold text-[#141414] mb-2">Condição de rodagem agora</span>
+        <div class="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            (click)="setSafetyRisk('SAFE_TO_RIDE')"
+            class="h-12 px-3 rounded-md border text-xs font-bold transition-colors"
+            [class.bg-[#141414]]="safetyRisk() === 'SAFE_TO_RIDE'"
+            [class.text-white]="safetyRisk() === 'SAFE_TO_RIDE'"
+            [class.border-[#141414]]="safetyRisk() === 'SAFE_TO_RIDE'"
+            [class.bg-[#F3F3F3]]="safetyRisk() !== 'SAFE_TO_RIDE'"
+            [class.text-[#545454]]="safetyRisk() !== 'SAFE_TO_RIDE'"
+            [class.border-transparent]="safetyRisk() !== 'SAFE_TO_RIDE'"
+          >
+            Posso seguir rodando
+          </button>
+          <button
+            type="button"
+            (click)="setSafetyRisk('CRITICAL_STOPPED')"
+            class="h-12 px-3 rounded-md border text-xs font-bold transition-colors"
+            [class.bg-[#DC2626]]="safetyRisk() === 'CRITICAL_STOPPED'"
+            [class.text-white]="safetyRisk() === 'CRITICAL_STOPPED'"
+            [class.border-[#DC2626]]="safetyRisk() === 'CRITICAL_STOPPED'"
+            [class.bg-[#F3F3F3]]="safetyRisk() !== 'CRITICAL_STOPPED'"
+            [class.text-[#545454]]="safetyRisk() !== 'CRITICAL_STOPPED'"
+            [class.border-transparent]="safetyRisk() !== 'CRITICAL_STOPPED'"
+          >
+            Moto parada / sem freio
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <span class="block text-xs font-bold text-[#141414] mb-2">Quando você percebeu?</span>
+        <div class="space-y-2">
+          <button
+            type="button"
+            (click)="setContext('RECEIVED_LIKE_THIS')"
+            class="w-full h-12 px-3.5 rounded-md border text-left text-xs font-semibold flex items-center justify-between transition-colors"
+            [class.border-[#141414]]="reportedContext() === 'RECEIVED_LIKE_THIS'"
+            [class.bg-white]="reportedContext() === 'RECEIVED_LIKE_THIS'"
+            [class.text-[#141414]]="reportedContext() === 'RECEIVED_LIKE_THIS'"
+            [class.border-transparent]="reportedContext() !== 'RECEIVED_LIKE_THIS'"
+            [class.bg-[#F3F3F3]]="reportedContext() !== 'RECEIVED_LIKE_THIS'"
+            [class.text-[#545454]]="reportedContext() !== 'RECEIVED_LIKE_THIS'"
+          >
+            <span>Já recebi a moto assim no galpão</span>
+            @if (reportedContext() === 'RECEIVED_LIKE_THIS') { <span class="font-bold">✓</span> }
+          </button>
+
+          <button
+            type="button"
+            (click)="setContext('NORMAL_USE_WEAR')"
+            class="w-full h-12 px-3.5 rounded-md border text-left text-xs font-semibold flex items-center justify-between transition-colors"
+            [class.border-[#141414]]="reportedContext() === 'NORMAL_USE_WEAR'"
+            [class.bg-white]="reportedContext() === 'NORMAL_USE_WEAR'"
+            [class.text-[#141414]]="reportedContext() === 'NORMAL_USE_WEAR'"
+            [class.border-transparent]="reportedContext() !== 'NORMAL_USE_WEAR'"
+            [class.bg-[#F3F3F3]]="reportedContext() !== 'NORMAL_USE_WEAR'"
+            [class.text-[#545454]]="reportedContext() !== 'NORMAL_USE_WEAR'"
+          >
+            <span>Desgaste natural de uso diário</span>
+            @if (reportedContext() === 'NORMAL_USE_WEAR') { <span class="font-bold">✓</span> }
+          </button>
+
+          <button
+            type="button"
+            (click)="setContext('ACCIDENT_OR_DROP')"
+            class="w-full h-12 px-3.5 rounded-md border text-left text-xs font-semibold flex items-center justify-between transition-colors"
+            [class.border-[#141414]]="reportedContext() === 'ACCIDENT_OR_DROP'"
+            [class.bg-white]="reportedContext() === 'ACCIDENT_OR_DROP'"
+            [class.text-[#141414]]="reportedContext() === 'ACCIDENT_OR_DROP'"
+            [class.border-transparent]="reportedContext() !== 'ACCIDENT_OR_DROP'"
+            [class.bg-[#F3F3F3]]="reportedContext() !== 'ACCIDENT_OR_DROP'"
+            [class.text-[#545454]]="reportedContext() !== 'ACCIDENT_OR_DROP'"
+          >
+            <span>Queda parada ou esbarrão em rota</span>
+            @if (reportedContext() === 'ACCIDENT_OR_DROP') { <span class="font-bold">✓</span> }
+          </button>
+        </div>
+      </div>
+
+      <!-- Odometer & Optional Notes -->
+      <div>
+        <label for="odometerInput" class="block text-xs font-bold text-[#141414] mb-1.5">
+          Quilometragem no painel (km)
+        </label>
+        <input
+          id="odometerInput"
+          type="number"
+          [ngModel]="reportedOdometer()"
+          (ngModelChange)="onOdometerChange($event)"
+          class="w-full h-touch px-3.5 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] font-mono text-base font-bold text-[#141414] focus:outline-none"
+        />
+        @if (odometerErrorMessage()) {
+          <p class="text-xs text-[#B91C1C] font-medium mt-1">{{ odometerErrorMessage() }}</p>
+        }
+      </div>
+
+      <div>
+        <label for="riderNotes" class="block text-xs font-bold text-[#141414] mb-1.5">
+          Observação rápida para a oficina (opcional)
+        </label>
+        <textarea
+          id="riderNotes"
+          rows="2"
+          [ngModel]="riderNotes()"
+          (ngModelChange)="onNotesChange($event)"
+          placeholder="Ex.: Manete ficou frouxo quando estacionei..."
+          class="w-full p-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm text-[#141414] placeholder-[#757575] focus:outline-none"
+        ></textarea>
+      </div>
+    </section>
+
+    @if (submitErrorMessage()) {
+      <div role="alert" class="p-3.5 rounded-lg bg-[#FEE2E2] border border-[#DC2626]/30 text-xs font-medium text-[#B91C1C]">
+        {{ submitErrorMessage() }}
+      </div>
+    }
+  </main>
+
+  <!-- Sticky Action Footer -->
+  <footer class="fixed bottom-0 inset-x-0 z-30 bg-white border-t border-[#EEEEEE] p-3">
+    <div class="max-w-md mx-auto">
+      <button
+        type="button"
+        [disabled]="!canSubmit()"
+        (click)="onSubmit()"
+        class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] disabled:bg-[#F3F3F3] disabled:text-[#757575] text-white font-bold text-sm transition-colors"
+      >
+        @if (store.isSubmittingInspection()) {
+          <span>Enviando vistoria...</span>
+        } @else {
+          <span>Enviar vistoria</span>
+        }
+      </button>
+    </div>
+  </footer>
 </div>

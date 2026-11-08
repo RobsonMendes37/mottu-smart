@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MechanicService } from '../../services/mechanic.service';
 import { PhotoZoomLensComponent } from '../../components/photo-zoom-lens/photo-zoom-lens.component';
+import { DesktopShellComponent } from '../../../../shared/layout/desktop-shell/desktop-shell.component';
 import {
   DamageBoundingBox,
   DamageVerdict,
@@ -16,7 +17,7 @@ import {
 @Component({
   selector: 'app-t06-workbench',
   standalone: true,
-  imports: [CommonModule, FormsModule, PhotoZoomLensComponent],
+  imports: [CommonModule, FormsModule, PhotoZoomLensComponent, DesktopShellComponent],
   templateUrl: './t06-workbench.component.html',
 })
 export class T06WorkbenchComponent implements OnInit {

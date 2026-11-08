@@ -157,4 +157,17 @@ describe('T08ApprovalsComponent (Screen T08 - User & Contract Approvals)', () =>
     expect(comp.errorMessage()).toContain('Erro ao carregar');
     expect(comp.isLoading()).toBe(false);
   });
+
+  it('TC-T08-9: Supports inline search and right 400px Slide-over Drawer selection', () => {
+    comp.ngOnInit();
+    comp.onSearch('Carlos');
+    expect(comp.filteredUsers().length).toBe(1);
+    expect(comp.filteredUsers()[0].fullName).toBe('Carlos Alberto');
+
+    comp.openUserDrawer(mockPendingUsers[0]);
+    expect(comp.drawerUser()?.id).toBe('user-rider-1');
+
+    comp.closeUserDrawer();
+    expect(comp.drawerUser()).toBeNull();
+  });
 });

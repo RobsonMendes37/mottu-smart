@@ -5,11 +5,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { RiderStore } from '../../state/rider.store';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AppointmentShift } from '../../models/rider.models';
+import { MobileShellComponent } from '../../../../shared/layout/mobile-shell/mobile-shell.component';
 
 @Component({
   selector: 'app-inspection-status',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MobileShellComponent],
   templateUrl: './inspection-status.component.html',
 })
 export class InspectionStatusComponent implements OnInit, OnDestroy {

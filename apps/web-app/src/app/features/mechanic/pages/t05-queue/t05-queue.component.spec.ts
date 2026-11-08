@@ -102,22 +102,22 @@ describe('T05QueueComponent (Screen T05 - Intelligent Queue)', () => {
     expect(mockMechanicService.getQueue).toHaveBeenCalledWith(undefined, 'MOT1A23', 0, 20);
   });
 
-  it('TC-T05-4: Priority color and styling adheres to Purple Ban (P4 uses cyan #29B6F6, zero purple)', () => {
+  it('TC-T05-4: Priority color and styling adheres to DESIGN.md v2.0 & Purple Ban (P4 uses slate/sky, zero purple)', () => {
     const badgeP1 = comp.getPriorityBadge('CRITICAL_SAFETY', 1);
     expect(badgeP1.label).toContain('P1');
-    expect(badgeP1.colorClass).toContain('text-[#FF4D4F]');
+    expect(badgeP1.colorClass).toContain('text-[#B91C1C]');
 
     const badgeP2 = comp.getPriorityBadge('RIDER_CONTESTATION', 2);
     expect(badgeP2.label).toContain('P2');
-    expect(badgeP2.colorClass).toContain('text-[#FFB300]');
+    expect(badgeP2.colorClass).toContain('text-[#92400E]');
 
     const badgeP3 = comp.getPriorityBadge('LOW_AI_CONFIDENCE', 3);
     expect(badgeP3.label).toContain('P3');
-    expect(badgeP3.colorClass).toContain('text-[#FFB300]');
+    expect(badgeP3.colorClass).toContain('text-[#92400E]');
 
     const badgeP4 = comp.getPriorityBadge('FRAUD_SUSPICION', 4);
     expect(badgeP4.label).toContain('P4');
-    expect(badgeP4.colorClass).toContain('text-[#29B6F6]');
+    expect(badgeP4.colorClass).toContain('text-[#334155]');
     // Strict Purple Ban verification:
     expect(badgeP4.colorClass).not.toMatch(/purple|violet|indigo/);
   });

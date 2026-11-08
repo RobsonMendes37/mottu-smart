@@ -782,3 +782,26 @@
 - **Correção (TDD):** `apps/web-app/src/app/core/utils/uuid.util.spec.ts` (RED) → `uuid.util.ts` com `generateUuid()` (usa `randomUUID` nativo se existir; senão UUID v4 RFC 4122 via `crypto.getRandomValues`, disponível em HTTP). Substituídas as 4 chamadas: interceptor, SSE client, `rider.store` e `accident-wizard`.
 - **Verificação:** `npm run lint` OK, `vitest run` 173/173, `ng build` OK, CD deploy do commit `7c5f5da` na VM confirmado (bundle contém o fallback), `POST /api/v1/auth/login` → 200.
 - **Pendência estrutural:** servir com HTTPS (domínio + Caddy automático) elimina essa classe de problema (Service Worker/PWA e câmera também exigem secure context).
+
+
+### [2026-11-07 21:03] — `UI-UBER-CLEAN-FLEET-V2`: Replicação Completa do Protótipo Mottu Clean Fleet (`DESIGN.md` v2.0 + `.pen`) no `apps/web-app`
+- **Agente / Modelo:** `@frontend-specialist` (TDD `RED -> GREEN`)
+- **Branch Git:** `feature/uber-clean-fleet-ui`
+- **Objetivo:** Replicar no sistema real (`apps/web-app`) toda a identidade visual clara **Uber Base Web / Uber Fleet Inspired** (`DESIGN.md` v2.0 + `design/mottu-smart-ops.pen`), shells de navegação, CRUDs com *Slide-over Drawers* de `400px`, módulos do ecossistema Mottu e textos naturais em português humano (removendo rótulos robóticos de IA).
+- **Entregas Realizadas:**
+  1. **Design Tokens & Estilos Globais:** Atualizados `tailwind.config.js`, `src/styles.css` e `src/index.html` com a paleta oficial v2.0 (`#FFFFFF` cards, `#F6F6F6` canvas, `#F3F3F3` inputs borderless, `#141414` texto primário e pílulas ativas, `#05944F` CTA primário único por tela, `#1C1F1E` restrito a viewfinders de câmera, players de vídeo e lupa óptica) e zero roxo/violeta/índigo (*Purple Ban*).
+  2. **App Shells & Perfil Self-Service:** Criados `ProfileService` (`localStorage` + sincronização de `fullName` no `AuthService`), `MobileShellComponent` (header `56px` + barra inferior de 5 abas do entregador) e `DesktopShellComponent` híbrido responsivo (Sidebar `240px` com `Mottu Ops`, `Unidade Butantã (SP-04)` e grupos por perfil + Top Header `60px` com breadcrumbs, busca e status `"Loja Mottu sincronizada"` + Footer LGPD `40px` + barra mobile `< lg`).
+  3. **5 Novas Telas/Rotas do Protótipo:**
+     - `/rider/account` (`RiderAccountComponent` — `T04B` Meus Dados e CNH)
+     - `/rider/rental` (`RiderRentalComponent` — `T04C` Plano Semanal, Pix integrado às vistorias reais `MAU_USO` da garagem e aba `Entregas`)
+     - `/mechanic/operations` (`MechanicOperationsComponent` — Ordens de serviço de baia e consulta rápida de prateleira/gaveta no almoxarifado)
+     - `/manager/billing` (`T12BillingComponent` — `T12` Contratos semanais e cobrança Pix com *Slide-over Drawer* de `400px`)
+     - `/mechanic/account` e `/manager/account` (`StaffAccountComponent` — `T11 Web` Minha Conta Corporativa)
+  4. **Migração Integral das 13 Telas Existentes + `PhotoZoomLensComponent`:** `T01` Login/Cadastro segmentado, `T02` Garagem, `T03` Wizard de Vistoria, `T04` Status/Agendamento/Contestação, `T03B`/`T04B-Acidente` Sinistro em Vídeo, `T05` Fila da Oficina, `T06` Bancada 55%/45%, `T07` Frota com Drawers `400px`, `T13` Dossiê de Sinistro, `T08` Aprovações com Drawer `400px`, `T09` Catálogo com Drawer `400px` e `T10` Painel Operacional (gráfico comparativo de 7 dias + distribuição por parecer + Looker Studio).
+  5. **Harmonização Documental:** Corrigidos 13 nós residuais v1 em `design/mottu-smart-ops.pen` e atualizada a referência de cores na Lei 5 do `AGENTS.md`.
+- **Verificação Executada:**
+  - `npm run lint` (`tsc --noEmit`): **0 erros**
+  - `npm run build` (`ng build --configuration production`): **0 erros e 0 warnings** (`375.25 kB` raw / `101.00 kB` transfer)
+  - `npm run test:ci` (`vitest run`): **38/38 arquivos de teste, 203/203 testes verdes**
+  - `npx playwright test` (`e2e/`): **148/148 testes E2E aprovados**
+  - `ux_audit.py` & `accessibility_checker.py`: **PASS (0 issues)** e **Purple Ban 100% limpo**.

@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     # AI Gemini (Multi-Model Smart Cascading)
     GEMINI_API_KEY: str = ""
     GEMINI_VISION_MODEL: str = "gemini-3.1-flash-lite"
-    GEMINI_VISION_MODELS_CASCADE: str = "gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-3.8-flash,gemini-2.5-flash"
+    GEMINI_VISION_MODELS_CASCADE: str = "gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-3.8-flash"
     GEMINI_EMBEDDING_MODEL: str = "gemini-embedding-2"
     GEMINI_EMBEDDING_MODELS_CASCADE: str = "gemini-embedding-2,text-embedding-004"
     GEMINI_MOCK_MODE: bool = True

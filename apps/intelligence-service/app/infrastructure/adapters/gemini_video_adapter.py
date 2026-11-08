@@ -43,6 +43,17 @@ class GeminiVideoAdapter:
 
             uploaded_file = self._client.files.upload(file=temp_file_path)
 
+            # Video files uploaded via Files API require polling until ACTIVE
+            import time
+            poll_retries = 0
+            while hasattr(uploaded_file, "state") and uploaded_file.state.name == "PROCESSING" and poll_retries < 15:
+                time.sleep(1)
+                try:
+                    uploaded_file = self._client.files.get(name=uploaded_file.name)
+                except Exception:
+                    break
+                poll_retries += 1
+
             prompt = (
                 "You are an expert motorcycle accident inspector for Mottu.\n"
                 "Analyze this accident video around the motorcycle, identifying damaged parts and estimating severity.\n"

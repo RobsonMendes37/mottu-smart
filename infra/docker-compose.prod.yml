@@ -146,14 +146,14 @@ services:
       S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-http://localhost:19000}
       BIGQUERY_ENABLED: ${BIGQUERY_ENABLED:-false}
       PUBLIC_DEMO_MODE: ${PUBLIC_DEMO_MODE:-false}
-      JAVA_OPTS: "-XX:+UseVirtualThreads -XX:MaxRAMPercentage=75.0 -Xmx256m -Xms128m"
+      JAVA_OPTS: "-XX:+UseSerialGC -Xmx220m -Xms64m -XX:MaxMetaspaceSize=96m"
     deploy:
       resources:
         limits:
-          memory: 450M
+          memory: 480M
         reservations:
-          memory: 256M
-    mem_limit: 450m
+          memory: 192M
+    mem_limit: 480m
     depends_on:
       postgres:
         condition: service_healthy

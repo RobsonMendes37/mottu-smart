@@ -843,3 +843,33 @@
   - `apps/core-api`: **257/257 testes aprovados com `BUILD SUCCESS`** (`./mvnw test`).
   - Teste live direto contra a loja Mottu: minerados 100 itens em 1,8s com `used_fallback=False`, SKU oficial (ex: `745`), Preço real (`R$ 92,03`), Categoria (`Coroas, Correntes e Pinhão`) e foto oficial do CDN VTEX.
 
+
+
+### [2026-11-07 22:50] — `HOTFIX-CLOUD-DEPLOY-AND-E2E-VALIDATION`: Resolução de Startup em Nuvem, SerialGC e Validação Ponta a Ponta Online
+- **Agente / Modelo:** `@devops-engineer` + `@qa-engineer`
+- **Diagnóstico:**
+  1. Durante o deploy contínuo na VM ARM64 da nuvem (`http://161.153.2.148:18088`), o container `mottu-core-api-prod` sofria `java.lang.OutOfMemoryError: Metaspace` porque o Spring Boot 3.4 com Hibernate 6.6, Jackson e Redis carrega mais de 15.000 classes, demandando ~140MB de Metaspace. A flag `-XX:MaxMetaspaceSize=96m` causava falha imediata na inicialização do contexto Spring.
+  2. A dependência `condition: service_healthy` no Caddy para `core-api` impedia que o reverse proxy inicializasse e servisse os assets estáticos do Angular enquanto o backend compilava ou reiniciava.
+  3. No script de CD, um tempo fixo de `sleep` causava `curl` prematuro enquanto a aplicação ainda estava subindo o JPA EntityManager, disparando o trap de erro e abortando o deploy.
+- **Solução Implementada:**
+  1. **Otimização de Memória da JVM (`apps/core-api/Dockerfile` & `infra/docker-compose.prod.yml`):**
+     - Alocação de `-XX:+UseSerialGC -Xmx220m -Xms64m -XX:MaxMetaspaceSize=220m`, eliminando o overhead de 100MB+ de card tables do G1GC e garantindo espaço generoso para carregamento de classes sem estouro de memória.
+     - Ajuste do limite de memória do container para 550MB.
+  2. **Desacoplamento de Inicialização no Caddy (`infra/docker-compose.prod.yml`):**
+     - O Caddy agora depende de `core-api` e `minio` em modo padrão (sem `condition: service_healthy`), subindo de imediato na porta 18088 e atuando como reverse proxy resiliente.
+  3. **Polling Inteligente no Continuous Deployment (`.github/workflows/cd.yml`):**
+     - Substituído o `sleep` fixo por um loop de polling resiliente com 30 tentativas (`curl -sf http://127.0.0.1:18088/api/v1/auth/public-config`), validando a prontidão real da API antes de finalizar o workflow.
+     - Captura de logs de deploy remotos e publicação automática nos comentários do commit do GitHub para auditoria em tempo real.
+- **Verificação Executada:**
+  - **Pipeline CD (`run #42435970775`):** `SUCCESS` no GitHub Actions.
+  - **API Pública na Nuvem:** `curl http://161.153.2.148:18088/api/v1/auth/public-config` retornou `{"publicDemoMode":true}` com `HTTP 200 OK`.
+  - **Autenticação Real na Nuvem:**
+    * `gestor@mottu-ops.local` -> `HTTP 200 OK` (JWT emitido, Role `MANAGER`).
+    * `mecanico@mottu-ops.local` -> `HTTP 200 OK` (JWT emitido, Role `MECHANIC`).
+    * `entregador@mottu-ops.local` -> `HTTP 200 OK` (JWT emitido, Role `RIDER`).
+  - **Bateria de Testes de Interface Real (Playwright Headless Chromium contra a VM Remota):**
+    * Acesso à tela de login pública (`http://161.153.2.148:18088/login`).
+    * Clique no botão 1-clique **"Gestor"** -> API 200 -> Rota protegida `/manager/approvals` carregada com sucesso.
+    * Clique no botão 1-clique **"Mecânico"** -> API 200 -> Rota protegida `/mechanic/queue` carregada com sucesso.
+    * Clique no botão 1-clique **"Entregador"** -> API 200 -> Rota protegida `/rider/garage` carregada com sucesso.
+  - **Bateria Playwright E2E Completa (`e2e/specs/`):** **148/148 testes aprovados (100% de sucesso)** cobrindo todos os fluxos de ponta a ponta, SLAs, contestações, sinistros, orçamentos e deflexão por IA.

@@ -21,6 +21,9 @@ MODEL_ALIAS_MAP: Dict[str, MotorcycleModel] = {
     "mottu sport": MotorcycleModel.MOTTU_SPORT_110I,
     "mottu sport 110": MotorcycleModel.MOTTU_SPORT_110I,
     "mottu sport 110i": MotorcycleModel.MOTTU_SPORT_110I,
+    "mottu sport 110i ks": MotorcycleModel.MOTTU_SPORT_110I,
+    "mottu sport esd": MotorcycleModel.MOTTU_SPORT_110I,
+    "sport ks esd": MotorcycleModel.MOTTU_SPORT_110I,
     "sport 110": MotorcycleModel.MOTTU_SPORT_110I,
     "sport 110i": MotorcycleModel.MOTTU_SPORT_110I,
     "tvs sport": MotorcycleModel.MOTTU_SPORT_110I,
@@ -35,6 +38,7 @@ MODEL_ALIAS_MAP: Dict[str, MotorcycleModel] = {
     "tvs apache": MotorcycleModel.TVS_APACHE_160,
     "tvs apache 160": MotorcycleModel.TVS_APACHE_160,
     "apache 160": MotorcycleModel.TVS_APACHE_160,
+    "apache 200": MotorcycleModel.TVS_APACHE_160,
     "apache": MotorcycleModel.TVS_APACHE_160,
     "tvs raider": MotorcycleModel.TVS_RAIDER_125,
     "tvs raider 125": MotorcycleModel.TVS_RAIDER_125,
@@ -108,11 +112,43 @@ def is_part_compatible_with_model(part_name: str, target_model: MotorcycleModel)
 def normalize_vtex_item(raw_item: Dict[str, Any], model: MotorcycleModel) -> PartCatalogItem:
     """Normalizes raw VTEX JSON product dictionary into domain PartCatalogItem."""
     name = str(raw_item.get("productName") or raw_item.get("part_name") or "").strip()
+    
     sku = str(raw_item.get("sku") or raw_item.get("vtex_sku") or "").strip()
-    category = str(raw_item.get("category") or "General").strip()
-    price_val = raw_item.get("price") if raw_item.get("price") is not None else raw_item.get("unit_price_brl", 0.0)
+    if not sku:
+        items = raw_item.get("items")
+        if isinstance(items, list) and len(items) > 0 and isinstance(items[0], dict):
+            sku = str(items[0].get("itemId") or "").strip()
+        if not sku:
+            sku = str(raw_item.get("productId") or "").strip()
+
+    category = str(raw_item.get("category") or "").strip()
+    if not category:
+        categories = raw_item.get("categories")
+        if isinstance(categories, list) and len(categories) > 0:
+            category = str(categories[0]).strip("/").split("/")[-1].strip()
+    if not category:
+        category = "General"
+
+    price_val = raw_item.get("price") if raw_item.get("price") is not None else raw_item.get("unit_price_brl")
+    if price_val is None:
+        items = raw_item.get("items")
+        if isinstance(items, list) and len(items) > 0 and isinstance(items[0], dict):
+            sellers = items[0].get("sellers")
+            if isinstance(sellers, list) and len(sellers) > 0 and isinstance(sellers[0], dict):
+                comm = sellers[0].get("commertialOffer")
+                if isinstance(comm, dict):
+                    price_val = comm.get("Price")
+    if price_val is None:
+        price_val = 0.0
     price = float(price_val)
+
     image = raw_item.get("imageUrl") or raw_item.get("image_url")
+    if not image:
+        items = raw_item.get("items")
+        if isinstance(items, list) and len(items) > 0 and isinstance(items[0], dict):
+            images = items[0].get("images")
+            if isinstance(images, list) and len(images) > 0 and isinstance(images[0], dict):
+                image = images[0].get("imageUrl")
 
     return PartCatalogItem(
         vtex_sku=sku,
@@ -124,4 +160,32 @@ def normalize_vtex_item(raw_item: Dict[str, Any], model: MotorcycleModel) -> Par
         price_overridden=False,
         image_url=image,
     )
+
+
+def extract_compatible_models(raw_item: Dict[str, Any]) -> list[MotorcycleModel]:
+    """Determines compatible motorcycle models from raw VTEX item or fallback dict."""
+    direct = raw_item.get("motorcycle_model")
+    if direct:
+        parsed = parse_motorcycle_model(str(direct))
+        if parsed:
+            return [parsed]
+
+    models: list[MotorcycleModel] = []
+    compat_list = raw_item.get("Compatibilidade da Peça")
+    if isinstance(compat_list, list):
+        for entry in compat_list:
+            parsed = parse_motorcycle_model(str(entry))
+            if parsed and parsed not in models:
+                models.append(parsed)
+
+    if models:
+        return models
+
+    name = str(raw_item.get("productName") or raw_item.get("part_name") or "")
+    for m in MotorcycleModel:
+        if is_part_compatible_with_model(name, m):
+            models.append(m)
+
+    return models if models else [MotorcycleModel.MOTTU_SPORT_110I]
+
 

@@ -17,6 +17,14 @@ public interface SpringDataCatalogPartRepository extends JpaRepository<CatalogPa
 
     Optional<CatalogPartJpaEntity> findByVtexSkuAndMotorcycleModel(String vtexSku, MotorcycleModel motorcycleModel);
 
+    Page<CatalogPartJpaEntity> findByMotorcycleModel(MotorcycleModel motorcycleModel, Pageable pageable);
+
+    @Query("SELECT c FROM CatalogPartJpaEntity c WHERE LOWER(c.partName) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(c.vtexSku) LIKE LOWER(CONCAT('%', :search, '%'))")
+    Page<CatalogPartJpaEntity> findBySearch(@Param("search") String search, Pageable pageable);
+
+    @Query("SELECT c FROM CatalogPartJpaEntity c WHERE c.motorcycleModel = :model AND (LOWER(c.partName) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(c.vtexSku) LIKE LOWER(CONCAT('%', :search, '%')))")
+    Page<CatalogPartJpaEntity> findByModelAndSearch(@Param("model") MotorcycleModel model, @Param("search") String search, Pageable pageable);
+
     @Query("SELECT c FROM CatalogPartJpaEntity c WHERE " +
             "(:model IS NULL OR c.motorcycleModel = :model) AND " +
             "(:search IS NULL OR LOWER(c.partName) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(c.vtexSku) LIKE LOWER(CONCAT('%', :search, '%')))")

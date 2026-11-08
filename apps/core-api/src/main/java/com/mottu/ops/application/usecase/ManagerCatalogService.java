@@ -55,7 +55,16 @@ public class ManagerCatalogService implements ManagerCatalogUseCase {
     @Transactional(readOnly = true)
     public PageResponse<CatalogPartResponseDto> getParts(MotorcycleModel model, String search, Pageable pageable) {
         String cleanSearch = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
-        Page<CatalogPartJpaEntity> page = catalogPartRepository.searchParts(model, cleanSearch, pageable);
+        Page<CatalogPartJpaEntity> page;
+        if (model != null && cleanSearch != null) {
+            page = catalogPartRepository.findByModelAndSearch(model, cleanSearch, pageable);
+        } else if (model != null) {
+            page = catalogPartRepository.findByMotorcycleModel(model, pageable);
+        } else if (cleanSearch != null) {
+            page = catalogPartRepository.findBySearch(cleanSearch, pageable);
+        } else {
+            page = catalogPartRepository.findAll(pageable);
+        }
 
         return new PageResponse<>(
                 page.getContent().stream().map(this::toDto).toList(),

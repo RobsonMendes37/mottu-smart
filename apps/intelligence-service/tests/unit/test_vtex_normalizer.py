@@ -10,6 +10,7 @@ from app.domain.vtex_normalizer import (
     parse_motorcycle_model,
     is_part_compatible_with_model,
     normalize_vtex_item,
+    extract_compatible_models,
 )
 
 
@@ -289,3 +290,115 @@ def test_catalog_seed_parts_classification():
     assert is_consumable_part("Pneu Dianteiro 90/90-17")
     assert is_consumable_part("Óleo de Motor 10W30 4T")
     assert not is_consumable_part("Farol Principal LED")
+
+
+# =============================================================================
+# 6. Real VTEX Native Structure & Model Compatibility Extraction Tests
+# =============================================================================
+
+def test_normalize_vtex_item_native_vtex_structure():
+    raw = {
+        "productId": 637,
+        "productName": "KIT RELAÇÃO - MOTTU SPORT 110i KS/ESD",
+        "categories": ["/Transmissão/Coroas, Correntes e Pinhão/", "/Transmissão/"],
+        "items": [
+            {
+                "itemId": "745",
+                "images": [{"imageUrl": "https://mottustore.vteximg.com.br/arquivos/ids/184066/kit-relacao.png"}],
+                "sellers": [
+                    {
+                        "commertialOffer": {
+                            "Price": 92.03,
+                            "ListPrice": 99.00,
+                        }
+                    }
+                ],
+            }
+        ],
+    }
+    item = normalize_vtex_item(raw, MotorcycleModel.MOTTU_SPORT_110I)
+    assert item.vtex_sku == "745"
+    assert item.part_name == "KIT RELAÇÃO - MOTTU SPORT 110i KS/ESD"
+    assert item.category == "Coroas, Correntes e Pinhão"
+    assert item.unit_price_brl == 92.03
+    assert item.is_natural_wear is True
+    assert item.image_url == "https://mottustore.vteximg.com.br/arquivos/ids/184066/kit-relacao.png"
+
+
+def test_normalize_vtex_item_with_product_id_fallback():
+    raw = {"productId": 999, "productName": "Parafuso Chassi"}
+    item = normalize_vtex_item(raw, MotorcycleModel.MOTTU_SPORT_110I)
+    assert item.vtex_sku == "999"
+    assert item.category == "General"
+    assert item.unit_price_brl == 0.0
+    assert item.image_url is None
+
+
+def test_parse_motorcycle_model_vtex_aliases():
+    assert parse_motorcycle_model("Mottu Sport 110i KS") == MotorcycleModel.MOTTU_SPORT_110I
+    assert parse_motorcycle_model("Mottu Sport ESD") == MotorcycleModel.MOTTU_SPORT_110I
+    assert parse_motorcycle_model("Sport KS/ESD") == MotorcycleModel.MOTTU_SPORT_110I
+    assert parse_motorcycle_model("Apache 200") == MotorcycleModel.TVS_APACHE_160
+
+
+def test_extract_compatible_models_direct_model():
+    raw = {"motorcycle_model": "HONDA_POP_110I", "part_name": "Filtro de Óleo"}
+    models = extract_compatible_models(raw)
+    assert models == [MotorcycleModel.HONDA_POP_110I]
+
+
+def test_extract_compatible_models_vtex_compat_list():
+    raw = {
+        "productName": "PASTILHA EXTERNA/INTERNA COMPLETA",
+        "Compatibilidade da Peça": ["Mottu Sport ESD", "Apache 160", "Apache 200", "Raider"],
+    }
+    models = extract_compatible_models(raw)
+    assert MotorcycleModel.MOTTU_SPORT_110I in models
+    assert MotorcycleModel.TVS_APACHE_160 in models
+    assert MotorcycleModel.TVS_RAIDER_125 in models
+    assert len(models) == 3
+
+
+def test_extract_compatible_models_inferred_from_name():
+    raw = {"productName": "Carenagem Lateral TVS Apache 160"}
+    models = extract_compatible_models(raw)
+    assert models == [MotorcycleModel.TVS_APACHE_160]
+
+
+def test_extract_compatible_models_fallback():
+    raw = {"productName": "Parafuso Universal Sextavado"}
+    models = extract_compatible_models(raw)
+    assert len(models) >= 1
+
+
+def test_normalize_vtex_item_nested_empty_edge_cases():
+    raw = {
+        "motorcycle_model": "INVALID_MODEL_STRING_XYZ",
+        "productName": "Item Edge",
+        "items": [
+            {
+                "itemId": "123",
+                "sellers": [],
+                "images": [],
+            }
+        ],
+    }
+    item = normalize_vtex_item(raw, MotorcycleModel.MOTTU_SPORT_110I)
+    assert item.unit_price_brl == 0.0
+    assert item.image_url is None
+
+    raw2 = {
+        "items": [
+            {
+                "itemId": "124",
+                "sellers": [{"sellerId": "1"}],
+            }
+        ]
+    }
+    item2 = normalize_vtex_item(raw2, MotorcycleModel.MOTTU_SPORT_110I)
+    assert item2.unit_price_brl == 0.0
+
+    models = extract_compatible_models(raw)
+    assert len(models) == 4
+
+

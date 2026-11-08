@@ -814,3 +814,32 @@
   1. Configurado o Caddy com rota canônica direta `handle /mottu-inspections/* { reverse_proxy minio:9000 }` (preservando o path e Host originais) e mantido `handle_path /storage/*` para compatibilidade retroativa.
   2. Ajustado o script de CD no GitHub Actions (`.github/workflows/cd.yml`) para normalizar `S3_PUBLIC_ENDPOINT=http://161.153.2.148:18088` no `.env` da VM, garantindo que o `S3Presigner` gere assinaturas 100% compatíveis com o MinIO.
 - **Verificação:** Testes de presigning unitários/integração Java no `MinioStorageIntegrationTest` aprovados com `BUILD SUCCESS`.
+
+
+### [2026-11-07 22:05] — `FEATURE-VTEX-SCRAPER-FIX`: Mineração Real da Loja Mottu (VTEX HTTP 206, Paginação Completa de 1.297 Peças e Extração Nativa)
+- **Agente / Modelo:** `@backend-specialist` + `@ai-engineer`
+- **Diagnóstico:**
+  1. A loja oficial `https://www.loja.mottu.com.br` está **100% online com 1.297 produtos cadastrados**.
+  2. O scraper caía no snapshot de contingência offline (`seed_catalog_snapshot.json`) porque a API de busca da VTEX (`/api/catalog_system/pub/products/search`) retorna `HTTP 206 Partial Content` (paginação padrão VTEX). O código em `scraper.py` verificava estritamente `resp.status_code == 200`, causando fallback silencioso.
+  3. No JSON nativo da VTEX, o SKU fica em `items[0].itemId`, o preço em `items[0].sellers[0].commertialOffer.Price`, a imagem em `items[0].images[0].imageUrl`, a categoria em `categories[0]` e a compatibilidade de moto em `Compatibilidade da Peça`. Sem mapear essa árvore, os dados reais vinham zerados.
+  4. O scraper só buscava os primeiros 50 itens (`_from=0&_to=49`), ignorando os outros 1.247 produtos ativos da loja Mottu.
+  5. No `core-api`, a consulta JPQL `searchParts` usava `:search IS NULL OR ...`, que no PostgreSQL nativo causava `could not determine data type of parameter` (HTTP 500) quando `search` ou `model` vinham nulos da interface.
+- **Solução Implementada:**
+  1. **Scraper Robusto com Paginação Assíncrona (`apps/intelligence-service/app/modules/catalog_miner/scraper.py`):**
+     - Aceita `resp.status_code in (200, 206)` da VTEX.
+     - Detecta o total de produtos via header `resources: 0-49/1297`.
+     - Implementa busca paralela concorrente via `asyncio.Semaphore(5)` para até 1.500 produtos (cobrindo os 1.297 da loja) em ~4,5 segundos.
+     - Preserva o modo offline (`force_refresh=False` ou sem conexão) retornando o snapshot local para testes CI/CD noturnos (Lei 8).
+  2. **Normalização Nativa e Mapeamento de Compatibilidade (`apps/intelligence-service/app/domain/vtex_normalizer.py`):**
+     - Extração profunda de SKU, Preço em R$, Imagem do CDN VTEX, Categorias e detecção de desgaste natural (`is_consumable_part`).
+     - Adicionada função pura `extract_compatible_models` mapeando `Compatibilidade da Peça` (Mottu Sport KS/ESD, Apache 160/200, Raider 125, Pop 110) ou inferindo pelo nome da peça.
+     - Suporte a modelos adicionais no alias map (`mottu sport 110i ks`, `mottu sport esd`, `sport ks esd`, `apache 200`).
+  3. **Router Interno (`apps/intelligence-service/app/infrastructure/web/internal_router.py`):**
+     - Sincroniza cada peça com seus modelos compatíveis reais e persiste no PostgreSQL com pgvector embeddings.
+  4. **Correção de Consulta no Core API (`ManagerCatalogService.java` & `SpringDataCatalogPartRepository.java`):**
+     - Decomposição das queries em métodos dedicados (`findByModelAndSearch`, `findByMotorcycleModel`, `findBySearch`, `findAll`), eliminando o erro de inferência de tipo nulo do PostgreSQL.
+- **Verificação Executada:**
+  - `apps/intelligence-service`: **140/140 testes aprovados com 100% de cobertura no domínio** (`tests/unit/test_vtex_normalizer.py`, `test_domain_purity.py`, `test_catalog_sync.py`).
+  - `apps/core-api`: **257/257 testes aprovados com `BUILD SUCCESS`** (`./mvnw test`).
+  - Teste live direto contra a loja Mottu: minerados 100 itens em 1,8s com `used_fallback=False`, SKU oficial (ex: `745`), Preço real (`R$ 92,03`), Categoria (`Coroas, Correntes e Pinhão`) e foto oficial do CDN VTEX.
+

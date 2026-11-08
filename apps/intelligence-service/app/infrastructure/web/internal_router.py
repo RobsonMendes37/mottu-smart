@@ -6,7 +6,7 @@ from app.application.dtos.catalog_dto import CatalogSyncRequestDTO, CatalogSyncR
 from app.application.dtos.feedback_dto import FeedbackPolishRequestDTO, FeedbackPolishResponseDTO
 from app.domain.enums import MotorcycleModel
 from app.domain.models import PartCatalogItem
-from app.domain.vtex_normalizer import normalize_vtex_item, parse_motorcycle_model
+from app.domain.vtex_normalizer import extract_compatible_models, normalize_vtex_item, parse_motorcycle_model
 from app.infrastructure.adapters.gemini_adapter import GeminiVisionAdapter
 from app.infrastructure.adapters.postgres_pgvector import PostgresPgVectorAdapter
 from app.infrastructure.security.auth import verify_internal_token
@@ -30,14 +30,13 @@ async def sync_catalog(request: CatalogSyncRequestDTO) -> CatalogSyncResponseDTO
 
     items_to_upsert: List[PartCatalogItem] = []
     for raw in raw_items:
-        raw_model = raw.get("motorcycle_model")
-        if raw_model:
-            model_enum = parse_motorcycle_model(raw_model) or MotorcycleModel.MOTTU_SPORT_110I
-            norm_item = normalize_vtex_item(raw, model_enum)
+        compatible_models = extract_compatible_models(raw)
+        for m in compatible_models:
+            norm_item = normalize_vtex_item(raw, m)
             emb = await vision_adapter.generate_embedding(norm_item.part_name)
             norm_item = PartCatalogItem(
                 vtex_sku=norm_item.vtex_sku,
-                motorcycle_model=norm_item.motorcycle_model,
+                motorcycle_model=m,
                 part_name=norm_item.part_name,
                 category=norm_item.category,
                 unit_price_brl=norm_item.unit_price_brl,
@@ -47,22 +46,6 @@ async def sync_catalog(request: CatalogSyncRequestDTO) -> CatalogSyncResponseDTO
                 embedding=emb,
             )
             items_to_upsert.append(norm_item)
-        else:
-            for m in MotorcycleModel:
-                norm_item = normalize_vtex_item(raw, m)
-                emb = await vision_adapter.generate_embedding(norm_item.part_name)
-                norm_item = PartCatalogItem(
-                    vtex_sku=norm_item.vtex_sku,
-                    motorcycle_model=m,
-                    part_name=norm_item.part_name,
-                    category=norm_item.category,
-                    unit_price_brl=norm_item.unit_price_brl,
-                    is_natural_wear=norm_item.is_natural_wear,
-                    price_overridden=norm_item.price_overridden,
-                    image_url=norm_item.image_url,
-                    embedding=emb,
-                )
-                items_to_upsert.append(norm_item)
 
     await postgres_adapter.upsert_parts(items_to_upsert)
 

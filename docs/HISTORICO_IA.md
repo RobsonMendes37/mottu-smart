@@ -927,3 +927,16 @@
 - **Testes Executados:**
   - Vitest Unit Tests (`apps/web-app`): **38 arquivos de teste / 203 testes aprovados (100% de sucesso)**.
 
+### [2026-11-08 21:25] — `FEAT-EXPANDED-VTEX-CATALOG`: Carga Expandida de 180 Peças Reais Mineradas da Loja Mottu VTEX
+- **Agente / Modelo:** `@backend-specialist` + `@database-architect`
+- **Contexto e Motivação:**
+  - O catálogo da aplicação continha apenas um seed básico de 24 itens, o que dava a impressão de tabela vazia (apenas 2 páginas).
+  - Mineramos a API oficial da Loja Mottu (`https://www.loja.mottu.com.br/api/catalog_system/pub/products/search`), filtramos miudezas/ruído de fixação e selecionamos 180 componentes mecânicos e elétricos legítimos e balanceados entre as 4 motos.
+- **Arquivos Criados:**
+  - `apps/core-api/src/main/resources/db/migration/V5__seed_expanded_vtex_catalog.sql`: 180 peças reais balanceadas (45 peças para `HONDA_POP_110I`, 45 para `TVS_APACHE_160`, 45 para `TVS_RAIDER_125` e 45 para `MOTTU_SPORT_110I`), contendo SKUs oficiais VTEX, preços reais em reais, categorias, fotos do CDN VTEX, classificação de desgaste natural e proteção `price_overridden`.
+- **Testes Executados:**
+  - `apps/core-api`: `MechanicWorkbenchIntegrationTest` (11/11 testes aprovados com migração V5 executada com sucesso).
+  - `apps/intelligence-service`: **140/140 testes pytest aprovados**.
+  - `apps/web-app`: **203/203 testes unitários aprovados**.
+
+

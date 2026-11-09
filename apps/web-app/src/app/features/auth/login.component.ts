@@ -159,4 +159,25 @@ export class LoginComponent {
       },
     });
   }
+
+  onDemoLoginMode(mode: 'VITRINE' | 'LIVE', role: UserRole): void {
+    if (!this.authService) {
+      this.errorMessage.set('Serviço de autenticação indisponível.');
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+    this.pendingApprovalNotice.set(false);
+
+    this.authService.demoLoginMode(mode, role).subscribe({
+      next: () => {
+        this.isLoading.set(false);
+      },
+      error: (prob: ProblemDetail) => {
+        this.isLoading.set(false);
+        this.errorMessage.set(prob.detail || 'Falha no login de demonstração.');
+      },
+    });
+  }
 }

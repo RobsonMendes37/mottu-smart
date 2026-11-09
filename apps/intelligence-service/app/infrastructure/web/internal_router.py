@@ -7,6 +7,8 @@ from app.application.dtos.feedback_dto import FeedbackPolishRequestDTO, Feedback
 from app.application.dtos.analytics_dto import (
     AnalyticsAdvisorRequestDTO,
     AnalyticsAdvisorResponseDTO,
+    DataExplorerQueryRequestDTO,
+    DataExplorerQueryResponseDTO,
     StockoutAlertDTO,
 )
 from app.domain.enums import MotorcycleModel
@@ -16,6 +18,7 @@ from app.domain.services.analytics_forecaster import (
     calculate_demand_growth,
     evaluate_stockout_risks,
 )
+from app.domain.services.data_explorer_service import answer_manager_query
 from app.domain.vtex_normalizer import extract_compatible_models, normalize_vtex_item, parse_motorcycle_model
 from app.infrastructure.adapters.gemini_adapter import GeminiVisionAdapter
 from app.infrastructure.adapters.postgres_pgvector import PostgresPgVectorAdapter
@@ -150,3 +153,29 @@ async def generate_ops_advice(request: AnalyticsAdvisorRequestDTO) -> AnalyticsA
         recommendedActions=list(enriched_advice.get("recommended_actions", [])),
     )
 
+
+
+@router.post("/analytics/ask", response_model=DataExplorerQueryResponseDTO)
+async def ask_analytics_data(request: DataExplorerQueryRequestDTO) -> DataExplorerQueryResponseDTO:
+    """Analyze a natural language manager query and return structured Google-grade analytics."""
+    raw_answer = answer_manager_query(
+        query=request.query,
+        yard_label=request.yardLabel,
+        context_data=request.contextData,
+    )
+
+    return DataExplorerQueryResponseDTO(
+        query=request.query,
+        yardKey=request.yardKey,
+        yardLabel=request.yardLabel,
+        generatedAt=datetime.now(timezone.utc),
+        modelUsed="gemini-3.5-flash-lite",
+        directAnswer=str(raw_answer.get("direct_answer", "")),
+        keyMetricLabel=str(raw_answer.get("key_metric_label", "")),
+        keyMetricValue=str(raw_answer.get("key_metric_value", "")),
+        keyMetricTrend=str(raw_answer.get("key_metric_trend", "")),
+        columns=list(raw_answer.get("columns", [])),
+        rows=list(raw_answer.get("rows", [])),
+        suggestedActionLabel=str(raw_answer.get("suggested_action_label", "")),
+        suggestedActionRoute=str(raw_answer.get("suggested_action_route", "")),
+    )

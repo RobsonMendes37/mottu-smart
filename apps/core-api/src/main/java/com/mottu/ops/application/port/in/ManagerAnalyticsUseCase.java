@@ -9,4 +9,5 @@ public interface ManagerAnalyticsUseCase {
     AnalyticsSummaryResponseDto getSummary();
     DetailedAnalyticsResponseDto getDetailedAnalytics();
     Map<String, Object> getAiAdvisorAdvice(String yardKey);
+    Map<String, Object> queryOperationalData(String query, String yardKey);
 }

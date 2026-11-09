@@ -12,6 +12,7 @@ describe('LoginComponent (Screen T01)', () => {
       login: vi.fn(),
       register: vi.fn(),
       demoLogin: vi.fn(),
+      demoLoginMode: vi.fn(),
       navigateForRole: vi.fn(),
       publicDemoMode: { __isSignal: true, set: vi.fn(), value: true },
     };
@@ -106,5 +107,11 @@ describe('LoginComponent (Screen T01)', () => {
 
     expect(comp.isLoading()).toBe(false);
     expect(mockAuthService.navigateForRole).toHaveBeenCalledWith('RIDER');
+  });
+
+  it('TC-T01-8: onDemoLoginMode triggers authService.demoLoginMode with mode and role', () => {
+    mockAuthService.demoLoginMode.mockReturnValue(of({}));
+    comp.onDemoLoginMode('LIVE', 'MANAGER');
+    expect(mockAuthService.demoLoginMode).toHaveBeenCalledWith('LIVE', 'MANAGER');
   });
 });

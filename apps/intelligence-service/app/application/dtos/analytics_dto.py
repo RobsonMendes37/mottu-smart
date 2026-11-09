@@ -46,3 +46,26 @@ class AnalyticsAdvisorResponseDTO(BaseModel):
     stockoutAlerts: List[StockoutAlertDTO]
     recommendedActions: List[str]
 
+
+
+class DataExplorerQueryRequestDTO(BaseModel):
+    query: str
+    yardKey: str = "ALL"
+    yardLabel: str = "Todas as Unidades (SP)"
+    contextData: dict = Field(default_factory=dict)
+
+
+class DataExplorerQueryResponseDTO(BaseModel):
+    query: str
+    yardKey: str
+    yardLabel: str
+    generatedAt: datetime
+    modelUsed: str = "gemini-3.5-flash-lite"
+    directAnswer: str
+    keyMetricLabel: str
+    keyMetricValue: str
+    keyMetricTrend: str
+    columns: List[str]
+    rows: List[List[str]]
+    suggestedActionLabel: str
+    suggestedActionRoute: str

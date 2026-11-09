@@ -19,6 +19,7 @@ import {
   WeeklyBillingContract,
   DetailedAnalyticsDto,
   OpsAdvisorResponseDto,
+  OpsDataExplorerResponseDto,
 } from '../models/manager.models';
 
 interface FleetMotorcycleRawItem {
@@ -167,5 +168,12 @@ export class ManagerService {
 
   restockPart(sku: string, delta: number): Observable<any> {
     return this.http.patch(`/api/v1/mechanic/operations/stock/${sku}`, { delta });
+  }
+
+  askDataExplorer(query: string, yardKey: string = 'ALL'): Observable<OpsDataExplorerResponseDto> {
+    return this.http.post<OpsDataExplorerResponseDto>(
+      '/api/v1/manager/analytics/ask',
+      { query, yardKey }
+    );
   }
 }

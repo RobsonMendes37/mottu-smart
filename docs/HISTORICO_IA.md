@@ -1175,3 +1175,39 @@
   - Pipeline GitHub Actions CD (Run `42670708594`): **100% SUCCESS**.
   - Todos os 731 testes automatizados (Python 175, Java 327, Angular 229) aprovados.
   - Todos os fluxos operacionais sem "Em breve" e 100% funcionais na nuvem.
+
+
+### [2026-11-09 17:00] — `FASE 8`: Perfis Duplos de Login (Vitrine vs. Vida Real) & Google-Grade AI Data Explorer ("Ask Your Data")
+- **Agente / Modelo:** `@orchestrator` + `@frontend-specialist` + `@backend-specialist` + `@devops-engineer`
+- **Objetivos Entregues:**
+  1. **Login com Seletor Duplo de Perfis Claramente Identificados:**
+     - **Barra 1 — Perfis Vitrine ("Dia a Dia Completo"):** Carlos Entregador (`entregador@mottu-ops.local`), Mecânico Chefe (`mecanico@mottu-ops.local`), Gestor Operações (`gestor@mottu-ops.local`) — dados demonstrativos pré-populados, rotina cheia e relatórios completos.
+     - **Barra 2 — Perfis Vida Real ("Operação Banco ao Vivo"):** Rafael Entregador Real (`entregador.real@mottu-ops.local`), Diego Mecânico Real (`mecanico.real@mottu-ops.local`), Roberto Gestor Real (`gestor.real@mottu-ops.local`) — contas dedicadas para salvar no PostgreSQL, enviar fotos de vistoria, registrar entregas e destravar bônus de R$ 40 na hora, pagar Pix, avançar motos em baias, baixar estoque e aprovar novos candidatos.
+  2. **Google-Grade AI Data Explorer na Tela T10 Analytics:**
+     - Barra de pesquisa em linguagem natural ("Ask Your Data") com 6 pílulas rápidas com um clique (Peças críticas, Vistorias pendentes, Modelos maior desgaste, Pátio Butantã, Faturas em atraso, Projeção 7 dias).
+     - Resposta executiva instantânea no padrão Google BigQuery Studio / Looker Concierge: Resposta Direta (TL;DR), Badge de Métrica Principal e Tendência, Tabela Dinâmica de Evidências Reais do Banco, Botão de Rota de Ação Rápida (1-clique), Exportação para CSV e Cópia do Resumo Executivo para a área de transferência.
+- **Arquivos Criados/Alterados:**
+  - `apps/core-api/src/main/resources/db/migration/V11__seed_live_operational_profiles.sql`: Seed dos perfis vida real com moto `MOT9Z99`, contrato `CTR-2026-9901` (115 entregas), 2 candidatos pendentes para aprovação rápida e credenciais `Mottu@2026!`.
+  - `apps/intelligence-service/app/domain/services/data_explorer_service.py`: Serviço puro de domínio hexagonal para exploração e análise de dados operacionais sem dependências externas.
+  - `apps/intelligence-service/tests/unit/test_data_explorer_service.py`: Testes unitários com 100% de cobertura de branches e linhas.
+  - `apps/intelligence-service/app/application/dtos/analytics_dto.py`: DTOs `DataExplorerQueryRequestDTO` e `DataExplorerQueryResponseDTO`.
+  - `apps/intelligence-service/app/infrastructure/web/internal_router.py`: Endpoint `/internal/v1/analytics/ask`.
+  - `apps/intelligence-service/tests/test_analytics_advisor.py`: Testes de integração do novo endpoint.
+  - `apps/core-api/src/main/java/com/mottu/ops/application/port/in/ManagerAnalyticsUseCase.java`: Porta de caso de uso `queryOperationalData`.
+  - `apps/core-api/src/main/java/com/mottu/ops/application/usecase/ManagerAnalyticsService.java`: Implementação defensiva agregando catálogo, pátios e chamando o intelligence-service com fallback resiliente.
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/in/web/ManagerAnalyticsController.java`: Endpoint `POST /api/v1/manager/analytics/ask`.
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/client/IntelligenceServiceClient.java`: Cliente HTTP e fallback local do Data Explorer.
+  - `apps/core-api/src/test/java/com/mottu/ops/application/usecase/ManagerAnalyticsServiceTest.java`: Testes unitários do caso de uso.
+  - `apps/web-app/src/app/core/services/auth.service.ts`: Mapeamento de credenciais `VITRINE` e `LIVE` com método `demoLoginMode()`.
+  - `apps/web-app/src/app/features/auth/login.component.ts|html|spec.ts`: Duas barras visuais elegantes com cards para perfis Vitrine e Vida Real.
+  - `apps/web-app/src/app/features/manager/models/manager.models.ts`: Modelo TypeScript `OpsDataExplorerResponseDto`.
+  - `apps/web-app/src/app/features/manager/services/manager.service.ts`: Método `askDataExplorer()`.
+  - `apps/web-app/src/app/features/manager/pages/t10-analytics/t10-analytics.component.ts|html|spec.ts`: Seção de destaque do AI Data Explorer no padrão Google.
+  - `PLANO_OPERACAO_REAL_E_IA_BIGQUERY.md` & `mottu-smart-ops.md`: Especificações e tarefas marcadas como concluídas.
+- **Testes Multi-Stack Executados:**
+  - Python: **185/185 testes aprovados** (`pytest`).
+  - Java: **329/329 testes aprovados** (`./mvnw test`).
+  - Angular: **232/232 testes aprovados** (`vitest`) + Build de Produção concluído com sucesso.
+  - **Total Consolidado: 746 testes automatizados passando com 100% de sucesso**.
+- **Próximo Passo:**
+  - Push para `origin main` com acionamento do CD e validação em produção na VM (`http://161.153.2.148`).

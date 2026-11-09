@@ -183,3 +183,20 @@ export interface OpsAdvisorResponseDto {
   stockoutAlerts: OpsStockoutAlertDto[];
   recommendedActions: string[];
 }
+
+
+export interface OpsDataExplorerResponseDto {
+  query: string;
+  yardKey: string;
+  yardLabel: string;
+  generatedAt: string;
+  modelUsed: string;
+  directAnswer: string;
+  keyMetricLabel: string;
+  keyMetricValue: string;
+  keyMetricTrend: string;
+  columns: string[];
+  rows: string[][];
+  suggestedActionLabel: string;
+  suggestedActionRoute: string;
+}

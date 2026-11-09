@@ -223,6 +223,25 @@ mottu-smart-ops/
   - **Dependencies:** `TASK-23`
   - **INPUT → OUTPUT → VERIFY:** Seção 5 (`TASK-24`) de `PLANO_OPERACAO_REAL_E_IA_BIGQUERY.md` → Validar todos os testes (`core-api`, `intelligence-service`, `web-app`), atualizar `docs/HISTORICO_IA.md`, fazer commit/push para `origin main` e validar endpoints na VM.
 
+### FASE 8 — Refinamento Executivo: Perfis Duplos de Login (Vitrine vs. Vida Real) & Google-Grade AI Data Explorer
+- [x] **`TASK-25` — Backend Java + Python: Migration V11 (Perfis Vida Real) + Motor de Pesquisa Direta nos Dados (`POST /api/v1/manager/analytics/ask`)**
+  - **Agent:** `backend-specialist` | **Skills:** `api-patterns`, `database-design`, `tdd-workflow`, `clean-code`
+  - **Pasta Permitida:** `apps/core-api/`, `apps/intelligence-service/`
+  - **Dependencies:** `TASK-24`
+  - **INPUT → OUTPUT → VERIFY:** Seção 6 de `PLANO_OPERACAO_REAL_E_IA_BIGQUERY.md` → Implementar `V11__seed_live_operational_profiles.sql`, serviço puro `data_explorer_service.py` no Python, rota `/internal/v1/analytics/ask` e `/api/v1/manager/analytics/ask` no Spring Boot → `cd apps/core-api && ./mvnw test -Dtest=ManagerAnalyticsServiceTest` passa e `pytest apps/intelligence-service` passa 100%.
+
+- [x] **`TASK-26` — Frontend Angular 19: Login com Duas Barras de Perfis (Vitrine vs. Vida Real) + Redesign Google-Grade do Relatório IA (`T10`)**
+  - **Agent:** `frontend-specialist` | **Skills:** `frontend-architecture`, `frontend-design`, `clean-code`
+  - **Pasta Permitida:** `apps/web-app/`
+  - **Dependencies:** `TASK-25`
+  - **INPUT → OUTPUT → VERIFY:** Seção 6.2 de `PLANO_OPERACAO_REAL_E_IA_BIGQUERY.md` → Criar cards de seleção de perfis duplos no login (`Carlos/Mecânico/Gestor Vitrine` vs `Rafael/Diego/Roberto Vida Real`), integrar componente `T10` com barra `Ask Your Data`, 6 chips rápidos, tabela de evidências dinâmicas, export CSV e cópia de resumo → `npm test -- --run` passa (232/232) e `npm run build` conclui sem erros.
+
+- [x] **`TASK-27` — Validação Multi-Stack Automatizada, Registro em `HISTORICO_IA.md` e Deploy Contínuo na VM (`161.153.2.148:80`)**
+  - **Agent:** `devops-engineer` + `qa-automation-engineer` | **Skills:** `verify-changes`, `deployment-procedures`
+  - **Pasta Permitida:** Repositório completo
+  - **Dependencies:** `TASK-26`
+  - **INPUT → OUTPUT → VERIFY:** Executar todos os 329 testes no Java, 185 no Python, 232 no Angular, registrar no histórico, subir para o GitHub e validar na VM de produção.
+
 ---
 
 ## 6. Phase X: Checklist Obrigatório de Conclusão

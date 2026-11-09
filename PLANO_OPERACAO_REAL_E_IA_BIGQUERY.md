@@ -369,3 +369,77 @@ CREATE INDEX IF NOT EXISTS idx_rider_deliveries_rider ON rider_daily_deliveries(
   2. Marcar `[x]` nas tarefas `TASK-19` a `TASK-24` em `mottu-smart-ops.md` e registrar o bloco detalhado em `docs/HISTORICO_IA.md`.
   3. Fazer commit e push para `origin main` e validar o deploy automático na VM (`http://161.153.2.148:18088`).
 
+
+
+---
+
+## 6. Fase 8 (Refinamento Executivo): Seletor Duplo de Perfis no Login (Vitrine vs. Vida Real) & Google-Grade AI Data Explorer (`TASK-25` a `TASK-27`)
+
+### 6.1 Objetivo do Refinamento
+Atender às duas melhorias centrais de experiência de produto (UX Executiva):
+1. **Login com Duas Barras de Acesso Rápido (Perfis Vitrine "Dia a Dia" vs. Perfis "Operação Vida Real"):**
+   * Na tela de login ([login.component.html](file:///home/robson/Projetos_Desenvolvimento/mattu-projeto-selecao/apps/web-app/src/app/features/auth/login.component.html)), exibir **duas listas separadas e claramente identificadas**:
+     * **Lista 1 — Perfis Vitrine ("Dia a Dia Perfeito" / Dados Demonstrativos Pré-Populados):**
+       * *Entregador Vitrine (`Carlos Entregador` — `entregador@mottu-ops.local`):* Mostra a rotina completa já preenchida (moto `MOT1A23`, 118/120 entregas, histórico de laudos e fatura).
+       * *Mecânico Vitrine (`Mecânico Chefe` — `mecanico@mottu-ops.local`):* Mostra as 6 baias ativas, fila de triagem e almoxarifado completo.
+       * *Gestor Vitrine (`Gestor Operações` — `gestor@mottu-ops.local`):* Mostra o consolidado dos 5 pátios de SP, 72 vistorias e indicadores cheios.
+     * **Lista 2 — Perfis de Operação Real ("Vida Real" — Salvar, Enviar, Aprovar e Pagar no Banco):**
+       * *Entregador Vida Real (`Rafael Souza` — `rafael.silva@mottu-ops.local`):* Conta real dedicada para o usuário testar **enviar nova vistoria com foto**, **lançar entregas e destravar bônus na hora**, **pagar Pix** e **salvar alterações de perfil/senha**.
+       * *Mecânico Vida Real (`Diego Oficina` — `mecanico.real@mottu-ops.local`):* Conta real dedicada para **assumir chamado da fila**, **salvar laudo técnico**, **criar nova Ordem de Serviço**, **avançar moto na baia** e **baixar estoque real**.
+       * *Gestor Vida Real (`Roberto Diretor` — `gestor.real@mottu-ops.local`):* Conta real dedicada para **aprovar/rejeitar cadastros**, **conciliar Pix**, **sincronizar Loja Mottu** e **pesquisar nos dados com a IA**.
+2. **Redesenho do Relatório de IA no Padrão Google (*BigQuery Studio / Looker Concierge*) com Pesquisa Livre (`Ask Your Data`):**
+   * Posicionar a inteligência logo no topo da tela `T10` ([t10-analytics.component.html](file:///home/robson/Projetos_Desenvolvimento/mattu-projeto-selecao/apps/web-app/src/app/features/manager/pages/t10-analytics/t10-analytics.component.html)) com layout corporativo limpo, direto e sem textos longos.
+   * Adicionar **Barra de Pesquisa Inteligente nos Dados (`POST /api/v1/manager/analytics/ask`)**:
+     * Permite ao gestor digitar qualquer pergunta ou termo sobre a operação (ex.: *"Qual peça dá mais prejuízo?"*, *"Estoque crítico Butantã"*, *"Motos com mau uso"*, *"Resumo de faturamento Pix"*) ou clicar em **6 pílulas rápidas**.
+     * Retorna resposta estruturada em **3 blocos executivos diretos**:
+       1. **Resposta Direta (TL;DR + Métrica Principal)**
+       2. **Tabela de Evidências Reais do Banco (`evidenceRows[]`)**
+       3. **Botões de Ação Direta + Exportar CSV / Copiar Resumo Executivo**
+
+---
+
+### 6.2 Contratos Técnicos da Fase 8
+
+#### 1. Migration `V11__seed_live_operational_profiles.sql`
+* Garante a existência dos 3 usuários da lista **"Operação Vida Real"** (`rafael.silva@mottu-ops.local` como `RIDER`, `mecanico.real@mottu-ops.local` como `MECHANIC`, `gestor.real@mottu-ops.local` como `MANAGER`, todos com senha `Mottu@2026!`), além de 2 cadastros `PENDING_APPROVAL` prontos para o Gestor Vida Real aprovar com 1 clique na tela `T08`.
+
+#### 2. Rota de Pesquisa Inteligente nos Dados (`POST /api/v1/manager/analytics/ask`)
+* **Request (`ManagerDataQueryRequest`):**
+  ```json
+  {
+    "query": "Quais peças estão com estoque crítico e precisam de compra hoje?",
+    "yardKey": "ALL"
+  }
+  ```
+* **Response `200 OK` (`ManagerDataQueryResponse`):**
+  ```json
+  {
+    "query": "Quais peças estão com estoque crítico e precisam de compra hoje?",
+    "yardKey": "ALL",
+    "generatedAt": "2026-11-09T19:30:00Z",
+    "modelUsed": "gemini-3.5-flash-lite",
+    "directAnswer": "Existem 5 peças abaixo do estoque mínimo com risco de parada de baia em até 4 dias (custo estimado de reposição: R$ 1.840,00).",
+    "keyMetricLabel": "Itens em Ruptura Iminente",
+    "keyMetricValue": "5 SKUs críticos",
+    "keyMetricTrend": "Ação imediata recomendada",
+    "columns": ["SKU", "Peça / Modelo", "Saldo Atual", "Consumo Diário", "Previsão Ruptura", "Lote Sugerido"],
+    "rows": [
+      ["SKU-SPORT-001", "Manete de Freio Direito (Mottu Sport 110i)", "4 un. (mín 8)", "1.5 un./dia", "3 dias (CRÍTICO)", "+20 un."],
+      ["SKU-POP-002", "Espelho Retrovisor Par (Honda Pop 110i)", "4 un. (mín 8)", "1.2 un./dia", "3 dias (CRÍTICO)", "+20 un."]
+    ],
+    "suggestedActionLabel": "Repor todos os itens críticos (+20 un.)",
+    "suggestedActionRoute": "/mechanic/operations"
+  }
+  ```
+
+---
+
+### 6.3 Roteiro de Execução (`TASK-25` a `TASK-27`)
+
+* **`TASK-25` — Backend Java + Python: Migration `V11` (Perfis Vida Real) + Motor de Pesquisa Direta nos Dados (`POST /api/v1/manager/analytics/ask`)**
+  * Implementar função pura de domínio + rota `/internal/v1/analytics/ask` no Python e `/api/v1/manager/analytics/ask` no Spring Boot cruzando dados reais de `inspections`, `catalog_parts`, `motorcycles` e `rental_contracts`.
+* **`TASK-26` — Frontend Angular 19: Login com Duas Barras de Perfis (Vitrine vs. Vida Real) + Seletor Rápido no Header + Redesign Google-Grade do Relatório IA (`T10`)**
+  * Atualizar `login.component.ts|html` com as duas listas de perfis detalhadas (nome, papel, placa/galpão e o que testar em cada um).
+  * Redesenhar o bloco de IA da `T10` no padrão Google Cloud / Looker com barra de pesquisa livre, pílulas rápidas, tabela de evidências filtrada, exportação CSV e cópia de resumo em 1 clique.
+* **`TASK-27` — Testes Automatizados Ponta a Ponta e Deploy Ao Vivo na Porta 80 (`http://161.153.2.148`)**
+  * Rodar `pytest`, `./mvnw test` e `npm test -- --run`, commitar na `main` e validar ao vivo na nuvem.

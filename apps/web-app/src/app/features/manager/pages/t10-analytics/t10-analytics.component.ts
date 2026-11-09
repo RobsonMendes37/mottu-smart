@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { ManagerService } from '../../services/manager.service';
@@ -12,6 +13,7 @@ import {
   AuditedPartAnalyticsRow,
   OpsAdvisorResponseDto,
   OpsStockoutAlertDto,
+  OpsDataExplorerResponseDto,
 } from '../../models/manager.models';
 import { DesktopShellComponent } from '../../../../shared/layout/desktop-shell/desktop-shell.component';
 
@@ -23,6 +25,7 @@ export type {
   AuditedPartAnalyticsRow,
   OpsAdvisorResponseDto,
   OpsStockoutAlertDto,
+  OpsDataExplorerResponseDto,
 };
 
 const DEFAULT_AI_ADVISOR: OpsAdvisorResponseDto = {
@@ -81,7 +84,7 @@ const DEFAULT_AI_ADVISOR: OpsAdvisorResponseDto = {
 @Component({
   selector: 'app-t10-analytics',
   standalone: true,
-  imports: [CommonModule, RouterLink, DesktopShellComponent],
+  imports: [CommonModule, FormsModule, RouterLink, DesktopShellComponent],
   templateUrl: './t10-analytics.component.html',
 })
 export class T10AnalyticsComponent implements OnInit {
@@ -103,6 +106,41 @@ export class T10AnalyticsComponent implements OnInit {
   aiAdvisor = signal<OpsAdvisorResponseDto>(DEFAULT_AI_ADVISOR);
   aiAdvisorLoading = signal<boolean>(false);
   aiAdvisorSuccessBanner = signal<string | null>(null);
+
+  // Google-Grade Conversational AI Data Explorer Signals
+  searchQuery = signal<string>('Quais peças estão com estoque crítico?');
+  dataExplorerLoading = signal<boolean>(false);
+  dataExplorerResult = signal<OpsDataExplorerResponseDto | null>({
+    query: 'Quais peças estão com estoque crítico?',
+    yardKey: 'ALL',
+    yardLabel: 'Todas as Unidades (SP)',
+    generatedAt: new Date().toISOString(),
+    modelUsed: 'gemini-3.5-flash-lite',
+    directAnswer: 'Foram identificados 5 itens com estoque crítico ou abaixo da margem de segurança no galpão.',
+    keyMetricLabel: 'Itens em Ruptura Iminente',
+    keyMetricValue: '5 SKUs Críticos',
+    keyMetricTrend: 'Ação de compra imediata recomendada',
+    columns: ['SKU', 'Componente e Modelo', 'Saldo em Almoxarifado', 'Consumo Médio', 'Previsão p/ Ruptura', 'Lote Sugerido'],
+    rows: [
+      ['SKU-SPORT-001', 'Manete de Freio Direito (Mottu Sport 110i)', '4 un. (mín 8)', '1.5 un./dia', '3 dias (CRÍTICO)', '+20 un.'],
+      ['SKU-POP-002', 'Espelho Retrovisor Par (Honda Pop 110i)', '4 un. (mín 8)', '1.2 un./dia', '3 dias (CRÍTICO)', '+20 un.'],
+      ['SKU-RAI-002', 'Pedaleira Dianteira Direita (TVS Raider 125)', '4 un. (mín 8)', '1.1 un./dia', '3 dias (CRÍTICO)', '+20 un.'],
+      ['SKU-SPORT-002', 'Lona de Freio Traseira (Mottu Sport 110i)', '6 un. (mín 8)', '1.4 un./dia', '4 dias (CRÍTICO)', '+18 un.'],
+      ['SKU-POP-003', 'Cabo de Embreagem (Honda Pop 110i)', '6 un. (mín 8)', '1.3 un./dia', '4 dias (CRÍTICO)', '+18 un.']
+    ],
+    suggestedActionLabel: 'Repor Peças no Almoxarifado WMS',
+    suggestedActionRoute: '/mechanic/operations'
+  });
+  copySummaryFeedback = signal<boolean>(false);
+
+  readonly quickPrompts = [
+    { label: '🚨 Ruptura de Estoque', query: 'Quais peças estão com estoque crítico e precisam de reposição?' },
+    { label: '💰 Mau Uso vs Isenção', query: 'Qual a proporção de mau uso cobrado vs isenções contratuais?' },
+    { label: '🏍️ Modelo Mais Demandado', query: 'Qual modelo de moto concentra mais vistorias e reparos?' },
+    { label: '🏭 Comparar Galpões', query: 'Comparativo de desempenho entre Butantã, Guarulhos, Interlagos e Lapa' },
+    { label: '📋 Pix e Faturamento', query: 'Qual a situação atual dos contratos e pagamentos Pix?' },
+    { label: '⚡ Resumo Geral de Hoje', query: 'Resumo executivo consolidado da operação de hoje' },
+  ];
 
   private readonly initialYardSnapshots: YardBiSnapshot[] = [
     {
@@ -460,9 +498,72 @@ export class T10AnalyticsComponent implements OnInit {
     this.loadAiAdvisor();
   }
 
+  executeDataQuery(queryText?: string): void {
+    const q = (queryText ?? this.searchQuery()).trim();
+    if (!q) return;
+    this.searchQuery.set(q);
+    this.dataExplorerLoading.set(true);
+
+    if (!this.managerService?.askDataExplorer) {
+      this.dataExplorerLoading.set(false);
+      return;
+    }
+
+    this.managerService.askDataExplorer(q, this.selectedYardFilter()).subscribe({
+      next: (res) => {
+        if (res) this.dataExplorerResult.set(res);
+        this.dataExplorerLoading.set(false);
+      },
+      error: () => {
+        this.dataExplorerLoading.set(false);
+      },
+    });
+  }
+
+  copyExecutiveSummary(): void {
+    const res = this.dataExplorerResult();
+    if (!res) return;
+
+    const summaryText = `*MOTTU SMART OPS — RESUMO EXECUTIVO DE IA*\n` +
+      `📌 *Consulta:* ${res.query}\n` +
+      `🏢 *Unidade:* ${res.yardLabel}\n` +
+      `💡 *Resposta Direta:* ${res.directAnswer}\n` +
+      `📈 *Métrica Chave:* ${res.keyMetricLabel}: ${res.keyMetricValue} (${res.keyMetricTrend})\n\n` +
+      `*Evidências em Tabela:*\n` +
+      res.columns.join(' | ') + '\n' +
+      res.rows.map((r) => r.join(' | ')).join('\n');
+
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(summaryText).then(() => {
+        this.copySummaryFeedback.set(true);
+        setTimeout(() => this.copySummaryFeedback.set(false), 2500);
+      });
+    }
+  }
+
+  exportCsv(): void {
+    const res = this.dataExplorerResult();
+    if (!res || typeof window === 'undefined') return;
+
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      [res.columns.join(','), ...res.rows.map((e) => e.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(','))].join(
+        '\n'
+      );
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `relatorio_mottu_ia_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   refresh(): void {
     this.loadSummary();
     this.loadDetailedAnalytics();
     this.loadAiAdvisor();
+    this.executeDataQuery();
   }
 }

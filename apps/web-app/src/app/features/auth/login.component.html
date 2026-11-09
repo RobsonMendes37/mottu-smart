@@ -258,40 +258,95 @@
         }
       </section>
 
-      <!-- Quick Profile Access (Demo Mode) -->
+      <!-- Quick Profile Access (Two Distinct Mode Bars) -->
       @if (publicDemoMode()) {
-        <section class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-          <div class="flex items-center justify-between mb-2.5">
-            <span class="text-xs font-semibold text-[#545454]">Acesso rápido por perfil</span>
-            <span class="text-[11px] text-[#757575]">Unidade Butantã</span>
-          </div>
-          <div class="grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              [disabled]="isLoading()"
-              (click)="onDemoLogin('RIDER')"
-              class="h-11 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-xs font-semibold text-[#141414] transition-colors"
-            >
-              Entregador
-            </button>
-            <button
-              type="button"
-              [disabled]="isLoading()"
-              (click)="onDemoLogin('MECHANIC')"
-              class="h-11 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-xs font-semibold text-[#141414] transition-colors"
-            >
-              Mecânico
-            </button>
-            <button
-              type="button"
-              [disabled]="isLoading()"
-              (click)="onDemoLogin('MANAGER')"
-              class="h-11 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-xs font-semibold text-[#141414] transition-colors"
-            >
-              Gestor
-            </button>
-          </div>
-        </section>
+        <div class="space-y-3">
+          <!-- BARRA 1: Perfis Vitrine ("Dia a Dia Perfeito" / Demonstrativo Rico) -->
+          <section class="bg-white border border-[#E2E2E2] rounded-lg p-3.5 shadow-xs">
+            <div class="flex items-center justify-between mb-1.5">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#05944F]"></span>
+                <span class="text-xs font-bold text-[#141414]">Perfis Vitrine • Dia a dia completo</span>
+              </div>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-[#F3F3F3] text-[#545454] font-medium">Dados ricos</span>
+            </div>
+            <p class="text-[11px] text-[#757575] mb-2.5">
+              Histórico pré-populado para ver gráficos, laudos e métricas consolidadas.
+            </p>
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                [disabled]="isLoading()"
+                (click)="onDemoLoginMode('VITRINE', 'RIDER')"
+                class="p-2 rounded-md bg-[#F6F6F6] hover:bg-[#EAEAEA] border border-transparent hover:border-[#141414] text-left transition-all group"
+              >
+                <span class="block text-xs font-bold text-[#141414] group-hover:text-[#05944F]">🏍️ Entregador</span>
+                <span class="block text-[10px] text-[#757575] truncate">Carlos • 118 entregas</span>
+              </button>
+              <button
+                type="button"
+                [disabled]="isLoading()"
+                (click)="onDemoLoginMode('VITRINE', 'MECHANIC')"
+                class="p-2 rounded-md bg-[#F6F6F6] hover:bg-[#EAEAEA] border border-transparent hover:border-[#141414] text-left transition-all group"
+              >
+                <span class="block text-xs font-bold text-[#141414] group-hover:text-[#05944F]">🔧 Mecânico</span>
+                <span class="block text-[10px] text-[#757575] truncate">Chefe • 6 baias</span>
+              </button>
+              <button
+                type="button"
+                [disabled]="isLoading()"
+                (click)="onDemoLoginMode('VITRINE', 'MANAGER')"
+                class="p-2 rounded-md bg-[#F6F6F6] hover:bg-[#EAEAEA] border border-transparent hover:border-[#141414] text-left transition-all group"
+              >
+                <span class="block text-xs font-bold text-[#141414] group-hover:text-[#05944F]">📊 Gestor</span>
+                <span class="block text-[10px] text-[#757575] truncate">5 Pátios • Telemetria</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- BARRA 2: Perfis de Operação Real ("Vida Real" / Salvar, Enviar, Aprovar, Pagar) -->
+          <section class="bg-white border-2 border-[#141414] rounded-lg p-3.5 shadow-xs">
+            <div class="flex items-center justify-between mb-1.5">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#141414]"></span>
+                <span class="text-xs font-extrabold text-[#141414]">Operação Vida Real • Banco ao vivo</span>
+              </div>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-[#141414] text-white font-bold">Ações ativas</span>
+            </div>
+            <p class="text-[11px] text-[#545454] mb-2.5">
+              Contas dedicadas para testar fluxo de ponta a ponta gravando no banco real.
+            </p>
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                [disabled]="isLoading()"
+                (click)="onDemoLoginMode('LIVE', 'RIDER')"
+                class="p-2 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] border border-transparent hover:border-[#05944F] text-left transition-all group"
+              >
+                <span class="block text-xs font-bold text-[#141414] group-hover:text-[#05944F]">🏍️ Entregador Real</span>
+                <span class="block text-[10px] text-[#545454] truncate">Nova vistoria / Pix</span>
+              </button>
+              <button
+                type="button"
+                [disabled]="isLoading()"
+                (click)="onDemoLoginMode('LIVE', 'MECHANIC')"
+                class="p-2 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] border border-transparent hover:border-[#05944F] text-left transition-all group"
+              >
+                <span class="block text-xs font-bold text-[#141414] group-hover:text-[#05944F]">🔧 Mecânico Real</span>
+                <span class="block text-[10px] text-[#545454] truncate">Avançar baia / WMS</span>
+              </button>
+              <button
+                type="button"
+                [disabled]="isLoading()"
+                (click)="onDemoLoginMode('LIVE', 'MANAGER')"
+                class="p-2 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] border border-transparent hover:border-[#05944F] text-left transition-all group"
+              >
+                <span class="block text-xs font-bold text-[#141414] group-hover:text-[#05944F]">📊 Gestor Real</span>
+                <span class="block text-[10px] text-[#545454] truncate">Aprovar fila / IA</span>
+              </button>
+            </div>
+          </section>
+        </div>
       }
     </div>
   </main>

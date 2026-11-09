@@ -172,5 +172,44 @@ class ManagerAnalyticsServiceTest {
         assertNotNull(advice);
         assertEquals("Fallback seguro executivo ativado", advice.get("executiveHeadline"));
     }
+
+    @Test
+    @DisplayName("queryOperationalData() returns structured response with inventory context")
+    void testQueryOperationalDataSuccess() {
+        CatalogPartJpaEntity part = new CatalogPartJpaEntity();
+        part.setVtexSku("SKU-SPORT-001");
+        part.setPartName("Manete de Freio");
+        part.setMotorcycleModel(MotorcycleModel.MOTTU_SPORT_110I);
+        part.setStockQuantity(4);
+        part.setMinStockQuantity(8);
+        when(catalogPartRepository.findAll()).thenReturn(List.of(part));
+
+        Map<String, Object> mockResponse = Map.of(
+                "query", "estoque crítico",
+                "directAnswer", "Itens identificados com sucesso",
+                "keyMetricValue", "5 SKUs Críticos",
+                "columns", List.of("SKU", "Nome"),
+                "rows", List.of(List.of("SKU-SPORT-001", "Manete"))
+        );
+        when(intelligenceServiceClient.queryAnalyticsData(anyMap())).thenReturn(mockResponse);
+
+        Map<String, Object> result = service.queryOperationalData("estoque crítico", "SP-04");
+
+        assertNotNull(result);
+        assertEquals("Itens identificados com sucesso", result.get("directAnswer"));
+        assertEquals("5 SKUs Críticos", result.get("keyMetricValue"));
+    }
+
+    @Test
+    @DisplayName("queryOperationalData() never throws exception when repository fails")
+    void testQueryOperationalDataDefensiveFallback() {
+        when(catalogPartRepository.findAll()).thenThrow(new RuntimeException("DB Connection down"));
+
+        Map<String, Object> result = service.queryOperationalData("resumo", "ALL");
+
+        assertNotNull(result);
+        assertNotNull(result.get("directAnswer"));
+        assertEquals("Eficiência Global", result.get("keyMetricLabel"));
+    }
 }
 

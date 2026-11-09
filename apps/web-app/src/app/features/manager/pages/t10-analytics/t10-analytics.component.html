@@ -111,6 +111,180 @@
       </div>
     </div>
 
+    <!-- GOOGLE-GRADE CONVERSATIONAL AI DATA EXPLORER (Ask Your Data) -->
+    <section class="bg-white border-2 border-[#141414] rounded-xl p-5 shadow-xs space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-[#EEEEEE]">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="text-base font-extrabold text-[#141414] tracking-tight">
+              ✨ Explorador Inteligente de Dados da Operação (Google AI & BigQuery)
+            </h3>
+            <span class="px-2 py-0.5 rounded bg-[#E6F4EE] text-[#046C3A] font-mono text-[11px] font-bold">
+              {{ dataExplorerResult()?.modelUsed || 'gemini-3.5-flash-lite' }}
+            </span>
+            <span class="px-2 py-0.5 rounded bg-[#F3F3F3] text-[#545454] font-mono text-[11px] font-semibold">
+              SQL Real
+            </span>
+          </div>
+          <p class="text-xs text-[#545454] mt-0.5">
+            Faça perguntas em linguagem natural para analisar frotas, estoque, laudos contratuais e finanças da rede Mottu.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="exportCsv()"
+            [disabled]="!dataExplorerResult()"
+            title="Exportar resultado para arquivo CSV"
+            class="px-3 h-8 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-[#141414] text-xs font-semibold transition-colors flex items-center gap-1.5 disabled:opacity-50"
+          >
+            <span>Exportar CSV ⬇</span>
+          </button>
+          <button
+            type="button"
+            (click)="copyExecutiveSummary()"
+            [disabled]="!dataExplorerResult()"
+            title="Copiar resumo formatado para colar no Slack ou WhatsApp"
+            class="px-3 h-8 rounded-md bg-[#141414] hover:opacity-90 text-white text-xs font-semibold transition-opacity flex items-center gap-1.5 disabled:opacity-50"
+          >
+            @if (copySummaryFeedback()) {
+              <span class="text-[#05944F] font-bold">✓ Copiado!</span>
+            } @else {
+              <span>Copiar Resumo 📋</span>
+            }
+          </button>
+        </div>
+      </div>
+
+      <!-- Natural Language Search Input Bar -->
+      <div class="space-y-2.5">
+        <form (ngSubmit)="executeDataQuery()" class="flex flex-col sm:flex-row gap-2">
+          <div class="relative flex-1">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#757575]">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              name="searchQuery"
+              [ngModel]="searchQuery()"
+              (ngModelChange)="searchQuery.set($event)"
+              placeholder="Pergunte aos dados da operação (ex.: Estoque crítico Butantã, Mau uso vs Isenção, Qual modelo quebra mais?)..."
+              class="w-full h-11 pl-10 pr-3.5 rounded-lg bg-[#F6F6F6] border border-[#E2E2E2] focus:bg-white focus:border-[#141414] text-sm text-[#141414] placeholder-[#757575] focus:outline-none transition-all"
+            />
+          </div>
+          <button
+            type="submit"
+            [disabled]="dataExplorerLoading()"
+            class="h-11 px-5 rounded-lg bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white text-xs font-bold transition-colors shrink-0 flex items-center justify-center gap-2"
+          >
+            @if (dataExplorerLoading()) {
+              <svg class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+              <span>Consultando IA...</span>
+            } @else {
+              <span>Consultar IA →</span>
+            }
+          </button>
+        </form>
+
+        <!-- 6 Quick Prompts Pills -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="text-[11px] font-bold text-[#757575] mr-1">Perguntas rápidas:</span>
+          @for (p of quickPrompts; track p.label) {
+            <button
+              type="button"
+              (click)="executeDataQuery(p.query)"
+              [disabled]="dataExplorerLoading()"
+              class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#F3F3F3] hover:bg-[#EAEAEA] text-[#141414] border border-transparent hover:border-[#141414] transition-all"
+            >
+              {{ p.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Structured Result Container -->
+      @if (dataExplorerResult(); as res) {
+        <div class="space-y-4 pt-2">
+          <!-- Direct Answer Card + Key Metric -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-3 bg-[#F6F6F6] p-4 rounded-lg border border-[#E2E2E2]">
+            <div class="md:col-span-8 space-y-1.5">
+              <span class="text-[10px] font-mono uppercase tracking-wider font-extrabold text-[#05944F]">
+                💡 Resposta Direta da IA (TL;DR)
+              </span>
+              <p class="text-sm font-bold text-[#141414] leading-relaxed">
+                {{ res.directAnswer }}
+              </p>
+              <span class="text-[11px] text-[#757575]">
+                Base: {{ res.yardLabel }} • Consulta gerada em tempo real com cruzamento SQL
+              </span>
+            </div>
+
+            <div class="md:col-span-4 bg-white p-3.5 rounded-md border border-[#E2E2E2] flex flex-col justify-between">
+              <span class="text-[10px] font-bold text-[#757575] uppercase">{{ res.keyMetricLabel }}</span>
+              <p class="text-xl font-extrabold font-mono text-[#141414] my-1">{{ res.keyMetricValue }}</p>
+              <span class="text-[11px] font-semibold text-[#046C3A]">{{ res.keyMetricTrend }}</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Evidence Table -->
+          @if (res.rows && res.rows.length > 0) {
+            <div class="overflow-x-auto border border-[#E2E2E2] rounded-lg">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-[#F3F3F3] text-[#757575] font-semibold border-b border-[#E2E2E2]">
+                    @for (col of res.columns; track col) {
+                      <th class="py-2.5 px-3.5">{{ col }}</th>
+                    }
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[#EEEEEE]">
+                  @for (row of res.rows; track $index) {
+                    <tr class="hover:bg-[#F6F6F6]/60">
+                      @for (cell of row; track $index) {
+                        <td class="py-2.5 px-3.5" [class.font-mono]="cell.includes('SKU') || cell.includes('R$') || cell.includes('%') || cell.includes('un') || cell.includes('CTR')">
+                          @if (cell.includes('CRÍTICO')) {
+                            <span class="px-2 py-0.5 rounded-full bg-[#FEE2E2] text-[#DC2626] font-bold text-[10px]">
+                              {{ cell }}
+                            </span>
+                          } @else if (cell.includes('ESTÁVEL') || cell.includes('Isenção') || cell.includes('Liquidado')) {
+                            <span class="px-2 py-0.5 rounded-full bg-[#E6F4EE] text-[#046C3A] font-bold text-[10px]">
+                              {{ cell }}
+                            </span>
+                          } @else {
+                            <span class="text-[#141414] font-medium">{{ cell }}</span>
+                          }
+                        </td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+          <!-- Suggested Action Route Button -->
+          @if (res.suggestedActionLabel && res.suggestedActionRoute) {
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-xs text-[#757575]">Ação operacional recomendada para este contexto:</span>
+              <a
+                [routerLink]="res.suggestedActionRoute"
+                class="px-4 h-9 rounded-md bg-[#141414] hover:bg-[#05944F] text-white text-xs font-bold transition-colors inline-flex items-center gap-1.5"
+              >
+                <span>{{ res.suggestedActionLabel }}</span>
+                <span>→</span>
+              </a>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
     <!-- Prototype Comparative Charts Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
       <!-- Daily Comparative Volume Chart (7 cols) -->

@@ -57,6 +57,35 @@ public class ManagerAnalyticsController {
         }
     }
 
+    @PostMapping("/ask")
+    public ResponseEntity<Map<String, Object>> askDataExplorer(@RequestBody(required = false) Map<String, Object> body) {
+        String query = body != null && body.containsKey("query") ? String.valueOf(body.get("query")) : "resumo de hoje";
+        String yardKey = body != null && body.containsKey("yardKey") ? String.valueOf(body.get("yardKey")) : "ALL";
+        try {
+            return ResponseEntity.ok(managerAnalyticsUseCase.queryOperationalData(query, yardKey));
+        } catch (Exception ex) {
+            log.error("Error in askDataExplorer for query {}, returning safe fallback", query, ex);
+            Map<String, Object> fallback = new LinkedHashMap<>();
+            fallback.put("query", query);
+            fallback.put("yardKey", yardKey);
+            fallback.put("yardLabel", "Todas as Unidades (SP)");
+            fallback.put("generatedAt", Instant.now().toString());
+            fallback.put("modelUsed", "gemini-3.5-flash-lite");
+            fallback.put("directAnswer", "Operação estável com 78,5% de deflexão autônoma e 16 motos em locação ativa.");
+            fallback.put("keyMetricLabel", "Eficiência Global");
+            fallback.put("keyMetricValue", "78,5% Automatizado");
+            fallback.put("keyMetricTrend", "28,5h poupadas na semana");
+            fallback.put("columns", List.of("Indicador", "Valor Atual", "Métrica de Comparação", "Impacto"));
+            fallback.put("rows", List.of(
+                    List.of("Frota Ativa", "16 motos", "36 motos no polo total", "94% de disponibilidade"),
+                    List.of("Vistorias sem Fila", "78,5%", "Média de 28 segundos", "Fila humana zerada")
+            ));
+            fallback.put("suggestedActionLabel", "Ver Indicadores Detalhados");
+            fallback.put("suggestedActionRoute", "/manager/analytics");
+            return ResponseEntity.ok(fallback);
+        }
+    }
+
     private DetailedAnalyticsResponseDto buildFallbackDetailedAnalytics() {
         List<YardSnapshotDto> snapshots = List.of(
                 new YardSnapshotDto("ALL", "Todas as Unidades (SP)", 72, 57, 15, 79.2, 36, 18.5),

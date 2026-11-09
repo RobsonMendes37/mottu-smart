@@ -93,3 +93,43 @@ def test_analytics_advisor_empty_inventory():
     assert data["stockoutAlerts"] == []
     assert len(data["recommendedActions"]) >= 1
 
+
+
+def test_analytics_ask_success():
+    payload = {
+        "query": "Quais peças estão com estoque crítico?",
+        "yardKey": "ALL",
+        "yardLabel": "Todas as Unidades (SP)",
+        "contextData": {
+            "parts_inventory": [
+                {
+                    "sku": "SKU-SPORT-001",
+                    "part_name": "Manete de Freio",
+                    "model_name": "Mottu Sport 110i",
+                    "stock_quantity": 4,
+                    "min_stock_quantity": 8,
+                    "daily_burn_rate": 1.5,
+                }
+            ]
+        },
+    }
+
+    response = client.post(
+        "/internal/v1/analytics/ask",
+        headers={"X-Internal-Token": settings.INTERNAL_API_TOKEN},
+        json=payload,
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "directAnswer" in data
+    assert "keyMetricLabel" in data
+    assert "keyMetricValue" in data
+    assert len(data["columns"]) > 0
+    assert len(data["rows"]) >= 1
+    assert data["suggestedActionRoute"] == "/mechanic/operations"
+
+
+def test_analytics_ask_unauthorized():
+    response = client.post("/internal/v1/analytics/ask", json={"query": "teste"})
+    assert response.status_code in (401, 422)

@@ -17,6 +17,17 @@ const TOKEN_KEY = 'mottu_access_token';
 const USER_KEY = 'mottu_current_user';
 
 export const SEED_CREDENTIALS = {
+  VITRINE: {
+    RIDER: { email: 'entregador@mottu-ops.local', password: 'Mottu@2026!' },
+    MECHANIC: { email: 'mecanico@mottu-ops.local', password: 'Mottu@2026!' },
+    MANAGER: { email: 'gestor@mottu-ops.local', password: 'Mottu@2026!' },
+  },
+  LIVE: {
+    RIDER: { email: 'entregador.real@mottu-ops.local', password: 'Mottu@2026!' },
+    MECHANIC: { email: 'mecanico.real@mottu-ops.local', password: 'Mottu@2026!' },
+    MANAGER: { email: 'gestor.real@mottu-ops.local', password: 'Mottu@2026!' },
+  },
+  // Retrocompatibilidade
   MANAGER: { email: 'gestor@mottu-ops.local', password: 'Mottu@2026!' },
   MECHANIC: { email: 'mecanico@mottu-ops.local', password: 'Mottu@2026!' },
   RIDER: { email: 'entregador@mottu-ops.local', password: 'Mottu@2026!' },
@@ -105,7 +116,11 @@ export class AuthService {
   }
 
   demoLogin(role: UserRole): Observable<LoginResponse> {
-    const creds = SEED_CREDENTIALS[role];
+    return this.demoLoginMode('VITRINE', role);
+  }
+
+  demoLoginMode(mode: 'VITRINE' | 'LIVE', role: UserRole): Observable<LoginResponse> {
+    const creds = SEED_CREDENTIALS[mode][role];
     return this.login(creds).pipe(
       tap(() => {
         this.navigateForRole(role);

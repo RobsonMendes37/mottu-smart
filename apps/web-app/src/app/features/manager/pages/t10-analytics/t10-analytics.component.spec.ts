@@ -125,4 +125,33 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
   it('TC-T10-10: Supports scrollToSection safely when element is present or absent', () => {
     expect(() => comp.scrollToSection('verdict-distribution-section')).not.toThrow();
   });
+
+  it('TC-T10-11: executeDataQuery fetches structured analytics from managerService', () => {
+    mockManagerService.askDataExplorer = vi.fn().mockReturnValue(
+      of({
+        query: 'estoque crítico',
+        yardKey: 'ALL',
+        yardLabel: 'Todas as Unidades (SP)',
+        directAnswer: 'Foram encontrados 5 SKUs críticos',
+        keyMetricLabel: 'SKUs em Ruptura',
+        keyMetricValue: '5 Críticos',
+        keyMetricTrend: 'Reposição necessária',
+        columns: ['SKU', 'Peça'],
+        rows: [['SKU-01', 'Manete']],
+        suggestedActionLabel: 'Repor no Almoxarifado',
+        suggestedActionRoute: '/mechanic/operations',
+      })
+    );
+
+    comp.executeDataQuery('estoque crítico');
+
+    expect(mockManagerService.askDataExplorer).toHaveBeenCalledWith('estoque crítico', 'ALL');
+    expect(comp.dataExplorerResult()?.directAnswer).toBe('Foram encontrados 5 SKUs críticos');
+    expect(comp.dataExplorerLoading()).toBe(false);
+  });
+
+  it('TC-T10-12: copyExecutiveSummary and exportCsv run safely without error', () => {
+    expect(() => comp.copyExecutiveSummary()).not.toThrow();
+    expect(() => comp.exportCsv()).not.toThrow();
+  });
 });

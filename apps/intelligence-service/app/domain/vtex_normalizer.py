@@ -23,6 +23,7 @@ MODEL_ALIAS_MAP: Dict[str, MotorcycleModel] = {
     "mottu sport 110i": MotorcycleModel.MOTTU_SPORT_110I,
     "mottu sport 110i ks": MotorcycleModel.MOTTU_SPORT_110I,
     "mottu sport esd": MotorcycleModel.MOTTU_SPORT_110I,
+    "sport esd": MotorcycleModel.MOTTU_SPORT_110I,
     "sport ks esd": MotorcycleModel.MOTTU_SPORT_110I,
     "sport 110": MotorcycleModel.MOTTU_SPORT_110I,
     "sport 110i": MotorcycleModel.MOTTU_SPORT_110I,
@@ -91,22 +92,55 @@ def parse_motorcycle_model(model_str: Optional[str]) -> Optional[MotorcycleModel
     return MODEL_ALIAS_MAP.get(cleaned)
 
 
+NON_FLEET_COMPAT_VALUES = frozenset({"apache 200", "ntorq"})
+
+_SPORT_PATTERN = re.compile(r"\bsport\b")
+_POP_PATTERN = re.compile(r"\bpop\b")
+_RAIDER_PATTERN = re.compile(r"\b(raider|rdr)\b")
+_AP160_PATTERN = re.compile(r"\bap ?160\b")
+_APACHE_PATTERN = re.compile(r"\bapache\b((?:\s+\d{3}\b)*)")
+_NON_FLEET_PATTERN = re.compile(r"\b(ntorq|ap ?200)\b")
+
+
+def _is_universal(normalized: str) -> bool:
+    return "universal" in normalized or "geral" in normalized
+
+
+def _mentions_apache_160(normalized: str) -> bool:
+    if _AP160_PATTERN.search(normalized):
+        return True
+    match = _APACHE_PATTERN.search(normalized)
+    if not match:
+        return False
+    displacements = match.group(1).split()
+    return not displacements or "160" in displacements
+
+
+def _mentions_non_fleet_model(normalized: str) -> bool:
+    return bool(_NON_FLEET_PATTERN.search(normalized) or _APACHE_PATTERN.search(normalized))
+
+
+def detect_models_in_name(part_name: str) -> list[MotorcycleModel]:
+    """Returns fleet models explicitly mentioned in a product name, in canonical enum order."""
+    normalized = normalize_text(part_name)
+    mentions = {
+        MotorcycleModel.MOTTU_SPORT_110I: bool(_SPORT_PATTERN.search(normalized)),
+        MotorcycleModel.HONDA_POP_110I: bool(_POP_PATTERN.search(normalized)),
+        MotorcycleModel.TVS_APACHE_160: _mentions_apache_160(normalized),
+        MotorcycleModel.TVS_RAIDER_125: bool(_RAIDER_PATTERN.search(normalized)),
+    }
+    return [model for model in MotorcycleModel if mentions[model]]
+
+
 def is_part_compatible_with_model(part_name: str, target_model: MotorcycleModel) -> bool:
     """Checks whether a catalog part name is compatible with the given motorcycle model."""
     normalized = normalize_text(part_name)
-    if "universal" in normalized or "geral" in normalized:
+    if _is_universal(normalized):
         return True
-
-    if "pop" in normalized and target_model != MotorcycleModel.HONDA_POP_110I:
-        return False
-    if "apache" in normalized and target_model != MotorcycleModel.TVS_APACHE_160:
-        return False
-    if "raider" in normalized and target_model != MotorcycleModel.TVS_RAIDER_125:
-        return False
-    if ("sport 110" in normalized or "tvs sport" in normalized) and target_model != MotorcycleModel.MOTTU_SPORT_110I:
-        return False
-
-    return True
+    mentioned = detect_models_in_name(part_name)
+    if mentioned:
+        return target_model in mentioned
+    return not _mentions_non_fleet_model(normalized)
 
 
 def normalize_vtex_item(raw_item: Dict[str, Any], model: MotorcycleModel) -> PartCatalogItem:
@@ -170,22 +204,22 @@ def extract_compatible_models(raw_item: Dict[str, Any]) -> list[MotorcycleModel]
         if parsed:
             return [parsed]
 
-    models: list[MotorcycleModel] = []
+    name = str(raw_item.get("productName") or raw_item.get("part_name") or "")
+    found = set(detect_models_in_name(name))
+
     compat_list = raw_item.get("Compatibilidade da Peça")
     if isinstance(compat_list, list):
         for entry in compat_list:
+            if normalize_text(str(entry)) in NON_FLEET_COMPAT_VALUES:
+                continue
             parsed = parse_motorcycle_model(str(entry))
-            if parsed and parsed not in models:
-                models.append(parsed)
+            if parsed:
+                found.add(parsed)
 
-    if models:
-        return models
-
-    name = str(raw_item.get("productName") or raw_item.get("part_name") or "")
-    for m in MotorcycleModel:
-        if is_part_compatible_with_model(name, m):
-            models.append(m)
-
-    return models if models else [MotorcycleModel.MOTTU_SPORT_110I]
+    if found:
+        return [model for model in MotorcycleModel if model in found]
+    if not compat_list and _is_universal(normalize_text(name)):
+        return list(MotorcycleModel)
+    return []
 
 

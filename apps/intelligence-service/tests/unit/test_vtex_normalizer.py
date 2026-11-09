@@ -399,6 +399,68 @@ def test_normalize_vtex_item_nested_empty_edge_cases():
     assert item2.unit_price_brl == 0.0
 
     models = extract_compatible_models(raw)
-    assert len(models) == 4
+    assert models == []  # unknown compatibility is never guessed
 
 
+
+
+# =============================================================================
+# 5. Precise Fleet Compatibility (real cases from loja.mottu.com.br)
+# =============================================================================
+
+SPORT = MotorcycleModel.MOTTU_SPORT_110I
+POP = MotorcycleModel.HONDA_POP_110I
+APACHE = MotorcycleModel.TVS_APACHE_160
+RAIDER = MotorcycleModel.TVS_RAIDER_125
+
+
+@pytest.mark.parametrize(
+    "compat, expected",
+    [
+        (["Mottu Sport 110i KS", "Mottu Sport ESD"], [SPORT]),
+        (["Sport ESD"], [SPORT]),
+        (["Honda Pop 110i"], [POP]),
+        (["Raider"], [RAIDER]),
+        (["Apache 160", "Apache 200"], [APACHE]),
+        (["Apache 200"], []),
+        (["Ntorq"], []),
+        (["Mottu Sport ESD", "Apache 160", "Apache 200", "Raider"], [SPORT, APACHE, RAIDER]),
+    ],
+)
+def test_extract_compatible_models_uses_only_vtex_fleet_compat_list(compat, expected):
+    raw = {"productName": "PEÇA QUALQUER", "Compatibilidade da Peça": compat}
+    assert extract_compatible_models(raw) == expected
+
+
+def test_extract_compatible_models_unions_incomplete_compat_list_with_explicit_name():
+    raw = {
+        "productName": "VELA DE IGNIÇÃO - Sport KS/ESD/POP/AP160/200/RDR",
+        "Compatibilidade da Peça": ["Mottu Sport 110i KS", "Mottu Sport ESD", "Apache 200", "Raider"],
+    }
+    assert extract_compatible_models(raw) == [SPORT, POP, APACHE, RAIDER]
+
+
+@pytest.mark.parametrize(
+    "name, expected",
+    [
+        ("KIT EMBREAGEM COMPLETA - Sport KS/ESD", [SPORT]),
+        ("MAGNETO - Sport 110i KS/ESD", [SPORT]),
+        ("PASTILHA EXTERNA/INTERNA COMPLETA - Sport ESD/AP160/200/RDR", [SPORT, APACHE, RAIDER]),
+        ("CARENAGEM LATERAL DE FAROL LD - APACHE 160", [APACHE]),
+        ("TAMPA LATERAL DIREITA (CHASSI) - APACHE 160/200", [APACHE]),
+        ("ROLAMENTO DE AGULHAS 15X23X12 - APACHE 200/NTORQ", []),
+        ("Lâmpada do Pisca - Honda POP 110i", [POP]),
+        ("CAPACETE ABERTO", []),
+        ("EIXO PRIMARIO DE TRANSMISSÃO DO MOTOR COM ENGRENAGEM", []),
+        ("Guidão Esportivo", []),
+    ],
+)
+def test_extract_compatible_models_infers_only_explicit_models_from_name(name, expected):
+    assert extract_compatible_models({"productName": name}) == expected
+
+
+def test_is_part_compatible_with_model_vtex_suffixes():
+    assert is_part_compatible_with_model("KIT EMBREAGEM COMPLETA - Sport KS/ESD", POP) is False
+    assert is_part_compatible_with_model("KIT EMBREAGEM COMPLETA - Sport KS/ESD", SPORT) is True
+    assert is_part_compatible_with_model("ROLAMENTO - APACHE 200/NTORQ", APACHE) is False
+    assert is_part_compatible_with_model("Escapamento Esportivo", SPORT) is True

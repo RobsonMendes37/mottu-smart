@@ -292,15 +292,15 @@ class AppointmentAndOutboxIntegrationTest {
     // ==========================================
 
     @Test
-    @DisplayName("Gestor: POST /api/v1/manager/catalog/sync-mottu-store sincroniza catálogo com sucesso")
+    @DisplayName("Gestor: POST /api/v1/manager/catalog/sync-mottu-store reporta indisponibilidade de forma honesta quando o serviço Python está fora")
     @WithMockUser(username = "gestor@mottu-ops.local", roles = {"MANAGER"})
     void shouldSyncCatalogWithMottuStore() throws Exception {
         mockMvc.perform(post("/api/v1/manager/catalog/sync-mottu-store"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.syncedCount").isNumber())
-                .andExpect(jsonPath("$.usedFallback").isBoolean())
+                .andExpect(jsonPath("$.syncedCount").value(0))
+                .andExpect(jsonPath("$.usedFallback").value(true))
                 .andExpect(jsonPath("$.syncedAt").isNotEmpty())
-                .andExpect(jsonPath("$.message").value("Catálogo sincronizado com loja.mottu.com.br!"));
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.startsWith("Sincronização ao vivo indisponível")));
     }
 
     @Test

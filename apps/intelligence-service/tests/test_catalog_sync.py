@@ -120,3 +120,32 @@ def test_feedback_polish_unauthorized():
     }
     response = client.post("/internal/v1/feedback/polish", json=payload)
     assert response.status_code == 401 or response.status_code == 422
+
+
+def test_catalog_sync_skips_items_without_fleet_compatibility():
+    raw_items = [
+        {"productName": "KIT EMBREAGEM COMPLETA - Sport KS/ESD", "productId": "930", "price": 274.73},
+        {"productName": "CAPACETE ABERTO", "productId": "592", "price": 288.64},
+        {"productName": "LONA - Honda POP 110i", "productId": "615", "price": 12.99,
+         "Compatibilidade da Peça": ["Honda Pop 110i"]},
+    ]
+    upserted = []
+
+    async def fake_upsert(self, parts):
+        upserted.extend(parts)
+        return len(parts)
+
+    with patch("app.modules.catalog_miner.scraper.VTEXCatalogMiner.fetch_catalog",
+               new=AsyncMock(return_value=(raw_items, False))), \
+         patch("app.infrastructure.adapters.postgres_pgvector.PostgresPgVectorAdapter.upsert_parts",
+               new=fake_upsert):
+        response = client.post(
+            "/internal/v1/catalog/sync",
+            headers={"X-Internal-Token": settings.INTERNAL_API_TOKEN},
+            json={"forceRefresh": True},
+        )
+
+    assert response.status_code == 200
+    assert response.json()["usedFallback"] is False
+    pairs = sorted((p.vtex_sku, p.motorcycle_model.value) for p in upserted)
+    assert pairs == [("615", "HONDA_POP_110I"), ("930", "MOTTU_SPORT_110I")]

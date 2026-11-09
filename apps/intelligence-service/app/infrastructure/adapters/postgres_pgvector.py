@@ -41,24 +41,43 @@ class PostgresPgVectorAdapter(CatalogRepositoryPort):
             return len(parts)
 
         try:
+            query = """
+                INSERT INTO catalog_parts (
+                    vtex_sku, motorcycle_model, part_name, category, unit_price_brl,
+                    is_natural_wear, price_overridden, image_url, embedding, updated_at
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::vector, NOW())
+                ON CONFLICT (vtex_sku, motorcycle_model) DO UPDATE
+                SET part_name = EXCLUDED.part_name,
+                    category = EXCLUDED.category,
+                    unit_price_brl = CASE WHEN catalog_parts.price_overridden THEN catalog_parts.unit_price_brl ELSE EXCLUDED.unit_price_brl END,
+                    is_natural_wear = EXCLUDED.is_natural_wear,
+                    image_url = EXCLUDED.image_url,
+                    embedding = COALESCE(EXCLUDED.embedding, catalog_parts.embedding),
+                    updated_at = NOW();
+            """
+            if len(parts) > 1 and hasattr(conn, "executemany"):
+                records = [
+                    (
+                        part.vtex_sku,
+                        part.motorcycle_model.value,
+                        part.part_name,
+                        part.category,
+                        part.unit_price_brl,
+                        part.is_natural_wear,
+                        part.price_overridden,
+                        part.image_url,
+                        f"[{','.join(str(x) for x in part.embedding)}]" if part.embedding else None,
+                    )
+                    for part in parts
+                ]
+                await conn.executemany(query, records)
+                return len(records)
+
             count = 0
             for part in parts:
                 vector_str = f"[{','.join(str(x) for x in part.embedding)}]" if part.embedding else None
                 await conn.execute(
-                    """
-                    INSERT INTO catalog_parts (
-                        vtex_sku, motorcycle_model, part_name, category, unit_price_brl,
-                        is_natural_wear, price_overridden, image_url, embedding, updated_at
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::vector, NOW())
-                    ON CONFLICT (vtex_sku, motorcycle_model) DO UPDATE
-                    SET part_name = EXCLUDED.part_name,
-                        category = EXCLUDED.category,
-                        unit_price_brl = CASE WHEN catalog_parts.price_overridden THEN catalog_parts.unit_price_brl ELSE EXCLUDED.unit_price_brl END,
-                        is_natural_wear = EXCLUDED.is_natural_wear,
-                        image_url = EXCLUDED.image_url,
-                        embedding = COALESCE(EXCLUDED.embedding, catalog_parts.embedding),
-                        updated_at = NOW();
-                    """,
+                    query,
                     part.vtex_sku,
                     part.motorcycle_model.value,
                     part.part_name,

@@ -8,10 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +34,14 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
     ) {
         this.intelligenceServiceUrl = intelligenceServiceUrl;
         this.internalToken = internalToken;
-        this.restClient = RestClient.builder().build();
+        // Forces HTTP/1.1: the JDK default (HTTP/2 + h2c Upgrade) makes uvicorn drop POST bodies (422).
+        HttpClient httpClient = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .connectTimeout(Duration.ofSeconds(5))
+                .build();
+        JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
+        requestFactory.setReadTimeout(Duration.ofMinutes(3));
+        this.restClient = RestClient.builder().requestFactory(requestFactory).build();
     }
 
     @Override
@@ -83,15 +93,20 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
                     .body(Map.class);
 
             if (response != null) {
-                int count = response.get("syncedCount") instanceof Number n ? n.intValue() : 48;
+                int count = response.get("syncedCount") instanceof Number n ? n.intValue() : 0;
                 boolean fallback = Boolean.TRUE.equals(response.get("usedFallback"));
                 return new SyncCatalogResponseDto(count, fallback, Instant.now(), "Catálogo sincronizado com loja.mottu.com.br!");
             }
+            return unavailable("resposta vazia do serviço de inteligência");
         } catch (Exception e) {
-            log.warn("Intelligence service catalog sync unavailable ({}), using fallback snapshot", e.getMessage());
+            log.warn("Intelligence service catalog sync unavailable ({})", e.getMessage());
+            return unavailable(e.getMessage());
         }
+    }
 
-        return new SyncCatalogResponseDto(48, true, Instant.now(), "Catálogo sincronizado com loja.mottu.com.br!");
+    private static SyncCatalogResponseDto unavailable(String reason) {
+        return new SyncCatalogResponseDto(0, true, Instant.now(),
+                "Sincronização ao vivo indisponível; catálogo atual mantido. Motivo: " + reason);
     }
 
     public static String buildLocalFeedbackFallback(

@@ -939,4 +939,27 @@
   - `apps/intelligence-service`: **140/140 testes pytest aprovados**.
   - `apps/web-app`: **203/203 testes unitários aprovados**.
 
+### [2026-11-08 21:50] — `FIX-CATALOG-COMPATIBILITY-AND-LIVE-SYNC`: Precisão Estrita de Modelos e Sincronização VTEX ao Vivo
+- **Agente / Modelo:** `@backend-specialist` + `@database-architect` + `@qa-engineer`
+- **Diagnóstico & Causa Raiz:**
+  1. **Compatibilidade Imprecisa de Peças:** A função `extract_compatible_models` usava correspondência frouxa que vinculava peças exclusivas da Mottu Sport (ex: "Kit Embreagem - Sport KS/ESD") também à Honda Pop, além de manter acessórios genéricos (capacetes, capas de chuva, suportes de celular).
+  2. **Falha da Sincronização ao Vivo (`usedFallback: true`):** O `RestClient` do Spring Boot usava por padrão HTTP/2 com cabeçalho `Upgrade: h2c`. O servidor Uvicorn/FastAPI descartava corpos de requisições POST com `Upgrade`, respondendo `422 Unprocessable Entity` ("Field required: body"). Além disso, o timeout curto e o `upsert` com queries SQL individuais causavam timeout.
+- **Solução Implementada:**
+  1. **Migração Flyway V6 (`apps/core-api/src/main/resources/db/migration/V6__cleanup_and_realign_motorcycle_catalog.sql`):**
+     - Removeu cirurgicamente os 40 registros errôneos do V5.
+     - Inseriu 40 peças mecânicas genuínas e 100% compatíveis para Pop, Apache, Raider e Sport.
+  2. **Normalizador Estrito de Compatibilidade (`vtex_normalizer.py`):**
+     - Regex refinado com `\bsport\b`, `\bpop\b`, `\b(raider|rdr)\b`, `\bap ?160\b`, ignorando modelos fora da frota (`apache 200`, `ntorq`).
+     - Peças sem modelo de frota explícito ou não-mecânicas são ignoradas.
+  3. **Correção do Cliente HTTP Java (`IntelligenceServiceClient.java`):**
+     - Forçado HTTP/1.1 via `JdkClientHttpRequestFactory` com timeout de 3 minutos, eliminando o cabeçalho `Upgrade: h2c`.
+     - Remoção da contagem fictícia (`48`) em caso de falha.
+  4. **Otimização de Ingestão em Lote (`postgres_pgvector.py`):**
+     - Adicionado `conn.executemany` para inserção em lote veloz no PostgreSQL.
+- **Testes Executados:**
+  - `apps/core-api`: 259/259 testes aprovados (incluindo `IntelligenceServiceClientTest`).
+  - `apps/intelligence-service`: 161/161 testes aprovados.
+  - `apps/web-app`: 203/203 testes aprovados.
+
+
 

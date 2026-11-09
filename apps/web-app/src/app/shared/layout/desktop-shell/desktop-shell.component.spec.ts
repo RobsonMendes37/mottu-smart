@@ -14,6 +14,11 @@ describe('DesktopShellComponent (Uber Clean Fleet Web & Mobile Hybrid Shell)', (
         role: 'MANAGER' as const,
         fullName: 'Roberto Mendes',
       }),
+      sessionMode: signal('VITRINE'),
+      isLiveMode: signal(false),
+      userRole: signal('MANAGER'),
+      switchRole: vi.fn().mockReturnValue({ subscribe: vi.fn() }),
+      setSessionMode: vi.fn().mockReturnValue({ subscribe: vi.fn() }),
       logout: vi.fn(),
     };
     mockRouter = {
@@ -56,6 +61,26 @@ describe('DesktopShellComponent (Uber Clean Fleet Web & Mobile Hybrid Shell)', (
 
     comp.onLogout();
     expect(mockAuthService.logout).toHaveBeenCalled();
+  });
+
+  it('TC-DSHELL-4: Toggle and close role switcher dropdown', () => {
+    expect(comp.isRoleSwitcherOpen()).toBe(false);
+    comp.toggleRoleSwitcher();
+    expect(comp.isRoleSwitcherOpen()).toBe(true);
+    comp.closeRoleSwitcher();
+    expect(comp.isRoleSwitcherOpen()).toBe(false);
+  });
+
+  it('TC-DSHELL-5: onSwitchRole and onSetEnvironment call authService and close switcher', () => {
+    comp.isRoleSwitcherOpen.set(true);
+    comp.onSwitchRole('MECHANIC');
+    expect(mockAuthService.switchRole).toHaveBeenCalledWith('MECHANIC');
+    expect(comp.isRoleSwitcherOpen()).toBe(false);
+
+    comp.isRoleSwitcherOpen.set(true);
+    comp.onSetEnvironment('LIVE');
+    expect(mockAuthService.setSessionMode).toHaveBeenCalledWith('LIVE');
+    expect(comp.isRoleSwitcherOpen()).toBe(false);
   });
 });
 

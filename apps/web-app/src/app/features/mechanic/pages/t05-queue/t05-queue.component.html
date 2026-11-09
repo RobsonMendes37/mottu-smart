@@ -173,12 +173,7 @@
                       type="button"
                       (click)="openWorkbench(item.inspectionId)"
                       class="px-3.5 h-9 rounded-md text-xs font-bold transition-colors"
-                      [class.bg-[#05944F]]="first || item.priorityReason === 'CRITICAL_SAFETY'"
-                      [class.hover:bg-[#047840]]="first || item.priorityReason === 'CRITICAL_SAFETY'"
-                      [class.text-white]="first || item.priorityReason === 'CRITICAL_SAFETY'"
-                      [class.bg-[#F3F3F3]]="!first && item.priorityReason !== 'CRITICAL_SAFETY'"
-                      [class.hover:bg-[#E2E2E2]]="!first && item.priorityReason !== 'CRITICAL_SAFETY'"
-                      [class.text-[#141414]]="!first && item.priorityReason !== 'CRITICAL_SAFETY'"
+                      [class]="(first || item.priorityReason === 'CRITICAL_SAFETY') ? 'bg-[#05944F] hover:bg-[#047840] text-white' : 'bg-[#F3F3F3] hover:bg-[#E2E2E2] text-[#141414]'"
                     >
                       {{ badge.actionText }}
                     </button>

@@ -14,6 +14,11 @@ describe('MobileShellComponent (Uber Clean Fleet Rider App Shell)', () => {
         role: 'RIDER' as const,
         fullName: 'Carlos Silva',
       }),
+      sessionMode: signal('VITRINE'),
+      isLiveMode: signal(false),
+      userRole: signal('RIDER'),
+      switchRole: vi.fn().mockReturnValue({ subscribe: vi.fn() }),
+      setSessionMode: vi.fn().mockReturnValue({ subscribe: vi.fn() }),
       logout: vi.fn(),
     };
     mockRouter = {
@@ -47,6 +52,21 @@ describe('MobileShellComponent (Uber Clean Fleet Rider App Shell)', () => {
   it('TC-MSHELL-4: Triggers AuthService.logout on logout click', () => {
     comp.onLogout();
     expect(mockAuthService.logout).toHaveBeenCalled();
+  });
+
+  it('TC-MSHELL-5: Toggles role switcher and executes role and environment switch on mobile', () => {
+    expect(comp.isRoleSwitcherOpen()).toBe(false);
+    comp.toggleRoleSwitcher();
+    expect(comp.isRoleSwitcherOpen()).toBe(true);
+
+    comp.onSwitchRole('MANAGER');
+    expect(mockAuthService.switchRole).toHaveBeenCalledWith('MANAGER');
+    expect(comp.isRoleSwitcherOpen()).toBe(false);
+
+    comp.toggleRoleSwitcher();
+    comp.onSetEnvironment('LIVE');
+    expect(mockAuthService.setSessionMode).toHaveBeenCalledWith('LIVE');
+    expect(comp.isRoleSwitcherOpen()).toBe(false);
   });
 });
 

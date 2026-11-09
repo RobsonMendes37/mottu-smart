@@ -99,11 +99,7 @@
                 type="button"
                 (click)="setUnit(unit)"
                 class="w-full text-left px-2.5 py-1.5 rounded-md text-xs font-medium flex items-center justify-between transition-colors"
-                [class.bg-[#E6F4EE]]="preferredUnit() === unit"
-                [class.text-[#046C3A]]="preferredUnit() === unit"
-                [class.font-bold]="preferredUnit() === unit"
-                [class.hover:bg-[#F3F3F3]]="preferredUnit() !== unit"
-                [class.text-[#545454]]="preferredUnit() !== unit"
+                [class]="preferredUnit() === unit ? 'bg-[#E6F4EE] text-[#046C3A] font-bold' : 'text-[#545454] hover:bg-[#F3F3F3]'"
               >
                 <span>{{ unit }}</span>
                 @if (preferredUnit() === unit) {

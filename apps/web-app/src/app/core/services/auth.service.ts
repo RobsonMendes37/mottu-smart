@@ -42,12 +42,16 @@ export class AuthService {
   currentUser = signal<AuthUser | null>(this.getStoredUser());
   accessToken = signal<string | null>(this.getStoredToken());
   publicDemoMode = signal<boolean>(true); // Defaults to true for instant demo fast-switch
+  sessionMode = signal<'VITRINE' | 'LIVE'>(this.getStoredMode());
 
   isAuthenticated = computed(() => !!this.accessToken() && !!this.currentUser());
   userRole = computed(() => this.currentUser()?.role ?? null);
   isManager = computed(() => this.userRole() === 'MANAGER');
   isMechanic = computed(() => this.userRole() === 'MECHANIC');
   isRider = computed(() => this.userRole() === 'RIDER');
+
+  isLiveMode = computed(() => this.sessionMode() === 'LIVE' || (this.currentUser()?.fullName?.includes('Real') ?? false));
+  modeLabel = computed(() => this.isLiveMode() ? 'Operação Real' : 'Modo Demonstração');
 
   constructor(
     http?: HttpClient,
@@ -121,11 +125,27 @@ export class AuthService {
 
   demoLoginMode(mode: 'VITRINE' | 'LIVE', role: UserRole): Observable<LoginResponse> {
     const creds = SEED_CREDENTIALS[mode][role];
+    this.sessionMode.set(mode);
+    try {
+      localStorage.setItem('mottu_session_mode', mode);
+    } catch {
+      // Storage fallback
+    }
     return this.login(creds).pipe(
       tap(() => {
         this.navigateForRole(role);
       })
     );
+  }
+
+  switchRole(role: UserRole, targetMode?: 'VITRINE' | 'LIVE'): Observable<LoginResponse> {
+    const mode = targetMode ?? (this.isLiveMode() ? 'LIVE' : 'VITRINE');
+    return this.demoLoginMode(mode, role);
+  }
+
+  setSessionMode(mode: 'VITRINE' | 'LIVE'): Observable<LoginResponse> {
+    const currentRole = this.userRole() || 'MANAGER';
+    return this.demoLoginMode(mode, currentRole);
   }
 
   logout(): void {
@@ -158,9 +178,16 @@ export class AuthService {
       fullName: res.fullName,
       role: res.role,
     };
+    const isLive = res.fullName?.includes('Real');
+    if (isLive) {
+      this.sessionMode.set('LIVE');
+    }
     try {
       localStorage.setItem(TOKEN_KEY, res.accessToken);
       localStorage.setItem(USER_KEY, JSON.stringify(user));
+      if (isLive) {
+        localStorage.setItem('mottu_session_mode', 'LIVE');
+      }
     } catch {
       // Storage unavailable fallback
     }
@@ -193,6 +220,15 @@ export class AuthService {
       return data ? JSON.parse(data) : null;
     } catch {
       return null;
+    }
+  }
+
+  private getStoredMode(): 'VITRINE' | 'LIVE' {
+    try {
+      const mode = localStorage.getItem('mottu_session_mode');
+      return mode === 'LIVE' ? 'LIVE' : 'VITRINE';
+    } catch {
+      return 'VITRINE';
     }
   }
 

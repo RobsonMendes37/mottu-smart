@@ -142,4 +142,53 @@ describe('AuthService', () => {
       },
     });
   });
+
+  it('TC-AUTH-9: demoLoginMode saves mode and logs in with proper credentials', () => {
+    const liveRiderResponse = {
+      accessToken: 'rider.live.jwt',
+      userId: 'uuid-rider-live',
+      role: 'RIDER',
+      fullName: 'Rafael Entregador (Vida Real)',
+    };
+    mockHttp.post.mockReturnValue(of(liveRiderResponse));
+
+    service.demoLoginMode('LIVE', 'RIDER').subscribe();
+
+    expect(mockHttp.post).toHaveBeenCalledWith('/api/v1/auth/login', SEED_CREDENTIALS.LIVE.RIDER);
+    expect(service.sessionMode()).toBe('LIVE');
+    expect(service.isLiveMode()).toBe(true);
+    expect(service.modeLabel()).toBe('Operação Real');
+  });
+
+  it('TC-AUTH-10: switchRole hot-swaps role preserving active mode', () => {
+    const liveMechResponse = {
+      accessToken: 'mech.live.jwt',
+      userId: 'uuid-mech-live',
+      role: 'MECHANIC',
+      fullName: 'Diego Mecânico (Vida Real)',
+    };
+    mockHttp.post.mockReturnValue(of(liveMechResponse));
+    service.sessionMode.set('LIVE');
+
+    service.switchRole('MECHANIC').subscribe();
+
+    expect(mockHttp.post).toHaveBeenCalledWith('/api/v1/auth/login', SEED_CREDENTIALS.LIVE.MECHANIC);
+  });
+
+  it('TC-AUTH-11: setSessionMode updates environment mode and switches current role', () => {
+    const vitrineMgrResponse = {
+      accessToken: 'mgr.vitrine.jwt',
+      userId: 'uuid-mgr-vitrine',
+      role: 'MANAGER',
+      fullName: 'Gestor Operações',
+    };
+    mockHttp.post.mockReturnValue(of(vitrineMgrResponse));
+    (service as any).currentUser.set({ userId: 'u', role: 'MANAGER', fullName: 'Gestor' });
+
+    service.setSessionMode('VITRINE').subscribe();
+
+    expect(mockHttp.post).toHaveBeenCalledWith('/api/v1/auth/login', SEED_CREDENTIALS.VITRINE.MANAGER);
+    expect(service.sessionMode()).toBe('VITRINE');
+    expect(service.isLiveMode()).toBe(false);
+  });
 });

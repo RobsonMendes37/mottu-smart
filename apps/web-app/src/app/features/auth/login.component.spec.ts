@@ -114,4 +114,17 @@ describe('LoginComponent (Screen T01)', () => {
     comp.onDemoLoginMode('LIVE', 'MANAGER');
     expect(mockAuthService.demoLoginMode).toHaveBeenCalledWith('LIVE', 'MANAGER');
   });
+
+  it('TC-T01-9: setQuickAccessMode switches between VITRINE and LIVE', () => {
+    expect(comp.quickAccessMode()).toBe('VITRINE');
+    comp.setQuickAccessMode('LIVE');
+    expect(comp.quickAccessMode()).toBe('LIVE');
+  });
+
+  it('TC-T01-10: onQuickLogin delegates to onDemoLoginMode with current quickAccessMode', () => {
+    mockAuthService.demoLoginMode.mockReturnValue(of({}));
+    comp.setQuickAccessMode('LIVE');
+    comp.onQuickLogin('RIDER');
+    expect(mockAuthService.demoLoginMode).toHaveBeenCalledWith('LIVE', 'RIDER');
+  });
 });

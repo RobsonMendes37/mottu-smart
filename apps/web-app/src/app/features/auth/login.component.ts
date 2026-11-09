@@ -22,6 +22,7 @@ export class LoginComponent {
   errorMessage = signal<string | null>(null);
   pendingApprovalNotice = signal<boolean>(false);
   successMessage = signal<string | null>(null);
+  quickAccessMode = signal<'VITRINE' | 'LIVE'>('VITRINE');
 
   // Demo mode signal from service
   publicDemoMode = computed(() => {
@@ -158,6 +159,14 @@ export class LoginComponent {
         this.errorMessage.set(prob.detail || 'Falha no login de demonstração.');
       },
     });
+  }
+
+  setQuickAccessMode(mode: 'VITRINE' | 'LIVE'): void {
+    this.quickAccessMode.set(mode);
+  }
+
+  onQuickLogin(role: UserRole): void {
+    this.onDemoLoginMode(this.quickAccessMode(), role);
   }
 
   onDemoLoginMode(mode: 'VITRINE' | 'LIVE', role: UserRole): void {

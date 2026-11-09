@@ -1239,3 +1239,28 @@
   - Angular Production Build: OK (383 kB bundle inicial, sem warnings de template).
   - Python Pytest: 185/185 testes passando.
   - Java Unit Tests: 7/7 passando.
+
+
+### [2026-11-09 17:35] — Padrão Google Cloud / Stripe: Seletor Segmentado de Ambiente e Hot-Swapper de Perfil no Topo
+- **Agente / Modelo:** `@orchestrator` + `@frontend-specialist` + `@test-engineer`
+- **Ajustes Realizados:**
+  1. **Seletor de Ambiente Segmentado na Tela de Login (Padrão Google Cloud / Stripe):**
+     - Substituídas as listas e botões duplicados por um controle segmentado intuitivo `[ 📦 Demonstração ]` vs `[ 🟢 Operação Real ]` no topo do card de acesso rápido.
+     - 3 botões de persona simplificados (`🏍️ Entregador`, `🔧 Mecânico`, `📊 Gestor`) que acionam a credencial correspondente ao ambiente ativo.
+     - Indicador dinâmico de persistência no banco de dados quando em "Operação Real".
+  2. **Hot-Swapper de Ambiente e Perfil nos Headers (Desktop e Mobile Shells):**
+     - Adicionado pill interativo no cabeçalho superior (`[ 📦 Demonstração ▾ ]` / `[ 🟢 Operação Real ▾ ]`) com dot colorido (`#D97706` âmbar para Demo, `#05944F` verde Mottu para Real).
+     - Menu suspenso flutuante permitindo alternar entre Demonstração e Operação Real ou trocar entre os 3 perfis (`Gestor`, `Mecânico`, `Entregador`) em 1 clique sem precisar deslogar.
+  3. **Correção de Sintaxe de Templates Angular e Higienização de Classes:**
+     - Eliminadas ligações inválidas de pseudo-classes em `[class.hover:...]` e classes com opacidade `[class.*/*]` substituídas por expressões ternárias `[class]="..."` padrão.
+  4. **Expansão da Cobertura de Testes Unitários:**
+     - `auth.service.spec.ts`: Adicionados testes para `sessionMode`, `isLiveMode`, `modeLabel`, `switchRole` e `setSessionMode` (11 testes).
+     - `login.component.spec.ts`: Testes para alternância de modo segmentado e login dinâmico por perfil (10 testes).
+     - `desktop-shell.component.spec.ts`: Testes para abertura/fechamento do dropdown, alternância de ambiente e troca de perfil em 1 clique (5 testes).
+     - `mobile-shell.component.spec.ts`: Testes para switcher mobile responsivo (5 testes).
+- **Validação de Testes e Builds:**
+  - Angular Vitest: **240/240 testes passando com 100% de sucesso** (38 arquivos de teste).
+  - Angular Production Build: **Aprovado com sucesso** (384 kB bundle, 0 erros, 0 warnings).
+  - Java Core API: **329/329 testes passando**.
+  - Python Intelligence: **185/185 testes passando**.
+  - Total consolidado: **754 testes automatizados multi-stack**.

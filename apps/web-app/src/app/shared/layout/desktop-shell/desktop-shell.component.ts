@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, Output, computed, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserRole } from '../../../core/models/auth.models';
 
 export type DesktopNavKey =
   | 'queue'
@@ -38,9 +39,17 @@ export class DesktopShellComponent {
 
   @Output() globalSearch = new EventEmitter<string>();
 
+  isRoleSwitcherOpen = signal<boolean>(false);
+
   currentUser = computed(() => this.authService?.currentUser?.() ?? null);
 
   isManager = computed(() => this.currentUser()?.role === 'MANAGER');
+
+  currentRole = computed(() => this.currentUser()?.role || 'MANAGER');
+
+  sessionMode = computed(() => this.authService?.sessionMode?.() ?? 'VITRINE');
+
+  isLiveMode = computed(() => this.authService?.isLiveMode?.() ?? false);
 
   userFullName = computed(() => this.currentUser()?.fullName || 'Equipe Mottu');
 
@@ -94,6 +103,24 @@ export class DesktopShellComponent {
 
   onSearchInput(value: string): void {
     this.globalSearch.emit(value);
+  }
+
+  toggleRoleSwitcher(): void {
+    this.isRoleSwitcherOpen.update((v) => !v);
+  }
+
+  closeRoleSwitcher(): void {
+    this.isRoleSwitcherOpen.set(false);
+  }
+
+  onSwitchRole(role: UserRole): void {
+    this.authService?.switchRole(role)?.subscribe();
+    this.closeRoleSwitcher();
+  }
+
+  onSetEnvironment(mode: 'VITRINE' | 'LIVE'): void {
+    this.authService?.setSessionMode(mode)?.subscribe();
+    this.closeRoleSwitcher();
   }
 
   onLogout(): void {

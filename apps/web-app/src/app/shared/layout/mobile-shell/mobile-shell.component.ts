@@ -1,7 +1,8 @@
-import { Component, Input, computed, inject } from '@angular/core';
+import { Component, Input, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserRole } from '../../../core/models/auth.models';
 
 export type RiderTabKey = 'home' | 'inspections' | 'rental' | 'deliveries' | 'account';
 
@@ -30,6 +31,12 @@ export class MobileShellComponent {
   @Input() backRoute = '/rider/garage';
   @Input() showBottomNav = true;
   @Input() badgeText = '';
+
+  isRoleSwitcherOpen = signal<boolean>(false);
+
+  sessionMode = computed(() => this.authService?.sessionMode?.() ?? 'VITRINE');
+  isLiveMode = computed(() => this.authService?.isLiveMode?.() ?? false);
+  currentRole = computed(() => this.authService?.userRole?.() ?? 'RIDER');
 
   readonly tabs: MobileTabItem[] = [
     { key: 'home', label: 'Início', route: '/rider/garage' },
@@ -61,6 +68,24 @@ export class MobileShellComponent {
 
   onBack(): void {
     this.router?.navigate([this.backRoute]);
+  }
+
+  toggleRoleSwitcher(): void {
+    this.isRoleSwitcherOpen.update((v) => !v);
+  }
+
+  closeRoleSwitcher(): void {
+    this.isRoleSwitcherOpen.set(false);
+  }
+
+  onSwitchRole(role: UserRole): void {
+    this.authService?.switchRole(role)?.subscribe();
+    this.closeRoleSwitcher();
+  }
+
+  onSetEnvironment(mode: 'VITRINE' | 'LIVE'): void {
+    this.authService?.setSessionMode(mode)?.subscribe();
+    this.closeRoleSwitcher();
   }
 
   onLogout(): void {

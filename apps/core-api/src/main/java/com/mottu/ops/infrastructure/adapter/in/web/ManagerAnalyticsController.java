@@ -48,12 +48,17 @@ public class ManagerAnalyticsController {
     }
 
     @PostMapping("/ai-advisor")
-    public ResponseEntity<Map<String, Object>> getAiAdvisor(@RequestParam(defaultValue = "ALL") String yardKey) {
+    public ResponseEntity<Map<String, Object>> getAiAdvisor(
+            @RequestParam(defaultValue = "ALL") String yardKey,
+            @RequestParam(defaultValue = "7") int horizonDays,
+            @RequestParam(defaultValue = "ALL") String systemCategory,
+            @RequestParam(defaultValue = "NORMAL") String scenario
+    ) {
         try {
-            return ResponseEntity.ok(managerAnalyticsUseCase.getAiAdvisorAdvice(yardKey));
+            return ResponseEntity.ok(managerAnalyticsUseCase.getAiAdvisorAdvice(yardKey, horizonDays, systemCategory, scenario));
         } catch (Exception ex) {
             log.error("Error in getAiAdvisor for yardKey {}, returning safe fallback", yardKey, ex);
-            return ResponseEntity.ok(buildFallbackAiAdvisor(yardKey));
+            return ResponseEntity.ok(buildFallbackAiAdvisor(yardKey, horizonDays, systemCategory, scenario));
         }
     }
 
@@ -121,23 +126,33 @@ public class ManagerAnalyticsController {
         return new DetailedAnalyticsResponseDto(snapshots, dailyBars, verdicts, fleetModels, topParts);
     }
 
-    private Map<String, Object> buildFallbackAiAdvisor(String yardKey) {
+    private Map<String, Object> buildFallbackAiAdvisor(String yardKey, int horizonDays, String systemCategory, String scenario) {
         String key = (yardKey != null && !yardKey.isBlank()) ? yardKey.trim().toUpperCase() : "ALL";
-        return Map.of(
-                "yardKey", key,
-                "yardLabel", "Todas as Unidades (SP)",
-                "generatedAt", Instant.now().toString(),
-                "modelUsed", "gemini-3.5-flash-lite",
-                "demandGrowthPct", 18.5,
-                "projectedNext7DaysInspections", 135,
-                "executiveHeadline", "Crescimento de 18.5% na demanda de vistorias com alerta de reposição imediata para peças críticas.",
-                "growthAnalysisText", "O cruzamento de dados operacionais indica projeção de 135 chamados nos próximos 7 dias.",
-                "stockoutAlerts", List.of(),
-                "recommendedActions", List.of(
-                        "Autorizar reposição preventiva de componentes no almoxarifado.",
-                        "Priorizar check-up preventivo de lonas de freio traseiro nas motos Mottu Sport 110i.",
-                        "Reforçar bancada de mecânicos para absorver a projeção de 135 vistorias."
-                )
-        );
+        int horizon = horizonDays > 0 ? horizonDays : 7;
+        String scen = (scenario != null && !scenario.isBlank()) ? scenario.trim().toUpperCase() : "NORMAL";
+        String scenarioLabel = scen.equals("RAIN_PEAK") ? "Pico de Chuva e Quedas (+35% estresse)"
+                : scen.equals("FLEET_EXPANSION") ? "Expansão de Frota (+25% giro diário)" : "Operação Normal";
+
+        Map<String, Object> fallback = new LinkedHashMap<>();
+        fallback.put("yardKey", key);
+        fallback.put("yardLabel", "Todas as Unidades (SP)");
+        fallback.put("generatedAt", Instant.now().toString());
+        fallback.put("modelUsed", "gemini-3.5-flash-lite");
+        fallback.put("demandGrowthPct", 18.5);
+        fallback.put("projectedNext7DaysInspections", 135);
+        fallback.put("executiveHeadline", "Crescimento de 18.5% na demanda de vistorias com alerta de reposição imediata para peças críticas.");
+        fallback.put("growthAnalysisText", "O cruzamento de dados operacionais indica projeção de 135 chamados nos próximos " + horizon + " dias no cenário " + scenarioLabel + ".");
+        fallback.put("stockoutAlerts", List.of());
+        fallback.put("recommendedActions", List.of(
+                "Autorizar reposição preventiva de componentes no almoxarifado.",
+                "Priorizar check-up preventivo de lonas de freio traseiro nas motos Mottu Sport 110i.",
+                "Reforçar bancada de mecânicos para absorver a projeção de 135 vistorias."
+        ));
+        fallback.put("horizonDays", horizon);
+        fallback.put("scenario", scen);
+        fallback.put("scenarioLabel", scenarioLabel);
+        fallback.put("systemCategory", systemCategory != null ? systemCategory : "ALL");
+        fallback.put("totalRestockBudgetBrl", 0.0);
+        return fallback;
     }
 }

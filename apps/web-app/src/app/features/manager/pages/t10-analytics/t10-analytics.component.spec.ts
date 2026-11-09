@@ -154,4 +154,30 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
     expect(() => comp.copyExecutiveSummary()).not.toThrow();
     expect(() => comp.exportCsv()).not.toThrow();
   });
+
+  it('TC-T10-13: Supports interactive predictive parameters: setHorizon, setSystemCategory, setScenario', () => {
+    mockManagerService.getAiAdvisorAdvice = vi.fn().mockReturnValue(of({
+      ...comp.aiAdvisor(),
+      horizonDays: 15,
+      scenario: 'RAIN_PEAK',
+      systemCategory: 'BRAKE_HANDLEBAR',
+      totalRestockBudgetBrl: 1500.0,
+    }));
+
+    comp.setHorizon(15);
+    expect(comp.selectedHorizon()).toBe(15);
+    expect(mockManagerService.getAiAdvisorAdvice).toHaveBeenCalledWith('ALL', 15, 'ALL', 'NORMAL');
+
+    comp.setSystemCategory('BRAKE_HANDLEBAR');
+    expect(comp.selectedSystemCategory()).toBe('BRAKE_HANDLEBAR');
+
+    comp.setScenario('RAIN_PEAK');
+    expect(comp.selectedScenario()).toBe('RAIN_PEAK');
+    expect(mockManagerService.getAiAdvisorAdvice).toHaveBeenCalledWith('ALL', 15, 'BRAKE_HANDLEBAR', 'RAIN_PEAK');
+  });
+
+  it('TC-T10-14: Computes totalStockoutBudget and criticalAlertsCount dynamically', () => {
+    expect(comp.totalStockoutBudget()).toBeGreaterThan(0);
+    expect(comp.criticalAlertsCount()).toBeGreaterThanOrEqual(1);
+  });
 });

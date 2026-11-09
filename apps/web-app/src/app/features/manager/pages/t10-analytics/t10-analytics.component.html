@@ -640,17 +640,33 @@
           </div>
 
           <!-- Previsão de Demanda e Reposição -->
-          <div id="ai-advisor-section" class="bg-white border border-[#E2E2E2] rounded-lg p-5 space-y-4">
+          <div id="ai-advisor-section" class="bg-white border border-[#E2E2E2] rounded-lg p-5 space-y-5">
+            <!-- Header with Title, Active Scenario Badge & Action -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#EEEEEE]">
               <div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                   <h4 class="text-sm font-bold text-[#141414]">Previsão de Demanda e Reposição</h4>
-                  <span class="px-2 py-0.5 rounded bg-[#E6F4EE] text-[#046C3A] font-mono text-[11px] font-bold">
-                    Próximos 7 dias
+                  <span class="px-2.5 py-0.5 rounded-full bg-[#E6F4EE] text-[#046C3A] font-mono text-[11px] font-bold">
+                    Projeção {{ selectedHorizon() }} dias
+                  </span>
+                  <span
+                    class="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold"
+                    [class.bg-[#F3F3F3]]="selectedScenario() === 'NORMAL'"
+                    [class.text-[#545454]]="selectedScenario() === 'NORMAL'"
+                    [class.bg-[#FEF3C7]]="selectedScenario() === 'RAIN_PEAK'"
+                    [class.text-[#92400E]]="selectedScenario() === 'RAIN_PEAK'"
+                    [class.bg-[#E0F2FE]]="selectedScenario() === 'FLEET_EXPANSION'"
+                    [class.text-[#0369A1]]="selectedScenario() === 'FLEET_EXPANSION'"
+                  >
+                    @switch (selectedScenario()) {
+                      @case ('RAIN_PEAK') { Chuva Intensa (+35% Quedas) }
+                      @case ('FLEET_EXPANSION') { Expansão de Frota (+25% Giro) }
+                      @default { Operação Padrão (1.0x) }
+                    }
                   </span>
                 </div>
                 <p class="text-xs text-[#757575] mt-0.5">
-                  Estimativa de revisões e alertas de estoque para evitar paradas na oficina.
+                  Simulação de estresse de estoque e demanda com modelos estatísticos e análise executiva da IA.
                 </p>
               </div>
 
@@ -658,7 +674,7 @@
                 type="button"
                 (click)="loadAiAdvisor()"
                 [disabled]="aiAdvisorLoading()"
-                class="px-3.5 h-9 rounded-md bg-[#141414] hover:opacity-90 text-white text-xs font-bold transition-opacity self-start sm:self-auto disabled:opacity-50 inline-flex items-center gap-1.5"
+                class="px-3.5 h-9 rounded-md bg-[#141414] hover:opacity-90 text-white text-xs font-bold transition-opacity self-start sm:self-auto disabled:opacity-50 inline-flex items-center gap-1.5 shrink-0"
               >
                 @if (aiAdvisorLoading()) {
                   <span>Calculando...</span>
@@ -675,27 +691,154 @@
               </div>
             }
 
-            <!-- Executive Headline & Growth Metrics -->
-            <div class="p-4 rounded-lg bg-[#F6F6F6] border border-[#E2E2E2] space-y-3">
-              <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <p class="text-sm font-bold text-[#141414] leading-snug">
-                  {{ aiAdvisor().executiveHeadline }}
-                </p>
-                <div class="flex items-center gap-2 shrink-0">
-                  <div class="bg-white border border-[#E2E2E2] px-3 py-1.5 rounded-md text-center">
-                    <span class="block text-[10px] text-[#757575] font-semibold">Crescimento 30d</span>
-                    <span class="font-mono text-sm font-extrabold text-[#046C3A]">
-                      +{{ aiAdvisor().demandGrowthPct }}%
-                    </span>
+            <!-- PARAMETERS & WHAT-IF SCENARIOS CONTROL BAR (Google-Grade AI) -->
+            <div class="p-4 rounded-xl bg-[#F6F6F6] border border-[#E2E2E2] space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-[#141414] uppercase tracking-wider">
+                  Parâmetros de Cruzamento Preditivo
+                </span>
+                <span class="text-[11px] text-[#757575] font-mono">
+                  Base: BigQuery fact_inspections + Catálogo VTEX
+                </span>
+              </div>
+
+              <!-- Horizon & Category Filters -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Horizon Selector -->
+                <div class="space-y-1.5">
+                  <span class="text-xs font-semibold text-[#545454] block">Horizonte de Projeção:</span>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    @for (h of horizonOptions; track h.value) {
+                      <button
+                        type="button"
+                        (click)="setHorizon(h.value)"
+                        class="px-3 h-7 rounded text-xs font-bold transition-all border"
+                        [class.bg-[#141414]]="selectedHorizon() === h.value"
+                        [class.text-white]="selectedHorizon() === h.value"
+                        [class.border-[#141414]]="selectedHorizon() === h.value"
+                        [class.bg-white]="selectedHorizon() !== h.value"
+                        [class.text-[#545454]]="selectedHorizon() !== h.value"
+                        [class.border-[#E2E2E2]]="selectedHorizon() !== h.value"
+                      >
+                        {{ h.label }}
+                      </button>
+                    }
                   </div>
-                  <div class="bg-white border border-[#E2E2E2] px-3 py-1.5 rounded-md text-center">
-                    <span class="block text-[10px] text-[#757575] font-semibold">Projeção 7 dias</span>
-                    <span class="font-mono text-sm font-extrabold text-[#141414]">
-                      {{ aiAdvisor().projectedNext7DaysInspections }} vistorias
-                    </span>
+                </div>
+
+                <!-- System Category Selector -->
+                <div class="space-y-1.5">
+                  <span class="text-xs font-semibold text-[#545454] block">Sistema da Moto:</span>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    @for (cat of systemCategoryOptions; track cat.value) {
+                      <button
+                        type="button"
+                        (click)="setSystemCategory(cat.value)"
+                        class="px-2.5 h-7 rounded text-xs font-bold transition-all border"
+                        [class.bg-[#05944F]]="selectedSystemCategory() === cat.value"
+                        [class.text-white]="selectedSystemCategory() === cat.value"
+                        [class.border-[#05944F]]="selectedSystemCategory() === cat.value"
+                        [class.bg-white]="selectedSystemCategory() !== cat.value"
+                        [class.text-[#545454]]="selectedSystemCategory() !== cat.value"
+                        [class.border-[#E2E2E2]]="selectedSystemCategory() !== cat.value"
+                      >
+                        {{ cat.label }}
+                      </button>
+                    }
                   </div>
                 </div>
               </div>
+
+              <!-- What-If Scenario Simulator Cards -->
+              <div class="space-y-1.5 pt-2 border-t border-[#E8E8E8]">
+                <span class="text-xs font-semibold text-[#545454] block">
+                  Simulação de Cenário de Estresse (What-If):
+                </span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  @for (scen of scenarioOptions; track scen.value) {
+                    <div
+                      (click)="setScenario(scen.value)"
+                      role="button"
+                      tabindex="0"
+                      class="p-3 rounded-lg border cursor-pointer transition-all flex flex-col justify-between"
+                      [class.bg-white]="selectedScenario() === scen.value"
+                      [class.border-[#141414]]="selectedScenario() === scen.value"
+                      [class.ring-2]="selectedScenario() === scen.value"
+                      [class.ring-[#141414]]="selectedScenario() === scen.value"
+                      [class.bg-[#FBFBFB]]="selectedScenario() !== scen.value"
+                      [class.border-[#E2E2E2]]="selectedScenario() !== scen.value"
+                    >
+                      <div class="flex items-center justify-between gap-1">
+                        <span class="text-xs font-bold text-[#141414]">{{ scen.label }}</span>
+                        <span
+                          class="px-2 py-0.5 rounded text-[10px] font-mono font-bold"
+                          [class.bg-[#E6F4EE]]="scen.value === 'NORMAL'"
+                          [class.text-[#046C3A]]="scen.value === 'NORMAL'"
+                          [class.bg-[#FEF3C7]]="scen.value === 'RAIN_PEAK'"
+                          [class.text-[#92400E]]="scen.value === 'RAIN_PEAK'"
+                          [class.bg-[#E0F2FE]]="scen.value === 'FLEET_EXPANSION'"
+                          [class.text-[#0369A1]]="scen.value === 'FLEET_EXPANSION'"
+                        >
+                          {{ scen.badge }}
+                        </span>
+                      </div>
+                      <p class="text-[11px] text-[#757575] mt-1.5 leading-tight">
+                        {{ scen.desc }}
+                      </p>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- 4 SCENARIO IMPACT SCORECARDS -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+              <div class="bg-[#FBFBFB] border border-[#E2E2E2] rounded-lg p-3.5">
+                <span class="text-[11px] font-medium text-[#757575]">Demanda Projetada</span>
+                <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">
+                  {{ aiAdvisor().projectedNext7DaysInspections }} un.
+                </p>
+                <span class="text-[10px] text-[#757575]">Estimativa para {{ selectedHorizon() }} dias</span>
+              </div>
+
+              <div class="bg-[#FBFBFB] border border-[#E2E2E2] rounded-lg p-3.5">
+                <span class="text-[11px] font-medium text-[#757575]">Alertas de Ruptura</span>
+                <p class="text-2xl font-extrabold font-mono mt-1" [class.text-[#DC2626]]="criticalAlertsCount() > 0" [class.text-[#046C3A]]="criticalAlertsCount() === 0">
+                  {{ criticalAlertsCount() }} SKUs
+                </p>
+                <span class="text-[10px] text-[#757575]">Peças com risco crítico na baia</span>
+              </div>
+
+              <div class="bg-[#FBFBFB] border border-[#E2E2E2] rounded-lg p-3.5">
+                <span class="text-[11px] font-medium text-[#757575]">Orçamento p/ Reposição</span>
+                <p class="text-2xl font-extrabold font-mono text-[#046C3A] mt-1">
+                  R$ {{ totalStockoutBudget() | number:'1.2-2' }}
+                </p>
+                <span class="text-[10px] text-[#757575]">Custo do lote sugerido no catálogo</span>
+              </div>
+
+              <div class="bg-[#FBFBFB] border border-[#E2E2E2] rounded-lg p-3.5">
+                <span class="text-[11px] font-medium text-[#757575]">Variação de Demanda</span>
+                <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">
+                  +{{ aiAdvisor().demandGrowthPct }}%
+                </p>
+                <span class="text-[10px] text-[#757575]">vs. período anterior de 30d</span>
+              </div>
+            </div>
+
+            <!-- Executive Headline & Growth Metrics -->
+            <div class="p-4 rounded-lg bg-[#F6F6F6] border border-[#E2E2E2] space-y-2.5">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded bg-[#141414] text-white font-mono text-[10px] font-bold">
+                  Diagnóstico IA (Gemini + BigQuery)
+                </span>
+                <span class="text-[11px] font-mono text-[#757575]">
+                  {{ aiAdvisor().scenarioLabel || 'Cenário Nominal' }}
+                </span>
+              </div>
+              <p class="text-sm font-bold text-[#141414] leading-snug">
+                {{ aiAdvisor().executiveHeadline }}
+              </p>
               <p class="text-xs text-[#545454] leading-relaxed">
                 {{ aiAdvisor().growthAnalysisText }}
               </p>
@@ -705,7 +848,7 @@
             <div class="space-y-2">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-[#141414]">Alertas de ruptura e reposição de estoque sugerida</span>
-                <span class="text-[11px] text-[#757575]">Previsão baseada no giro dos últimos 30 dias</span>
+                <span class="text-[11px] text-[#757575]">Simulação calculada sobre {{ aiAdvisor().stockoutAlerts.length }} itens filtrados</span>
               </div>
 
               <div class="overflow-x-auto border border-[#E2E2E2] rounded-lg">
@@ -716,8 +859,11 @@
                       <th class="py-2.5 px-3">Peça e Modelo</th>
                       <th class="py-2.5 px-3">Saldo / Mínimo</th>
                       <th class="py-2.5 px-3">Consumo Diário</th>
+                      <th class="py-2.5 px-3">Demanda ({{ selectedHorizon() }}d)</th>
                       <th class="py-2.5 px-3">Dias p/ Ruptura</th>
                       <th class="py-2.5 px-3">Risco</th>
+                      <th class="py-2.5 px-3 text-right">Preço Unit.</th>
+                      <th class="py-2.5 px-3 text-right">Orçamento</th>
                       <th class="py-2.5 px-3 text-right">Ação rápida</th>
                     </tr>
                   </thead>
@@ -734,6 +880,9 @@
                           <span class="text-[10px] text-[#757575] font-normal">/ mín {{ alert.minStock }}</span>
                         </td>
                         <td class="py-3 px-3 font-mono text-[#545454]">{{ alert.dailyBurnRate }} un./dia</td>
+                        <td class="py-3 px-3 font-mono font-bold text-[#141414]">
+                          {{ alert.projectedDemand || (alert.dailyBurnRate * selectedHorizon() | number:'1.0-0') }} un.
+                        </td>
                         <td class="py-3 px-3 font-mono font-bold" [class.text-[#DC2626]]="alert.daysToStockout <= 4" [class.text-[#D97706]]="alert.daysToStockout > 4 && alert.daysToStockout <= 8">
                           {{ alert.daysToStockout }} dias
                         </td>
@@ -759,6 +908,16 @@
                             }
                           }
                         </td>
+                        <td class="py-3 px-3 text-right font-mono text-[#545454]">
+                          R$ {{ (alert.unitPriceBrl || 25.0) | number:'1.2-2' }}
+                        </td>
+                        <td class="py-3 px-3 text-right font-mono font-bold text-[#141414]">
+                          @if (alert.suggestedRestockQty > 0) {
+                            R$ {{ (alert.estimatedCostBrl || (alert.suggestedRestockQty * (alert.unitPriceBrl || 25))) | number:'1.2-2' }}
+                          } @else {
+                            -
+                          }
+                        </td>
                         <td class="py-3 px-3 text-right">
                           @if (alert.suggestedRestockQty > 0) {
                             <button
@@ -767,7 +926,7 @@
                               class="px-2.5 h-7 rounded bg-[#05944F] hover:bg-[#047840] text-white font-bold text-[11px] transition-colors inline-flex items-center gap-1"
                             >
                               <span>+{{ alert.suggestedRestockQty }} un.</span>
-                              <span class="hidden sm:inline">Repor lote</span>
+                              <span class="hidden sm:inline">Repor</span>
                             </button>
                           } @else {
                             <span class="text-[11px] text-[#046C3A] font-semibold">Em nível seguro</span>

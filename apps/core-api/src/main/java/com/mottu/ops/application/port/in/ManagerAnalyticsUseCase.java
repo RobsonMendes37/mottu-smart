@@ -8,6 +8,9 @@ import java.util.Map;
 public interface ManagerAnalyticsUseCase {
     AnalyticsSummaryResponseDto getSummary();
     DetailedAnalyticsResponseDto getDetailedAnalytics();
-    Map<String, Object> getAiAdvisorAdvice(String yardKey);
+    default Map<String, Object> getAiAdvisorAdvice(String yardKey) {
+        return getAiAdvisorAdvice(yardKey, 7, "ALL", "NORMAL");
+    }
+    Map<String, Object> getAiAdvisorAdvice(String yardKey, int horizonDays, String systemCategory, String scenario);
     Map<String, Object> queryOperationalData(String query, String yardKey);
 }

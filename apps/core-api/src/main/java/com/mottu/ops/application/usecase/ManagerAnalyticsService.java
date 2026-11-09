@@ -257,8 +257,16 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
 
     @Override
     public Map<String, Object> getAiAdvisorAdvice(String yardKey) {
+        return getAiAdvisorAdvice(yardKey, 7, "ALL", "NORMAL");
+    }
+
+    @Override
+    public Map<String, Object> getAiAdvisorAdvice(String yardKey, int horizonDays, String systemCategory, String scenario) {
         String key = (yardKey != null && !yardKey.isBlank()) ? yardKey.trim().toUpperCase() : "ALL";
         String label = resolveYardLabel(key);
+        int horizon = horizonDays > 0 ? horizonDays : 7;
+        String category = (systemCategory != null && !systemCategory.isBlank()) ? systemCategory.trim().toUpperCase() : "ALL";
+        String scen = (scenario != null && !scenario.isBlank()) ? scenario.trim().toUpperCase() : "NORMAL";
 
         try {
             Instant now = Instant.now();
@@ -284,7 +292,7 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
 
             List<Map<String, Object>> partsInventory = catalogParts.stream()
                     .filter(p -> p != null && p.getId() != null)
-                    .limit(8)
+                    .limit(10)
                     .map(p -> {
                         Map<String, Object> item = new HashMap<>();
                         item.put("sku", p.getVtexSku() != null ? p.getVtexSku() : "SKU-GEN");
@@ -293,6 +301,7 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
                         item.put("stockQuantity", p.getStockQuantity());
                         item.put("minStockQuantity", p.getMinStockQuantity());
                         item.put("occurrences30d", Math.max(p.getMinStockQuantity() * 3, partCounts.getOrDefault(p.getId(), 0L).intValue()));
+                        item.put("unitPriceBrl", p.getUnitPriceBrl() != null ? p.getUnitPriceBrl().doubleValue() : 25.0);
                         return item;
                     })
                     .toList();
@@ -304,6 +313,9 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
             requestPayload.put("previousPeriodInspections", prevCount);
             requestPayload.put("topMotorcycleModel", "Mottu Sport 110i");
             requestPayload.put("partsInventory", partsInventory);
+            requestPayload.put("horizonDays", horizon);
+            requestPayload.put("systemCategory", category);
+            requestPayload.put("scenario", scen);
 
             return intelligenceServiceClient.getAnalyticsAdvisorAdvice(requestPayload);
         } catch (Exception ex) {
@@ -316,6 +328,9 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
                 fallbackPayload.put("previousPeriodInspections", 96);
                 fallbackPayload.put("topMotorcycleModel", "Mottu Sport 110i");
                 fallbackPayload.put("partsInventory", List.of());
+                fallbackPayload.put("horizonDays", horizon);
+                fallbackPayload.put("systemCategory", category);
+                fallbackPayload.put("scenario", scen);
                 return intelligenceServiceClient.getAnalyticsAdvisorAdvice(fallbackPayload);
             } catch (Exception innerEx) {
                 log.error("Error calling intelligenceServiceClient fallback for yardKey {}", yardKey, innerEx);

@@ -169,6 +169,10 @@ export interface OpsStockoutAlertDto {
   daysToStockout: number;
   riskLevel: 'CRITICAL' | 'WARNING' | 'HEALTHY';
   suggestedRestockQty: number;
+  unitPriceBrl?: number;
+  estimatedCostBrl?: number;
+  projectedDemand?: number;
+  systemCategory?: string;
 }
 
 export interface OpsAdvisorResponseDto {
@@ -182,6 +186,11 @@ export interface OpsAdvisorResponseDto {
   growthAnalysisText: string;
   stockoutAlerts: OpsStockoutAlertDto[];
   recommendedActions: string[];
+  horizonDays?: number;
+  scenario?: string;
+  scenarioLabel?: string;
+  systemCategory?: string;
+  totalRestockBudgetBrl?: number;
 }
 
 

@@ -11,6 +11,7 @@ class PartInventoryItemDTO(BaseModel):
     stockQuantity: int = Field(ge=0)
     minStockQuantity: int = Field(ge=0, default=8)
     occurrences30d: int = Field(ge=0, default=0)
+    unitPriceBrl: float = Field(ge=0.0, default=25.0)
 
 
 class AnalyticsAdvisorRequestDTO(BaseModel):
@@ -20,6 +21,9 @@ class AnalyticsAdvisorRequestDTO(BaseModel):
     previousPeriodInspections: int = Field(ge=0, default=0)
     topMotorcycleModel: str = "Mottu Sport 110i"
     partsInventory: List[PartInventoryItemDTO] = Field(default_factory=list)
+    horizonDays: int = Field(ge=1, default=7)
+    scenario: str = "NORMAL"
+    systemCategory: str = "ALL"
 
 
 class StockoutAlertDTO(BaseModel):
@@ -32,6 +36,10 @@ class StockoutAlertDTO(BaseModel):
     daysToStockout: int
     riskLevel: str
     suggestedRestockQty: int
+    unitPriceBrl: float = 25.0
+    estimatedCostBrl: float = 0.0
+    projectedDemand: int = 0
+    systemCategory: str = "OTHER"
 
 
 class AnalyticsAdvisorResponseDTO(BaseModel):
@@ -45,6 +53,11 @@ class AnalyticsAdvisorResponseDTO(BaseModel):
     growthAnalysisText: str
     stockoutAlerts: List[StockoutAlertDTO]
     recommendedActions: List[str]
+    horizonDays: int = 7
+    scenario: str = "NORMAL"
+    scenarioLabel: str = "Operação Normal"
+    systemCategory: str = "ALL"
+    totalRestockBudgetBrl: float = 0.0
 
 
 

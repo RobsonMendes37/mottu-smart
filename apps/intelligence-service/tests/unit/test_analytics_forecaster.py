@@ -159,3 +159,136 @@ def test_build_deterministic_ops_advice_without_critical_alerts():
     assert "sem alertas críticos" in advice["executive_headline"] or "estável" in advice["executive_headline"]
     assert len(advice["recommended_actions"]) >= 1
 
+
+def test_categorize_part_domains():
+    from app.domain.services.analytics_forecaster import categorize_part
+
+    assert categorize_part("Manete de Freio Direito") == "BRAKE_HANDLEBAR"
+    assert categorize_part("Pastilha de Freio Dianteira") == "BRAKE_HANDLEBAR"
+    assert categorize_part("Pneu Traseiro 80/100-14") == "TIRES_WHEELS"
+    assert categorize_part("Kit Embreagem Completo") == "ENGINE_TRANSMISSION"
+    assert categorize_part("Retrovisor Direito Sport") == "FAIRING_BODY"
+    assert categorize_part("Bloco Óptico Principal") == "FAIRING_BODY"
+    assert categorize_part("Item Genérico Especial") == "OTHER"
+
+
+def test_evaluate_stockout_risks_scenarios_and_categories():
+    parts = [
+        {
+            "sku": "SKU-MANETE",
+            "part_name": "Manete de Freio",
+            "model_name": "Mottu Sport 110i",
+            "stock_quantity": 4,
+            "min_stock_quantity": 8,
+            "occurrences_30d": 30,  # base daily = 1.0
+            "unit_price_brl": 25.0,
+        },
+        {
+            "sku": "SKU-PNEU",
+            "part_name": "Pneu Traseiro",
+            "model_name": "Honda Pop 110i",
+            "stock_quantity": 10,
+            "min_stock_quantity": 8,
+            "occurrences_30d": 30,  # base daily = 1.0
+            "unit_price_brl": 180.0,
+        },
+        {
+            "sku": "SKU-EMBREAGEM",
+            "part_name": "Kit Embreagem",
+            "model_name": "TVS Raider 125",
+            "stock_quantity": 12,
+            "min_stock_quantity": 6,
+            "occurrences_30d": 30,  # base daily = 1.0
+            "unit_price_brl": 120.0,
+        },
+    ]
+
+    # 1. Rain peak scenario -> 1.35x for brake/drop
+    rain_eval = evaluate_stockout_risks(parts, horizon_days=15, scenario="RAIN_PEAK")
+    assert len(rain_eval) == 3
+    manete = next(p for p in rain_eval if p["sku"] == "SKU-MANETE")
+    assert manete["daily_burn_rate"] == 1.35
+    assert manete["projected_demand"] == round(1.35 * 15)
+    assert manete["unit_price_brl"] == 25.0
+    assert manete["estimated_cost_brl"] == manete["suggested_restock_qty"] * 25.0
+
+    # 2. Category filtering -> Only TIRES_WHEELS
+    tires_only = evaluate_stockout_risks(parts, system_category="TIRES_WHEELS")
+    assert len(tires_only) == 1
+    assert tires_only[0]["sku"] == "SKU-PNEU"
+
+    # 3. Fleet expansion scenario -> 1.25x across all
+    fleet_eval = evaluate_stockout_risks(parts, horizon_days=30, scenario="FLEET_EXPANSION")
+    assert all(p["daily_burn_rate"] >= 1.25 for p in fleet_eval)
+
+
+def test_build_deterministic_ops_advice_scenario_narrative():
+    growth = {"growth_rate_pct": 25.0, "projected_next_7d_count": 150}
+    stock_risks = [
+        {
+            "sku": "SKU-MANETE",
+            "part_name": "Manete de Freio",
+            "model_name": "Mottu Sport 110i",
+            "stock_quantity": 3,
+            "min_stock_quantity": 8,
+            "daily_burn_rate": 1.35,
+            "days_to_stockout": 2,
+            "risk_level": "CRITICAL",
+            "suggested_restock_qty": 21,
+            "estimated_cost_brl": 525.0,
+            "unit_price_brl": 25.0,
+            "projected_demand": 20,
+        }
+    ]
+
+    advice = build_deterministic_ops_advice(
+        yard_label="Butantã",
+        growth_info=growth,
+        stock_risks=stock_risks,
+        top_model="Mottu Sport 110i",
+        horizon_days=15,
+        scenario="RAIN_PEAK",
+    )
+
+    assert "Pico de Chuva" in advice["executive_headline"] or "Chuva" in advice["executive_headline"]
+    assert "15 dias" in advice["growth_analysis_text"] or "chuva" in advice["growth_analysis_text"].lower()
+    assert advice.get("total_restock_budget_brl") == 525.0
+    assert advice.get("scenario") == "RAIN_PEAK"
+    assert advice.get("horizon_days") == 15
+
+
+def test_build_deterministic_ops_advice_fleet_expansion():
+    growth = {"growth_rate_pct": 30.0, "projected_next_7d_count": 180}
+    stock_risks = [
+        {
+            "sku": "SKU-PNEU",
+            "part_name": "Pneu Traseiro",
+            "model_name": "Mottu Sport 110i",
+            "stock_quantity": 4,
+            "min_stock_quantity": 8,
+            "daily_burn_rate": 2.0,
+            "days_to_stockout": 2,
+            "risk_level": "CRITICAL",
+            "suggested_restock_qty": 20,
+            "estimated_cost_brl": 3600.0,
+            "unit_price_brl": 180.0,
+            "projected_demand": 60,
+        }
+    ]
+
+    advice = build_deterministic_ops_advice(
+        yard_label="Guarulhos",
+        growth_info=growth,
+        stock_risks=stock_risks,
+        top_model="Mottu Sport 110i",
+        horizon_days=30,
+        scenario="FLEET_EXPANSION",
+    )
+
+    assert "Expansão de Frota" in advice["executive_headline"]
+    assert "25%" in advice["growth_analysis_text"]
+    assert advice["total_restock_budget_brl"] == 3600.0
+    assert any("Ampliar lote mínimo" in action for action in advice["recommended_actions"])
+
+
+

@@ -106,16 +106,25 @@ async def generate_ops_advice(request: AnalyticsAdvisorRequestDTO) -> AnalyticsA
             "stock_quantity": p.stockQuantity,
             "min_stock_quantity": p.minStockQuantity,
             "occurrences_30d": p.occurrences30d,
+            "unit_price_brl": p.unitPriceBrl,
         }
         for p in request.partsInventory
     ]
 
-    stock_risks = evaluate_stockout_risks(parts_dicts)
+    stock_risks = evaluate_stockout_risks(
+        parts_dicts,
+        horizon_days=request.horizonDays,
+        scenario=request.scenario,
+        system_category=request.systemCategory,
+    )
     base_advice = build_deterministic_ops_advice(
         yard_label=request.yardLabel,
         growth_info=growth_info,
         stock_risks=stock_risks,
         top_model=request.topMotorcycleModel,
+        horizon_days=request.horizonDays,
+        scenario=request.scenario,
+        system_category=request.systemCategory,
     )
 
     vision_adapter = GeminiVisionAdapter()
@@ -136,6 +145,10 @@ async def generate_ops_advice(request: AnalyticsAdvisorRequestDTO) -> AnalyticsA
             daysToStockout=s["days_to_stockout"],
             riskLevel=s["risk_level"],
             suggestedRestockQty=s["suggested_restock_qty"],
+            unitPriceBrl=float(s.get("unit_price_brl", 25.0)),
+            estimatedCostBrl=float(s.get("estimated_cost_brl", 0.0)),
+            projectedDemand=int(s.get("projected_demand", 0)),
+            systemCategory=str(s.get("system_category", "OTHER")),
         )
         for s in enriched_advice.get("stockout_alerts", [])
     ]
@@ -151,6 +164,11 @@ async def generate_ops_advice(request: AnalyticsAdvisorRequestDTO) -> AnalyticsA
         growthAnalysisText=str(enriched_advice.get("growth_analysis_text")),
         stockoutAlerts=stockout_dtos,
         recommendedActions=list(enriched_advice.get("recommended_actions", [])),
+        horizonDays=int(base_advice.get("horizon_days", request.horizonDays)),
+        scenario=str(base_advice.get("scenario", request.scenario)),
+        scenarioLabel=str(base_advice.get("scenario_label", "Operação Normal")),
+        systemCategory=str(base_advice.get("system_category", request.systemCategory)),
+        totalRestockBudgetBrl=float(base_advice.get("total_restock_budget_brl", 0.0)),
     )
 
 

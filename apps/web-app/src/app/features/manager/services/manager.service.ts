@@ -157,8 +157,17 @@ export class ManagerService {
     return this.http.get<DetailedAnalyticsDto>('/api/v1/manager/analytics/detailed');
   }
 
-  getAiAdvisorAdvice(yardKey: string = 'ALL'): Observable<OpsAdvisorResponseDto> {
-    const params = new HttpParams().set('yardKey', yardKey);
+  getAiAdvisorAdvice(
+    yardKey: string = 'ALL',
+    horizonDays: number = 7,
+    systemCategory: string = 'ALL',
+    scenario: string = 'NORMAL'
+  ): Observable<OpsAdvisorResponseDto> {
+    const params = new HttpParams()
+      .set('yardKey', yardKey)
+      .set('horizonDays', horizonDays.toString())
+      .set('systemCategory', systemCategory)
+      .set('scenario', scenario);
     return this.http.post<OpsAdvisorResponseDto>(
       '/api/v1/manager/analytics/ai-advisor',
       {},

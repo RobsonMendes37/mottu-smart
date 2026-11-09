@@ -39,6 +39,11 @@ const DEFAULT_AI_ADVISOR: OpsAdvisorResponseDto = {
     'Crescimento de 18,4% na demanda de vistorias com alerta de reposição imediata para peças de freio e guidão.',
   growthAnalysisText:
     'Identificada aceleração de revisões nas motos Mottu Sport 110i e Honda Pop 110i, recomendando reposição preventiva no almoxarifado para manter as baias com liberação em até 30 minutos.',
+  horizonDays: 7,
+  scenario: 'NORMAL',
+  scenarioLabel: 'Operação Padrão',
+  systemCategory: 'ALL',
+  totalRestockBudgetBrl: 1137.50,
   stockoutAlerts: [
     {
       sku: 'SKU-SPORT-001',
@@ -50,6 +55,10 @@ const DEFAULT_AI_ADVISOR: OpsAdvisorResponseDto = {
       daysToStockout: 3,
       riskLevel: 'CRITICAL',
       suggestedRestockQty: 20,
+      unitPriceBrl: 25.00,
+      estimatedCostBrl: 500.00,
+      projectedDemand: 11,
+      systemCategory: 'BRAKE_HANDLEBAR',
     },
     {
       sku: 'SKU-POP-002',
@@ -61,6 +70,10 @@ const DEFAULT_AI_ADVISOR: OpsAdvisorResponseDto = {
       daysToStockout: 5,
       riskLevel: 'WARNING',
       suggestedRestockQty: 15,
+      unitPriceBrl: 42.50,
+      estimatedCostBrl: 637.50,
+      projectedDemand: 7,
+      systemCategory: 'FAIRING_BODY',
     },
     {
       sku: 'SKU-SPORT-002',
@@ -72,6 +85,10 @@ const DEFAULT_AI_ADVISOR: OpsAdvisorResponseDto = {
       daysToStockout: 13,
       riskLevel: 'HEALTHY',
       suggestedRestockQty: 0,
+      unitPriceBrl: 33.00,
+      estimatedCostBrl: 0.00,
+      projectedDemand: 15,
+      systemCategory: 'BRAKE_HANDLEBAR',
     },
   ],
   recommendedActions: [
@@ -106,6 +123,62 @@ export class T10AnalyticsComponent implements OnInit {
   aiAdvisor = signal<OpsAdvisorResponseDto>(DEFAULT_AI_ADVISOR);
   aiAdvisorLoading = signal<boolean>(false);
   aiAdvisorSuccessBanner = signal<string | null>(null);
+
+  // Predictive Forecasting Parameters & Scenario Simulation (Google-Grade What-If)
+  selectedHorizon = signal<number>(7);
+  selectedSystemCategory = signal<string>('ALL');
+  selectedScenario = signal<string>('NORMAL');
+
+  readonly horizonOptions = [
+    { value: 7, label: '7 dias' },
+    { value: 15, label: '15 dias' },
+    { value: 30, label: '30 dias' },
+    { value: 90, label: '90 dias' },
+  ];
+
+  readonly systemCategoryOptions = [
+    { value: 'ALL', label: 'Todos os Sistemas' },
+    { value: 'BRAKE_HANDLEBAR', label: 'Freio e Guidão' },
+    { value: 'TIRES_WHEELS', label: 'Pneus e Rodas' },
+    { value: 'ENGINE_TRANSMISSION', label: 'Motor e Câmbio' },
+    { value: 'FAIRING_BODY', label: 'Carenagem e Chassi' },
+  ];
+
+  readonly scenarioOptions = [
+    {
+      value: 'NORMAL',
+      label: 'Operação Padrão',
+      badge: '1.0x Nominal',
+      desc: 'Histórico nominal sem intempéries climáticas',
+    },
+    {
+      value: 'RAIN_PEAK',
+      label: 'Pico de Chuva e Quedas',
+      badge: '+35% Estresse',
+      desc: 'Chuva intensa em SP: quedas e quebra de manetes, espelhos e pastilhas',
+    },
+    {
+      value: 'FLEET_EXPANSION',
+      label: 'Expansão de Frota',
+      badge: '+25% Giro',
+      desc: 'Novos contratos ativos e maior quilometragem rodada por dia',
+    },
+  ];
+
+  totalStockoutBudget = computed(() => {
+    const adv = this.aiAdvisor();
+    if (adv?.totalRestockBudgetBrl && adv.totalRestockBudgetBrl > 0) {
+      return adv.totalRestockBudgetBrl;
+    }
+    return (adv?.stockoutAlerts || []).reduce(
+      (sum, a) => sum + (a.estimatedCostBrl || (a.suggestedRestockQty * (a.unitPriceBrl || 25))),
+      0
+    );
+  });
+
+  criticalAlertsCount = computed(() => {
+    return (this.aiAdvisor()?.stockoutAlerts || []).filter((a) => a.riskLevel === 'CRITICAL').length;
+  });
 
   // Google-Grade Conversational AI Data Explorer Signals
   searchQuery = signal<string>('Quais peças estão com estoque crítico?');
@@ -435,15 +508,37 @@ export class T10AnalyticsComponent implements OnInit {
     if (!this.managerService?.getAiAdvisorAdvice) return;
     this.aiAdvisorLoading.set(true);
 
-    this.managerService.getAiAdvisorAdvice(this.selectedYardFilter()).subscribe({
-      next: (res) => {
-        if (res) this.aiAdvisor.set(res);
-        this.aiAdvisorLoading.set(false);
-      },
-      error: () => {
-        this.aiAdvisorLoading.set(false);
-      },
-    });
+    this.managerService
+      .getAiAdvisorAdvice(
+        this.selectedYardFilter(),
+        this.selectedHorizon(),
+        this.selectedSystemCategory(),
+        this.selectedScenario()
+      )
+      .subscribe({
+        next: (res) => {
+          if (res) this.aiAdvisor.set(res);
+          this.aiAdvisorLoading.set(false);
+        },
+        error: () => {
+          this.aiAdvisorLoading.set(false);
+        },
+      });
+  }
+
+  setHorizon(days: number): void {
+    this.selectedHorizon.set(days);
+    this.loadAiAdvisor();
+  }
+
+  setSystemCategory(category: string): void {
+    this.selectedSystemCategory.set(category);
+    this.loadAiAdvisor();
+  }
+
+  setScenario(scenario: string): void {
+    this.selectedScenario.set(scenario);
+    this.loadAiAdvisor();
   }
 
   restockPart(sku: string, suggestedQty: number): void {

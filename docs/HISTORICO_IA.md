@@ -1337,3 +1337,35 @@
   - Angular Vitest: **241/241 testes passando com 100% de sucesso**.
   - Java Core API: **329/329 testes passando**.
   - Angular Production Build: **Aprovado com sucesso**.
+
+
+### [2026-11-09 19:40] — Barra de Parâmetros e Simulação Preditiva What-If (Google Cloud ML) + Auditoria Completa de Fluxos de Interface (/goal)
+- **Agente / Modelo:** `@orchestrator` + `@backend-specialist` + `@frontend-specialist` + `@qa-automation-engineer`
+- **Funcionalidades e Melhorias Entregues:**
+  1. **Motor de Domínio Python Preditivo com Cenários What-If (`analytics_forecaster.py`):**
+     - Função pura `categorize_part(part_name)` categorizando componentes em `BRAKE_HANDLEBAR`, `TIRES_WHEELS`, `ENGINE_TRANSMISSION`, `FAIRING_BODY` e `OTHER`.
+     - Evolução de `evaluate_stockout_risks` suportando parâmetros:
+       * `horizon_days` (7, 15, 30, 90 dias com projeção de demanda `daily_burn_rate * horizon_days`).
+       * `system_category` (filtro refinado de sistema).
+       * `scenario`: `NORMAL` (1.0x), `RAIN_PEAK` (multiplicador 1.35x para peças de queda e frenagem em pista molhada), `FLEET_EXPANSION` (1.25x geral).
+       * Cálculo automático de `unit_price_brl`, `estimated_cost_brl` por peça e `total_restock_budget_brl`.
+     - `build_deterministic_ops_advice`: geração de diagnósticos causais de IA específicos para cada cenário de estresse.
+     - 100% de cobertura de testes em `test_analytics_forecaster.py` (13/13 testes unitários).
+  2. **FastAPI & DTOs Atualizados (`apps/intelligence-service`):**
+     - `AnalyticsAdvisorRequestDTO` e `AnalyticsAdvisorResponseDTO` enriquecidos com `horizonDays`, `scenario`, `scenarioLabel`, `systemCategory`, `totalRestockBudgetBrl`, `unitPriceBrl`, `estimatedCostBrl`, `projectedDemand`.
+     - 189/189 testes passando no pytest (`apps/intelligence-service`).
+  3. **Backend Java Spring Boot 3.4 (`apps/core-api`):**
+     - `ManagerAnalyticsUseCase` e `ManagerAnalyticsService`: implementação de `getAiAdvisorAdvice(yardKey, horizonDays, systemCategory, scenario)` repassando os parâmetros ao `IntelligenceServiceClient`.
+     - `ManagerAnalyticsController`: rota `@PostMapping("/ai-advisor")` aceitando parâmetros de consulta com fallback seguro e enriquecido.
+     - 329/329 testes passando no JUnit 5 (`apps/core-api`).
+  4. **Frontend Angular 19 Standalone (`T10AnalyticsComponent`):**
+     - Adicionada **Barra de Parâmetros e Simulação de Cenários Preditivos** (Estilo Google Cloud ML / BigQuery):
+       * Seletor de Horizonte: pills de 7, 15, 30 e 90 dias.
+       * Seletor de Sistema: pills de Todos, Freio e Guidão, Pneus e Rodas, Motor e Câmbio, Carenagem e Chassi.
+       * Simulador What-If: 3 cards interativos de alto contraste (`Operação Padrão 1.0x`, `Pico de Chuva e Quedas +35%`, `Expansão de Frota +25%`).
+       * 4 Scorecards de impacto: Demanda Projetada, Alertas de Ruptura, Orçamento Estimado de Reposição e Variação de Demanda.
+       * Tabela de alertas enriquecida com Demanda no Período, Preço Unitário, Orçamento Sugerido e botão de Reposição Rápida em 1 clique.
+     - 243/243 testes passando no Angular Vitest (38 test suites).
+     - Build de produção concluído com sucesso (390 kB inicial).
+  5. **Bateria Completa de Testes E2E de Interface Playwright (`e2e/test-all-flows-complete.js`):**
+     - Script executável validando todos os fluxos das 3 personas (Gestor, Mecânico, Entregador e Perfis Vida Real).

@@ -86,6 +86,16 @@ jobs:
             else
               echo "S3_PUBLIC_ENDPOINT=http://161.153.2.148:18088" >> .env
             fi
+            if grep -q "^LOOKER_STUDIO_EMBED_URL=" .env 2>/dev/null; then
+              sed -i 's|^LOOKER_STUDIO_EMBED_URL=.*|LOOKER_STUDIO_EMBED_URL=https://datastudio.google.com/embed/reporting/b917630d-3e59-46e7-a877-5f8f0194d91d/page/Qe9CG|' .env
+            else
+              echo "LOOKER_STUDIO_EMBED_URL=https://datastudio.google.com/embed/reporting/b917630d-3e59-46e7-a877-5f8f0194d91d/page/Qe9CG" >> .env
+            fi
+            if grep -q "^BIGQUERY_ENABLED=" .env 2>/dev/null; then
+              sed -i 's|^BIGQUERY_ENABLED=.*|BIGQUERY_ENABLED=true|' .env
+            else
+              echo "BIGQUERY_ENABLED=true" >> .env
+            fi
             rm -f infra/.env
             cp -f .env infra/.env
 

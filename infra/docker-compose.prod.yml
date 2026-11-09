@@ -144,8 +144,9 @@ services:
       S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin123}
       S3_INTERNAL_ENDPOINT: ${S3_INTERNAL_ENDPOINT:-http://minio:9000}
       S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-http://localhost:19000}
-      BIGQUERY_ENABLED: ${BIGQUERY_ENABLED:-false}
+      BIGQUERY_ENABLED: ${BIGQUERY_ENABLED:-true}
       PUBLIC_DEMO_MODE: ${PUBLIC_DEMO_MODE:-false}
+      LOOKER_STUDIO_EMBED_URL: ${LOOKER_STUDIO_EMBED_URL:-https://datastudio.google.com/embed/reporting/b917630d-3e59-46e7-a877-5f8f0194d91d/page/Qe9CG}
       JAVA_OPTS: "-XX:+UseSerialGC -Xmx220m -Xms64m -XX:MaxMetaspaceSize=220m"
     deploy:
       resources:

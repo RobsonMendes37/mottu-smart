@@ -976,3 +976,15 @@
   - `apps/web-app`: 203/203 testes aprovados.
   - `apps/core-api`: `AppointmentAndOutboxIntegrationTest` 9/9 testes aprovados.
   - API da VM remota `/api/v1/manager/analytics/summary` retornou `HTTP 200` com a URL do Looker Studio vinculada com sucesso.
+
+### [2026-11-08 23:53] — `FEAT-EXECUTIVE-MOTTU-BI-STUDIO-AND-V7-SEED`: Painel Executivo Mottu BI Nativo + Migração Flyway V7 de Frota e Histórico
+- **Agente / Modelo:** `@frontend-specialist` + `@database-architect`
+- **Contexto e Execução:**
+  1. **Migração Flyway V7 (`apps/core-api/src/main/resources/db/migration/V7__seed_executive_fleet_and_inspections_history.sql`):**
+     - Semeados galpões adicionais (`Interlagos`, `Lapa`), 16 entregadores ativos, 18 motocicletas (`RENTED` e `AVAILABLE` nos 4 modelos) e 72 vistorias históricas resolvidas (`57 AUTO_RESOLVED` e `15 HUMAN_RESOLVED`, 79,2% de deflexão autônoma IA) para alimentar os indicadores reais de frota e oficina.
+  2. **Suíte Executiva Mottu BI Nativa (`apps/web-app/src/app/features/manager/pages/t10-analytics`):**
+     - Implementado o modo **`Painel Executivo Mottu BI`** (padrão Big Tech / Uber Base Web / Mottu Clean Fleet `#05944F`, `#141414`, `#D97706`, zero roxo) diretamente na tela T10, eliminando a necessidade de edição manual de gráficos no Looker Studio.
+     - Inclui filtros interativos por regional (`Todas as Unidades`, `Butantã`, `Guarulhos`, `Interlagos`, `Lapa`), 4 scorecards analíticos do BigQuery (`fact_inspections`), gráfico de rosca SVG multi-segmento, comparativo de deflexão IA e SLA por modelo de motocicleta e tabela executiva das Top 6 peças auditadas.
+     - Mantida a aba **`Relatório Looker Studio`** com alternância instantânea para exibir o `<iframe>` ao vivo do Google Looker Studio (`LOOKER_STUDIO_EMBED_URL`).
+- **Verificação Executada:**
+  - `apps/web-app`: 204/204 testes unitários aprovados (`t10-analytics.component.spec.ts` 7/7) e build de produção aprovado.

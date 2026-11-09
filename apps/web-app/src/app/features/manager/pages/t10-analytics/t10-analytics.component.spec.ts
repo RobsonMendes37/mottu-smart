@@ -85,4 +85,19 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
       expect(item.barClass).not.toMatch(/purple|violet|indigo/);
     }
   });
+
+  it('TC-T10-7: Switches between native Mottu BI Studio and Looker Studio iframe mode and filters by yard', () => {
+    expect(comp.biViewMode()).toBe('native');
+    expect(comp.selectedYardFilter()).toBe('ALL');
+    expect(comp.activeBiSnapshot().totalInspections).toBe(480);
+
+    comp.setYardFilter('SP-04');
+    expect(comp.selectedYardFilter()).toBe('SP-04');
+    expect(comp.activeBiSnapshot().totalInspections).toBe(168);
+
+    comp.setBiViewMode('looker');
+    expect(comp.biViewMode()).toBe('looker');
+    expect(comp.fleetModelBreakdown.length).toBe(4);
+    expect(comp.topAuditedParts.length).toBe(6);
+  });
 });

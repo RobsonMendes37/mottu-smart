@@ -525,10 +525,10 @@ export class T10AnalyticsComponent implements OnInit {
     if (!res) return;
 
     const summaryText = `*MOTTU SMART OPS — RELATÓRIO OPERACIONAL*\n` +
-      `📌 *Consulta:* ${res.query}\n` +
-      `🏢 *Unidade:* ${res.yardLabel}\n` +
-      `💡 *Diagnóstico:* ${res.directAnswer}\n` +
-      `📈 *Métrica:* ${res.keyMetricLabel}: ${res.keyMetricValue} (${res.keyMetricTrend})\n\n` +
+      `• *Consulta:* ${res.query}\n` +
+      `• *Unidade:* ${res.yardLabel}\n` +
+      `• *Diagnóstico:* ${res.directAnswer}\n` +
+      `• *Métrica:* ${res.keyMetricLabel}: ${res.keyMetricValue} (${res.keyMetricTrend})\n\n` +
       `*Evidências:*\n` +
       res.columns.join(' | ') + '\n' +
       res.rows.map((r) => r.join(' | ')).join('\n');

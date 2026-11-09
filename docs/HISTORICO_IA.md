@@ -1369,3 +1369,20 @@
      - Build de produção concluído com sucesso (390 kB inicial).
   5. **Bateria Completa de Testes E2E de Interface Playwright (`e2e/test-all-flows-complete.js`):**
      - Script executável validando todos os fluxos das 3 personas (Gestor, Mecânico, Entregador e Perfis Vida Real).
+- **Validação Completa E2E na Nuvem (`http://161.153.2.148`):**
+  - **15 de 15 fluxos de ponta a ponta validados com 100% de sucesso:**
+    1. Gestor: Login Vitrine e Navegação Inicial (`/manager/`) — ✅ APROVADO
+    2. Gestor: T08 Aprovações de Entregadores e Vínculo de Moto (`/manager/approvals`) — ✅ APROVADO
+    3. Gestor: T09 Catálogo VTEX com Sincronização e Edição Inline (`/manager/catalog`) — ✅ APROVADO
+    4. Gestor: T12 Faturamento Semanal e Conciliação Pix em 1 Clique (`/manager/billing`) — ✅ APROVADO
+    5. Gestor: T10 Analytics — Busca Operacional de Dados com Chips e Export (`/manager/analytics`) — ✅ APROVADO
+    6. Gestor: T10 Analytics — Nova Barra Preditiva e Simulação What-If de Cenários — ✅ APROVADO
+    7. Mecânico: Login e Fila de Triagem Priorizada (T05) (`/mechanic/queue`) — ✅ APROVADO
+    8. Mecânico: Bancada de Análise com Lupa Interativa e Foto Real (T06) (`/mechanic/workbench`) — ✅ APROVADO
+    9. Mecânico: WMS de Oficina — Ordens de Serviço nas Baias e Almoxarifado (`/mechanic/operations`) — ✅ APROVADO
+    10. Mecânico: Gestão da Frota de Motos do Pátio (T07) (`/mechanic/fleet`) — ✅ APROVADO
+    11. Entregador: Garagem Mobile e Dados da Moto Ativa (T02) (`/rider/garage`) — ✅ APROVADO
+    12. Entregador: Fatura Semanal Pix e Simulador de Entregas com Bônus (`/rider/rental`) — ✅ APROVADO
+    13. Entregador: Perfil Pessoal e Auditoria de Segurança (`/rider/account`) — ✅ APROVADO
+    14. Vida Real: Login com Entregador da Vida Real (Carlos Silva) — ✅ APROVADO
+    15. Vida Real: Login com Gestor da Vida Real (Diego Gestor) — ✅ APROVADO

@@ -81,7 +81,7 @@ export class RiderStore {
   // Live Inspection Status State (Screen T04)
   readonly currentInspection = signal<RiderInspectionDetails | null>(null);
   readonly currentLiveStatus = signal<InspectionStatus | null>(null);
-  readonly liveStepLabel = signal<string>('Aguardando análise da IA...');
+  readonly liveStepLabel = signal<string>('Analisando fotos da vistoria...');
   readonly isStreamingSse = signal<boolean>(false);
 
   // Yards & Booking

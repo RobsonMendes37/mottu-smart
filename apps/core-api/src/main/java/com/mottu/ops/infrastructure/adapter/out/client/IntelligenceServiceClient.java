@@ -206,7 +206,7 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
                 "demandGrowthPct", growthPct,
                 "projectedNext7DaysInspections", projected7d,
                 "executiveHeadline", "Crescimento de " + growthPct + "% na demanda de vistorias com alerta de reposição imediata para peças críticas.",
-                "growthAnalysisText", "O cruzamento do BigQuery (fact_inspections) indica projeção de " + projected7d + " vistorias nos próximos 7 dias para " + yardLabel + ".",
+                "growthAnalysisText", "Projeção de " + projected7d + " vistorias nos próximos 7 dias para " + yardLabel + ", com foco em giro de peças preventivas.",
                 "stockoutAlerts", List.of(),
                 "recommendedActions", List.of(
                         "Autorizar reposição preventiva de componentes com estoque abaixo do mínimo de segurança.",

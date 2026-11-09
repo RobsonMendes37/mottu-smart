@@ -206,7 +206,7 @@ export class AccidentWizardComponent {
       }
 
       // 4. Create accident report
-      this.uploadStatusMessage.set('Registrando chamado e acionando IA...');
+      this.uploadStatusMessage.set('Registrando chamado e analisando fotos...');
       const idempotencyKey = generateUuid();
 
       const command: CreateAccidentReportCommand = {

@@ -97,7 +97,7 @@
         (click)="scrollToSection('ai-advisor-section')"
         role="button"
         tabindex="0"
-        title="Ver projeções e recomendações da IA"
+        title="Ver previsão de demanda e reposição"
         class="bg-white border border-[#E2E2E2] hover:border-[#141414] rounded-lg p-4 cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all group"
       >
         <div class="flex items-center justify-between">
@@ -111,23 +111,20 @@
       </div>
     </div>
 
-    <!-- GOOGLE-GRADE CONVERSATIONAL AI DATA EXPLORER (Ask Your Data) -->
-    <section class="bg-white border-2 border-[#141414] rounded-xl p-5 shadow-xs space-y-4">
+    <!-- OPERATIONAL DATA SEARCH & EXPLORER -->
+    <section class="bg-white border border-[#E2E2E2] rounded-xl p-5 shadow-xs space-y-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-[#EEEEEE]">
         <div>
           <div class="flex items-center gap-2">
             <h3 class="text-base font-extrabold text-[#141414] tracking-tight">
-              ✨ Explorador Inteligente de Dados da Operação (Google AI & BigQuery)
+              Busca Operacional de Dados
             </h3>
             <span class="px-2 py-0.5 rounded bg-[#E6F4EE] text-[#046C3A] font-mono text-[11px] font-bold">
-              {{ dataExplorerResult()?.modelUsed || 'gemini-3.5-flash-lite' }}
-            </span>
-            <span class="px-2 py-0.5 rounded bg-[#F3F3F3] text-[#545454] font-mono text-[11px] font-semibold">
-              SQL Real
+              Base Atualizada
             </span>
           </div>
           <p class="text-xs text-[#545454] mt-0.5">
-            Faça perguntas em linguagem natural para analisar frotas, estoque, laudos contratuais e finanças da rede Mottu.
+            Consulte peças em risco, vistorias e indicadores em tempo real.
           </p>
         </div>
 
@@ -145,7 +142,7 @@
             type="button"
             (click)="copyExecutiveSummary()"
             [disabled]="!dataExplorerResult()"
-            title="Copiar resumo formatado para colar no Slack ou WhatsApp"
+            title="Copiar resumo para compartilhar"
             class="px-3 h-8 rounded-md bg-[#141414] hover:opacity-90 text-white text-xs font-semibold transition-opacity flex items-center gap-1.5 disabled:opacity-50"
           >
             @if (copySummaryFeedback()) {
@@ -157,7 +154,7 @@
         </div>
       </div>
 
-      <!-- Natural Language Search Input Bar -->
+      <!-- Search Input Bar -->
       <div class="space-y-2.5">
         <form (ngSubmit)="executeDataQuery()" class="flex flex-col sm:flex-row gap-2">
           <div class="relative flex-1">
@@ -171,7 +168,7 @@
               name="searchQuery"
               [ngModel]="searchQuery()"
               (ngModelChange)="searchQuery.set($event)"
-              placeholder="Pergunte aos dados da operação (ex.: Estoque crítico Butantã, Mau uso vs Isenção, Qual modelo quebra mais?)..."
+              placeholder="Ex: Peças com estoque crítico, vistorias pendentes, consumo por modelo..."
               class="w-full h-11 pl-10 pr-3.5 rounded-lg bg-[#F6F6F6] border border-[#E2E2E2] focus:bg-white focus:border-[#141414] text-sm text-[#141414] placeholder-[#757575] focus:outline-none transition-all"
             />
           </div>
@@ -185,16 +182,16 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
               </svg>
-              <span>Consultando IA...</span>
+              <span>Buscando...</span>
             } @else {
-              <span>Consultar IA →</span>
+              <span>Buscar dados →</span>
             }
           </button>
         </form>
 
-        <!-- 6 Quick Prompts Pills -->
+        <!-- Quick Prompts Pills -->
         <div class="flex items-center gap-1.5 flex-wrap">
-          <span class="text-[11px] font-bold text-[#757575] mr-1">Perguntas rápidas:</span>
+          <span class="text-[11px] font-bold text-[#757575] mr-1">Consultas rápidas:</span>
           @for (p of quickPrompts; track p.label) {
             <button
               type="button"
@@ -215,13 +212,13 @@
           <div class="grid grid-cols-1 md:grid-cols-12 gap-3 bg-[#F6F6F6] p-4 rounded-lg border border-[#E2E2E2]">
             <div class="md:col-span-8 space-y-1.5">
               <span class="text-[10px] font-mono uppercase tracking-wider font-extrabold text-[#05944F]">
-                💡 Resposta Direta da IA (TL;DR)
+                Diagnóstico Operacional
               </span>
               <p class="text-sm font-bold text-[#141414] leading-relaxed">
                 {{ res.directAnswer }}
               </p>
               <span class="text-[11px] text-[#757575]">
-                Base: {{ res.yardLabel }} • Consulta gerada em tempo real com cruzamento SQL
+                Unidade: {{ res.yardLabel }} • Atualizado agora
               </span>
             </div>
 
@@ -636,18 +633,18 @@
             </div>
           </div>
 
-          <!-- NOVO: Diagnóstico e Previsão de Demanda IA (BigQuery + Almoxarifado) -->
+          <!-- Previsão de Demanda e Reposição -->
           <div id="ai-advisor-section" class="bg-white border border-[#E2E2E2] rounded-lg p-5 space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#EEEEEE]">
               <div>
                 <div class="flex items-center gap-2">
-                  <h4 class="text-sm font-bold text-[#141414]">Diagnóstico e Previsão de Demanda IA (BigQuery + Almoxarifado)</h4>
+                  <h4 class="text-sm font-bold text-[#141414]">Previsão de Demanda e Reposição</h4>
                   <span class="px-2 py-0.5 rounded bg-[#E6F4EE] text-[#046C3A] font-mono text-[11px] font-bold">
-                    {{ aiAdvisor().modelUsed }}
+                    Próximos 7 dias
                   </span>
                 </div>
                 <p class="text-xs text-[#757575] mt-0.5">
-                  Análise preditiva cruzando histórico no Google BigQuery com o consumo diário de peças na unidade.
+                  Estimativa de revisões e alertas de estoque para evitar paradas na oficina.
                 </p>
               </div>
 
@@ -660,7 +657,7 @@
                 @if (aiAdvisorLoading()) {
                   <span>Calculando...</span>
                 } @else {
-                  <span>Atualizar análise IA</span>
+                  <span>Atualizar previsão</span>
                 }
               </button>
             </div>
@@ -799,7 +796,7 @@
           <div class="bg-[#F6F6F6] p-4 space-y-3">
             <div class="flex items-center justify-between bg-white px-4 py-2.5 rounded-lg border border-[#E2E2E2] text-xs">
               <span class="text-[#545454]">
-                Relatório interativo do Looker Studio conectado à base analítica do BigQuery.
+                Painel executivo com telemetria e histórico consolidado da frota.
               </span>
               @if (rawEmbedUrl()) {
                 <a

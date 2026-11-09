@@ -38,7 +38,7 @@ const DEFAULT_AI_ADVISOR: OpsAdvisorResponseDto = {
   executiveHeadline:
     'Crescimento de 18,4% na demanda de vistorias com alerta de reposição imediata para peças de freio e guidão.',
   growthAnalysisText:
-    'O cruzamento com os dados operacionais do BigQuery (fact_inspections) indica aceleração de chamados nas motos Mottu Sport 110i e Honda Pop 110i, demandando reposição proativa no almoxarifado para manter o tempo de baia abaixo de 30 minutos.',
+    'Identificada aceleração de revisões nas motos Mottu Sport 110i e Honda Pop 110i, recomendando reposição preventiva no almoxarifado para manter as baias com liberação em até 30 minutos.',
   stockoutAlerts: [
     {
       sku: 'SKU-SPORT-001',
@@ -134,12 +134,12 @@ export class T10AnalyticsComponent implements OnInit {
   copySummaryFeedback = signal<boolean>(false);
 
   readonly quickPrompts = [
-    { label: '🚨 Ruptura de Estoque', query: 'Quais peças estão com estoque crítico e precisam de reposição?' },
-    { label: '💰 Mau Uso vs Isenção', query: 'Qual a proporção de mau uso cobrado vs isenções contratuais?' },
-    { label: '🏍️ Modelo Mais Demandado', query: 'Qual modelo de moto concentra mais vistorias e reparos?' },
-    { label: '🏭 Comparar Galpões', query: 'Comparativo de desempenho entre Butantã, Guarulhos, Interlagos e Lapa' },
-    { label: '📋 Pix e Faturamento', query: 'Qual a situação atual dos contratos e pagamentos Pix?' },
-    { label: '⚡ Resumo Geral de Hoje', query: 'Resumo executivo consolidado da operação de hoje' },
+    { label: 'Peças críticas', query: 'Quais peças estão com estoque crítico e precisam de reposição?' },
+    { label: 'Vistorias pendentes', query: 'Qual a situação das vistorias e laudos de hoje?' },
+    { label: 'Modelos com mais trocas', query: 'Qual modelo de moto concentra mais revisões e trocas de peças?' },
+    { label: 'Comparar unidades', query: 'Comparativo de desempenho entre Butantã, Guarulhos, Interlagos e Lapa' },
+    { label: 'Contratos e Pix', query: 'Qual a situação atual dos contratos e pagamentos Pix?' },
+    { label: 'Resumo geral', query: 'Resumo operacional consolidado da operação de hoje' },
   ];
 
   private readonly initialYardSnapshots: YardBiSnapshot[] = [
@@ -524,12 +524,12 @@ export class T10AnalyticsComponent implements OnInit {
     const res = this.dataExplorerResult();
     if (!res) return;
 
-    const summaryText = `*MOTTU SMART OPS — RESUMO EXECUTIVO DE IA*\n` +
+    const summaryText = `*MOTTU SMART OPS — RELATÓRIO OPERACIONAL*\n` +
       `📌 *Consulta:* ${res.query}\n` +
       `🏢 *Unidade:* ${res.yardLabel}\n` +
-      `💡 *Resposta Direta:* ${res.directAnswer}\n` +
-      `📈 *Métrica Chave:* ${res.keyMetricLabel}: ${res.keyMetricValue} (${res.keyMetricTrend})\n\n` +
-      `*Evidências em Tabela:*\n` +
+      `💡 *Diagnóstico:* ${res.directAnswer}\n` +
+      `📈 *Métrica:* ${res.keyMetricLabel}: ${res.keyMetricValue} (${res.keyMetricTrend})\n\n` +
+      `*Evidências:*\n` +
       res.columns.join(' | ') + '\n' +
       res.rows.map((r) => r.join(' | ')).join('\n');
 
@@ -554,7 +554,7 @@ export class T10AnalyticsComponent implements OnInit {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `relatorio_mottu_ia_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `relatorio_operacional_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

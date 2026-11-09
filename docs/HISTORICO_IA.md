@@ -1211,3 +1211,31 @@
   - **Total Consolidado: 746 testes automatizados passando com 100% de sucesso**.
 - **Próximo Passo:**
   - Push para `origin main` com acionamento do CD e validação em produção na VM (`http://161.153.2.148`).
+
+
+### [2026-11-09 17:15] — Limpeza de Jargões de IA e Simplificação Direta dos Perfis de Login
+- **Agente / Modelo:** `@orchestrator` + `@frontend-specialist`
+- **Ajustes Realizados:**
+  1. **Seletor de Perfis no Login Super Direto e Sem Paredes de Texto:**
+     - Eliminadas as caixas duplas com parágrafos explicativos longos e bordas pesadas.
+     - Substituído por um bloco compacto único com 2 linhas diretas:
+       - Linha 1: `Demonstração (Histórico completo)` -> Botões diretos `🏍️ Entregador`, `🔧 Mecânico`, `📊 Gestor`.
+       - Linha 2: `Operação Real (Grava no banco)` -> Botões destacados com verde Mottu `🏍️ Entregador`, `🔧 Mecânico`, `📊 Gestor`.
+     - Zero poluição visual, acionamento limpo em 1 clique.
+  2. **Eliminação de Jargões Excessivos de IA em Todas as Telas:**
+     - `T10 Analytics`: Mudado de "Explorador Inteligente de Dados da Operação (Google AI & BigQuery)" para **"Busca Operacional de Dados"**; "Consultar IA" para **"Buscar dados"**; "💡 Resposta Direta da IA (TL;DR)" para **"Diagnóstico Operacional"**; "Diagnóstico e Previsão de Demanda IA (BigQuery + Almoxarifado)" para **"Previsão de Demanda e Reposição"**; chips renomeados para termos operacionais diretos (*Peças críticas*, *Vistorias pendentes*, *Modelos com mais trocas*, *Faturas e Pix*, etc.).
+     - Removidas tags artificiais como `gemini-3.5-flash-lite` e menções acadêmicas de "linguagem natural" e "cruzamento SQL".
+     - Ajustados textos na área do Entregador e Mecânico (*"Registrando chamado e analisando fotos..."*, *"Analisando fotos da vistoria..."* e *"Indicadores & Relatórios"*).
+- **Arquivos Alterados:**
+  - `apps/web-app/src/app/features/auth/login.component.html`
+  - `apps/web-app/src/app/features/manager/pages/t10-analytics/t10-analytics.component.html`
+  - `apps/web-app/src/app/features/manager/pages/t10-analytics/t10-analytics.component.ts`
+  - `apps/web-app/src/app/features/shared/account/staff-account.component.html`
+  - `apps/web-app/src/app/features/rider/pages/accident-wizard/accident-wizard.component.ts`
+  - `apps/web-app/src/app/features/rider/state/rider.store.ts`
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/client/IntelligenceServiceClient.java`
+- **Validação:**
+  - Angular Vitest: 232/232 testes passando.
+  - Angular Production Build: OK (383 kB bundle inicial, sem warnings de template).
+  - Python Pytest: 185/185 testes passando.
+  - Java Unit Tests: 7/7 passando.

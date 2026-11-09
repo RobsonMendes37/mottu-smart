@@ -1124,3 +1124,26 @@
   - Todas as tarefas de `TASK-19` a `TASK-24` do `PLANO_OPERACAO_REAL_E_IA_BIGQUERY.md` e `mottu-smart-ops.md` foram integralmente concluídas.
 - **Próximo Passo:**
   - Merge e push para a branch `main` com disparo do fluxo de Continuous Deployment na VM (`http://161.153.2.148:18088`).
+
+
+### [2026-11-09 14:45] — Correção e Blindagem End-to-End: Sincronização VTEX, Resiliência de Indicadores/IA (Anti-500) e Interatividade dos Cards do Gestor
+- **Agente / Modelo:** `@orchestrator` + `@frontend-specialist` + `@backend-specialist`
+- **Arquivos Criados/Alterados:**
+  - `apps/intelligence-service/app/infrastructure/web/internal_router.py`: Otimização do endpoint `/internal/v1/catalog/sync` eliminando chamadas síncronas remotas em loop ao Gemini para 200+ peças raspadas (evitando timeout/reset do HTTP client `header parser received no bytes`) e limitando a mineração a `max_items=200`.
+  - `apps/intelligence-service/app/infrastructure/adapters/postgres_pgvector.py`: Query `upsert_parts` atualizada com defaults explícitos para `stock_quantity` (18), `min_stock_quantity` (8) e `aisle_bin` ('Corredor A • Gaveta 01').
+  - `apps/core-api/src/main/resources/db/migration/V9__heal_catalog_and_contracts_nulls.sql`: Migração Flyway de auto-cura sanitizando linhas pré-existentes no PostgreSQL com valores nulos em `catalog_parts` e `rental_contracts`.
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/entity/CatalogPartJpaEntity.java`: Substituição de tipos primitivos `int` por `Integer` com getters seguros para evitar `PropertyAccessException` do Hibernate ao ler nulos do banco.
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/entity/RentalContractJpaEntity.java`: Remoção de anotações estritas `nullable = false` e inclusão de getters defensivos para contratos legados.
+  - `apps/core-api/src/main/java/com/mottu/ops/application/usecase/ManagerAnalyticsService.java`: Blindagem completa dos métodos `getSummary()`, `getDetailedAnalytics()` e `getAiAdvisorAdvice(yardKey)` com proteção contra NPE no agrupamento de modelos de motos e blocos `try-catch` com fallbacks estruturados, garantindo impossibilidade de erro HTTP 500.
+  - `apps/core-api/src/main/java/com/mottu/ops/application/service/BillingAndRentalService.java`: Tratamento defensivo em `listBillingContracts()` e `toBillingSummary()`.
+  - `apps/core-api/src/test/java/com/mottu/ops/application/usecase/ManagerAnalyticsServiceTest.java`: 5 novos testes unitários validando imunidade a falhas e comportamento dos fallbacks analíticos.
+  - `apps/web-app/src/app/features/shared/account/staff-account.component.ts|html` & `staff-account.component.spec.ts`: Implementação de interatividade com click-to-copy para Matrícula e CPF (com toast "Copiado!"), seletor interativo de unidade com persistência imediata e 4 cards de atalhos operacionais rápidos com navegação direta para os painéis do gestor.
+  - `apps/web-app/src/app/features/manager/pages/t08-approvals/t08-approvals.component.ts|html` & `t08-approvals.component.spec.ts`: Interatividade nos 4 cards KPI com filtros (`ALL`, `RIDER`, `MECHANIC`) e navegação para a frota.
+  - `apps/web-app/src/app/features/manager/pages/t10-analytics/t10-analytics.component.ts|html` & `t10-analytics.component.spec.ts`: Cards KPI clicáveis com navegação e scroll suave para distribuição de pareceres e consultor IA BigQuery, além de indicadores visuais de carregamento (spinners).
+  - `apps/web-app/src/app/features/manager/pages/t12-billing/t12-billing.component.html`: 4 cards KPI com filtros dinâmicos de faturamento (`ALL`, `PAID`, `PENDING_PIX`, `OVERDUE`).
+  - `apps/web-app/src/app/features/manager/pages/t09-catalog/t09-catalog.component.html`: Interatividade e visual tokens atualizados.
+- **Testes Multi-Stack Executados:**
+  - Python: **175/175 testes aprovados** (`pytest`).
+  - Java: **327/327 testes aprovados** (`./mvnw test`).
+  - Angular: **229/229 testes aprovados** (`vitest`) + Build de Produção concluído com sucesso em 5.8s.
+  - **Total: 731 testes automatizados passando com 100% de sucesso**.

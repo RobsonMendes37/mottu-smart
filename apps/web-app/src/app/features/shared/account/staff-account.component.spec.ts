@@ -52,5 +52,20 @@ describe('StaffAccountComponent (Screen T11 Web - Minha conta corporativa)', () 
     );
     expect(comp.successMessage()).toContain('Dados da conta atualizados');
   });
+
+  it('TC-STAFF-3: Copies field to clipboard and sets copiedField signal', () => {
+    comp.copyToClipboard('MOT-SP04-0104', 'employeeCode');
+    expect(comp.copiedField()).toBe('employeeCode');
+  });
+
+  it('TC-STAFF-4: Switches preferred operational unit and saves profile', () => {
+    comp.setUnit('Unidade Guarulhos (SP-01)');
+    expect(comp.preferredUnit()).toBe('Unidade Guarulhos (SP-01)');
+    expect(mockProfileService.updateProfile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        preferredUnit: 'Unidade Guarulhos (SP-01)',
+      })
+    );
+  });
 });
 

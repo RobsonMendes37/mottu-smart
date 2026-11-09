@@ -44,8 +44,9 @@ class PostgresPgVectorAdapter(CatalogRepositoryPort):
             query = """
                 INSERT INTO catalog_parts (
                     vtex_sku, motorcycle_model, part_name, category, unit_price_brl,
-                    is_natural_wear, price_overridden, image_url, embedding, updated_at
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::vector, NOW())
+                    is_natural_wear, price_overridden, image_url, embedding,
+                    stock_quantity, min_stock_quantity, aisle_bin, updated_at
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::vector, 18, 8, 'Corredor A • Gaveta 01', NOW())
                 ON CONFLICT (vtex_sku, motorcycle_model) DO UPDATE
                 SET part_name = EXCLUDED.part_name,
                     category = EXCLUDED.category,
@@ -53,6 +54,9 @@ class PostgresPgVectorAdapter(CatalogRepositoryPort):
                     is_natural_wear = EXCLUDED.is_natural_wear,
                     image_url = EXCLUDED.image_url,
                     embedding = COALESCE(EXCLUDED.embedding, catalog_parts.embedding),
+                    stock_quantity = COALESCE(catalog_parts.stock_quantity, 18),
+                    min_stock_quantity = COALESCE(catalog_parts.min_stock_quantity, 8),
+                    aisle_bin = COALESCE(catalog_parts.aisle_bin, 'Corredor A • Gaveta 01'),
                     updated_at = NOW();
             """
             if len(parts) > 1 and hasattr(conn, "executemany"):

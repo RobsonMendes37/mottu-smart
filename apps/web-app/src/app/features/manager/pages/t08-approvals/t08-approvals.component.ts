@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ManagerService } from '../../services/manager.service';
 import {
   PendingUserResponseDto,
@@ -16,6 +17,7 @@ import { DesktopShellComponent } from '../../../../shared/layout/desktop-shell/d
 })
 export class T08ApprovalsComponent implements OnInit {
   private managerService: ManagerService;
+  private router: Router | null = null;
 
   pendingUsers = signal<PendingUserResponseDto[]>([]);
   availableMotorcycles = signal<AvailableMotorcycleOption[]>([]);
@@ -55,11 +57,24 @@ export class T08ApprovalsComponent implements OnInit {
   riderCount = computed(() => this.pendingUsers().filter((u) => u.role === 'RIDER').length);
   mechanicCount = computed(() => this.pendingUsers().filter((u) => u.role === 'MECHANIC').length);
 
-  constructor(managerService?: ManagerService) {
+  constructor(managerService?: ManagerService, router?: Router) {
     try {
       this.managerService = managerService ?? inject(ManagerService);
     } catch {
       this.managerService = managerService as ManagerService;
+    }
+    try {
+      this.router = router ?? inject(Router, { optional: true });
+    } catch {
+      this.router = router ?? null;
+    }
+  }
+
+  navigateToFleet(): void {
+    if (this.router) {
+      this.router.navigate(['/mechanic/fleet']);
+    } else if (typeof window !== 'undefined') {
+      window.location.href = '/mechanic/fleet';
     }
   }
 

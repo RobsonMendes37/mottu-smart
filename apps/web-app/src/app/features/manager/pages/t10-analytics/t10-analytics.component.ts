@@ -446,6 +446,15 @@ export class T10AnalyticsComponent implements OnInit {
     this.biViewMode.set(mode);
   }
 
+  scrollToSection(sectionId: string): void {
+    if (typeof document !== 'undefined') {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }
+
   setYardFilter(yardKey: string): void {
     this.selectedYardFilter.set(yardKey);
     this.loadAiAdvisor();

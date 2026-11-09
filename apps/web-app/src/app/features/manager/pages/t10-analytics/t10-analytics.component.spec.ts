@@ -121,4 +121,8 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
     expect(updated.riskLevel).toBe('HEALTHY');
     expect(comp.aiAdvisorSuccessBanner()).toContain('reposto com sucesso');
   });
+
+  it('TC-T10-10: Supports scrollToSection safely when element is present or absent', () => {
+    expect(() => comp.scrollToSection('verdict-distribution-section')).not.toThrow();
+  });
 });

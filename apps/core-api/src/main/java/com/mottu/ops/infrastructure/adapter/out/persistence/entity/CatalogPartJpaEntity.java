@@ -47,13 +47,13 @@ public class CatalogPartJpaEntity {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    @Column(name = "stock_quantity", nullable = false)
-    private int stockQuantity = 18;
+    @Column(name = "stock_quantity")
+    private Integer stockQuantity = 18;
 
-    @Column(name = "min_stock_quantity", nullable = false)
-    private int minStockQuantity = 8;
+    @Column(name = "min_stock_quantity")
+    private Integer minStockQuantity = 8;
 
-    @Column(name = "aisle_bin", nullable = false, length = 60)
+    @Column(name = "aisle_bin", length = 60)
     private String aisleBin = "Corredor A • Gaveta 01";
 
     public CatalogPartJpaEntity() {
@@ -164,26 +164,26 @@ public class CatalogPartJpaEntity {
     }
 
     public int getStockQuantity() {
-        return stockQuantity;
+        return stockQuantity != null ? stockQuantity : 18;
     }
 
-    public void setStockQuantity(int stockQuantity) {
-        this.stockQuantity = stockQuantity;
+    public void setStockQuantity(Integer stockQuantity) {
+        this.stockQuantity = stockQuantity != null ? stockQuantity : 18;
     }
 
     public int getMinStockQuantity() {
-        return minStockQuantity;
+        return minStockQuantity != null ? minStockQuantity : 8;
     }
 
-    public void setMinStockQuantity(int minStockQuantity) {
-        this.minStockQuantity = minStockQuantity;
+    public void setMinStockQuantity(Integer minStockQuantity) {
+        this.minStockQuantity = minStockQuantity != null ? minStockQuantity : 8;
     }
 
     public String getAisleBin() {
-        return aisleBin;
+        return (aisleBin != null && !aisleBin.isBlank()) ? aisleBin : "Corredor A • Gaveta 01";
     }
 
     public void setAisleBin(String aisleBin) {
-        this.aisleBin = aisleBin;
+        this.aisleBin = (aisleBin != null && !aisleBin.isBlank()) ? aisleBin : "Corredor A • Gaveta 01";
     }
 }

@@ -1,13 +1,14 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { DesktopShellComponent } from '../../../shared/layout/desktop-shell/desktop-shell.component';
 import { ProfileService } from '../../../core/services/profile.service';
 
 @Component({
   selector: 'app-staff-account',
   standalone: true,
-  imports: [CommonModule, FormsModule, DesktopShellComponent],
+  imports: [CommonModule, FormsModule, RouterLink, DesktopShellComponent],
   templateUrl: './staff-account.component.html',
 })
 export class StaffAccountComponent implements OnInit {
@@ -27,6 +28,14 @@ export class StaffAccountComponent implements OnInit {
 
   successMessage = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
+  copiedField = signal<string | null>(null);
+
+  availableUnits = [
+    'Unidade Butantã (SP-04)',
+    'Unidade Guarulhos (SP-01)',
+    'Unidade Interlagos (SP-07)',
+    'Unidade Lapa (SP-02)',
+  ];
 
   initials = computed(() => {
     const name = this.fullName() || 'MO';
@@ -53,6 +62,24 @@ export class StaffAccountComponent implements OnInit {
       },
       error: () => {},
     });
+  }
+
+  copyToClipboard(text: string, fieldName: string): void {
+    if (!text) return;
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {});
+    }
+    this.copiedField.set(fieldName);
+    setTimeout(() => {
+      if (this.copiedField() === fieldName) {
+        this.copiedField.set(null);
+      }
+    }, 2000);
+  }
+
+  setUnit(unit: string): void {
+    this.preferredUnit.set(unit);
+    this.onSaveProfile();
   }
 
   private populateFields(p: any): void {

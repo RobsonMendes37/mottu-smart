@@ -36,16 +36,16 @@ public class RentalContractJpaEntity {
     @Column(name = "contract_code", length = 30)
     private String contractCode;
 
-    @Column(name = "weekly_plan_brl", nullable = false, precision = 10, scale = 2)
+    @Column(name = "weekly_plan_brl", precision = 10, scale = 2)
     private java.math.BigDecimal weeklyPlanBrl = new java.math.BigDecimal("196.00");
 
-    @Column(name = "discount_brl", nullable = false, precision = 10, scale = 2)
+    @Column(name = "discount_brl", precision = 10, scale = 2)
     private java.math.BigDecimal discountBrl = new java.math.BigDecimal("15.00");
 
-    @Column(name = "payment_status", nullable = false, length = 20)
+    @Column(name = "payment_status", length = 20)
     private String paymentStatus = "PENDING_PIX";
 
-    @Column(name = "due_date_label", nullable = false, length = 80)
+    @Column(name = "due_date_label", length = 80)
     private String dueDateLabel = "Vence segunda-feira • 18:00";
 
     @Column(name = "paid_at")
@@ -137,7 +137,7 @@ public class RentalContractJpaEntity {
     }
 
     public java.math.BigDecimal getWeeklyPlanBrl() {
-        return weeklyPlanBrl;
+        return weeklyPlanBrl != null ? weeklyPlanBrl : new java.math.BigDecimal("196.00");
     }
 
     public void setWeeklyPlanBrl(java.math.BigDecimal weeklyPlanBrl) {
@@ -145,7 +145,7 @@ public class RentalContractJpaEntity {
     }
 
     public java.math.BigDecimal getDiscountBrl() {
-        return discountBrl;
+        return discountBrl != null ? discountBrl : new java.math.BigDecimal("15.00");
     }
 
     public void setDiscountBrl(java.math.BigDecimal discountBrl) {
@@ -153,7 +153,7 @@ public class RentalContractJpaEntity {
     }
 
     public String getPaymentStatus() {
-        return paymentStatus;
+        return paymentStatus != null ? paymentStatus : "PENDING_PIX";
     }
 
     public void setPaymentStatus(String paymentStatus) {
@@ -161,7 +161,7 @@ public class RentalContractJpaEntity {
     }
 
     public String getDueDateLabel() {
-        return dueDateLabel;
+        return dueDateLabel != null ? dueDateLabel : "Vence segunda-feira • 18:00";
     }
 
     public void setDueDateLabel(String dueDateLabel) {

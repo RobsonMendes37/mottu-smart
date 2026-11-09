@@ -21,29 +21,96 @@
       </div>
     }
 
-    <!-- 4 KPI Cards -->
+    <!-- 4 Interactive KPI Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-        <span class="text-xs font-medium text-[#757575]">Contratos na carteira</span>
+      <div
+        (click)="setFilter('ALL')"
+        role="button"
+        tabindex="0"
+        title="Filtrar todos os contratos"
+        class="bg-white border rounded-lg p-4 cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all"
+        [class.border-[#141414]]="activeFilter() === 'ALL'"
+        [class.border-[#E2E2E2]]="activeFilter() !== 'ALL'"
+        [class.ring-1]="activeFilter() === 'ALL'"
+        [class.ring-[#141414]]="activeFilter() === 'ALL'"
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-[#757575]">Contratos na carteira</span>
+          @if (activeFilter() === 'ALL') {
+            <span class="text-[10px] font-bold text-[#141414] bg-[#F3F3F3] px-1.5 py-0.5 rounded">Ativo</span>
+          }
+        </div>
         <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">{{ contracts().length }}</p>
+        <span class="text-[11px] text-[#757575]">Clique para ver todos</span>
       </div>
-      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-        <span class="text-xs font-medium text-[#757575]">Quitados no ciclo</span>
+
+      <div
+        (click)="setFilter('PAID')"
+        role="button"
+        tabindex="0"
+        title="Filtrar contratos quitados"
+        class="bg-white border rounded-lg p-4 cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all"
+        [class.border-[#141414]]="activeFilter() === 'PAID'"
+        [class.border-[#E2E2E2]]="activeFilter() !== 'PAID'"
+        [class.ring-1]="activeFilter() === 'PAID'"
+        [class.ring-[#141414]]="activeFilter() === 'PAID'"
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-[#757575]">Quitados no ciclo</span>
+          @if (activeFilter() === 'PAID') {
+            <span class="text-[10px] font-bold text-[#141414] bg-[#F3F3F3] px-1.5 py-0.5 rounded">Ativo</span>
+          }
+        </div>
         <p class="text-2xl font-extrabold font-mono text-[#046C3A] mt-1">
           {{ paidCount() }} / {{ contracts().length }}
         </p>
+        <span class="text-[11px] text-[#757575]">Clique para filtrar quitados</span>
       </div>
-      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-        <span class="text-xs font-medium text-[#757575]">Faturamento da semana</span>
+
+      <div
+        (click)="setFilter('PENDING_PIX')"
+        role="button"
+        tabindex="0"
+        title="Filtrar contratos pendentes Pix"
+        class="bg-white border rounded-lg p-4 cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all"
+        [class.border-[#141414]]="activeFilter() === 'PENDING_PIX'"
+        [class.border-[#E2E2E2]]="activeFilter() !== 'PENDING_PIX'"
+        [class.ring-1]="activeFilter() === 'PENDING_PIX'"
+        [class.ring-[#141414]]="activeFilter() === 'PENDING_PIX'"
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-[#757575]">Faturamento da semana</span>
+          @if (activeFilter() === 'PENDING_PIX') {
+            <span class="text-[10px] font-bold text-[#141414] bg-[#F3F3F3] px-1.5 py-0.5 rounded">Pendentes Pix</span>
+          }
+        </div>
         <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">
           R$ {{ totalWeeklyRevenueBrl().toFixed(2).replace('.', ',') }}
         </p>
+        <span class="text-[11px] text-[#757575]">Clique para ver pendentes Pix</span>
       </div>
-      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-        <span class="text-xs font-medium text-[#757575]">Com avaria vinculada</span>
+
+      <div
+        (click)="setFilter('OVERDUE')"
+        role="button"
+        tabindex="0"
+        title="Filtrar contratos em atraso"
+        class="bg-white border rounded-lg p-4 cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all"
+        [class.border-[#141414]]="activeFilter() === 'OVERDUE'"
+        [class.border-[#E2E2E2]]="activeFilter() !== 'OVERDUE'"
+        [class.ring-1]="activeFilter() === 'OVERDUE'"
+        [class.ring-[#141414]]="activeFilter() === 'OVERDUE'"
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-[#757575]">Com avaria vinculada</span>
+          @if (activeFilter() === 'OVERDUE') {
+            <span class="text-[10px] font-bold text-[#DC2626] bg-[#FEE2E2] px-1.5 py-0.5 rounded">Atrasos</span>
+          }
+        </div>
         <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">
           {{ withInspectionChargeCount() }}
         </p>
+        <span class="text-[11px] text-[#757575]">Clique para filtrar pendências</span>
       </div>
     </div>
 

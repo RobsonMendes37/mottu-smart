@@ -24,23 +24,84 @@
       </button>
     </div>
 
-    <!-- 4 KPI Summary Cards -->
+    <!-- 4 Interactive KPI Summary Cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-        <span class="text-xs font-medium text-[#757575]">Aguardando liberação</span>
+      <div
+        (click)="setFilter('ALL')"
+        role="button"
+        tabindex="0"
+        title="Filtrar todos os cadastros pendentes"
+        class="bg-white border rounded-lg p-4 cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all"
+        [class.border-[#141414]]="activeFilter() === 'ALL'"
+        [class.border-[#E2E2E2]]="activeFilter() !== 'ALL'"
+        [class.ring-1]="activeFilter() === 'ALL'"
+        [class.ring-[#141414]]="activeFilter() === 'ALL'"
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-[#757575]">Aguardando liberação</span>
+          @if (activeFilter() === 'ALL') {
+            <span class="text-[10px] font-bold text-[#141414] bg-[#F3F3F3] px-1.5 py-0.5 rounded">Ativo</span>
+          }
+        </div>
         <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">{{ pendingUsers().length }}</p>
+        <span class="text-[11px] text-[#757575]">Clique para ver todos</span>
       </div>
-      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-        <span class="text-xs font-medium text-[#757575]">Entregadores pendentes</span>
+
+      <div
+        (click)="setFilter('RIDER')"
+        role="button"
+        tabindex="0"
+        title="Filtrar apenas entregadores"
+        class="bg-white border rounded-lg p-4 cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all"
+        [class.border-[#141414]]="activeFilter() === 'RIDER'"
+        [class.border-[#E2E2E2]]="activeFilter() !== 'RIDER'"
+        [class.ring-1]="activeFilter() === 'RIDER'"
+        [class.ring-[#141414]]="activeFilter() === 'RIDER'"
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-[#757575]">Entregadores pendentes</span>
+          @if (activeFilter() === 'RIDER') {
+            <span class="text-[10px] font-bold text-[#141414] bg-[#F3F3F3] px-1.5 py-0.5 rounded">Ativo</span>
+          }
+        </div>
         <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">{{ riderCount() }}</p>
+        <span class="text-[11px] text-[#757575]">Clique para filtrar</span>
       </div>
-      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-        <span class="text-xs font-medium text-[#757575]">Mecânicos pendentes</span>
+
+      <div
+        (click)="setFilter('MECHANIC')"
+        role="button"
+        tabindex="0"
+        title="Filtrar apenas mecânicos"
+        class="bg-white border rounded-lg p-4 cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all"
+        [class.border-[#141414]]="activeFilter() === 'MECHANIC'"
+        [class.border-[#E2E2E2]]="activeFilter() !== 'MECHANIC'"
+        [class.ring-1]="activeFilter() === 'MECHANIC'"
+        [class.ring-[#141414]]="activeFilter() === 'MECHANIC'"
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-[#757575]">Mecânicos pendentes</span>
+          @if (activeFilter() === 'MECHANIC') {
+            <span class="text-[10px] font-bold text-[#141414] bg-[#F3F3F3] px-1.5 py-0.5 rounded">Ativo</span>
+          }
+        </div>
         <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">{{ mechanicCount() }}</p>
+        <span class="text-[11px] text-[#757575]">Clique para filtrar</span>
       </div>
-      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-        <span class="text-xs font-medium text-[#757575]">Motos livres para vínculo</span>
+
+      <div
+        (click)="navigateToFleet()"
+        role="button"
+        tabindex="0"
+        title="Ver motos disponíveis no galpão"
+        class="bg-white border border-[#E2E2E2] hover:border-[#05944F] rounded-lg p-4 cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all"
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-[#757575]">Motos livres para vínculo</span>
+          <span class="w-2 h-2 rounded-full bg-[#05944F]"></span>
+        </div>
         <p class="text-2xl font-extrabold font-mono text-[#046C3A] mt-1">{{ availableMotorcycles().length }}</p>
+        <span class="text-[11px] text-[#046C3A] font-semibold">Ver frota no pátio &rarr;</span>
       </div>
     </div>
 

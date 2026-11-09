@@ -33,7 +33,10 @@ router = APIRouter(
 async def sync_catalog(request: CatalogSyncRequestDTO) -> CatalogSyncResponseDTO:
     """Sync catalog with VTEX Mottu Store or fallback snapshot (UC-11)."""
     miner = VTEXCatalogMiner()
-    raw_items, used_fallback = await miner.fetch_catalog(force_refresh=request.forceRefresh)
+    raw_items, used_fallback = await miner.fetch_catalog(
+        force_refresh=request.forceRefresh,
+        max_items=200,
+    )
 
     postgres_adapter = PostgresPgVectorAdapter()
     vision_adapter = GeminiVisionAdapter()
@@ -43,7 +46,11 @@ async def sync_catalog(request: CatalogSyncRequestDTO) -> CatalogSyncResponseDTO
         compatible_models = extract_compatible_models(raw)
         for m in compatible_models:
             norm_item = normalize_vtex_item(raw, m)
-            emb = await vision_adapter.generate_embedding(norm_item.part_name)
+            # Deterministic fast embedding in mock mode; in live mode, leave None so COALESCE preserves DB vector
+            emb = None
+            if vision_adapter.mock_mode:
+                emb = vision_adapter.mock_service.generate_embedding(norm_item.part_name)
+
             norm_item = PartCatalogItem(
                 vtex_sku=norm_item.vtex_sku,
                 motorcycle_model=m,
@@ -63,7 +70,7 @@ async def sync_catalog(request: CatalogSyncRequestDTO) -> CatalogSyncResponseDTO
         syncedCount=len(raw_items),
         usedFallback=used_fallback,
         syncedAt=datetime.now(timezone.utc),
-        message="Catálogo sincronizado com sucesso.",
+        message="Catálogo sincronizado com a Loja Mottu com sucesso.",
     )
 
 

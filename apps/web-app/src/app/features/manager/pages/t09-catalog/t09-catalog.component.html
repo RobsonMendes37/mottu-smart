@@ -29,11 +29,27 @@
       </button>
     </div>
 
-    <!-- 3 KPI Cards -->
+    <!-- 3 Interactive KPI Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-        <span class="text-xs font-medium text-[#757575]">Peças ativas na base</span>
+      <div
+        (click)="setModelFilter('')"
+        role="button"
+        tabindex="0"
+        title="Mostrar todas as peças"
+        class="bg-white border rounded-lg p-4 cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all"
+        [class.border-[#141414]]="selectedModel() === ''"
+        [class.border-[#E2E2E2]]="selectedModel() !== ''"
+        [class.ring-1]="selectedModel() === ''"
+        [class.ring-[#141414]]="selectedModel() === ''"
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-[#757575]">Peças ativas na base</span>
+          @if (selectedModel() === '') {
+            <span class="text-[10px] font-bold text-[#141414] bg-[#F3F3F3] px-1.5 py-0.5 rounded">Todas</span>
+          }
+        </div>
         <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">{{ totalElements() }}</p>
+        <span class="text-[11px] text-[#757575]">Clique para limpar filtros</span>
       </div>
 
       <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
@@ -73,9 +89,13 @@
         }
       </div>
 
-      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-        <span class="text-xs font-medium text-[#757575]">Itens isentos (desgaste natural)</span>
+      <div class="bg-white border border-[#E2E2E2] hover:border-[#05944F] rounded-lg p-4 transition-all">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-[#757575]">Itens isentos (desgaste natural)</span>
+          <span class="w-2 h-2 rounded-full bg-[#05944F]"></span>
+        </div>
         <p class="text-2xl font-extrabold font-mono text-[#046C3A] mt-1">{{ naturalWearCount() }}</p>
+        <span class="text-[11px] text-[#757575]">Peças cobertas pelo plano</span>
       </div>
     </div>
 

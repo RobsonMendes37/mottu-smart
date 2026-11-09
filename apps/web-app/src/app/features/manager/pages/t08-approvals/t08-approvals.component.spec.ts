@@ -170,4 +170,11 @@ describe('T08ApprovalsComponent (Screen T08 - User & Contract Approvals)', () =>
     comp.closeUserDrawer();
     expect(comp.drawerUser()).toBeNull();
   });
+
+  it('TC-T08-10: Navigates to fleet screen when clicking fleet card', () => {
+    const mockRouter = { navigate: vi.fn() } as any;
+    const approvalsComp = new T08ApprovalsComponent(mockManagerService, mockRouter);
+    approvalsComp.navigateToFleet();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/mechanic/fleet']);
+  });
 });

@@ -16,9 +16,21 @@
       <button
         type="button"
         (click)="refresh()"
-        class="self-start sm:self-auto px-4 h-10 rounded-md bg-white border border-[#E2E2E2] hover:bg-[#F3F3F3] text-xs font-semibold text-[#141414] transition-colors"
+        [disabled]="isLoading() || aiAdvisorLoading()"
+        class="self-start sm:self-auto px-4 h-10 rounded-md bg-white border border-[#E2E2E2] hover:bg-[#F3F3F3] text-xs font-semibold text-[#141414] transition-colors flex items-center gap-2 disabled:opacity-50"
       >
-        Atualizar painel
+        @if (isLoading() || aiAdvisorLoading()) {
+          <svg class="animate-spin w-3.5 h-3.5 text-[#141414]" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          <span>Atualizando indicadores...</span>
+        } @else {
+          <svg class="w-3.5 h-3.5 text-[#545454]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>Atualizar painel</span>
+        }
       </button>
     </div>
 
@@ -28,38 +40,74 @@
       </div>
     }
 
-    <!-- 4 Sober Executive KPI Cards -->
+    <!-- 4 Interactive Sober Executive KPI Cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-        <span class="text-xs font-medium text-[#757575]">Frota em operação</span>
+      <a
+        routerLink="/mechanic/fleet"
+        role="button"
+        tabindex="0"
+        title="Ver detalhes da frota do galpão"
+        class="bg-white border border-[#E2E2E2] hover:border-[#141414] rounded-lg p-4 cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all block group"
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-[#757575]">Frota em operação</span>
+          <span class="text-[11px] text-[#757575] group-hover:text-[#141414]">&rarr;</span>
+        </div>
         <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">
           {{ summary()?.activeMotorcyclesCount || 36 }}
         </p>
-        <span class="text-[11px] text-[#757575]">Motos com contrato ativo</span>
-      </div>
+        <span class="text-[11px] text-[#757575] group-hover:underline">Motos com contrato ativo</span>
+      </a>
 
-      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-        <span class="text-xs font-medium text-[#757575]">Vistorias sem fila humana</span>
+      <div
+        (click)="scrollToSection('verdict-distribution-section')"
+        role="button"
+        tabindex="0"
+        title="Ver distribuição de pareceres"
+        class="bg-white border border-[#E2E2E2] hover:border-[#05944F] rounded-lg p-4 cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all group"
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-[#757575]">Vistorias sem fila humana</span>
+          <span class="text-[11px] text-[#05944F]">&darr;</span>
+        </div>
         <p class="text-2xl font-extrabold font-mono text-[#046C3A] mt-1">
           {{ summary()?.autoResolvedPercentage || 78.5 }}%
         </p>
-        <span class="text-[11px] text-[#757575]">Resolvidas direto pelo app</span>
+        <span class="text-[11px] text-[#757575] group-hover:text-[#046C3A]">Resolvidas direto pelo app</span>
       </div>
 
-      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-        <span class="text-xs font-medium text-[#757575]">Fila da oficina agora</span>
+      <a
+        routerLink="/mechanic/queue"
+        role="button"
+        tabindex="0"
+        title="Ver fila de espera na oficina"
+        class="bg-white border border-[#E2E2E2] hover:border-[#141414] rounded-lg p-4 cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all block group"
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-[#757575]">Fila da oficina agora</span>
+          <span class="text-[11px] text-[#757575] group-hover:text-[#141414]">&rarr;</span>
+        </div>
         <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">
           {{ summary()?.currentHumanQueueSize ?? 0 }}
         </p>
-        <span class="text-[11px] text-[#757575]">Aguardando parecer na bancada</span>
-      </div>
+        <span class="text-[11px] text-[#757575] group-hover:underline">Aguardando parecer na bancada</span>
+      </a>
 
-      <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
-        <span class="text-xs font-medium text-[#757575]">Horas poupadas na oficina</span>
+      <div
+        (click)="scrollToSection('ai-advisor-section')"
+        role="button"
+        tabindex="0"
+        title="Ver projeções e recomendações da IA"
+        class="bg-white border border-[#E2E2E2] hover:border-[#141414] rounded-lg p-4 cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all group"
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-[#757575]">Horas poupadas na oficina</span>
+          <span class="text-[11px] text-[#141414]">&darr;</span>
+        </div>
         <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">
           {{ summary()?.estimatedMechanicHoursSaved || 28.5 }}h
         </p>
-        <span class="text-[11px] text-[#757575]">Capacidade liberada para reparos</span>
+        <span class="text-[11px] text-[#757575] group-hover:underline">Capacidade liberada para reparos</span>
       </div>
     </div>
 
@@ -97,7 +145,7 @@
       </section>
 
       <!-- Verdict Distribution Card (5 cols) -->
-      <section class="lg:col-span-5 bg-white border border-[#E2E2E2] rounded-lg p-5 space-y-4">
+      <section id="verdict-distribution-section" class="lg:col-span-5 bg-white border border-[#E2E2E2] rounded-lg p-5 space-y-4">
         <div>
           <h3 class="text-sm font-bold text-[#141414]">Distribuição de pareceres</h3>
           <p class="text-xs text-[#757575]">Classificação consolidada das vistorias encerradas</p>
@@ -415,7 +463,7 @@
           </div>
 
           <!-- NOVO: Diagnóstico e Previsão de Demanda IA (BigQuery + Almoxarifado) -->
-          <div class="bg-white border border-[#E2E2E2] rounded-lg p-5 space-y-4">
+          <div id="ai-advisor-section" class="bg-white border border-[#E2E2E2] rounded-lg p-5 space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#EEEEEE]">
               <div>
                 <div class="flex items-center gap-2">

@@ -6,6 +6,7 @@ import com.mottu.ops.application.exception.DuplicateResourceException;
 import com.mottu.ops.application.exception.InvalidCredentialsException;
 import com.mottu.ops.application.exception.ResourceNotFoundException;
 import com.mottu.ops.domain.exception.BusinessRuleViolationException;
+import com.mottu.ops.domain.exception.DomainRuleException;
 import com.mottu.ops.domain.exception.DomainValidationException;
 import com.mottu.ops.infrastructure.adapter.in.web.dto.ErrorResponseDto;
 import com.mottu.ops.infrastructure.config.CorrelationIdFilter;
@@ -94,6 +95,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessRuleViolationException.class)
     public ResponseEntity<ErrorResponseDto> handleBusinessRuleViolationException(
             BusinessRuleViolationException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, "Regra de Negócio Violada", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(DomainRuleException.class)
+    public ResponseEntity<ErrorResponseDto> handleDomainRuleException(
+            DomainRuleException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, "Regra de Negócio Violada", ex.getMessage(), request);
     }
 

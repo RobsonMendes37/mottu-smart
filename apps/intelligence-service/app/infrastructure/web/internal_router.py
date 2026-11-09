@@ -4,8 +4,18 @@ from typing import List
 from fastapi import APIRouter, Depends
 from app.application.dtos.catalog_dto import CatalogSyncRequestDTO, CatalogSyncResponseDTO
 from app.application.dtos.feedback_dto import FeedbackPolishRequestDTO, FeedbackPolishResponseDTO
+from app.application.dtos.analytics_dto import (
+    AnalyticsAdvisorRequestDTO,
+    AnalyticsAdvisorResponseDTO,
+    StockoutAlertDTO,
+)
 from app.domain.enums import MotorcycleModel
 from app.domain.models import PartCatalogItem
+from app.domain.services.analytics_forecaster import (
+    build_deterministic_ops_advice,
+    calculate_demand_growth,
+    evaluate_stockout_risks,
+)
 from app.domain.vtex_normalizer import extract_compatible_models, normalize_vtex_item, parse_motorcycle_model
 from app.infrastructure.adapters.gemini_adapter import GeminiVisionAdapter
 from app.infrastructure.adapters.postgres_pgvector import PostgresPgVectorAdapter
@@ -68,3 +78,68 @@ async def polish_feedback(request: FeedbackPolishRequestDTO) -> FeedbackPolishRe
         mechanic_notes=request.mechanicNotes,
     )
     return FeedbackPolishResponseDTO(customerFriendlyMessage=polished)
+
+
+@router.post("/analytics/advisor", response_model=AnalyticsAdvisorResponseDTO)
+async def generate_ops_advice(request: AnalyticsAdvisorRequestDTO) -> AnalyticsAdvisorResponseDTO:
+    """Analyze demand growth and evaluate stockout risks for yard operations."""
+    growth_info = calculate_demand_growth(
+        current_period_count=request.currentPeriodInspections,
+        previous_period_count=request.previousPeriodInspections,
+    )
+
+    parts_dicts = [
+        {
+            "sku": p.sku,
+            "part_name": p.partName,
+            "model_name": p.modelName,
+            "stock_quantity": p.stockQuantity,
+            "min_stock_quantity": p.minStockQuantity,
+            "occurrences_30d": p.occurrences30d,
+        }
+        for p in request.partsInventory
+    ]
+
+    stock_risks = evaluate_stockout_risks(parts_dicts)
+    base_advice = build_deterministic_ops_advice(
+        yard_label=request.yardLabel,
+        growth_info=growth_info,
+        stock_risks=stock_risks,
+        top_model=request.topMotorcycleModel,
+    )
+
+    vision_adapter = GeminiVisionAdapter()
+    enriched_advice = await vision_adapter.generate_ops_advisor_insights(
+        deterministic_advice=base_advice,
+        top_model=request.topMotorcycleModel,
+        yard_label=request.yardLabel,
+    )
+
+    stockout_dtos = [
+        StockoutAlertDTO(
+            sku=s["sku"],
+            partName=s["part_name"],
+            modelName=s["model_name"],
+            currentStock=s["stock_quantity"],
+            minStock=s["min_stock_quantity"],
+            dailyBurnRate=s["daily_burn_rate"],
+            daysToStockout=s["days_to_stockout"],
+            riskLevel=s["risk_level"],
+            suggestedRestockQty=s["suggested_restock_qty"],
+        )
+        for s in enriched_advice.get("stockout_alerts", [])
+    ]
+
+    return AnalyticsAdvisorResponseDTO(
+        yardKey=request.yardKey,
+        yardLabel=request.yardLabel,
+        generatedAt=datetime.now(timezone.utc),
+        modelUsed="gemini-3.5-flash-lite",
+        demandGrowthPct=float(growth_info["growth_rate_pct"]),
+        projectedNext7DaysInspections=int(growth_info["projected_next_7d_count"]),
+        executiveHeadline=str(enriched_advice.get("executive_headline")),
+        growthAnalysisText=str(enriched_advice.get("growth_analysis_text")),
+        stockoutAlerts=stockout_dtos,
+        recommendedActions=list(enriched_advice.get("recommended_actions", [])),
+    )
+

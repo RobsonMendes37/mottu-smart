@@ -79,5 +79,31 @@ describe('RiderRentalComponent (Screen T04C - Aluguel semanal e entregas)', () =
     expect(comp.activeSection()).toBe('deliveries');
     expect(comp.shellActiveTab()).toBe('deliveries');
   });
+
+  it('TC-T04C-4: payPix updates payment status to PAID and sets confirmation message', () => {
+    expect(comp.paymentStatus()).toBe('PENDING_PIX');
+    comp.payPix();
+    expect(comp.paymentStatus()).toBe('PAID');
+    expect(comp.feedbackMessage()).toContain('confirmado com sucesso');
+  });
+
+  it('TC-T04C-5: submitDeliveries adds daily count and unlocks R$ 40,00 bonus when reaching 120', () => {
+    comp.setSection('deliveries');
+    const initialCount = comp.weeklyDeliveriesTotal();
+    expect(initialCount).toBe(118);
+
+    comp.toggleRegisterDeliveries();
+    expect(comp.isRegisterDeliveriesOpen()).toBe(true);
+
+    comp.newDeliveriesCount.set(5);
+    comp.newDeliveriesEarnings.set(50.0);
+    comp.submitDeliveries();
+
+    expect(comp.isRegisterDeliveriesOpen()).toBe(false);
+    expect(comp.weeklyDeliveriesTotal()).toBe(123);
+    expect(comp.deliveryBonusBrl()).toBe(40.0);
+    expect(comp.isGoalAchieved()).toBe(true);
+    expect(comp.feedbackMessage()).toContain('bônus creditados');
+  });
 });
 

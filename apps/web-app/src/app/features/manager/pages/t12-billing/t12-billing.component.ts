@@ -1,21 +1,14 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DesktopShellComponent } from '../../../../shared/layout/desktop-shell/desktop-shell.component';
+import { ManagerService } from '../../services/manager.service';
+import {
+  ContractPaymentStatus,
+  WeeklyBillingContract,
+} from '../../models/manager.models';
 
-export type ContractPaymentStatus = 'PAID' | 'PENDING_PIX' | 'OVERDUE';
-
-export interface WeeklyBillingContract {
-  contractCode: string;
-  riderName: string;
-  plate: string;
-  model: string;
-  weeklyPlanBrl: number;
-  inspectionChargesBrl: number;
-  discountBrl: number;
-  paymentStatus: ContractPaymentStatus;
-  dueDateLabel: string;
-}
+export type { ContractPaymentStatus, WeeklyBillingContract };
 
 @Component({
   selector: 'app-t12-billing',
@@ -23,10 +16,13 @@ export interface WeeklyBillingContract {
   imports: [CommonModule, FormsModule, DesktopShellComponent],
   templateUrl: './t12-billing.component.html',
 })
-export class T12BillingComponent {
+export class T12BillingComponent implements OnInit {
+  private managerService: ManagerService | null;
+
   activeFilter = signal<'ALL' | ContractPaymentStatus>('ALL');
   searchQuery = signal<string>('');
   selectedContract = signal<WeeklyBillingContract | null>(null);
+  feedbackBanner = signal<string | null>(null);
 
   contracts = signal<WeeklyBillingContract[]>([
     {
@@ -100,6 +96,31 @@ export class T12BillingComponent {
     () => this.contracts().filter((c) => c.inspectionChargesBrl > 0).length
   );
 
+  constructor(managerService?: ManagerService) {
+    try {
+      this.managerService = managerService ?? inject(ManagerService, { optional: true });
+    } catch {
+      this.managerService = managerService ?? null;
+    }
+  }
+
+  ngOnInit(): void {
+    this.loadContracts();
+  }
+
+  loadContracts(): void {
+    if (!this.managerService) return;
+
+    this.managerService.getBillingContracts().subscribe({
+      next: (list) => {
+        if (list && list.length > 0) {
+          this.contracts.set(list);
+        }
+      },
+      error: () => {},
+    });
+  }
+
   netTotal(c: WeeklyBillingContract): number {
     return c.weeklyPlanBrl + c.inspectionChargesBrl - c.discountBrl;
   }
@@ -119,5 +140,42 @@ export class T12BillingComponent {
   closeDrawer(): void {
     this.selectedContract.set(null);
   }
-}
 
+  confirmPix(contractCode: string): void {
+    // Otimista
+    this.contracts.update((list) =>
+      list.map((c) =>
+        c.contractCode === contractCode
+          ? { ...c, paymentStatus: 'PAID', dueDateLabel: 'Pago via Pix • Confirmado' }
+          : c
+      )
+    );
+
+    const sel = this.selectedContract();
+    if (sel && sel.contractCode === contractCode) {
+      this.selectedContract.set({
+        ...sel,
+        paymentStatus: 'PAID',
+        dueDateLabel: 'Pago via Pix • Confirmado',
+      });
+    }
+
+    this.feedbackBanner.set(
+      `Pagamento Pix do contrato ${contractCode} confirmado com sucesso!`
+    );
+
+    if (this.managerService) {
+      this.managerService.confirmPixPayment(contractCode).subscribe({
+        next: (updated) => {
+          this.contracts.update((list) =>
+            list.map((c) => (c.contractCode === contractCode ? updated : c))
+          );
+          if (this.selectedContract()?.contractCode === contractCode) {
+            this.selectedContract.set(updated);
+          }
+        },
+        error: () => {},
+      });
+    }
+  }
+}

@@ -17,6 +17,7 @@ import com.mottu.ops.infrastructure.adapter.out.persistence.entity.InspectionAud
 import com.mottu.ops.infrastructure.adapter.out.persistence.entity.InspectionJpaEntity;
 import com.mottu.ops.infrastructure.adapter.out.persistence.entity.MotorcycleJpaEntity;
 import com.mottu.ops.infrastructure.adapter.out.persistence.entity.RentalContractJpaEntity;
+import com.mottu.ops.infrastructure.adapter.out.persistence.entity.ServiceOrderJpaEntity;
 import com.mottu.ops.domain.model.YardAppointment;
 import com.mottu.ops.infrastructure.adapter.out.persistence.entity.YardAppointmentJpaEntity;
 import com.mottu.ops.infrastructure.adapter.out.persistence.entity.YardJpaEntity;
@@ -25,6 +26,7 @@ import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDat
 import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataInspectionRepository;
 import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataMotorcycleRepository;
 import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataRentalContractRepository;
+import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataServiceOrderRepository;
 import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataYardAppointmentRepository;
 import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataYardRepository;
 import com.mottu.ops.infrastructure.adapter.out.storage.PerceptualHashService;
@@ -58,6 +60,7 @@ public class RiderInspectionService implements RiderInspectionUseCase {
     private final SpringDataMotorcycleRepository motorcycleRepository;
     private final SpringDataYardAppointmentRepository appointmentRepository;
     private final SpringDataYardRepository yardRepository;
+    private final SpringDataServiceOrderRepository serviceOrderRepository;
     private final StoragePort storagePort;
     private final S3StorageProperties storageProperties;
     private final PerceptualHashService perceptualHashService;
@@ -73,6 +76,7 @@ public class RiderInspectionService implements RiderInspectionUseCase {
             SpringDataMotorcycleRepository motorcycleRepository,
             SpringDataYardAppointmentRepository appointmentRepository,
             SpringDataYardRepository yardRepository,
+            SpringDataServiceOrderRepository serviceOrderRepository,
             StoragePort storagePort,
             S3StorageProperties storageProperties,
             PerceptualHashService perceptualHashService,
@@ -87,6 +91,7 @@ public class RiderInspectionService implements RiderInspectionUseCase {
         this.motorcycleRepository = motorcycleRepository;
         this.appointmentRepository = appointmentRepository;
         this.yardRepository = yardRepository;
+        this.serviceOrderRepository = serviceOrderRepository;
         this.storagePort = storagePort;
         this.storageProperties = storageProperties;
         this.perceptualHashService = perceptualHashService;
@@ -373,6 +378,23 @@ public class RiderInspectionService implements RiderInspectionUseCase {
         String previousStatus = entity.getStatus().name();
         entity.setStatus(InspectionStatus.SCHEDULED);
         inspectionRepository.save(entity);
+
+        if (!serviceOrderRepository.existsByInspectionId(inspectionId)) {
+            ServiceOrderJpaEntity serviceOrder = new ServiceOrderJpaEntity();
+            serviceOrder.setId(UUID.randomUUID());
+            serviceOrder.setCode(String.format("OS-2026-%04d", Math.abs(inspectionId.hashCode() % 9000) + 1000));
+            serviceOrder.setMotorcycleId(entity.getMotorcycleId());
+            serviceOrder.setInspectionId(inspectionId);
+            serviceOrder.setYardId(yard.getId());
+            serviceOrder.setBayLabel(request.shift() == AppointmentShift.MORNING ? "Baia 01 • Agendamento" : "Baia 02 • Agendamento");
+            serviceOrder.setServiceTitle("Reparo agendado pós-vistoria #" + inspectionId.toString().substring(0, 4));
+            serviceOrder.setOriginLabel("Agendamento pelo entregador • " + request.scheduledDate());
+            serviceOrder.setSlaMinutes(30);
+            serviceOrder.setStatus(ServiceOrderStatus.WAITING_BAY);
+            serviceOrder.setCreatedAt(Instant.now());
+            serviceOrder.setUpdatedAt(Instant.now());
+            serviceOrderRepository.save(serviceOrder);
+        }
 
         saveAuditLog(inspectionId, riderId, "RIDER", previousStatus, "SCHEDULED", Map.of(
                 "action", "SCHEDULED_APPOINTMENT",

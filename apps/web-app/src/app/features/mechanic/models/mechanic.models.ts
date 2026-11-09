@@ -154,3 +154,37 @@ export interface DamageBoundingBox {
   width: number; // percentage (0..100)
   height: number; // percentage (0..100)
 }
+
+export interface BayServiceOrder {
+  id: string;
+  code: string;
+  plate: string;
+  model: string;
+  bay: string;
+  serviceTitle: string;
+  originLabel: string;
+  slaMinutes: number;
+  status: 'WAITING_BAY' | 'IN_REPAIR' | 'READY_PICKUP';
+}
+
+export interface LocalStockItem {
+  partId?: string;
+  sku: string;
+  partName: string;
+  model: string;
+  aisleBin: string;
+  quantity: number;
+  minQuantity: number;
+  unitPriceBrl: number;
+}
+
+export interface MechanicOperationsResponseDto {
+  serviceOrders: BayServiceOrder[];
+  stockItems: LocalStockItem[];
+}
+
+export interface CreateServiceOrderRequestDto {
+  plate: string;
+  bay: string;
+  serviceTitle: string;
+}

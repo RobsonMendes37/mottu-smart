@@ -184,6 +184,47 @@ mottu-smart-ops/
 
 ---
 
+### FASE 7 — Operação 100% Real (Zero Mocks), Segurança `SHA-256`, WMS de Oficina, Faturamento Pix e IA Preditiva BigQuery
+> **ESPECIFICAÇÃO COMPLETA:** Leia obrigatoriamente `PLANO_OPERACAO_REAL_E_IA_BIGQUERY.md` na raiz do projeto antes de iniciar qualquer tarefa abaixo.
+
+- [x] **`TASK-19` — TDD Domínio Java (`SHA-256` + `BCrypt`, Ordem de Serviço, Faturamento Semanal) + Migration `V8`**
+  - **Agent:** `test-engineer` → `backend-specialist` + `database-architect` | **Skills:** `tdd-workflow`, `database-design`, `clean-code`
+  - **Pasta Permitida:** `apps/core-api/src/test/java/com/mottu/ops/domain/`, `apps/core-api/src/main/java/com/mottu/ops/domain/`, `apps/core-api/src/main/resources/db/migration/`
+  - **Dependencies:** `TASK-18`
+  - **INPUT → OUTPUT → VERIFY:** Seções 2 e 3.1 de `PLANO_OPERACAO_REAL_E_IA_BIGQUERY.md` → Criar `PasswordSecurityPolicyTest`, `ServiceOrderPolicyTest` e `WeeklyBillingCalculatorTest` (`RED`), implementar classes de domínio puras (`GREEN`) e criar `V8__operational_workflows_billing_and_security.sql` → `cd apps/core-api && ./mvnw test jacoco:check -Dtest="com.mottu.ops.domain.**"` passa com 100% de cobertura.
+
+- [x] **`TASK-20` — TDD Domínio Python (`AnalyticsForecaster`) + Endpoint FastAPI `/internal/v1/analytics/advisor` (Gemini + BigQuery)**
+  - **Agent:** `test-engineer` → `backend-specialist` | **Skills:** `tdd-workflow`, `python-patterns`, `clean-code`
+  - **Pasta Permitida:** `apps/intelligence-service/`
+  - **Dependencies:** `TASK-18`
+  - **INPUT → OUTPUT → VERIFY:** Seções 3.2 e 4.4 de `PLANO_OPERACAO_REAL_E_IA_BIGQUERY.md` → Criar `tests/unit/test_analytics_forecaster.py` (`RED`), implementar `app/domain/services/analytics_forecaster.py` e rota `/internal/v1/analytics/advisor` (`GREEN`) → `cd apps/intelligence-service && .venv/bin/pytest --cov=app/domain --cov-branch --cov-fail-under=100` passa com 100%.
+
+- [x] **`TASK-21` — Backend Spring Boot: Perfil Real e Senha `SHA-256` (`/api/v1/profile/me`) + Operações de Oficina e Almoxarifado WMS (`/api/v1/mechanic/operations`)**
+  - **Agent:** `security-auditor` + `backend-specialist` | **Skills:** `api-patterns`, `tdd-workflow`, `clean-code`
+  - **Pasta Permitida:** `apps/core-api/`
+  - **Dependencies:** `TASK-19`
+  - **INPUT → OUTPUT → VERIFY:** Seções 4.1 e 4.2 de `PLANO_OPERACAO_REAL_E_IA_BIGQUERY.md` → Implementar `ProfileController`, `MechanicOperationsController`, gatilho automático de Ordem de Serviço em `AppointmentService` e `ProfileAndOperationsIntegrationTest` → `cd apps/core-api && ./mvnw test -Dtest=ProfileAndOperationsIntegrationTest` passa.
+
+- [x] **`TASK-22` — Backend Spring Boot: Contratos e Faturamento Pix (`T12`), Aluguel/Entregas do Entregador (`/rider/rental`) e Analytics Detalhado + IA BigQuery (`T10`)**
+  - **Agent:** `backend-specialist` | **Skills:** `api-patterns`, `database-design`, `tdd-workflow`
+  - **Pasta Permitida:** `apps/core-api/`
+  - **Dependencies:** `TASK-20`, `TASK-21`
+  - **INPUT → OUTPUT → VERIFY:** Seções 4.3 e 4.4 de `PLANO_OPERACAO_REAL_E_IA_BIGQUERY.md` → Implementar `ManagerBillingController`, `RiderRentalController`, evoluir `ManagerAnalyticsController` (`/detailed` e `/ai-advisor`) e criar `BillingAndAnalyticsAdvisorIntegrationTest` → `cd apps/core-api && ./mvnw clean verify` passa 100%.
+
+- [x] **`TASK-23` — Frontend Angular 19: Integração 100% Real nas Telas `Account`, `Operations`, `T12 Billing`, `Rider Rental` e `T10 Analytics` (Com Consultor IA BigQuery e Reposição 1-Clique)**
+  - **Agent:** `frontend-specialist` | **Skills:** `frontend-architecture`, `frontend-design`, `tdd-workflow`
+  - **Pasta Permitida:** `apps/web-app/`
+  - **Dependencies:** `TASK-22`
+  - **INPUT → OUTPUT → VERIFY:** Seção 5 (`TASK-23`) de `PLANO_OPERACAO_REAL_E_IA_BIGQUERY.md` → Conectar serviços e componentes às APIs reais, adicionar seção do Consultor IA Preditivo na `T10` e atualizar specs Vitest → `source ~/.nvm/nvm.sh && cd apps/web-app && npm test -- --run && npm run build -- --configuration production` passa sem erros.
+
+- [x] **`TASK-24` — Verificação Final da Fase 7, Registro em `docs/HISTORICO_IA.md` e Deploy Contínuo na VM (`161.153.2.148:18088`)**
+  - **Agent:** `qa-automation-engineer` + `devops-engineer` | **Skills:** `verify-changes`, `deployment-procedures`
+  - **Pasta Permitida:** Repositório completo
+  - **Dependencies:** `TASK-23`
+  - **INPUT → OUTPUT → VERIFY:** Seção 5 (`TASK-24`) de `PLANO_OPERACAO_REAL_E_IA_BIGQUERY.md` → Validar todos os testes (`core-api`, `intelligence-service`, `web-app`), atualizar `docs/HISTORICO_IA.md`, fazer commit/push para `origin main` e validar endpoints na VM.
+
+---
+
 ## 6. Phase X: Checklist Obrigatório de Conclusão
 - [x] Zero códigos de cor roxo/violeta (`Purple Ban` respeitado em CSS, HTML e `.pen`).
 - [x] `python .agents/skills/vulnerability-scanner/scripts/security_scan.py .` sem falhas críticas.

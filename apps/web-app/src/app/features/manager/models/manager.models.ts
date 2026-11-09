@@ -86,3 +86,100 @@ export interface AvailableMotorcycleOption {
   model: MotorcycleModel;
   yardName?: string;
 }
+
+export type ContractPaymentStatus = 'PAID' | 'PENDING_PIX' | 'OVERDUE';
+
+export interface WeeklyBillingContract {
+  contractId?: string;
+  contractCode: string;
+  riderName: string;
+  plate: string;
+  model: string;
+  weeklyPlanBrl: number;
+  inspectionChargesBrl: number;
+  discountBrl: number;
+  deliveryBonusBrl?: number;
+  netTotalBrl?: number;
+  paymentStatus: ContractPaymentStatus;
+  dueDateLabel: string;
+}
+
+export interface YardBiSnapshot {
+  key: string;
+  label: string;
+  totalInspections: number;
+  aiPrecisionPct: string;
+  avgSlaSeconds: string;
+  auditedRevenueBrl: string;
+  naturalWearCount: number;
+  preExistingCount: number;
+  badUseCount: number;
+}
+
+export interface DailyInspectionBar {
+  day: string;
+  directPct: number;
+  workshopPct: number;
+  totalCount: number;
+}
+
+export interface VerdictBreakdownRow {
+  label: string;
+  subtitle: string;
+  percentage: number;
+  count: number;
+  barClass: string;
+  dotColor: string;
+}
+
+export interface FleetModelAnalyticsRow {
+  modelName: string;
+  code: string;
+  inspectionsCount: number;
+  sharePct: number;
+  aiDeflectionPct: number;
+  avgSlaSeconds: string;
+}
+
+export interface AuditedPartAnalyticsRow {
+  sku: string;
+  partName: string;
+  modelName: string;
+  isNaturalWear: boolean;
+  occurrences: number;
+  sharePct: number;
+  totalAuditedBrl: string;
+}
+
+export interface DetailedAnalyticsDto {
+  yardSnapshots: YardBiSnapshot[];
+  dailyVolumeBars: DailyInspectionBar[];
+  verdictBreakdown: VerdictBreakdownRow[];
+  fleetModelBreakdown: FleetModelAnalyticsRow[];
+  topAuditedParts: AuditedPartAnalyticsRow[];
+}
+
+export interface OpsStockoutAlertDto {
+  sku: string;
+  partName: string;
+  modelName: string;
+  currentStock: number;
+  minStock: number;
+  dailyBurnRate: number;
+  daysToStockout: number;
+  riskLevel: 'CRITICAL' | 'WARNING' | 'HEALTHY';
+  suggestedRestockQty: number;
+}
+
+export interface OpsAdvisorResponseDto {
+  yardKey: string;
+  yardLabel: string;
+  generatedAt: string;
+  modelUsed: string;
+  demandGrowthPct: number;
+  projectedNext7DaysInspections: number;
+  executiveHeadline: string;
+  growthAnalysisText: string;
+  stockoutAlerts: OpsStockoutAlertDto[];
+  recommendedActions: string[];
+}

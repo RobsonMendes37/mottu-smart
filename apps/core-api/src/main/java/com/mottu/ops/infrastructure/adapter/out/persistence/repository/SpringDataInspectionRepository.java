@@ -20,6 +20,10 @@ public interface SpringDataInspectionRepository extends JpaRepository<Inspection
 
     int countByContractIdAndStatusIn(UUID contractId, Collection<InspectionStatus> statuses);
 
+    List<InspectionJpaEntity> findByContractId(UUID contractId);
+
+    List<InspectionJpaEntity> findByRiderId(UUID riderId);
+
     List<InspectionJpaEntity> findTop5ByContractIdOrderByCreatedAtDesc(UUID contractId);
 
     int countByRiderIdAndStatusIn(UUID riderId, Collection<InspectionStatus> statuses);

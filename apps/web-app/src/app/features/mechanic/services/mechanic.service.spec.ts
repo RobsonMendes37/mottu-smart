@@ -109,4 +109,29 @@ describe('MechanicService (T05 & T06 API Client)', () => {
     expect(result?.status).toBe('HUMAN_RESOLVED');
     expect(result?.totalEstimatedBrl).toBe(60.0);
   });
+
+  it('TC-MS-4: getOperations issues GET /api/v1/mechanic/operations', () => {
+    mockHttp.get.mockReturnValue(of({ serviceOrders: [], stockItems: [] }));
+    service.getOperations().subscribe();
+    expect(mockHttp.get).toHaveBeenCalledWith('/api/v1/mechanic/operations');
+  });
+
+  it('TC-MS-5: createServiceOrder posts order command to /api/v1/mechanic/operations/orders', () => {
+    mockHttp.post.mockReturnValue(of({ id: 'os-new', code: 'OS-2026-9999' }));
+    const cmd = { plate: 'MOT1A23', bay: 'Baia 01', serviceTitle: 'Revisão geral' };
+    service.createServiceOrder(cmd).subscribe();
+    expect(mockHttp.post).toHaveBeenCalledWith('/api/v1/mechanic/operations/orders', cmd);
+  });
+
+  it('TC-MS-6: advanceServiceOrderStatus patches order status', () => {
+    mockHttp.patch = vi.fn().mockReturnValue(of({ id: 'os-1', status: 'IN_REPAIR' }));
+    service.advanceServiceOrderStatus('os-1').subscribe();
+    expect(mockHttp.patch).toHaveBeenCalledWith('/api/v1/mechanic/operations/orders/os-1/advance', {});
+  });
+
+  it('TC-MS-7: adjustStock patches stock quantity with delta', () => {
+    mockHttp.patch = vi.fn().mockReturnValue(of({ sku: 'MOT-110-MFD', quantity: 19 }));
+    service.adjustStock('MOT-110-MFD', 1).subscribe();
+    expect(mockHttp.patch).toHaveBeenCalledWith('/api/v1/mechanic/operations/stock/MOT-110-MFD', { delta: 1 });
+  });
 });

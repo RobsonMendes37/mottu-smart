@@ -8,6 +8,10 @@ import {
   ResolveInspectionResponse,
   PageResponse,
   QueuePriorityReason,
+  BayServiceOrder,
+  LocalStockItem,
+  MechanicOperationsResponseDto,
+  CreateServiceOrderRequestDto,
 } from '../models/mechanic.models';
 
 @Injectable({ providedIn: 'root' })
@@ -59,5 +63,24 @@ export class MechanicService {
       `/api/v1/mechanic/inspections/${id}/resolve`,
       request
     );
+  }
+
+  getOperations(): Observable<MechanicOperationsResponseDto> {
+    return this.http.get<MechanicOperationsResponseDto>('/api/v1/mechanic/operations');
+  }
+
+  createServiceOrder(command: CreateServiceOrderRequestDto): Observable<BayServiceOrder> {
+    return this.http.post<BayServiceOrder>('/api/v1/mechanic/operations/orders', command);
+  }
+
+  advanceServiceOrderStatus(orderId: string): Observable<BayServiceOrder> {
+    return this.http.patch<BayServiceOrder>(
+      `/api/v1/mechanic/operations/orders/${orderId}/advance`,
+      {}
+    );
+  }
+
+  adjustStock(sku: string, delta: number): Observable<LocalStockItem> {
+    return this.http.patch<LocalStockItem>(`/api/v1/mechanic/operations/stock/${sku}`, { delta });
   }
 }

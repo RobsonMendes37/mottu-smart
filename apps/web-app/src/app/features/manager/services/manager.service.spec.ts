@@ -292,5 +292,39 @@ describe('ManagerService (API Client for T08, T09, T10)', () => {
       expect(result?.length).toBe(1);
       expect(result?.[0].plate).toBe('MOT2B34');
     });
+
+    it('TC-MS-12: should issue GET to /api/v1/manager/billing/contracts', () => {
+      mockHttp.get.mockReturnValue(of([]));
+      service.getBillingContracts().subscribe();
+      expect(mockHttp.get).toHaveBeenCalledWith('/api/v1/manager/billing/contracts');
+    });
+
+    it('TC-MS-13: should issue POST to /api/v1/manager/billing/contracts/:code/confirm-pix', () => {
+      mockHttp.post.mockReturnValue(of({ contractCode: 'CTR-1', paymentStatus: 'PAID' }));
+      service.confirmPixPayment('CTR-1').subscribe();
+      expect(mockHttp.post).toHaveBeenCalledWith('/api/v1/manager/billing/contracts/CTR-1/confirm-pix', {});
+    });
+
+    it('TC-MS-14: should issue GET to /api/v1/manager/analytics/detailed', () => {
+      mockHttp.get.mockReturnValue(of({ yardSnapshots: [] }));
+      service.getDetailedAnalytics().subscribe();
+      expect(mockHttp.get).toHaveBeenCalledWith('/api/v1/manager/analytics/detailed');
+    });
+
+    it('TC-MS-15: should issue POST to /api/v1/manager/analytics/ai-advisor with yardKey param', () => {
+      mockHttp.post.mockReturnValue(of({ executiveHeadline: 'ok' }));
+      service.getAiAdvisorAdvice('SP-04').subscribe();
+      expect(mockHttp.post).toHaveBeenCalledWith(
+        '/api/v1/manager/analytics/ai-advisor',
+        {},
+        expect.objectContaining({ params: expect.anything() })
+      );
+    });
+
+    it('TC-MS-16: should issue PATCH to /api/v1/mechanic/operations/stock/:sku for batch restock', () => {
+      mockHttp.patch.mockReturnValue(of({ sku: 'SKU-1', quantity: 20 }));
+      service.restockPart('SKU-1', 10).subscribe();
+      expect(mockHttp.patch).toHaveBeenCalledWith('/api/v1/mechanic/operations/stock/SKU-1', { delta: 10 });
+    });
   });
 });

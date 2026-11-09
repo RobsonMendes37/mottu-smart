@@ -16,6 +16,9 @@ import {
   PageResponse,
   MotorcycleModel,
   AvailableMotorcycleOption,
+  WeeklyBillingContract,
+  DetailedAnalyticsDto,
+  OpsAdvisorResponseDto,
 } from '../models/manager.models';
 
 interface FleetMotorcycleRawItem {
@@ -136,5 +139,33 @@ export class ManagerService {
           }))
         )
       );
+  }
+
+  getBillingContracts(): Observable<WeeklyBillingContract[]> {
+    return this.http.get<WeeklyBillingContract[]>('/api/v1/manager/billing/contracts');
+  }
+
+  confirmPixPayment(contractCode: string): Observable<WeeklyBillingContract> {
+    return this.http.post<WeeklyBillingContract>(
+      `/api/v1/manager/billing/contracts/${contractCode}/confirm-pix`,
+      {}
+    );
+  }
+
+  getDetailedAnalytics(): Observable<DetailedAnalyticsDto> {
+    return this.http.get<DetailedAnalyticsDto>('/api/v1/manager/analytics/detailed');
+  }
+
+  getAiAdvisorAdvice(yardKey: string = 'ALL'): Observable<OpsAdvisorResponseDto> {
+    const params = new HttpParams().set('yardKey', yardKey);
+    return this.http.post<OpsAdvisorResponseDto>(
+      '/api/v1/manager/analytics/ai-advisor',
+      {},
+      { params }
+    );
+  }
+
+  restockPart(sku: string, delta: number): Observable<any> {
+    return this.http.patch(`/api/v1/mechanic/operations/stock/${sku}`, { delta });
   }
 }

@@ -47,6 +47,15 @@ public class CatalogPartJpaEntity {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @Column(name = "stock_quantity", nullable = false)
+    private int stockQuantity = 18;
+
+    @Column(name = "min_stock_quantity", nullable = false)
+    private int minStockQuantity = 8;
+
+    @Column(name = "aisle_bin", nullable = false, length = 60)
+    private String aisleBin = "Corredor A • Gaveta 01";
+
     public CatalogPartJpaEntity() {
     }
 
@@ -152,5 +161,29 @@ public class CatalogPartJpaEntity {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public int getStockQuantity() {
+        return stockQuantity;
+    }
+
+    public void setStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
+    public int getMinStockQuantity() {
+        return minStockQuantity;
+    }
+
+    public void setMinStockQuantity(int minStockQuantity) {
+        this.minStockQuantity = minStockQuantity;
+    }
+
+    public String getAisleBin() {
+        return aisleBin;
+    }
+
+    public void setAisleBin(String aisleBin) {
+        this.aisleBin = aisleBin;
     }
 }

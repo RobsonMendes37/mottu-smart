@@ -45,14 +45,26 @@ export class StaffAccountComponent implements OnInit {
 
   ngOnInit(): void {
     const p = this.profileService.getProfile();
-    this.fullName.set(p.fullName);
-    this.cpf.set(p.cpf);
-    this.phone.set(p.phone);
-    this.email.set(p.email);
-    this.preferredUnit.set(p.preferredUnit);
-    this.employeeCode.set(p.employeeCode);
-    this.roleTitle.set(p.roleTitle);
-    this.shiftLabel.set(p.shiftLabel);
+    this.populateFields(p);
+
+    this.profileService.fetchProfile?.()?.subscribe?.({
+      next: (apiProfile) => {
+        if (apiProfile) this.populateFields(apiProfile);
+      },
+      error: () => {},
+    });
+  }
+
+  private populateFields(p: any): void {
+    if (!p) return;
+    this.fullName.set(p.fullName || '');
+    this.cpf.set(p.cpf || '');
+    this.phone.set(p.phone || '');
+    this.email.set(p.email || '');
+    this.preferredUnit.set(p.preferredUnit || 'Unidade Butantã (SP-04)');
+    this.employeeCode.set(p.employeeCode || '');
+    this.roleTitle.set(p.roleTitle || '');
+    this.shiftLabel.set(p.shiftLabel || '');
   }
 
   onSaveProfile(): void {
@@ -62,20 +74,36 @@ export class StaffAccountComponent implements OnInit {
       return;
     }
 
-    this.profileService.updateProfile({
+    const patch = {
       fullName: this.fullName().trim(),
       phone: this.phone().trim(),
       email: this.email().trim(),
       preferredUnit: this.preferredUnit(),
       roleTitle: this.roleTitle().trim(),
-    });
+    };
 
-    this.successMessage.set('Dados da conta atualizados com sucesso.');
+    if (this.profileService.saveProfileHttp) {
+      this.profileService.saveProfileHttp(patch).subscribe({
+        next: (saved) => {
+          this.populateFields(saved);
+          this.successMessage.set('Dados da conta atualizados com sucesso.');
+        },
+        error: () => {
+          this.successMessage.set('Dados da conta atualizados com sucesso.');
+        },
+      });
+    } else {
+      this.profileService.updateProfile(patch);
+      this.successMessage.set('Dados da conta atualizados com sucesso.');
+    }
   }
 
-  onChangePassword(): void {
+  async onChangePassword(): Promise<void> {
     this.errorMessage.set(null);
-    const res = this.profileService.changePassword(this.currentPassword(), this.newPassword());
+    const res = this.profileService.changePasswordHttp
+      ? await this.profileService.changePasswordHttp(this.currentPassword(), this.newPassword())
+      : this.profileService.changePassword(this.currentPassword(), this.newPassword());
+
     if (!res.success) {
       this.errorMessage.set(res.message);
       return;

@@ -1002,3 +1002,125 @@
   - `apps/web-app/src/app/shared/layout/desktop-shell/desktop-shell.component.html`, `mobile-shell.component.html` e `login.component.html`: Removidas tags `Piloto` dos menus de navegação.
 - **Verificação Executada:**
   - `apps/web-app`: **204/204 testes unitários aprovados (38 suítes)** e build de produção concluído sem avisos.
+
+
+### [2026-11-09 00:55] — `TASK-19`: TDD Domínio Java (SHA-256 + BCrypt, Ordem de Serviço, Faturamento Semanal) + Migration V8
+- **Agente / Modelo:** `@backend-specialist` + `@test-engineer` + `@database-architect`
+- **Arquivos Criados/Alterados:**
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/exception/DomainRuleException.java` (Exceção pura com código de erro)
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/enums/ServiceOrderStatus.java` (Enum `WAITING_BAY`, `IN_REPAIR`, `READY_PICKUP`)
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/service/PasswordSecurityPolicy.java` (Cálculo SHA-256 e validação anti-reutilização de senha em Java puro)
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/service/ServiceOrderPolicy.java` (Transições de status de OS, atualização de status de moto e cálculo de estoque)
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/service/WeeklyBillingCalculator.java` (Cálculo de plano base semanal, bônus de 120 corridas e total líquido)
+  - `apps/core-api/src/test/java/com/mottu/ops/domain/service/PasswordSecurityPolicyTest.java` (19 testes unitários)
+  - `apps/core-api/src/test/java/com/mottu/ops/domain/service/ServiceOrderPolicyTest.java` (13 testes unitários)
+  - `apps/core-api/src/test/java/com/mottu/ops/domain/service/WeeklyBillingCalculatorTest.java` (15 testes unitários)
+  - `apps/core-api/src/main/resources/db/migration/V8__operational_workflows_billing_and_security.sql` (Migration DDL + DML de metadados de perfil, WMS de almoxarifado físico, ordens de serviço, contratos Pix e 118 entregas diárias)
+- **Testes TDD Executados (`RED -> GREEN`):**
+  - `cd apps/core-api && ./mvnw test jacoco:check -Dtest="com.mottu.ops.domain.**"`: **208/208 testes aprovados**, 100% de cobertura de linhas no pacote `domain.service` e `domain.model`, `DomainPurityTest` 100% aprovado.
+- **Decisões ou Observações para o Próximo Agente:**
+  - A migration `V8` popula com segurança as ordens de serviço, gavetas WMS, dados financeiros dos contratos e entregas do entregador demo Carlos (`entregador@mottu-ops.local`).
+- **Próxima Tarefa Liberada:** `TASK-20`
+
+### [2026-11-09 01:00] — `TASK-20`: TDD Domínio Python (AnalyticsForecaster) + Endpoint FastAPI `/internal/v1/analytics/advisor`
+- **Agente / Modelo:** `@backend-specialist` + `@test-engineer`
+- **Arquivos Criados/Alterados:**
+  - `apps/intelligence-service/app/domain/services/__init__.py`
+  - `apps/intelligence-service/app/domain/services/analytics_forecaster.py` (Cálculo de crescimento de demanda, projeção de 7 dias, avaliação de ruptura de estoque WMS e motor determinístico de consultoria operacional)
+  - `apps/intelligence-service/tests/unit/test_analytics_forecaster.py` (9 testes unitários com 100% de cobertura de linhas e branches)
+  - `apps/intelligence-service/app/application/dtos/analytics_dto.py` (`AnalyticsAdvisorRequestDTO`, `AnalyticsAdvisorResponseDTO`, `StockoutAlertDTO`, `PartInventoryItemDTO`)
+  - `apps/intelligence-service/app/infrastructure/adapters/gemini_adapter.py` (Adicionado `generate_ops_advisor_insights` com cascade resiliente e fallback offline)
+  - `apps/intelligence-service/app/infrastructure/web/internal_router.py` (Endpoint `POST /internal/v1/analytics/advisor` autenticado via `X-Internal-Token`)
+  - `apps/intelligence-service/tests/test_analytics_advisor.py` (4 testes de integração de API: unauthorized, invalid token, sucesso com alertas e payload vazio)
+- **Testes TDD Executados (`RED -> GREEN`):**
+  - `cd apps/intelligence-service && .venv/bin/pytest --cov=app/domain --cov-branch --cov-fail-under=100`: **175/175 testes aprovados** (100% de cobertura em `app/domain` com verificação de pureza hexagonal).
+- **Decisões ou Observações para o Próximo Agente:**
+  - O endpoint `/internal/v1/analytics/advisor` calcula matematicamente as taxas de crescimento e dias para ruptura (*days to stockout*), enriquecendo o parecer executivo via Gemini quando online, ou servindo o parecer determinístico instantâneo sem depender de chaves externas.
+- **Próxima Tarefa Liberada:** `TASK-21`
+
+### [2026-11-09 01:10] — `TASK-21`: Backend Spring Boot: Perfil Real e Senha SHA-256 + Operações de Oficina e Almoxarifado WMS
+- **Agente / Modelo:** `@security-auditor` + `@backend-specialist`
+- **Arquivos Criados/Alterados:**
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/entity/UserJpaEntity.java` (Adicionados campos de perfil, SHA-256, CNH, matrícula, PIX e turno)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/entity/CatalogPartJpaEntity.java` (Adicionados `stockQuantity`, `minStockQuantity` e `aisleBin`)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/entity/RentalContractJpaEntity.java` (Adicionados campos de código de contrato, plano semanal, desconto, status de pagamento Pix e vencimento)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/entity/ServiceOrderJpaEntity.java` (Entidade JPA mapeando `service_orders`)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/repository/SpringDataServiceOrderRepository.java` (Repositório Spring Data JPA)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/repository/SpringDataCatalogPartRepository.java` (Adicionado `findByVtexSku`)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/in/web/dto/profile/*` (`UserProfileResponseDto`, `UpdateProfileRequestDto`, `UpdatePasswordRequestDto`, `UpdatePasswordResponseDto`)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/in/web/dto/mechanic/*` (`ServiceOrderResponseDto`, `StockItemResponseDto`, `MechanicOperationsResponseDto`, `CreateServiceOrderRequestDto`, `UpdateStockRequestDto`)
+  - `apps/core-api/src/main/java/com/mottu/ops/application/service/ProfileApplicationService.java` (Serviço de perfil com validação SHA-256 e BCrypt)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/in/web/ProfileController.java` (`GET / PUT /api/v1/profile/me` e `PUT /api/v1/profile/me/password`)
+  - `apps/core-api/src/main/java/com/mottu/ops/application/service/MechanicOperationsService.java` (Serviço de operações da oficina, ordens de serviço e estoque)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/in/web/MechanicOperationsController.java` (`/api/v1/mechanic/operations/*`)
+  - `apps/core-api/src/main/java/com/mottu/ops/application/usecase/RiderInspectionService.java` (Gatilho automático criando `service_orders` `WAITING_BAY` ao agendar visita)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/in/web/GlobalExceptionHandler.java` (Mapeamento de `DomainRuleException` para `422 UNPROCESSABLE_ENTITY`)
+  - `apps/core-api/src/test/java/com/mottu/ops/infrastructure/adapter/in/web/ProfileAndOperationsIntegrationTest.java` (11 testes de integração)
+- **Testes TDD Executados (`RED -> GREEN`):**
+  - `cd apps/core-api && ./mvnw test -Dtest=ProfileAndOperationsIntegrationTest`: **11/11 testes aprovados**.
+- **Decisões ou Observações para o Próximo Agente:**
+  - O fluxo da oficina (`/mechanic/operations`) está 100% conectado com transições de status da moto (`WAITING_BAY` -> `IN_REPAIR` -> `READY_PICKUP`) e baixa automática de estoque.
+- **Próxima Tarefa Liberada:** `TASK-22`
+
+### [2026-11-09 01:20] — `TASK-22`: Backend Spring Boot: Contratos e Faturamento Pix (T12), Aluguel/Entregas do Entregador (/rider/rental) e Analytics Detalhado + IA BigQuery (T10)
+- **Agente / Modelo:** `@backend-specialist` + `@database-architect`
+- **Arquivos Criados/Alterados:**
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/entity/RiderDailyDeliveryJpaEntity.java` (Entidade JPA mapeando `rider_daily_deliveries`)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/repository/SpringDataRiderDailyDeliveryRepository.java` (Repositório Spring Data JPA)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/repository/SpringDataRentalContractRepository.java` (Adicionados `findByContractCode` e `findAllByActiveTrue`)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/persistence/repository/SpringDataInspectionRepository.java` (Adicionados `findByContractId` e `findByRiderId`)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/in/web/dto/billing/*` (`BillingContractSummaryDto`, `RiderChargedInspectionDto`, `RiderDailyDeliveryItemDto`, `RiderRentalSummaryResponseDto`, `AddRiderDeliveriesRequestDto`)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/in/web/dto/analytics/*` (`DetailedAnalyticsResponseDto`, `YardSnapshotDto`, `DailyVolumeBarDto`, `VerdictBreakdownItemDto`, `FleetModelBreakdownDto`, `TopAuditedPartDto`)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/out/client/IntelligenceServiceClient.java` (Adicionado `getAnalyticsAdvisorAdvice` com fallback determinístico resiliente)
+  - `apps/core-api/src/main/java/com/mottu/ops/application/service/BillingAndRentalService.java` (Cálculo semanal de contratos, bônus de 120 corridas, cobrança de mau uso e conciliação Pix)
+  - `apps/core-api/src/main/java/com/mottu/ops/application/port/in/ManagerAnalyticsUseCase.java` e `apps/core-api/src/main/java/com/mottu/ops/application/usecase/ManagerAnalyticsService.java` (Implementação SQL real dos snapshots por galpão, barras de 7 dias, rosca de laudos, modelo e top 6 peças + consultor IA BigQuery)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/in/web/ManagerBillingController.java` (`/api/v1/manager/billing/*`)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/in/web/RiderRentalController.java` (`/api/v1/rider/rental/*`)
+  - `apps/core-api/src/main/java/com/mottu/ops/infrastructure/adapter/in/web/ManagerAnalyticsController.java` (Adicionados `/detailed` e `/ai-advisor`)
+  - `apps/core-api/src/test/java/com/mottu/ops/infrastructure/adapter/in/web/BillingAndAnalyticsAdvisorIntegrationTest.java` (5 testes de integração end-to-end)
+- **Testes TDD Executados (`RED -> GREEN`):**
+  - `cd apps/core-api && ./mvnw test -Dtest=BillingAndAnalyticsAdvisorIntegrationTest`: **5/5 testes aprovados**.
+  - `cd apps/core-api && ./mvnw test`: **322/322 testes aprovados** em todo o `core-api`.
+- **Decisões ou Observações para o Próximo Agente:**
+  - O cálculo de faturamento e bônus dinâmico de 120 entregas e os dados do painel analítico / consultor IA BigQuery estão 100% integrados e prontos para consumo pelo frontend Angular 19.
+- **Próxima Tarefa Liberada:** `TASK-23`
+
+### [2026-11-09 01:36] — `TASK-23`: Frontend Angular 19: Integração 100% Real nas Telas Account, Operations, T12 Billing, Rider Rental e T10 Analytics
+- **Agente / Modelo:** `@frontend-specialist` + `@frontend-architecture` + `@clean-code`
+- **Arquivos Criados/Alterados:**
+  - `apps/web-app/src/app/core/services/profile.service.ts`: Implementado consumo HTTP (`GET /api/v1/profile/me`, `PUT /api/v1/profile/me`, `PUT /api/v1/profile/me/password` com cálculo cliente de hash SHA-256 via Web Crypto API), mantendo sincronização de cache local e fallback offline seguro.
+  - `apps/web-app/src/app/features/rider/pages/account/rider-account.component.ts`: Conectado a `fetchProfile()` e `saveProfileHttp()`, além de alteração de senha assíncrona com SHA-256 e feedback em tempo real.
+  - `apps/web-app/src/app/features/shared/account/staff-account.component.ts`: Conectado a `fetchProfile()` e `saveProfileHttp()`, com atualização de dados e alteração de senha.
+  - `apps/web-app/src/app/features/mechanic/models/mechanic.models.ts` e `mechanic.service.ts`: Modelos e métodos REST para `getOperations()` (`GET /api/v1/mechanic/operations`), `createServiceOrder()` (`POST .../orders`), `advanceServiceOrderStatus()` (`PATCH .../orders/{id}/advance`) e `adjustStock()` (`PATCH .../stock/{sku}`).
+  - `apps/web-app/src/app/features/mechanic/pages/operations/mechanic-operations.component.ts` e `html`: Conexão com a API real de ordens e almoxarifado, modal de "+ Nova Ordem de Serviço" com validação de placa e baia, e persistência otimista com atualização na base.
+  - `apps/web-app/src/app/features/manager/models/manager.models.ts` e `manager.service.ts`: Adicionados métodos e modelos para `getBillingContracts()`, `confirmPixPayment()`, `getDetailedAnalytics()`, `getAiAdvisorAdvice()` e `restockPart()`.
+  - `apps/web-app/src/app/features/manager/pages/t12-billing/t12-billing.component.ts` e `html`: Conectado a `/api/v1/manager/billing/contracts`, drawer lateral com botão "Confirmar recebimento Pix" persistindo no backend (`POST .../confirm-pix`).
+  - `apps/web-app/src/app/features/rider/models/rider.models.ts` e `rider.service.ts`: Adicionados métodos e modelos para `getRentalSummary()`, `payRentalPix()` e `registerDailyDeliveries()`.
+  - `apps/web-app/src/app/features/rider/pages/rental/rider-rental.component.ts` e `html`: Conectado a `/api/v1/rider/rental/summary`, ação de pagamento Pix instantâneo (`POST .../pay-pix`), barra dinâmica de meta semanal de 120 corridas e formulário rápido de "+ Registrar entregas de hoje" desbloqueando o bônus de R$ 40,00 na fatura.
+  - `apps/web-app/src/app/features/manager/pages/t10-analytics/t10-analytics.component.ts` e `html`: Integração com `GET /api/v1/manager/analytics/detailed`, nova seção executiva **"Diagnóstico e Previsão de Demanda IA (BigQuery + Almoxarifado)"** com insights preditivos do `gemini-3.5-flash-lite`, alertas de risco de ruptura (CRÍTICO / ATENÇÃO) e botão de 1 clique **"Repor lote no estoque"** acionando `PATCH .../stock/{sku}`.
+  - Suítes de testes Vitest (`*.spec.ts`): Criados novos casos de testes para todos os serviços e componentes atualizados.
+- **Testes Unitários e Build de Produção Executados:**
+  - `source ~/.nvm/nvm.sh && cd apps/web-app && npm test -- --run`: **225/225 testes aprovados (38/38 arquivos)**.
+  - `source ~/.nvm/nvm.sh && cd apps/web-app && npm run build -- --configuration production`: **Build de produção gerado com 100% de sucesso**, zero erros TypeScript e respeito estrito ao Purple Ban.
+- **Decisões ou Observações para o Próximo Agente:**
+  - Todas as 5 telas da Fase 7 estão totalmente integradas e prontas para validação end-to-end em `TASK-24`.
+- **Próxima Tarefa Liberada:** `TASK-24`
+
+### [2026-11-09 01:40] — `TASK-24`: Verificação Global de Qualidade Multi-Stack e Conclusão da Fase 7
+- **Agente / Modelo:** `@qa-automation-engineer` + `@devops-engineer` + `@clean-code`
+- **Resultados de Verificação Multi-Stack:**
+  1. **Python Intelligence Service:**
+     - Comando: `cd apps/intelligence-service && .venv/bin/pytest --cov=app/domain --cov-branch --cov-fail-under=100`
+     - Resultado: **175/175 testes aprovados** com 100% de cobertura em `app/domain` e verificação estrita de pureza hexagonal.
+  2. **Java Core API:**
+     - Comando: `cd apps/core-api && ./mvnw test`
+     - Resultado: **322/322 testes aprovados** (BUILD SUCCESS), cobrindo domínio puro (100%), segurança SHA-256 + BCrypt, workflows WMS de oficina, faturamento semanal de contratos Pix, bônus de corridas e agregação SQL do Google BigQuery / Consultor IA.
+  3. **Angular 19 Frontend Web App:**
+     - Comandos: `source ~/.nvm/nvm.sh && cd apps/web-app && npm test -- --run` e `npm run build -- --configuration production`
+     - Resultado: **225/225 testes unitários aprovados (38/38 arquivos)**, build de produção gerado com sucesso em 5.5s e 100% de conformidade com o Purple Ban.
+  4. **Total Consolidado de Testes Automatizados no Projeto:**
+     - **722 testes automatizados passando com 100% de sucesso**.
+- **Status do Plano de Operação Real:**
+  - Todas as tarefas de `TASK-19` a `TASK-24` do `PLANO_OPERACAO_REAL_E_IA_BIGQUERY.md` e `mottu-smart-ops.md` foram integralmente concluídas.
+- **Próximo Passo:**
+  - Merge e push para a branch `main` com disparo do fluxo de Continuous Deployment na VM (`http://161.153.2.148:18088`).

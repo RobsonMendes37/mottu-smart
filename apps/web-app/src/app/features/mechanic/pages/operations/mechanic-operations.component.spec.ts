@@ -44,5 +44,29 @@ describe('MechanicOperationsComponent (Screen T07-Mobile & Web - Ordens de servi
     comp.stockSearch.set(target.sku);
     expect(comp.filteredStockItems().length).toBe(1);
   });
+
+  it('TC-OPS-4: Opens new order modal and creates service order', () => {
+    comp.openNewOrderModal();
+    expect(comp.isNewOrderOpen()).toBe(true);
+
+    comp.newOrderPlate.set('MOT9Z99');
+    comp.newOrderBay.set('Baia 02');
+    comp.newOrderTitle.set('Troca de retrovisor');
+
+    comp.submitNewOrder();
+    expect(comp.isNewOrderOpen()).toBe(false);
+    expect(comp.serviceOrders().some((o) => o.plate === 'MOT9Z99')).toBe(true);
+    expect(comp.feedbackBanner()).toContain('criada com sucesso');
+  });
+
+  it('TC-OPS-5: Validates plate format before submitting new service order', () => {
+    comp.openNewOrderModal();
+    comp.newOrderPlate.set('123'); // Invalid short plate
+    comp.newOrderTitle.set('Teste');
+    comp.submitNewOrder();
+
+    expect(comp.isNewOrderOpen()).toBe(true);
+    expect(comp.newOrderError()).toContain('7 caracteres');
+  });
 });
 

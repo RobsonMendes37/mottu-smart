@@ -121,3 +121,54 @@ class GeminiVisionAdapter(AIVisionPort):
 
         logger.warning("All embedding models exhausted. Using deterministic fallback.")
         return self.mock_service.generate_embedding(text)
+
+    async def generate_ops_advisor_insights(
+        self, deterministic_advice: Dict[str, Any], top_model: str, yard_label: str
+    ) -> Dict[str, Any]:
+        """Optionally enrich deterministic operations advice with Gemini 3.5 Flash Lite if online."""
+        if self.mock_mode or not settings.GEMINI_API_KEY or self._client is None:
+            return deterministic_advice
+
+        prompt = (
+            f"You are the Mottu AI Ops Executive Advisor.\n"
+            f"Context: Yard '{yard_label}', top inspected motorcycle model '{top_model}'.\n"
+            f"Data summary:\n"
+            f"- Base headline: {deterministic_advice.get('executive_headline')}\n"
+            f"- Growth analysis: {deterministic_advice.get('growth_analysis_text')}\n"
+            f"- Recommended actions: {json.dumps(deterministic_advice.get('recommended_actions', []))}\n"
+            "Generate an executive, professional analysis in Brazilian Portuguese with:\n"
+            "{\n"
+            '  "executive_headline": "string",\n'
+            '  "growth_analysis_text": "string",\n'
+            '  "recommended_actions": ["action 1", "action 2", "action 3"]\n'
+            "}"
+        )
+
+        for model_name in settings.vision_models_list:
+            try:
+                from google.genai import types
+
+                response = self._client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(response_mime_type="application/json"),
+                )
+                if response.text and response.text.strip():
+                    parsed = json.loads(response.text)
+                    return {
+                        "executive_headline": parsed.get(
+                            "executive_headline", deterministic_advice.get("executive_headline")
+                        ),
+                        "growth_analysis_text": parsed.get(
+                            "growth_analysis_text", deterministic_advice.get("growth_analysis_text")
+                        ),
+                        "stockout_alerts": deterministic_advice.get("stockout_alerts", []),
+                        "recommended_actions": parsed.get(
+                            "recommended_actions", deterministic_advice.get("recommended_actions", [])
+                        ),
+                    }
+            except Exception as e:
+                logger.warning(f"Ops advisor enrichment failed with {model_name} ({e}). Cascading...")
+
+        return deterministic_advice
+

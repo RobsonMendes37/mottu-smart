@@ -51,6 +51,30 @@ public class UserJpaEntity {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    @Column(name = "password_sha256", length = 64)
+    private String passwordSha256;
+
+    @Column(name = "pix_key", length = 150)
+    private String pixKey;
+
+    @Column(name = "preferred_unit", nullable = false, length = 100)
+    private String preferredUnit = "Unidade Butantã (SP-04)";
+
+    @Column(name = "cnh_status", nullable = false, length = 80)
+    private String cnhStatus = "Categoria A • Válida até 08/2029";
+
+    @Column(name = "employee_code", length = 30)
+    private String employeeCode;
+
+    @Column(name = "role_title", length = 80)
+    private String roleTitle;
+
+    @Column(name = "shift_label", length = 80)
+    private String shiftLabel;
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt = Instant.now();
+
     public UserJpaEntity() {
     }
 
@@ -166,5 +190,69 @@ public class UserJpaEntity {
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getPasswordSha256() {
+        return passwordSha256;
+    }
+
+    public void setPasswordSha256(String passwordSha256) {
+        this.passwordSha256 = passwordSha256;
+    }
+
+    public String getPixKey() {
+        return pixKey;
+    }
+
+    public void setPixKey(String pixKey) {
+        this.pixKey = pixKey;
+    }
+
+    public String getPreferredUnit() {
+        return preferredUnit;
+    }
+
+    public void setPreferredUnit(String preferredUnit) {
+        this.preferredUnit = preferredUnit;
+    }
+
+    public String getCnhStatus() {
+        return cnhStatus;
+    }
+
+    public void setCnhStatus(String cnhStatus) {
+        this.cnhStatus = cnhStatus;
+    }
+
+    public String getEmployeeCode() {
+        return employeeCode;
+    }
+
+    public void setEmployeeCode(String employeeCode) {
+        this.employeeCode = employeeCode;
+    }
+
+    public String getRoleTitle() {
+        return roleTitle;
+    }
+
+    public void setRoleTitle(String roleTitle) {
+        this.roleTitle = roleTitle;
+    }
+
+    public String getShiftLabel() {
+        return shiftLabel;
+    }
+
+    public void setShiftLabel(String shiftLabel) {
+        this.shiftLabel = shiftLabel;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

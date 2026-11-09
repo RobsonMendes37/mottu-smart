@@ -100,4 +100,25 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
     expect(comp.fleetModelBreakdown.length).toBe(4);
     expect(comp.topAuditedParts.length).toBe(6);
   });
+
+  it('TC-T10-8: Exposes AI Ops Advisor insights with BigQuery forecasting', () => {
+    expect(comp.aiAdvisor()).toBeDefined();
+    expect(comp.aiAdvisor().modelUsed).toContain('gemini');
+    expect(comp.aiAdvisor().demandGrowthPct).toBeGreaterThan(0);
+    expect(comp.aiAdvisor().stockoutAlerts.length).toBeGreaterThan(0);
+    expect(comp.aiAdvisor().recommendedActions.length).toBeGreaterThan(0);
+  });
+
+  it('TC-T10-9: restockPart performs 1-click batch replenishment and updates risk level to HEALTHY', () => {
+    const critical = comp.aiAdvisor().stockoutAlerts.find((a) => a.riskLevel === 'CRITICAL')!;
+    expect(critical).toBeDefined();
+    const initialQty = critical.currentStock;
+
+    comp.restockPart(critical.sku, critical.suggestedRestockQty);
+
+    const updated = comp.aiAdvisor().stockoutAlerts.find((a) => a.sku === critical.sku)!;
+    expect(updated.currentStock).toBe(initialQty + critical.suggestedRestockQty);
+    expect(updated.riskLevel).toBe('HEALTHY');
+    expect(comp.aiAdvisorSuccessBanner()).toContain('reposto com sucesso');
+  });
 });

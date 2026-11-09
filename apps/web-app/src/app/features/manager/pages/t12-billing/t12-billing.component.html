@@ -14,6 +14,13 @@
       </p>
     </div>
 
+    @if (feedbackBanner()) {
+      <div role="status" class="p-3.5 rounded-lg bg-[#E6F4EE] border border-[#05944F]/30 text-xs font-medium text-[#046C3A] flex items-center justify-between">
+        <span>{{ feedbackBanner() }}</span>
+        <button type="button" (click)="feedbackBanner.set(null)" class="font-bold text-[#046C3A] px-2">Fechar</button>
+      </div>
+    }
+
     <!-- 4 KPI Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
@@ -226,13 +233,24 @@
           </p>
         </div>
 
-        <button
-          type="button"
-          (click)="closeDrawer()"
-          class="w-full h-11 rounded-md bg-[#05944F] hover:bg-[#047840] text-white font-bold text-sm transition-colors"
-        >
-          Concluir conferência
-        </button>
+        <div class="space-y-2 pt-4">
+          @if (sel.paymentStatus !== 'PAID') {
+            <button
+              type="button"
+              (click)="confirmPix(sel.contractCode)"
+              class="w-full h-11 rounded-md bg-[#05944F] hover:bg-[#047840] text-white font-bold text-sm transition-colors flex items-center justify-center gap-2"
+            >
+              <span>Confirmar recebimento Pix</span>
+            </button>
+          }
+          <button
+            type="button"
+            (click)="closeDrawer()"
+            class="w-full h-11 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-[#141414] font-bold text-sm transition-colors"
+          >
+            Concluir conferência
+          </button>
+        </div>
       </aside>
     </div>
   }

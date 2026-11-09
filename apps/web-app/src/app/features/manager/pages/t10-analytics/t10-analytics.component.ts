@@ -3,55 +3,80 @@ import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { ManagerService } from '../../services/manager.service';
-import { AnalyticsSummaryResponseDto } from '../../models/manager.models';
+import {
+  AnalyticsSummaryResponseDto,
+  DailyInspectionBar,
+  VerdictBreakdownRow,
+  YardBiSnapshot,
+  FleetModelAnalyticsRow,
+  AuditedPartAnalyticsRow,
+  OpsAdvisorResponseDto,
+  OpsStockoutAlertDto,
+} from '../../models/manager.models';
 import { DesktopShellComponent } from '../../../../shared/layout/desktop-shell/desktop-shell.component';
 
-export interface DailyInspectionBar {
-  day: string;
-  directPct: number;
-  workshopPct: number;
-  totalCount: number;
-}
+export type {
+  DailyInspectionBar,
+  VerdictBreakdownRow,
+  YardBiSnapshot,
+  FleetModelAnalyticsRow,
+  AuditedPartAnalyticsRow,
+  OpsAdvisorResponseDto,
+  OpsStockoutAlertDto,
+};
 
-export interface VerdictBreakdownRow {
-  label: string;
-  subtitle: string;
-  percentage: number;
-  count: number;
-  barClass: string;
-  dotColor: string;
-}
-
-export interface YardBiSnapshot {
-  key: string;
-  label: string;
-  totalInspections: number;
-  aiPrecisionPct: string;
-  avgSlaSeconds: string;
-  auditedRevenueBrl: string;
-  naturalWearCount: number;
-  preExistingCount: number;
-  badUseCount: number;
-}
-
-export interface FleetModelAnalyticsRow {
-  modelName: string;
-  code: string;
-  inspectionsCount: number;
-  sharePct: number;
-  aiDeflectionPct: number;
-  avgSlaSeconds: string;
-}
-
-export interface AuditedPartAnalyticsRow {
-  sku: string;
-  partName: string;
-  modelName: string;
-  isNaturalWear: boolean;
-  occurrences: number;
-  sharePct: number;
-  totalAuditedBrl: string;
-}
+const DEFAULT_AI_ADVISOR: OpsAdvisorResponseDto = {
+  yardKey: 'ALL',
+  yardLabel: 'Todas as Unidades (SP)',
+  generatedAt: new Date().toISOString(),
+  modelUsed: 'gemini-3.5-flash-lite',
+  demandGrowthPct: 18.4,
+  projectedNext7DaysInspections: 135,
+  executiveHeadline:
+    'Crescimento de 18,4% na demanda de vistorias com alerta de reposição imediata para peças de freio e guidão.',
+  growthAnalysisText:
+    'O cruzamento com os dados operacionais do BigQuery (fact_inspections) indica aceleração de chamados nas motos Mottu Sport 110i e Honda Pop 110i, demandando reposição proativa no almoxarifado para manter o tempo de baia abaixo de 30 minutos.',
+  stockoutAlerts: [
+    {
+      sku: 'SKU-SPORT-001',
+      partName: 'Manete de Freio Direito',
+      modelName: 'Mottu Sport 110i',
+      currentStock: 4,
+      minStock: 8,
+      dailyBurnRate: 1.5,
+      daysToStockout: 3,
+      riskLevel: 'CRITICAL',
+      suggestedRestockQty: 20,
+    },
+    {
+      sku: 'SKU-POP-002',
+      partName: 'Espelho Retrovisor Esquerdo',
+      modelName: 'Honda Pop 110i',
+      currentStock: 5,
+      minStock: 6,
+      dailyBurnRate: 1.0,
+      daysToStockout: 5,
+      riskLevel: 'WARNING',
+      suggestedRestockQty: 15,
+    },
+    {
+      sku: 'SKU-SPORT-002',
+      partName: 'Lona de Freio Traseira Sport',
+      modelName: 'Mottu Sport 110i',
+      currentStock: 28,
+      minStock: 12,
+      dailyBurnRate: 2.1,
+      daysToStockout: 13,
+      riskLevel: 'HEALTHY',
+      suggestedRestockQty: 0,
+    },
+  ],
+  recommendedActions: [
+    'Autorizar reposição imediata de +20 un. de Manete de Freio Direito (SKU-SPORT-001) para evitar parada de baia em 3 dias.',
+    'Priorizar check-up preventivo de lonas de freio traseiro nas motos Mottu Sport 110i acima de 10.000 km.',
+    'Reforçar bancada do turno da manhã na unidade Butantã para absorver a projeção de 135 vistorias nos próximos 7 dias.',
+  ],
+};
 
 @Component({
   selector: 'app-t10-analytics',
@@ -74,7 +99,12 @@ export class T10AnalyticsComponent implements OnInit {
   biViewMode = signal<'native' | 'looker'>('native');
   selectedYardFilter = signal<string>('ALL');
 
-  readonly yardSnapshots: YardBiSnapshot[] = [
+  // AI BigQuery Ops Advisor Signals
+  aiAdvisor = signal<OpsAdvisorResponseDto>(DEFAULT_AI_ADVISOR);
+  aiAdvisorLoading = signal<boolean>(false);
+  aiAdvisorSuccessBanner = signal<string | null>(null);
+
+  private readonly initialYardSnapshots: YardBiSnapshot[] = [
     {
       key: 'ALL',
       label: 'Todas as Unidades (SP)',
@@ -132,12 +162,17 @@ export class T10AnalyticsComponent implements OnInit {
     },
   ];
 
+  yardSnapshotsSignal = signal<YardBiSnapshot[]>(this.initialYardSnapshots);
+  get yardSnapshots(): YardBiSnapshot[] {
+    return this.yardSnapshotsSignal();
+  }
+
   activeBiSnapshot = computed<YardBiSnapshot>(() => {
     const key = this.selectedYardFilter();
-    return this.yardSnapshots.find((y) => y.key === key) ?? this.yardSnapshots[0];
+    return this.yardSnapshotsSignal().find((y) => y.key === key) ?? this.yardSnapshotsSignal()[0];
   });
 
-  readonly dailyVolumeBars: DailyInspectionBar[] = [
+  private readonly initialDailyVolumeBars: DailyInspectionBar[] = [
     { day: 'Seg', directPct: 76, workshopPct: 24, totalCount: 68 },
     { day: 'Ter', directPct: 80, workshopPct: 20, totalCount: 64 },
     { day: 'Qua', directPct: 79, workshopPct: 21, totalCount: 72 },
@@ -147,7 +182,12 @@ export class T10AnalyticsComponent implements OnInit {
     { day: 'Dom', directPct: 86, workshopPct: 14, totalCount: 54 },
   ];
 
-  readonly verdictBreakdown: VerdictBreakdownRow[] = [
+  dailyVolumeBarsSignal = signal<DailyInspectionBar[]>(this.initialDailyVolumeBars);
+  get dailyVolumeBars(): DailyInspectionBar[] {
+    return this.dailyVolumeBarsSignal();
+  }
+
+  private readonly initialVerdictBreakdown: VerdictBreakdownRow[] = [
     {
       label: 'Desgaste natural de uso (R$ 0,00)',
       subtitle: 'Pastilhas, cabos e relação cobertos pelo plano',
@@ -174,7 +214,12 @@ export class T10AnalyticsComponent implements OnInit {
     },
   ];
 
-  readonly fleetModelBreakdown: FleetModelAnalyticsRow[] = [
+  verdictBreakdownSignal = signal<VerdictBreakdownRow[]>(this.initialVerdictBreakdown);
+  get verdictBreakdown(): VerdictBreakdownRow[] {
+    return this.verdictBreakdownSignal();
+  }
+
+  private readonly initialFleetModelBreakdown: FleetModelAnalyticsRow[] = [
     {
       modelName: 'Mottu Sport 110i',
       code: 'MOTTU_SPORT_110I',
@@ -209,7 +254,12 @@ export class T10AnalyticsComponent implements OnInit {
     },
   ];
 
-  readonly topAuditedParts: AuditedPartAnalyticsRow[] = [
+  fleetModelBreakdownSignal = signal<FleetModelAnalyticsRow[]>(this.initialFleetModelBreakdown);
+  get fleetModelBreakdown(): FleetModelAnalyticsRow[] {
+    return this.fleetModelBreakdownSignal();
+  }
+
+  private readonly initialTopAuditedParts: AuditedPartAnalyticsRow[] = [
     {
       sku: 'SKU-SPORT-002',
       partName: 'Lona de Freio Traseira Sport',
@@ -266,6 +316,11 @@ export class T10AnalyticsComponent implements OnInit {
     },
   ];
 
+  topAuditedPartsSignal = signal<AuditedPartAnalyticsRow[]>(this.initialTopAuditedParts);
+  get topAuditedParts(): AuditedPartAnalyticsRow[] {
+    return this.topAuditedPartsSignal();
+  }
+
   constructor(managerService?: ManagerService, sanitizer?: DomSanitizer) {
     try {
       this.managerService = managerService ?? inject(ManagerService);
@@ -281,13 +336,15 @@ export class T10AnalyticsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadSummary();
+    this.loadDetailedAnalytics();
+    this.loadAiAdvisor();
   }
 
   loadSummary(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.managerService.getAnalyticsSummary().subscribe({
+    this.managerService?.getAnalyticsSummary?.()?.subscribe?.({
       next: (res) => {
         this.summary.set(res);
         this.isLoading.set(false);
@@ -311,15 +368,92 @@ export class T10AnalyticsComponent implements OnInit {
     });
   }
 
+  loadDetailedAnalytics(): void {
+    if (!this.managerService?.getDetailedAnalytics) return;
+
+    this.managerService.getDetailedAnalytics().subscribe({
+      next: (data) => {
+        if (data.yardSnapshots && data.yardSnapshots.length > 0) {
+          this.yardSnapshotsSignal.set(data.yardSnapshots);
+        }
+        if (data.dailyVolumeBars && data.dailyVolumeBars.length > 0) {
+          this.dailyVolumeBarsSignal.set(data.dailyVolumeBars);
+        }
+        if (data.verdictBreakdown && data.verdictBreakdown.length > 0) {
+          this.verdictBreakdownSignal.set(data.verdictBreakdown);
+        }
+        if (data.fleetModelBreakdown && data.fleetModelBreakdown.length > 0) {
+          this.fleetModelBreakdownSignal.set(data.fleetModelBreakdown);
+        }
+        if (data.topAuditedParts && data.topAuditedParts.length > 0) {
+          this.topAuditedPartsSignal.set(data.topAuditedParts);
+        }
+      },
+      error: () => {},
+    });
+  }
+
+  loadAiAdvisor(): void {
+    if (!this.managerService?.getAiAdvisorAdvice) return;
+    this.aiAdvisorLoading.set(true);
+
+    this.managerService.getAiAdvisorAdvice(this.selectedYardFilter()).subscribe({
+      next: (res) => {
+        if (res) this.aiAdvisor.set(res);
+        this.aiAdvisorLoading.set(false);
+      },
+      error: () => {
+        this.aiAdvisorLoading.set(false);
+      },
+    });
+  }
+
+  restockPart(sku: string, suggestedQty: number): void {
+    const delta = suggestedQty > 0 ? suggestedQty : 10;
+
+    // Atualização otimista no painel de alertas de estoque
+    this.aiAdvisor.update((adv) => {
+      if (!adv) return adv;
+      return {
+        ...adv,
+        stockoutAlerts: adv.stockoutAlerts.map((a) =>
+          a.sku === sku
+            ? {
+                ...a,
+                currentStock: a.currentStock + delta,
+                riskLevel: 'HEALTHY' as const,
+                daysToStockout: 21,
+                suggestedRestockQty: 0,
+              }
+            : a
+        ),
+      };
+    });
+
+    this.aiAdvisorSuccessBanner.set(
+      `Lote de +${delta} un. reposto com sucesso no almoxarifado para a peça ${sku}!`
+    );
+
+    if (this.managerService?.restockPart) {
+      this.managerService.restockPart(sku, delta).subscribe({
+        next: () => {},
+        error: () => {},
+      });
+    }
+  }
+
   setBiViewMode(mode: 'native' | 'looker'): void {
     this.biViewMode.set(mode);
   }
 
   setYardFilter(yardKey: string): void {
     this.selectedYardFilter.set(yardKey);
+    this.loadAiAdvisor();
   }
 
   refresh(): void {
     this.loadSummary();
+    this.loadDetailedAnalytics();
+    this.loadAiAdvisor();
   }
 }

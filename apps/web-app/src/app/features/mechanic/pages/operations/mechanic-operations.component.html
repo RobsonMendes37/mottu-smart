@@ -15,29 +15,40 @@
         </p>
       </div>
 
-      <div class="bg-[#E2E2E2]/60 p-1 rounded-md inline-grid grid-cols-2 gap-1 self-start">
+      <div class="flex items-center gap-2 self-start flex-wrap">
         <button
           type="button"
-          (click)="setTab('orders')"
-          class="px-4 h-9 rounded-sm text-xs font-bold transition-all"
-          [class.bg-white]="activeTab() === 'orders'"
-          [class.text-[#141414]]="activeTab() === 'orders'"
-          [class.shadow-sm]="activeTab() === 'orders'"
-          [class.text-[#545454]]="activeTab() !== 'orders'"
+          (click)="openNewOrderModal()"
+          class="px-4 h-9 rounded-md bg-[#05944F] hover:bg-[#047840] text-white text-xs font-bold transition-colors inline-flex items-center gap-1.5 shadow-sm"
         >
-          Ordens de serviço ({{ serviceOrders().length }})
+          <span class="text-sm font-extrabold">+</span>
+          <span>Nova Ordem de Serviço</span>
         </button>
-        <button
-          type="button"
-          (click)="setTab('stock')"
-          class="px-4 h-9 rounded-sm text-xs font-bold transition-all"
-          [class.bg-white]="activeTab() === 'stock'"
-          [class.text-[#141414]]="activeTab() === 'stock'"
-          [class.shadow-sm]="activeTab() === 'stock'"
-          [class.text-[#545454]]="activeTab() !== 'stock'"
-        >
-          Estoque do galpão ({{ stockItems().length }})
-        </button>
+
+        <div class="bg-[#E2E2E2]/60 p-1 rounded-md inline-grid grid-cols-2 gap-1">
+          <button
+            type="button"
+            (click)="setTab('orders')"
+            class="px-4 h-9 rounded-sm text-xs font-bold transition-all"
+            [class.bg-white]="activeTab() === 'orders'"
+            [class.text-[#141414]]="activeTab() === 'orders'"
+            [class.shadow-sm]="activeTab() === 'orders'"
+            [class.text-[#545454]]="activeTab() !== 'orders'"
+          >
+            Ordens de serviço ({{ serviceOrders().length }})
+          </button>
+          <button
+            type="button"
+            (click)="setTab('stock')"
+            class="px-4 h-9 rounded-sm text-xs font-bold transition-all"
+            [class.bg-white]="activeTab() === 'stock'"
+            [class.text-[#141414]]="activeTab() === 'stock'"
+            [class.shadow-sm]="activeTab() === 'stock'"
+            [class.text-[#545454]]="activeTab() !== 'stock'"
+          >
+            Estoque do galpão ({{ stockItems().length }})
+          </button>
+        </div>
       </div>
     </div>
 
@@ -199,5 +210,99 @@
       </div>
     }
   </div>
+
+  <!-- Nova Ordem de Serviço Modal -->
+  @if (isNewOrderOpen()) {
+    <div
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      (click)="closeNewOrderModal()"
+    >
+      <div
+        class="bg-white rounded-lg border border-[#E2E2E2] shadow-xl w-full max-w-lg overflow-hidden space-y-4 p-6"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="flex items-center justify-between pb-3 border-b border-[#EEEEEE]">
+          <div>
+            <h3 class="text-base font-bold text-[#141414]">Nova Ordem de Serviço</h3>
+            <p class="text-xs text-[#757575] mt-0.5">Entrada de moto na baia de manutenção da unidade.</p>
+          </div>
+          <button
+            type="button"
+            (click)="closeNewOrderModal()"
+            class="w-8 h-8 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-sm font-bold text-[#141414]"
+          >
+            ✕
+          </button>
+        </div>
+
+        @if (newOrderError()) {
+          <div class="p-3 rounded-md bg-[#FEE2E2] border border-[#DC2626]/30 text-xs font-semibold text-[#DC2626]">
+            {{ newOrderError() }}
+          </div>
+        }
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-semibold text-[#545454] mb-1">Placa do veículo (7 dígitos)</label>
+            <input
+              type="text"
+              [ngModel]="newOrderPlate()"
+              (ngModelChange)="newOrderPlate.set($event)"
+              placeholder="Ex: MOT1A23"
+              maxlength="7"
+              class="w-full h-10 px-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] font-mono font-bold text-sm text-[#141414] uppercase focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label class="block font-semibold text-[#545454] mb-1">Baia de destino</label>
+            <select
+              [ngModel]="newOrderBay()"
+              (ngModelChange)="newOrderBay.set($event)"
+              class="w-full h-10 px-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] font-semibold text-xs text-[#141414] focus:outline-none"
+            >
+              <option value="Baia 01 • Rápida">Baia 01 • Rápida</option>
+              <option value="Baia 02 • Freios & Suspensão">Baia 02 • Freios & Suspensão</option>
+              <option value="Baia 03 • Motor & Transmissão">Baia 03 • Motor & Transmissão</option>
+              <option value="Pátio Frontal • Aguardando">Pátio Frontal • Aguardando</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-[#545454] mb-1">Diagnóstico / Descrição do serviço</label>
+            <textarea
+              [ngModel]="newOrderTitle()"
+              (ngModelChange)="newOrderTitle.set($event)"
+              rows="3"
+              placeholder="Ex: Troca de pastilha dianteira e regulagem de embreagem..."
+              class="w-full p-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-xs text-[#141414] focus:outline-none resize-none"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#EEEEEE]">
+          <button
+            type="button"
+            (click)="closeNewOrderModal()"
+            class="h-10 px-4 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-xs font-bold text-[#141414]"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            (click)="submitNewOrder()"
+            [disabled]="newOrderSubmitting()"
+            class="h-10 px-5 rounded-md bg-[#05944F] hover:bg-[#047840] text-white text-xs font-bold transition-colors disabled:opacity-50"
+          >
+            @if (newOrderSubmitting()) {
+              <span>Salvando...</span>
+            } @else {
+              <span>Criar Ordem</span>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </app-desktop-shell>
 

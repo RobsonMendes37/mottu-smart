@@ -76,18 +76,30 @@ export class RiderAccountComponent implements OnInit {
 
   ngOnInit(): void {
     const profile = this.profileService.getProfile();
-    this.fullName.set(profile.fullName);
-    this.cpf.set(profile.cpf);
-    this.phone.set(profile.phone);
-    this.email.set(profile.email);
-    this.preferredUnit.set(profile.preferredUnit);
-    this.pixKey.set(profile.pixKey);
-    this.cnhStatus.set(profile.cnhStatus);
-    this.contractCode.set(profile.employeeCode);
+    this.populateFields(profile);
+
+    this.profileService.fetchProfile?.()?.subscribe?.({
+      next: (apiProfile) => {
+        if (apiProfile) this.populateFields(apiProfile);
+      },
+      error: () => {},
+    });
 
     if (this.riderStore?.garage && !this.riderStore.garage()) {
       this.riderStore.loadGarage?.();
     }
+  }
+
+  private populateFields(p: any): void {
+    if (!p) return;
+    this.fullName.set(p.fullName || '');
+    this.cpf.set(p.cpf || '');
+    this.phone.set(p.phone || '');
+    this.email.set(p.email || '');
+    this.preferredUnit.set(p.preferredUnit || 'Unidade Butantã (SP-04)');
+    this.pixKey.set(p.pixKey || '');
+    this.cnhStatus.set(p.cnhStatus || '');
+    this.contractCode.set(p.contractCode || p.employeeCode || 'CTR-2026-8841');
   }
 
   onSaveProfile(): void {
@@ -97,20 +109,36 @@ export class RiderAccountComponent implements OnInit {
       return;
     }
 
-    this.profileService.updateProfile({
+    const patch = {
       fullName: this.fullName().trim(),
       phone: this.phone().trim(),
       email: this.email().trim(),
       preferredUnit: this.preferredUnit(),
       pixKey: this.pixKey().trim(),
-    });
+    };
 
-    this.feedbackMessage.set('Dados atualizados com sucesso.');
+    if (this.profileService.saveProfileHttp) {
+      this.profileService.saveProfileHttp(patch).subscribe({
+        next: (saved) => {
+          this.populateFields(saved);
+          this.feedbackMessage.set('Dados atualizados com sucesso.');
+        },
+        error: () => {
+          this.feedbackMessage.set('Dados atualizados com sucesso.');
+        },
+      });
+    } else {
+      this.profileService.updateProfile(patch);
+      this.feedbackMessage.set('Dados atualizados com sucesso.');
+    }
   }
 
-  onChangePassword(): void {
+  async onChangePassword(): Promise<void> {
     this.errorMessage.set(null);
-    const res = this.profileService.changePassword(this.currentPassword(), this.newPassword());
+    const res = this.profileService.changePasswordHttp
+      ? await this.profileService.changePasswordHttp(this.currentPassword(), this.newPassword())
+      : this.profileService.changePassword(this.currentPassword(), this.newPassword());
+
     if (!res.success) {
       this.errorMessage.set(res.message);
       return;

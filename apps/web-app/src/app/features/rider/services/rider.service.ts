@@ -13,6 +13,7 @@ import {
   CreateAppointmentRequest,
   CreateAppointmentResponse,
   YardResponse,
+  RiderRentalSummaryDto,
 } from '../models/rider.models';
 
 @Injectable({ providedIn: 'root' })
@@ -73,5 +74,23 @@ export class RiderService {
 
   getYards(): Observable<YardResponse[]> {
     return this.http.get<YardResponse[]>('/api/v1/yards');
+  }
+
+  getRentalSummary(): Observable<RiderRentalSummaryDto> {
+    return this.http.get<RiderRentalSummaryDto>('/api/v1/rider/rental/summary');
+  }
+
+  payRentalPix(): Observable<RiderRentalSummaryDto> {
+    return this.http.post<RiderRentalSummaryDto>('/api/v1/rider/rental/pay-pix', {});
+  }
+
+  registerDailyDeliveries(
+    completedCount: number,
+    earningsBrl: number
+  ): Observable<RiderRentalSummaryDto> {
+    return this.http.post<RiderRentalSummaryDto>('/api/v1/rider/rental/deliveries', {
+      completedCount,
+      earningsBrl,
+    });
   }
 }

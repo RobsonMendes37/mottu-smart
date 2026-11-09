@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface SpringDataRentalContractRepository extends JpaRepository<RentalContractJpaEntity, UUID> {
     Optional<RentalContractJpaEntity> findByRiderIdAndActiveTrue(UUID riderId);
     Optional<RentalContractJpaEntity> findByMotorcycleIdAndActiveTrue(UUID motorcycleId);
+    Optional<RentalContractJpaEntity> findByContractCode(String contractCode);
+    java.util.List<RentalContractJpaEntity> findAllByActiveTrue();
 }

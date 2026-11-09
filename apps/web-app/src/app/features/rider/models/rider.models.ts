@@ -151,3 +151,35 @@ export interface YardResponse {
   address: string;
   active: boolean;
 }
+
+export interface DailyDeliverySummary {
+  dayLabel: string;
+  completedCount: number;
+  earningsBrl: number;
+  onTimeRate: string;
+}
+
+export interface ChargedInspectionDto {
+  inspectionId: string;
+  plate: string;
+  reportedAt: string;
+  chargeBrl: number;
+  partDescription: string;
+}
+
+export interface RiderRentalSummaryDto {
+  contractCode: string;
+  activePlate: string;
+  baseWeeklyPlanBrl: number;
+  punctualityDiscountBrl: number;
+  deliveryBonusBrl: number;
+  inspectionChargesBrl: number;
+  weeklyTotalBrl: number;
+  paymentStatus: string;
+  dueDateLabel: string;
+  chargedInspections: ChargedInspectionDto[];
+  weeklyDeliveriesTotal: number;
+  weeklyDeliveryEarningsBrl: number;
+  deliveryGoalTarget: number;
+  deliveryDays: DailyDeliverySummary[];
+}

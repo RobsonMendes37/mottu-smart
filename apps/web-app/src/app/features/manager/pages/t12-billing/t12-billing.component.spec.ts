@@ -30,5 +30,18 @@ describe('T12BillingComponent (Screen T12 Web - Contratos e faturamento semanal)
     comp.closeDrawer();
     expect(comp.selectedContract()).toBeNull();
   });
+
+  it('TC-BILL-4: Confirms Pix payment for pending contract', () => {
+    const pending = comp.contracts().find((c) => c.paymentStatus === 'PENDING_PIX')!;
+    expect(pending).toBeDefined();
+
+    comp.openDrawer(pending);
+    comp.confirmPix(pending.contractCode);
+
+    const updated = comp.contracts().find((c) => c.contractCode === pending.contractCode);
+    expect(updated?.paymentStatus).toBe('PAID');
+    expect(comp.selectedContract()?.paymentStatus).toBe('PAID');
+    expect(comp.feedbackBanner()).toContain('confirmado com sucesso');
+  });
 });
 

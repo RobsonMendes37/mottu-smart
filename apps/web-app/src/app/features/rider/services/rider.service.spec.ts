@@ -161,4 +161,25 @@ describe('RiderService', () => {
     expect(mockHttp.get).toHaveBeenCalledWith('/api/v1/yards');
     expect(result).toEqual(mockRes);
   });
+
+  it('TC-RDS-8: getRentalSummary sends GET /api/v1/rider/rental/summary', () => {
+    mockHttp.get.mockReturnValue(of({ contractCode: 'CTR-2026-8841', weeklyTotalBrl: 241.0 }));
+    service.getRentalSummary().subscribe();
+    expect(mockHttp.get).toHaveBeenCalledWith('/api/v1/rider/rental/summary');
+  });
+
+  it('TC-RDS-9: payRentalPix sends POST /api/v1/rider/rental/pay-pix', () => {
+    mockHttp.post.mockReturnValue(of({ contractCode: 'CTR-2026-8841', paymentStatus: 'PAID' }));
+    service.payRentalPix().subscribe();
+    expect(mockHttp.post).toHaveBeenCalledWith('/api/v1/rider/rental/pay-pix', {});
+  });
+
+  it('TC-RDS-10: registerDailyDeliveries sends POST /api/v1/rider/rental/deliveries', () => {
+    mockHttp.post.mockReturnValue(of({ weeklyDeliveriesTotal: 122, deliveryBonusBrl: 40.0 }));
+    service.registerDailyDeliveries(5, 52.5).subscribe();
+    expect(mockHttp.post).toHaveBeenCalledWith('/api/v1/rider/rental/deliveries', {
+      completedCount: 5,
+      earningsBrl: 52.5,
+    });
+  });
 });

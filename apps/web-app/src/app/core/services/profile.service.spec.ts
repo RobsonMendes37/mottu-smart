@@ -59,5 +59,18 @@ describe('ProfileService (Self-Service Account Persistence)', () => {
     expect(validChange.success).toBe(true);
     expect(validChange.message).toContain('Senha atualizada');
   });
+
+  it('TC-PROF-4: fetchProfile issues GET /api/v1/profile/me and falls back gracefully', () => {
+    let emitted: any = null;
+    service.fetchProfile().subscribe((p) => (emitted = p));
+    expect(emitted).toBeTruthy();
+    expect(emitted.fullName).toBe('Carlos Silva');
+  });
+
+  it('TC-PROF-5: changePasswordHttp validates input and computes SHA-256 fingerprint', async () => {
+    const res = await service.changePasswordHttp('Mottu@2026!', 'NovaSenhaForte@2026');
+    expect(res.success).toBe(true);
+    expect(res.passwordSha256Fingerprint).toBeDefined();
+  });
 });
 

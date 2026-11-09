@@ -231,6 +231,7 @@ services:
     container_name: mottu-caddy-prod
     restart: always
     ports:
+      - "80:80"
       - "${HOST_PORT_CADDY:-18088}:80"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro

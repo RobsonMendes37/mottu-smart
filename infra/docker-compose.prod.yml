@@ -193,9 +193,11 @@ services:
       S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin123}
       S3_INTERNAL_ENDPOINT: ${S3_INTERNAL_ENDPOINT:-http://minio:9000}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-      GEMINI_MOCK_MODE: ${GEMINI_MOCK_MODE:-true}
-      GEMINI_VISION_MODEL: ${GEMINI_VISION_MODEL:-gemini-2.5-flash}
-      GEMINI_EMBEDDING_MODEL: ${GEMINI_EMBEDDING_MODEL:-text-embedding-004}
+      GEMINI_MOCK_MODE: ${GEMINI_MOCK_MODE:-false}
+      GEMINI_VISION_MODEL: ${GEMINI_VISION_MODEL:-gemini-3.5-flash-lite}
+      GEMINI_VISION_MODELS_CASCADE: ${GEMINI_VISION_MODELS_CASCADE:-gemini-3.5-flash-lite,gemini-3.8-flash}
+      GEMINI_EMBEDDING_MODEL: ${GEMINI_EMBEDDING_MODEL:-gemini-embedding-2}
+      GEMINI_EMBEDDING_MODELS_CASCADE: ${GEMINI_EMBEDDING_MODELS_CASCADE:-gemini-embedding-2,text-embedding-004}
       VTEX_STORE_BASE_URL: ${VTEX_STORE_BASE_URL:-https://www.loja.mottu.com.br}
     deploy:
       resources:

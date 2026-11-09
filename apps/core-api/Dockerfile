@@ -4,6 +4,8 @@
 FROM eclipse-temurin:21-jdk-jammy AS builder
 WORKDIR /build
 
+ENV MAVEN_OPTS="-XX:+UseSerialGC -Xmx384m"
+
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
 RUN ./mvnw dependency:go-offline -B || true

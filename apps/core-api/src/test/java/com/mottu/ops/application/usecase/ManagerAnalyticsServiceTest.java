@@ -173,3 +173,4 @@ class ManagerAnalyticsServiceTest {
         assertEquals("Fallback seguro executivo ativado", advice.get("executiveHeadline"));
     }
 }
+

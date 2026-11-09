@@ -43,3 +43,4 @@ SET weekly_plan_brl = CASE
     END
 FROM motorcycles m
 WHERE rc.motorcycle_id = m.id AND rc.weekly_plan_brl IS NULL;
+

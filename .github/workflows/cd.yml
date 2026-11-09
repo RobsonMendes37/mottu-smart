@@ -44,6 +44,7 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
@@ -99,9 +100,12 @@ jobs:
             rm -f infra/.env
             cp -f .env infra/.env
 
-            echo "🚀 Fazendo build e reiniciando containers via Docker Compose..."
-            docker compose -f infra/docker-compose.prod.yml build
+            echo "🚀 Liberando memória e parando containers..."
             docker compose -f infra/docker-compose.prod.yml down --remove-orphans || true
+            docker system prune -f || true
+            echo "🚀 Fazendo build dos containers via Docker Compose..."
+            docker compose -f infra/docker-compose.prod.yml build
+            echo "🚀 Subindo stack com imagens atualizadas..."
             docker compose -f infra/docker-compose.prod.yml up -d --remove-orphans
 
             echo "🚀 Aguardando Core API inicializar e ficar pronta..."

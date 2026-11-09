@@ -80,7 +80,7 @@ describe('AuthService', () => {
     service.demoLogin('MANAGER').subscribe();
 
     expect(mockHttp.post).toHaveBeenCalledWith('/api/v1/auth/login', SEED_CREDENTIALS.MANAGER);
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/manager/dashboard']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/manager/approvals']);
   });
 
   it('TC-AUTH-5: Registration forwards payload to register endpoint', () => {
@@ -114,9 +114,9 @@ describe('AuthService', () => {
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/rider/garage']);
   });
 
-  it('TC-AUTH-8: Navigates MANAGER role to /manager/dashboard', () => {
+  it('TC-AUTH-8: Navigates MANAGER role to /manager/approvals', () => {
     service.navigateForRole('MANAGER');
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/manager/dashboard']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/manager/approvals']);
   });
 
   it('TC-AUTH-7: Handles error response by mapping to ProblemDetail', () => {

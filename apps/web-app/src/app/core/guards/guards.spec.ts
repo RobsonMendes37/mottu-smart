@@ -108,7 +108,7 @@ describe('Route Guards', () => {
       expect(mockRouter.createUrlTree).toHaveBeenCalledWith(['/rider/garage']);
     });
 
-    it('TC-GUARD-6: redirects MANAGER to /manager/dashboard when role mismatch occurs on another route', () => {
+    it('TC-GUARD-6: redirects MANAGER to /manager/approvals when role mismatch occurs on another route', () => {
       const mockAuthService = {
         isAuthenticated: () => true,
         userRole: () => 'MANAGER',
@@ -125,7 +125,7 @@ describe('Route Guards', () => {
         mockRouter
       );
 
-      expect(mockRouter.createUrlTree).toHaveBeenCalledWith(['/manager/dashboard']);
+      expect(mockRouter.createUrlTree).toHaveBeenCalledWith(['/manager/approvals']);
     });
   });
 });

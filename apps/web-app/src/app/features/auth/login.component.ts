@@ -151,8 +151,9 @@ export class LoginComponent {
     this.pendingApprovalNotice.set(false);
 
     this.authService.demoLogin(role).subscribe({
-      next: () => {
+      next: (res) => {
         this.isLoading.set(false);
+        this.authService?.navigateForRole(role);
       },
       error: (prob: ProblemDetail) => {
         this.isLoading.set(false);
@@ -180,8 +181,9 @@ export class LoginComponent {
     this.pendingApprovalNotice.set(false);
 
     this.authService.demoLoginMode(mode, role).subscribe({
-      next: () => {
+      next: (res) => {
         this.isLoading.set(false);
+        this.authService?.navigateForRole(role);
       },
       error: (prob: ProblemDetail) => {
         this.isLoading.set(false);

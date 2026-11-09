@@ -25,7 +25,7 @@ export const roleGuard = (allowedRoles: UserRole[]): CanActivateFn => {
     // Role mismatch: redirect to default authorized landing
     switch (currentRole) {
       case 'MANAGER':
-        return router.createUrlTree(['/manager/dashboard']);
+        return router.createUrlTree(['/manager/approvals']);
       case 'MECHANIC':
         return router.createUrlTree(['/mechanic/queue']);
       case 'RIDER':

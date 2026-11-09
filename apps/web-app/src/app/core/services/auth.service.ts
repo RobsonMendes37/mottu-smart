@@ -93,8 +93,9 @@ export class AuthService {
     }
 
     return http.post<LoginResponse>('/api/v1/auth/login', credentials).pipe(
-      tap((res) => {
+      map((res) => {
         this.setSession(res);
+        return res;
       }),
       catchError((error: HttpErrorResponse) => {
         return throwError(() => this.mapProblemDetail(error));
@@ -132,8 +133,9 @@ export class AuthService {
       // Storage fallback
     }
     return this.login(creds).pipe(
-      tap(() => {
+      map((res) => {
         this.navigateForRole(role);
+        return res;
       })
     );
   }
@@ -156,19 +158,28 @@ export class AuthService {
   }
 
   navigateForRole(role: UserRole): void {
-    if (!this.router) return;
-    switch (role) {
-      case 'MANAGER':
-        this.router.navigate(['/manager/dashboard']);
-        break;
-      case 'MECHANIC':
-        this.router.navigate(['/mechanic/queue']);
-        break;
-      case 'RIDER':
-        this.router.navigate(['/rider/garage']);
-        break;
-      default:
-        this.router.navigate(['/login']);
+    const target = role === 'MANAGER'
+      ? '/manager/approvals'
+      : (role === 'MECHANIC' ? '/mechanic/queue' : '/rider/garage');
+
+    if (!this.router) {
+      if (typeof window !== 'undefined') {
+        window.location.href = target;
+      }
+      return;
+    }
+
+    const navRes = this.router.navigate([target]);
+    if (navRes && typeof (navRes as any).then === 'function') {
+      (navRes as Promise<boolean>).then((navigated) => {
+        if (!navigated && typeof window !== 'undefined' && window.location.pathname !== target) {
+          window.location.href = target;
+        }
+      }).catch(() => {
+        if (typeof window !== 'undefined') {
+          window.location.href = target;
+        }
+      });
     }
   }
 

@@ -963,3 +963,16 @@
 
 
 
+
+### [2026-11-08 23:20] — `FEAT-LIVE-BIGQUERY-LOOKER-INTEGRATION`: Conexão ao Vivo do Google BigQuery e Painel Looker Studio
+- **Agente / Modelo:** `@database-architect` + `@backend-specialist` + `@frontend-specialist`
+- **Contexto e Execução:**
+  1. Criação do dataset `mottu_ops_bi` e da tabela analítica `fact_inspections` no Google Cloud BigQuery (`mottu-ops-bi`).
+  2. Carga inicial de dados históricos de vistorias balanceadas cobrindo os 4 modelos de motocicletas e vereditos operacionais (`PRE_EXISTENTE`, `DESGASTE_NATURAL`, `MAU_USO`).
+  3. Criação do relatório no Google Looker Studio e configuração da URL de incorporação: `https://datastudio.google.com/embed/reporting/b917630d-3e59-46e7-a877-5f8f0194d91d/page/Qe9CG`.
+  4. Configuração do Core API (`application.yml` e `ManagerAnalyticsService`), Docker Compose (`infra/docker-compose.prod.yml`) e variáveis de ambiente com `BIGQUERY_ENABLED=true` e `LOOKER_STUDIO_EMBED_URL`.
+  5. Deploy contínuo aprovado no GitHub Actions CD (`7bd4086`) e ativado com sucesso na VM (`161.153.2.148:18088`).
+- **Verificação Executada:**
+  - `apps/web-app`: 203/203 testes aprovados.
+  - `apps/core-api`: `AppointmentAndOutboxIntegrationTest` 9/9 testes aprovados.
+  - API da VM remota `/api/v1/manager/analytics/summary` retornou `HTTP 200` com a URL do Looker Studio vinculada com sucesso.

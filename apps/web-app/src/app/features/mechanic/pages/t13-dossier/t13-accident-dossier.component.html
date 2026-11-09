@@ -58,7 +58,12 @@
                     class="relative h-24 rounded-md border border-[#E2E2E2] overflow-hidden group block bg-[#F3F3F3]"
                     title="Clique para abrir imagem original"
                   >
-                    <img [src]="photo" alt="Foto adicional de detalhe" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    <img
+                      [src]="photo"
+                      (error)="$any($event.target).src = '/demo-photos/avaria-escapamento.webp'"
+                      alt="Foto adicional de detalhe"
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    />
                   </a>
                 }
               </div>

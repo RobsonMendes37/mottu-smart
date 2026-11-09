@@ -81,6 +81,8 @@ services:
     depends_on:
       minio:
         condition: service_healthy
+    volumes:
+      - ./mock-photos:/mock-photos:ro
     entrypoint:
       - /bin/sh
       - -c
@@ -88,6 +90,14 @@ services:
         mc alias set myminio http://minio:9000 $${S3_ACCESS_KEY:-minioadmin} $${S3_SECRET_KEY:-minioadmin123}
         mc mb --ignore-existing myminio/$${S3_BUCKET_NAME:-mottu-inspections}
         mc anonymous set download myminio/$${S3_BUCKET_NAME:-mottu-inspections}
+        if [ -d /mock-photos ]; then
+          mc cp /mock-photos/avaria-retrovisor.webp myminio/$${S3_BUCKET_NAME:-mottu-inspections}/inspections/sample-retrovisor.webp || true
+          mc cp /mock-photos/avaria-retrovisor.webp myminio/$${S3_BUCKET_NAME:-mottu-inspections}/inspections/2026/11/633cc57e-cad2-4d7b-9d9a-0eebd8fa771a.webp || true
+          mc cp /mock-photos/avaria-manete.webp myminio/$${S3_BUCKET_NAME:-mottu-inspections}/inspections/sample-manete.webp || true
+          mc cp /mock-photos/avaria-pneu.webp myminio/$${S3_BUCKET_NAME:-mottu-inspections}/inspections/sample-pneu.webp || true
+          mc cp /mock-photos/avaria-farol.webp myminio/$${S3_BUCKET_NAME:-mottu-inspections}/inspections/sample-farol.webp || true
+          mc cp /mock-photos/avaria-escapamento.webp myminio/$${S3_BUCKET_NAME:-mottu-inspections}/inspections/sample-escapamento.webp || true
+        fi
         exit 0
     environment:
       S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}

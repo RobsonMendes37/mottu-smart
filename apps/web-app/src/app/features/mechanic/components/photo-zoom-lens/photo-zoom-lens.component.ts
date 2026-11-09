@@ -25,10 +25,11 @@ import { DamageBoundingBox } from '../../models/mechanic.models';
       (touchend)="isHovering.set(false)"
     >
       <!-- Base High-Res Photo -->
-      @if (photoUrlSignal()) {
+      @if (activePhotoUrl()) {
         <img
           #baseImage
-          [src]="photoUrlSignal()"
+          [src]="activePhotoUrl()"
+          (error)="onPhotoError()"
           alt="Foto da avaria em alta resolução"
           class="w-full h-full object-contain pointer-events-none"
         />
@@ -59,14 +60,14 @@ import { DamageBoundingBox } from '../../models/mechanic.models';
       }
 
       <!-- Magnifying Loupe (2x - 4x) -->
-      @if (isHovering() && photoUrlSignal()) {
+      @if (isHovering() && activePhotoUrl()) {
         <div
           class="absolute rounded-full pointer-events-none border-2 border-white shadow-2xl z-20 overflow-hidden"
           [style.width.px]="loupeSize"
           [style.height.px]="loupeSize"
           [style.left.px]="loupeLeft()"
           [style.top.px]="loupeTop()"
-          [style.background-image]="'url(' + photoUrlSignal() + ')'"
+          [style.background-image]="'url(' + activePhotoUrl() + ')'"
           [style.background-repeat]="'no-repeat'"
           [style.background-size]="bgSize()"
           [style.background-position]="bgPosition()"
@@ -102,13 +103,51 @@ import { DamageBoundingBox } from '../../models/mechanic.models';
 })
 export class PhotoZoomLensComponent {
   photoUrlSignal = signal<string>('');
+  activePhotoUrl = signal<string>('');
   boundingBoxesSignal = signal<DamageBoundingBox[]>([]);
 
   @Input() set photoUrl(val: string) {
     this.photoUrlSignal.set(val || '');
+    this.resolveActivePhoto(val);
   }
   get photoUrl(): string {
     return this.photoUrlSignal();
+  }
+
+  resolveActivePhoto(url: string): void {
+    if (!url) {
+      this.activePhotoUrl.set('/demo-photos/avaria-retrovisor.webp');
+      return;
+    }
+    const lower = url.toLowerCase();
+    if (lower.includes('manete') || lower.includes('guidao')) {
+      this.activePhotoUrl.set(url.startsWith('http') ? url : '/demo-photos/avaria-manete.webp');
+    } else if (lower.includes('pneu') || lower.includes('roda')) {
+      this.activePhotoUrl.set(url.startsWith('http') ? url : '/demo-photos/avaria-pneu.webp');
+    } else if (lower.includes('farol') || lower.includes('otica')) {
+      this.activePhotoUrl.set(url.startsWith('http') ? url : '/demo-photos/avaria-farol.webp');
+    } else if (lower.includes('escapamento') || lower.includes('queda')) {
+      this.activePhotoUrl.set(url.startsWith('http') ? url : '/demo-photos/avaria-escapamento.webp');
+    } else {
+      this.activePhotoUrl.set(url);
+    }
+  }
+
+  onPhotoError(): void {
+    const current = this.activePhotoUrl();
+    if (current && current.startsWith('/demo-photos/')) return;
+    const lower = (this.photoUrlSignal() || '').toLowerCase();
+    if (lower.includes('manete') || lower.includes('guidao')) {
+      this.activePhotoUrl.set('/demo-photos/avaria-manete.webp');
+    } else if (lower.includes('pneu') || lower.includes('roda')) {
+      this.activePhotoUrl.set('/demo-photos/avaria-pneu.webp');
+    } else if (lower.includes('farol') || lower.includes('otica')) {
+      this.activePhotoUrl.set('/demo-photos/avaria-farol.webp');
+    } else if (lower.includes('escapamento') || lower.includes('queda')) {
+      this.activePhotoUrl.set('/demo-photos/avaria-escapamento.webp');
+    } else {
+      this.activePhotoUrl.set('/demo-photos/avaria-retrovisor.webp');
+    }
   }
 
   @Input() set boundingBoxes(val: DamageBoundingBox[]) {

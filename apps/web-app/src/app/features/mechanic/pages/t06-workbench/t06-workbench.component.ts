@@ -62,15 +62,32 @@ export class T06WorkbenchComponent implements OnInit {
   boundingBoxes = computed<DamageBoundingBox[]>(() => {
     const d = this.details();
     if (!d || !d.items || d.items.length === 0) return [];
-    // Provide visual bounding chips based on items
-    return d.items.map((item, idx) => ({
-      label: item.partName,
-      confidence: Math.round((d.aiConfidence || 0.85) * 100),
-      x: 20 + (idx % 2) * 30,
-      y: 25 + (idx % 2) * 25,
-      width: 35,
-      height: 30,
-    }));
+    return d.items.map((item, idx) => {
+      const name = (item.partName || '').toLowerCase();
+      if (name.includes('retrovisor') || name.includes('espelho')) {
+        return { label: item.partName, confidence: Math.round((d.aiConfidence || 0.94) * 100), x: 50, y: 14, width: 28, height: 26 };
+      }
+      if (name.includes('manete') || name.includes('freio') || name.includes('guidão')) {
+        return { label: item.partName, confidence: Math.round((d.aiConfidence || 0.92) * 100), x: 44, y: 28, width: 32, height: 24 };
+      }
+      if (name.includes('pneu') || name.includes('roda')) {
+        return { label: item.partName, confidence: Math.round((d.aiConfidence || 0.96) * 100), x: 26, y: 22, width: 48, height: 48 };
+      }
+      if (name.includes('farol') || name.includes('lâmpada') || name.includes('ótico')) {
+        return { label: item.partName, confidence: Math.round((d.aiConfidence || 0.91) * 100), x: 28, y: 18, width: 42, height: 36 };
+      }
+      if (name.includes('escapamento') || name.includes('pedaleira')) {
+        return { label: item.partName, confidence: Math.round((d.aiConfidence || 0.89) * 100), x: 35, y: 44, width: 44, height: 28 };
+      }
+      return {
+        label: item.partName,
+        confidence: Math.round((d.aiConfidence || 0.88) * 100),
+        x: 20 + (idx % 2) * 30,
+        y: 25 + (idx % 2) * 25,
+        width: 35,
+        height: 30,
+      };
+    });
   });
 
   constructor(

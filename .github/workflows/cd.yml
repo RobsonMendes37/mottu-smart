@@ -107,6 +107,7 @@ jobs:
             docker compose -f infra/docker-compose.prod.yml build
             echo "🚀 Subindo stack com imagens atualizadas..."
             docker compose -f infra/docker-compose.prod.yml up -d --remove-orphans
+            docker compose -f infra/docker-compose.prod.yml run --rm minio-create-buckets || true
 
             echo "🚀 Aguardando Core API inicializar e ficar pronta..."
             for i in $(seq 1 30); do

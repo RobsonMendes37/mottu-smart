@@ -1310,3 +1310,30 @@
 - **Validação de Testes e Builds:**
   - Angular Vitest: **240/240 testes passando com 100% de sucesso** (38 suites de teste).
   - Angular Production Build: **Aprovado com sucesso** (dist/web-app gerado sem erros).
+
+
+### [2026-11-09 18:48] — Fotos Realistas de Vistorias e Avarias nos Mocks e MinIO S3
+- **Agente / Modelo:** `@orchestrator` + `@frontend-specialist` + `@backend-specialist` + `@test-engineer`
+- **Ajustes Realizados:**
+  1. **Geração e Otimização de Fotografias Realistas em Alta Definição:**
+     - Criadas 5 fotografias foto-realistas de inspeção mecânica urbana de entrega cobrindo as avarias reais do negócio:
+       * `avaria-retrovisor`: Retrovisor direito partido com vidro estilhaçado e carenagem lateral raspada.
+       * `avaria-manete`: Manete de freio dianteiro direito fraturado na ponta com metal exposto e punho abrasado.
+       * `avaria-pneu`: Pneu traseiro totalmente careca por desgaste natural de rodagem urbana severa.
+       * `avaria-farol`: Bloco óptico do farol frontal trincado em teia de aranha (Risco P1 de segurança).
+       * `avaria-escapamento`: Protetor de escapamento metálico com ralados profundos e pedaleira torta por queda lateral.
+     - As fotos foram convertidas para WebP de alta qualidade (~150-250KB) e JPEG, salvas em `apps/web-app/public/demo-photos/` e `infra/mock-photos/`.
+  2. **Migration Flyway `V12__seed_realistic_damaged_inspections.sql`:**
+     - Atualização de vistorias ativas existentes para apontar para `inspections/sample-retrovisor.webp`.
+     - Inserção de 5 vistorias com fotografias de alta resolução, diagnósticos técnicos realistas da IA e peças de catálogo vinculadas (`inspection_items`).
+     - Atualização de fotos de dossiê de sinistro (`accident_report_photos`).
+  3. **Integração com Docker Compose & MinIO S3:**
+     - `minio-create-buckets` nos ambientes de prod e dev configurado para carregar automaticamente as fotos realistas para o bucket `mottu-inspections`.
+  4. **Frontend com Fallback Automático e Bounding Boxes Precisas:**
+     - `PhotoZoomLensComponent`: Lupa amplificadora (2x a 4x) sincronizada com `activePhotoUrl()` e fallback automático para fotos realistas em caso de erro de rede ou mock.
+     - `T06WorkbenchComponent`: Coordenadas de bounding box inteligentes alinhadas visualmente com as posições das avarias na imagem (retrovisor no topo direito, manete no guidão, pneu central, farol frontal, escapamento inferior).
+     - `InspectionStatusComponent` e `T13AccidentDossierComponent`: Imagens de vistoria e sinistros equipadas com fallback automático para as fotos realistas.
+- **Validação de Testes e Builds:**
+  - Angular Vitest: **241/241 testes passando com 100% de sucesso**.
+  - Java Core API: **329/329 testes passando**.
+  - Angular Production Build: **Aprovado com sucesso**.

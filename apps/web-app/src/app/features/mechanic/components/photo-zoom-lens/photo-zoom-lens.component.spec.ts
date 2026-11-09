@@ -81,4 +81,15 @@ describe('PhotoZoomLensComponent (Damage Photo Magnifier & AI Overlays)', () => 
     expect(comp.isHovering()).toBe(true);
     expect(comp.cursorPos()).toEqual({ x: 200, y: 150 });
   });
+
+  it('TC-PZL-7: resolves realistic photo matching damage keywords or falls back to retrovisor', () => {
+    comp.photoUrl = 'http://minio/inspections/manete.webp';
+    expect(comp.activePhotoUrl()).toBe('http://minio/inspections/manete.webp');
+
+    comp.onPhotoError();
+    expect(comp.activePhotoUrl()).toBe('/demo-photos/avaria-manete.webp');
+
+    comp.photoUrl = '';
+    expect(comp.activePhotoUrl()).toBe('/demo-photos/avaria-retrovisor.webp');
+  });
 });

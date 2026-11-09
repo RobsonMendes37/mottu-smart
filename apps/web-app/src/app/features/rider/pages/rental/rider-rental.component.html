@@ -16,7 +16,6 @@
         [class.text-[#545454]]="activeSection() !== 'rental'"
       >
         <span>Fatura semanal</span>
-        <span class="text-[9px] font-semibold text-[#545454] bg-[#EAEAEA] border border-[#E2E2E2] px-1.5 py-0.5 rounded-full leading-none">Piloto</span>
       </button>
       <button
         type="button"
@@ -28,22 +27,7 @@
         [class.text-[#545454]]="activeSection() !== 'deliveries'"
       >
         <span>Entregas da semana</span>
-        <span class="text-[9px] font-semibold text-[#545454] bg-[#EAEAEA] border border-[#E2E2E2] px-1.5 py-0.5 rounded-full leading-none">Piloto</span>
       </button>
-    </div>
-
-    <!-- Notice Alert -->
-    <div role="status" class="p-3.5 rounded-lg bg-white border border-[#E2E2E2] shadow-sm text-xs">
-      <div class="flex items-start gap-2.5">
-        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#F3F3F3] text-[#141414] font-bold text-[11px] shrink-0 mt-0.5">i</span>
-        <div class="text-[#545454] leading-relaxed">
-          @if (activeSection() === 'rental') {
-            <strong class="text-[#141414]">Versão Prévia de Fatura:</strong> O espelho de cobrança semanal com conciliação Pix automática está em fase de homologação operacional.
-          } @else {
-            <strong class="text-[#141414]">Versão Prévia de Corridas:</strong> A telemetria integrada com o aplicativo Mottu Entregas está em fase de homologação piloto.
-          }
-        </div>
-      </div>
     </div>
 
     @if (activeSection() === 'rental') {

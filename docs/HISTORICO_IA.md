@@ -988,3 +988,17 @@
      - Mantida a aba **`Relatório Looker Studio`** com alternância instantânea para exibir o `<iframe>` ao vivo do Google Looker Studio (`LOOKER_STUDIO_EMBED_URL`).
 - **Verificação Executada:**
   - `apps/web-app`: 204/204 testes unitários aprovados (`t10-analytics.component.spec.ts` 7/7) e build de produção aprovado.
+
+### [2026-11-09 00:20] — `UX-COPY-REFINEMENT-SOBER-MOTTU`: Revisão de Linguagem Corporativa e Remoção de Textos Artificiais / Jargões Técnicos na Interface
+- **Agente / Modelo:** `@frontend-specialist` + `@clean-code` + `@frontend-design`
+- **Motivação:**
+  - Revisão completa do microcopy da aplicação web para eliminar nomes técnicos de colunas SQL na interface (`final_verdict`, `motorcycle_model`, `primary_part_name`, `fact_inspections`), siglas internas (`Outbox NDJSON`, `CRAG Ativo`) e avisos extensos de "Ambiente de Demonstração / Homologação / Piloto" que soavam artificiais.
+- **Arquivos Atualizados:**
+  - `apps/web-app/src/app/features/manager/pages/t10-analytics/t10-analytics.component.html`: Títulos e legendas reescritos com linguagem operacional direta (`Análise por unidade e frota`, abas `Visão consolidada` e `Looker Studio`, `Classificação dos laudos`, `Vistorias por modelo da frota`, `Peças mais recorrentes nas vistorias`).
+  - `apps/web-app/src/app/features/mechanic/pages/operations/mechanic-operations.component.html`: Removidos avisos de homologação/demonstração.
+  - `apps/web-app/src/app/features/manager/pages/t12-billing/t12-billing.component.html`: Removidos avisos de demonstração financeira.
+  - `apps/web-app/src/app/features/rider/pages/rental/rider-rental.component.html`: Removidas tags `Piloto` e aviso de versão prévia.
+  - `apps/web-app/src/app/features/rider/pages/account/rider-account.component.html` e `apps/web-app/src/app/features/shared/account/staff-account.component.html`: Textos de alteração de senha limpos e diretos.
+  - `apps/web-app/src/app/shared/layout/desktop-shell/desktop-shell.component.html`, `mobile-shell.component.html` e `login.component.html`: Removidas tags `Piloto` dos menus de navegação.
+- **Verificação Executada:**
+  - `apps/web-app`: **204/204 testes unitários aprovados (38 suítes)** e build de produção concluído sem avisos.

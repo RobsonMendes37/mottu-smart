@@ -20,6 +20,6 @@ SET reported_context = CASE
         WHEN priority_reason IN ('CRITICAL_SAFETY', 'RIDER_CONTESTATION', 'LOW_AI_CONFIDENCE', 'FRAUD_SUSPICION') THEN priority_reason
         ELSE 'LOW_AI_CONFIDENCE'
     END
-WHERE id LIKE 'd2000000-%'
-   OR reported_context NOT IN ('NORMAL_USE_WEAR', 'RECEIVED_LIKE_THIS', 'ACCIDENT_OR_DROP')
-   OR safety_risk NOT IN ('SAFE_TO_RIDE', 'CRITICAL_STOPPED');
+WHERE id::text LIKE 'd2000000-%'
+   OR reported_context::text NOT IN ('NORMAL_USE_WEAR', 'RECEIVED_LIKE_THIS', 'ACCIDENT_OR_DROP')
+   OR safety_risk::text NOT IN ('SAFE_TO_RIDE', 'CRITICAL_STOPPED');

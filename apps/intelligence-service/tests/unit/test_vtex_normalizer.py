@@ -424,6 +424,7 @@ RAIDER = MotorcycleModel.TVS_RAIDER_125
         (["Apache 160", "Apache 200"], [APACHE]),
         (["Apache 200"], []),
         (["Ntorq"], []),
+        (["Modelo Desconhecido XYZ"], []),
         (["Mottu Sport ESD", "Apache 160", "Apache 200", "Raider"], [SPORT, APACHE, RAIDER]),
     ],
 )

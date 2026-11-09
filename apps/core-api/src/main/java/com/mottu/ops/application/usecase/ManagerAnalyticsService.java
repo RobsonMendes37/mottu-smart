@@ -56,7 +56,6 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public AnalyticsSummaryResponseDto getSummary() {
         try {
             long activeMotorcyclesCount = motorcycleRepository.countByStatus(MotorcycleStatus.RENTED);
@@ -93,7 +92,6 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public DetailedAnalyticsResponseDto getDetailedAnalytics() {
         try {
             List<InspectionJpaEntity> allInspections = inspectionRepository.findAll();
@@ -258,7 +256,6 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Map<String, Object> getAiAdvisorAdvice(String yardKey) {
         String key = (yardKey != null && !yardKey.isBlank()) ? yardKey.trim().toUpperCase() : "ALL";
         String label = resolveYardLabel(key);

@@ -501,6 +501,7 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
   private currentAudioPlayer: HTMLAudioElement | null = null;
   private currentAudioUrl: string | null = null;
   private currentTtsSub: Subscription | null = null;
+  private aiAdvisorSub: Subscription | null = null;
   private currentSpeechSessionId = 0;
   private typewriterInterval: any = null;
 
@@ -1031,6 +1032,10 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopSpeech();
+    if (this.aiAdvisorSub) {
+      this.aiAdvisorSub.unsubscribe();
+      this.aiAdvisorSub = null;
+    }
     if (this.recognition) {
       try {
         this.recognition.stop();
@@ -1162,7 +1167,12 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
     if (!this.managerService?.getAiAdvisorAdvice) return;
     this.aiAdvisorLoading.set(true);
 
-    this.managerService
+    if (this.aiAdvisorSub) {
+      this.aiAdvisorSub.unsubscribe();
+      this.aiAdvisorSub = null;
+    }
+
+    this.aiAdvisorSub = this.managerService
       .getAiAdvisorAdvice(
         this.selectedYardFilter(),
         this.selectedHorizon(),
@@ -1173,9 +1183,11 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
         next: (res) => {
           if (res) this.aiAdvisor.set(res);
           this.aiAdvisorLoading.set(false);
+          this.aiAdvisorSub = null;
         },
         error: () => {
           this.aiAdvisorLoading.set(false);
+          this.aiAdvisorSub = null;
         },
       });
   }

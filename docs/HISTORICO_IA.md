@@ -1640,25 +1640,26 @@
   - Purple Ban: **100% em conformidade**.
 
 
-### [2026-11-10 15:20] — Integração Gemini LLM para Consultas Livres e Correção de Visibilidade de Resposta
-- **Agente / Modelo:** `@backend-specialist` + `@frontend-specialist` + `@orchestrator`
+### [2026-11-10 15:45] — Correção dos Filtros de Sistemas da Moto (Pneus e Rodas, Motor e Câmbio) e Simulação Reativa
+- **Agente / Modelo:** `@frontend-specialist` + `@backend-specialist` + `@orchestrator`
 - **Requisitos Atendidos:**
-  - **Ativação Real de LLM Generativo (Gemini 3.5 Flash Lite):**
-    - Identificada a causa raiz de respostas limitadas apenas a skills fixas: o endpoint `ask_analytics_data` em `apps/intelligence-service/app/infrastructure/web/internal_router.py` utilizava apenas o dicionário estático de palavras-chave.
-    - Implementado método `answer_manager_query_with_llm` em `apps/intelligence-service/app/infrastructure/adapters/gemini_adapter.py` integrando o modelo `gemini-3.5-flash-lite` com fallback cascata para `gemini-3.8-flash`.
-    - O prompt injeta o contexto operacional em tempo real (unidade atual, peças críticas no almoxarifado, volume de ordens na oficina, taxa de resolução de vistorias de 78.5% e distribuição da frota ativa) e gera 2 a 3 frases objetivas em Português do Brasil, sem markdown e sem emojis.
-    - Quando o gestor envia uma pergunta em linguagem natural (sem seleção explícita de skill), o Gemini formula a resposta personalizada e direta.
-  - **Correção da Bolha de Texto Vazia no Frontend:**
-    - Identificada a causa raiz da resposta em branco na interface: `displayedText` era inicializado como string vazia `''`, e a expressão `{{ msg.displayedText ?? msg.text }}` avaliava falsamente para `''`. Além disso, a chamada de fala cancelava indevidamente o intervalo de digitação.
-    - Em `t10-analytics.component.html`, alterado para `{{ msg.displayedText || msg.text }}` garantindo fallback seguro para o texto completo.
-    - Em `t10-analytics.component.ts`, inicializado `displayedText` com `answer` e parametrizado `stopSpeech(keepTypewriter: boolean = false)` para preservar a animação da mensagem corrente.
-  - **Isolamento de Testes Unitários (Lei 8):**
-    - Adicionada fixture `force_mock_mode_in_tests` em `apps/intelligence-service/tests/conftest.py` garantindo que a suíte de testes de integração e unitária rode 100% offline em mock mode mesmo com `GEMINI_MOCK_MODE=false` no `.env` de produção.
+  - **Eliminação do Gargalo de Truncamento do Catálogo (`ManagerAnalyticsService.java`):**
+    - Identificada a causa raiz de filtros de categoria como `Motor e Câmbio` e `Pneus e Rodas` resultarem em 0 peças e parecerem inoperantes: o método `getAiAdvisorAdvice` limitava arbitrariamente o inventário a 10 peças (`.limit(10)`), cortando a maioria dos componentes mecânicos e de transmissão antes do processamento.
+    - Removida a limitação arbitrária, permitindo que todo o catálogo ativo seja avaliado e categorizado nas suas respectivas famílias mecânicas.
+  - **Classificação Completa de Sistemas Operacionais (`analytics_forecaster.py`):**
+    - Expandidas as palavras-chave de `ENGINE_TRANSMISSION` para incluir `"relação"`, `"relacao"`, `"pinhão"`, `"pinhao"`, `"coroa"`, `"câmbio"` e `"cambio"`.
+    - Expandidas as palavras-chave de `TIRES_WHEELS` para incluir `"pneu"`, `"roda"`, `"aro"`, `"raio"`, `"câmara"`, `"camara"`, `"bico"`, `"válvula"`, `"valvula"`.
+    - Ajustado o limiar preditivo de risco de ruptura (`evaluate_stockout_risks`) para ser sensível ao horizonte temporal de projeção selecionado (7, 15, 30 ou 90 dias) e à demanda projetada frente ao estoque atual.
+  - **Reatividade e Cancelamento de Requisições Concorrentes no Frontend (`t10-analytics.component.ts`):**
+    - Adicionado cancelamento de requisições pendentes via `this.aiAdvisorSub?.unsubscribe()` ao alternar filtros rápidos (evitando *race conditions* de requisições anteriores sobrescreverem a seleção mais recente do gestor).
+    - Adicionado suporte a `@empty` na tabela de alertas de estoque para exibir feedback amigável e profissional quando o estoque daquele sistema estiver 100% seguro no horizonte selecionado.
+    - Adicionadas classes `cursor-pointer select-none hover:bg-[#F3F3F3]` aos botões de categorias e horizontes para feedback tátil imediato.
 - **Validação de Testes e Qualidade:**
-  - Python Pytest: **203/203 testes aprovados com 100% de cobertura de domínio**.
-  - Python Linters: **Ruff e Mypy 100% aprovados sem erros**.
+  - Java Maven: **351/351 testes aprovados sem falhas (BUILD SUCCESS)**.
+  - Python Pytest: **175/175 testes de domínio aprovados com 100% de cobertura**.
   - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
   - Angular Production Build: **Concluído com sucesso (397 kB inicial, zero erros)**.
+
 
 
 

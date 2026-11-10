@@ -712,13 +712,14 @@
                       <button
                         type="button"
                         (click)="setHorizon(h.value)"
-                        class="px-3 h-7 rounded text-xs font-bold transition-all border"
+                        class="px-3 h-7 rounded text-xs font-bold transition-all border cursor-pointer select-none"
                         [class.bg-[#141414]]="selectedHorizon() === h.value"
                         [class.text-white]="selectedHorizon() === h.value"
                         [class.border-[#141414]]="selectedHorizon() === h.value"
                         [class.bg-white]="selectedHorizon() !== h.value"
                         [class.text-[#545454]]="selectedHorizon() !== h.value"
                         [class.border-[#E2E2E2]]="selectedHorizon() !== h.value"
+                        [class.hover:bg-[#F3F3F3]]="selectedHorizon() !== h.value"
                       >
                         {{ h.label }}
                       </button>
@@ -734,13 +735,14 @@
                       <button
                         type="button"
                         (click)="setSystemCategory(cat.value)"
-                        class="px-2.5 h-7 rounded text-xs font-bold transition-all border"
+                        class="px-2.5 h-7 rounded text-xs font-bold transition-all border cursor-pointer select-none"
                         [class.bg-[#05944F]]="selectedSystemCategory() === cat.value"
                         [class.text-white]="selectedSystemCategory() === cat.value"
                         [class.border-[#05944F]]="selectedSystemCategory() === cat.value"
                         [class.bg-white]="selectedSystemCategory() !== cat.value"
                         [class.text-[#545454]]="selectedSystemCategory() !== cat.value"
                         [class.border-[#E2E2E2]]="selectedSystemCategory() !== cat.value"
+                        [class.hover:bg-[#F3F3F3]]="selectedSystemCategory() !== cat.value"
                       >
                         {{ cat.label }}
                       </button>
@@ -931,6 +933,16 @@
                           } @else {
                             <span class="text-[11px] text-[#046C3A] font-semibold">Em nível seguro</span>
                           }
+                        </td>
+                      </tr>
+                    } @empty {
+                      <tr>
+                        <td colspan="10" class="py-8 px-4 text-center text-xs text-[#757575] bg-[#FBFBFB]">
+                          <div class="flex flex-col items-center justify-center gap-2 py-3">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#05944F]"></span>
+                            <span class="font-bold text-[#141414] text-xs">Estoque em nível seguro para este sistema</span>
+                            <span class="text-[11px] text-[#757575]">Não foram identificados riscos de ruptura para os próximos {{ selectedHorizon() }} dias.</span>
+                          </div>
                         </td>
                       </tr>
                     }

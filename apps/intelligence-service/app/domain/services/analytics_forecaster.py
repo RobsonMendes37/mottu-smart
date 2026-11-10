@@ -32,11 +32,52 @@ def categorize_part(part_name: str) -> str:
     name = (part_name or "").lower()
     if any(k in name for k in ["manete", "freio", "pastilha", "lona", "disco", "guidão", "guidao", "manopla", "cabo"]):
         return "BRAKE_HANDLEBAR"
-    if any(k in name for k in ["pneu", "roda", "aro", "raio", "câmara", "camara"]):
+    if any(k in name for k in ["pneu", "roda", "aro", "raio", "câmara", "camara", "bico", "válvula", "valvula"]):
         return "TIRES_WHEELS"
-    if any(k in name for k in ["embreagem", "motor", "corrente", "óleo", "oleo", "eixo", "transmissão", "transmissao", "vela", "magneto", "engrenagem", "rolamento"]):
+    if any(
+        k in name
+        for k in [
+            "embreagem",
+            "motor",
+            "corrente",
+            "óleo",
+            "oleo",
+            "eixo",
+            "transmissão",
+            "transmissao",
+            "vela",
+            "magneto",
+            "engrenagem",
+            "rolamento",
+            "relação",
+            "relacao",
+            "pinhão",
+            "pinhao",
+            "coroa",
+            "câmbio",
+            "cambio",
+        ]
+    ):
         return "ENGINE_TRANSMISSION"
-    if any(k in name for k in ["carenagem", "retrovisor", "espelho", "farol", "protetor", "escapamento", "tampa", "bloco óptico", "bloco optico", "pedaleira"]):
+    if any(
+        k in name
+        for k in [
+            "carenagem",
+            "retrovisor",
+            "espelho",
+            "farol",
+            "protetor",
+            "escapamento",
+            "tampa",
+            "bloco óptico",
+            "bloco optico",
+            "pedaleira",
+            "paralama",
+            "para-lama",
+            "rabeta",
+            "estribo",
+        ]
+    ):
         return "FAIRING_BODY"
     return "OTHER"
 
@@ -81,9 +122,11 @@ def evaluate_stockout_risks(
         days_to_stockout = int(round(stock_quantity / daily_burn_rate))
         projected_demand = max(1, int(round(daily_burn_rate * horizon)))
 
-        if stock_quantity <= min_stock_quantity or days_to_stockout <= 4:
+        critical_threshold = max(4, int(round(horizon * 0.25)))
+        warning_threshold = max(8, horizon)
+        if stock_quantity <= min_stock_quantity or days_to_stockout <= critical_threshold:
             risk_level = "CRITICAL"
-        elif days_to_stockout <= 8:
+        elif days_to_stockout <= warning_threshold or (stock_quantity < projected_demand):
             risk_level = "WARNING"
         else:
             risk_level = "HEALTHY"

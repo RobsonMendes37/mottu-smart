@@ -313,7 +313,6 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
 
             List<Map<String, Object>> partsInventory = catalogParts.stream()
                     .filter(p -> p != null && p.getId() != null)
-                    .limit(10)
                     .map(p -> {
                         Map<String, Object> item = new HashMap<>();
                         item.put("sku", p.getVtexSku() != null ? p.getVtexSku() : "SKU-GEN");

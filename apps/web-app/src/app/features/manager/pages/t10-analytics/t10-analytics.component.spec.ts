@@ -180,4 +180,71 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
     expect(comp.totalStockoutBudget()).toBeGreaterThan(0);
     expect(comp.criticalAlertsCount()).toBeGreaterThanOrEqual(1);
   });
+
+  it('TC-T10-15: Floating Voice Copilot toggles, sends messages, and supports speech synthesis', () => {
+    expect(comp.isCopilotOpen()).toBe(false);
+    comp.toggleCopilot();
+    expect(comp.isCopilotOpen()).toBe(true);
+
+    mockManagerService.askDataExplorer = vi.fn().mockReturnValue(of({
+      query: 'Crescimento de demanda',
+      directAnswer: 'Demanda cresceu 18,4% no período.',
+      keyMetricLabel: 'Crescimento',
+      keyMetricValue: '+18.4%',
+      keyMetricTrend: 'Alta',
+      yardLabel: 'Todas as Unidades (SP)',
+      suggestedActionLabel: 'Ver peças',
+      suggestedActionRoute: '/manager/catalog',
+      columns: ['Métrica'],
+      rows: [['+18.4%']],
+    }));
+
+    comp.sendCopilotMessage('Crescimento de demanda');
+    expect(comp.copilotMessages().length).toBeGreaterThanOrEqual(2);
+    const lastMsg = comp.copilotMessages()[comp.copilotMessages().length - 1];
+    expect(lastMsg.text).toContain('Demanda cresceu 18,4%');
+
+    // Speech control methods run safely
+    expect(() => comp.speakText('Teste de voz', 999)).not.toThrow();
+    expect(() => comp.stopSpeech()).not.toThrow();
+    expect(comp.isSpeaking()).toBe(false);
+
+    comp.toggleCopilot();
+    expect(comp.isCopilotOpen()).toBe(false);
+  });
+
+  it('TC-T10-16: loadDetailedAnalytics maps raw backend DTOs to UI models preserving bar colors and yard labels', () => {
+    mockManagerService.getDetailedAnalytics = vi.fn().mockReturnValue(of({
+      yardSnapshots: [
+        { yardKey: 'SP-04', yardLabel: 'Galpão Mottu Butantã', totalInspections: 45, deflectionRatePct: 82.5 }
+      ],
+      dailyVolumeBars: [
+        { dayLabel: 'seg., 09/11', autoCount: 10, humanCount: 2, totalCount: 12 }
+      ],
+      verdictBreakdown: [
+        { verdict: 'DESGASTE_NATURAL', label: 'Desgaste natural (Mottu)', count: 25, percentage: 55.5 },
+        { verdict: 'MAU_USO', label: 'Mau uso', count: 10, percentage: 22.2 }
+      ],
+      fleetModelBreakdown: [
+        { modelKey: 'MOTTU_SPORT_110I', modelName: 'Mottu Sport 110i', inspectionsCount: 30, deflectionPct: 85.0 }
+      ],
+      topAuditedParts: [
+        { sku: 'SKU-001', partName: 'Manete', modelName: 'Sport', occurrences: 5, wearType: 'DESGASTE_NATURAL', unitPriceBrl: 25 }
+      ]
+    }));
+
+    comp.loadDetailedAnalytics();
+
+    // Verify yard label is not blank ("bolinhas" bug eliminated)
+    expect(comp.yardSnapshots[0].label).toBe('Galpão Mottu Butantã');
+    expect(comp.yardSnapshots[0].key).toBe('SP-04');
+
+    // Verify volume bar colors & proportions
+    expect(comp.dailyVolumeBars[0].directPct).toBe(83);
+    expect(comp.dailyVolumeBars[0].workshopPct).toBe(17);
+
+    // Verify verdict bar classes for colors
+    expect(comp.verdictBreakdown[0].barClass).toBe('bg-[#05944F]');
+    expect(comp.verdictBreakdown[1].barClass).toBe('bg-[#D97706]');
+  });
 });

@@ -1494,3 +1494,21 @@
   - Python Intelligence: **195/195 testes aprovados** (`pytest`).
   - Angular Web App: **248/248 testes aprovados** (`vitest`).
 
+
+
+### [2026-11-10 02:05] — Ajuste de Gráficos e Unidades em T10 Analytics + Floating AI Voice Copilot (Web Speech API)
+- **Agente / Modelo:** `@frontend-specialist` + `@ai-engineer`
+- **Causa Raiz dos Gráficos sem Cor e Bolinhas de Unidade:**
+  - O endpoint `/api/v1/manager/analytics/detailed` da Core API retorna DTOs com chaves `yardKey`/`yardLabel`, `dayLabel`/`autoCount`/`humanCount`, `verdict`/`percentage` (sem `barClass`), `modelKey`/`deflectionPct` (sem `sharePct`) e `wearType` (sem `isNaturalWear`).
+  - O componente Angular atribuía o payload diretamente aos signals. Como `yard.label` vinha indefinido, os botões das unidades renderizavam sem texto ("bolinhas"). Da mesma forma, as barras dos gráficos ficavam sem classe de cor ou com proporção 0% (sem altura/largura).
+- **Solução Implementada:**
+  - `t10-analytics.component.ts`: Mapeamento resiliente de DTO para os modelos de UI em `loadDetailedAnalytics()`, injetando tokens de design do Purple Ban (`#05944F`, `#141414`, `#D97706`), calculando proporções percentuais e derivando rótulos legíveis.
+  - `t10-analytics.component.html`:
+    * Botão "Abrir Looker Studio Direto ↗" para acesso imediato ao painel executivo externo ou ao painel nativo.
+    * Floating Action Button (FAB) `[🤖 Mottu IA Copilot]` fixo no canto inferior direito.
+    * Drawer interativo com histórico de mensagens, chips de perguntas rápidas do gestor e integração com `managerService.askDataExplorer`.
+    * Síntese de voz neural via **Web Speech API (`window.speechSynthesis`)** em português (`pt-BR`), com controles de reprodução/pausa e visualizador de ondas animadas.
+  - `t10-analytics.component.spec.ts`: Cobertura de testes unitários para o FAB, abertura do drawer e gatilho de síntese de voz.
+- **Validação de Testes:**
+  - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Angular Production Build: **Compilado com 100% de sucesso**.

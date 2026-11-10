@@ -34,19 +34,77 @@
     }
 
     @if (resolutionResult(); as res) {
-      <div role="status" class="p-4 rounded-lg bg-[#E6F4EE] border border-[#05944F]/30 text-sm text-[#046C3A] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <p class="font-bold">Parecer emitido com sucesso ({{ res.finalVerdict }})</p>
-          <p class="text-xs mt-0.5">{{ res.customerFeedbackText }}</p>
+      <section role="status" class="bg-white border-2 border-[#05944F] rounded-xl p-6 shadow-sm space-y-4">
+        <!-- Header with Success Icon, Title, and Verdict Badge -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#EEEEEE]">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-[#E6F4EE] border border-[#05944F]/40 flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5 text-[#05944F]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-base font-extrabold text-[#141414] tracking-tight">Laudo Técnico Emitido com Sucesso</h3>
+              <p class="text-xs text-[#545454]">O chamado foi finalizado e a notificação foi enviada ao aplicativo do entregador.</p>
+            </div>
+          </div>
+          <!-- Human Verdict Badge -->
+          <div class="shrink-0">
+            @switch (res.finalVerdict) {
+              @case ('DESGASTE_NATURAL') {
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#E6F4EE] text-[#046C3A] border border-[#05944F]/30">
+                  <span class="w-2 h-2 rounded-full bg-[#05944F]"></span>
+                  Desgaste Natural (Isento • R$ 0,00)
+                </span>
+              }
+              @case ('PRE_EXISTENTE') {
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#E6F4EE] text-[#046C3A] border border-[#05944F]/30">
+                  <span class="w-2 h-2 rounded-full bg-[#05944F]"></span>
+                  Avaria Pré-existente (Isento • R$ 0,00)
+                </span>
+              }
+              @case ('MAU_USO') {
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#FEF3C7] text-[#92400E] border border-[#D97706]/40">
+                  <span class="w-2 h-2 rounded-full bg-[#D97706]"></span>
+                  Mau Uso / Impacto • R$ {{ res.totalEstimatedBrl.toFixed(2).replace('.', ',') }}
+                </span>
+              }
+            }
+          </div>
         </div>
-        <button
-          type="button"
-          (click)="backToQueue()"
-          class="px-4 h-9 rounded-md bg-[#05944F] text-white text-xs font-bold shrink-0"
-        >
-          Próximo da fila
-        </button>
-      </div>
+
+        <!-- Feedback Message Box (Clean, Polished, High Legibility) -->
+        <div class="bg-[#F8F9FA] border border-[#E2E2E2] rounded-lg p-4 space-y-2">
+          <div class="flex items-center gap-2 text-xs font-bold text-[#545454] uppercase tracking-wide">
+            <svg class="w-4 h-4 text-[#05944F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+            </svg>
+            <span>Mensagem enviada ao entregador parceiro</span>
+          </div>
+          <p class="text-sm text-[#141414] leading-relaxed whitespace-pre-line">
+            {{ formatCustomerMessage(res.customerFeedbackText) }}
+          </p>
+        </div>
+
+        <!-- Action Buttons Bar -->
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button
+            type="button"
+            (click)="backToQueue()"
+            class="px-5 h-11 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-[#141414] font-bold text-xs transition-colors cursor-pointer"
+          >
+            ← Voltar para a Fila
+          </button>
+          <button
+            type="button"
+            (click)="backToQueue()"
+            class="px-6 h-11 rounded-md bg-[#05944F] hover:bg-[#047840] text-white font-bold text-xs transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
+          >
+            <span>Próxima Vistoria da Fila</span>
+            <span>→</span>
+          </button>
+        </div>
+      </section>
     }
 
     @if (isLoading()) {

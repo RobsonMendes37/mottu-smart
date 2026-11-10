@@ -1386,3 +1386,29 @@
     13. Entregador: Perfil Pessoal e Auditoria de Segurança (`/rider/account`) — ✅ APROVADO
     14. Vida Real: Login com Entregador da Vida Real (Carlos Silva) — ✅ APROVADO
     15. Vida Real: Login com Gestor da Vida Real (Diego Gestor) — ✅ APROVADO
+
+
+### [2026-11-09 22:15] — Correção de Captura de Foto Mobile (HTTPS/Câmera/Galeria) e Redesenho do Card de Laudo do Mecânico
+- **Agente / Modelo:** `@systematic-debugging` + `@frontend-specialist`
+- **Problemas Resolvidos:**
+  1. **Falha de Captura de Foto no Celular e Ausência de HTTPS:**
+     - Modernos navegadores mobile bloqueiam o acesso a APIs de câmera ou falham silenciosamente ao acionar `<input type="file" class="hidden">` via JS `.click()`, especialmente em contextos HTTP não seguros.
+     - `infra/Caddyfile`: Atualizado com suporte a `http://161.153.2.148`, `https://161.153.2.148.sslip.io` e `https://161.153.2.148.nip.io` (geração automática de certificado TLS real Let's Encrypt / ZeroSSL com cadeado verde oficial), e `https://161.153.2.148` com `tls internal`.
+     - `infra/docker-compose.prod.yml`: Porta `443:443` exposta no container do Caddy.
+     - `.github/workflows/cd.yml`: Regras de firewall iptables para as portas 80 e 443 adicionadas no script de deploy da VM.
+     - `inspection-upload.service.ts`: Resolvido o problema de *Mixed Content*: a URL pré-assinada do S3 agora adapta dinamicamente o protocolo (`https:`) e o host atual do navegador.
+     - `inspection-wizard.component.html`: Substituído o input escondido por dois botões nativos com `<label>`: **"Tirar foto na câmera"** (`capture="environment"`) e **"Galeria"** (seleção de arquivo de foto existente), além do atalho **"Usar foto de teste"** com imagem realista pré-carregada.
+  2. **Card Feio com Markdown Bruto na Aprovação do Laudo pelo Mecânico:**
+     - A mensagem gerada pelo Gemini frequentemente continha asteriscos `**` e marcadores de lista brutos que eram exibidos literalmente numa `div` verde apertada sem quebra de linha.
+     - `T06WorkbenchComponent`: Redesenhado o componente de resolução:
+       * Cabeçalho de confirmação com ícone de sucesso e título formal: "Laudo Técnico Emitido com Sucesso".
+       * Badge legível e humanizado do parecer técnico (Desgaste Natural Isento, Avaria Pré-existente Isenta, Mau Uso com valor).
+       * Card dedicado e estilizado "Mensagem enviada ao entregador parceiro" com tipografia limpa, quebra de linha natural (`whitespace-pre-line`) e sanitização de sintaxe markdown (remoção de `**`, `*`, `#`).
+       * Botões de ação rápidos: `← Voltar para a Fila` e `Próxima Vistoria da Fila →`.
+     - `gemini_adapter.py`: Prompt ajustado com regras estritas proibindo o uso de sintaxe Markdown e reforçando parágrafos limpos em português do Brasil, com função `sanitize_feedback()` de segurança.
+     - `inspection-status.component`: Função `formatFeedback()` integrada na visão do entregador para assegurar visualização idêntica e sem markdown bruto.
+- **Validação de Testes e Builds:**
+  - Python Pytest: **189/189 testes passando com 100% de sucesso**.
+  - Angular Vitest: **243/243 testes passando (38 suítes)**.
+  - Angular Production Build: **Concluído com sucesso (391 kB inicial)**.
+  - Java Core API: **Compilação e testes validados com sucesso**.

@@ -170,6 +170,26 @@ export class InspectionWizardComponent implements OnInit {
     }
   }
 
+  async useDemoPhoto(slot: 'damage' | 'odometer' | 'front' | 'detail'): Promise<void> {
+    const demoPhotos: Record<string, string> = {
+      damage: '/demo-photos/avaria-manete.webp',
+      odometer: '/demo-photos/avaria-painel.webp',
+      front: '/demo-photos/avaria-farol.webp',
+      detail: '/demo-photos/avaria-escapamento.webp',
+    };
+    const photoUrl = demoPhotos[slot] || '/demo-photos/avaria-retrovisor.webp';
+    try {
+      this.isUploading.set(true);
+      this.uploadErrorMessage.set(null);
+      const res = await fetch(photoUrl);
+      const blob = await res.blob();
+      await this.processSelectedFile(blob, slot);
+    } catch {
+      this.uploadErrorMessage.set('Não foi possível carregar a foto de exemplo.');
+      this.isUploading.set(false);
+    }
+  }
+
   onRemoveSlotPhoto(slot: 'damage' | 'odometer' | 'front' | 'detail', event?: Event): void {
     if (event) {
       event.preventDefault();

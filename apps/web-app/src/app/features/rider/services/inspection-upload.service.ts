@@ -40,8 +40,25 @@ export class InspectionUploadService {
       })
     );
 
-    // 3. Direct binary PUT to storage URL (WITHOUT Authorization header)
-    const storageResponse = await fetch(presigned.uploadUrl, {
+    // 3. Resolve upload URL to match current page's protocol and host (prevents Mixed Content & CORS blocks)
+    let uploadUrl = presigned.uploadUrl;
+    if (typeof window !== 'undefined' && window.location) {
+      try {
+        const parsedUrl = new URL(uploadUrl);
+        parsedUrl.protocol = window.location.protocol;
+        if (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          parsedUrl.host = window.location.host;
+        }
+        uploadUrl = parsedUrl.toString();
+      } catch {
+        if (window.location.protocol === 'https:' && uploadUrl.startsWith('http://')) {
+          uploadUrl = uploadUrl.replace('http://', 'https://');
+        }
+      }
+    }
+
+    // 4. Direct binary PUT to storage URL (WITHOUT Authorization header)
+    const storageResponse = await fetch(uploadUrl, {
       method: 'PUT',
       headers: {
         'Content-Type': 'image/webp',

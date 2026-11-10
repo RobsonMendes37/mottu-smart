@@ -177,6 +177,16 @@ export class InspectionStatusComponent implements OnInit, OnDestroy {
     }
   }
 
+  formatFeedback(text: string | null | undefined): string {
+    if (!text) return '';
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/^#{1,6}\s+/gm, '')
+      .replace(/^\s*[-*]\s+/gm, '• ')
+      .trim();
+  }
+
   onBack(): void {
     this.router?.navigate(['/rider/garage']);
   }

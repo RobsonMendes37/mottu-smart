@@ -203,6 +203,16 @@ export class T06WorkbenchComponent implements OnInit {
     this.router.navigate(['/mechanic/queue']);
   }
 
+  formatCustomerMessage(rawText: string | null | undefined): string {
+    if (!rawText) return 'Laudo concluído pela oficina com sucesso.';
+    return rawText
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/^#{1,6}\s+/gm, '')
+      .replace(/^\s*[-*]\s+/gm, '• ')
+      .trim();
+  }
+
   formatModel(model: MotorcycleModel | string): string {
     switch (model) {
       case 'MOTTU_SPORT_110I':

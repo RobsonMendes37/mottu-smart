@@ -77,15 +77,28 @@ class GeminiVisionAdapter(AIVisionPort):
                 final_verdict, part_names, total_estimated_brl, mechanic_notes
             )
 
-        parts_str = ", ".join(part_names)
+        parts_str = ", ".join(part_names) if part_names else "componentes avaliados"
         prompt = (
-            f"Transform this mechanic's technical note into an empathetic, clear, and polite message for a motorcycle delivery rider.\n"
-            f"Verdict: {final_verdict}\n"
-            f"Parts: {parts_str}\n"
-            f"Total Estimated BRL: R$ {total_estimated_brl:.2f}\n"
-            f"Mechanic note: {mechanic_notes}\n"
-            "Message must be in Brazilian Portuguese, professional, without technical jargon."
+            "Escreva uma mensagem humana, acolhedora, respeitosa e clara para um entregador parceiro da Mottu.\n"
+            f"Parecer da oficina: {final_verdict}\n"
+            f"Peças avaliadas: {parts_str}\n"
+            f"Valor estimado do reparo: R$ {total_estimated_brl:.2f}\n"
+            f"Observação técnica do mecânico: {mechanic_notes}\n"
+            "Regras obrigatórias de formatação:\n"
+            "- Idioma: Português do Brasil, tom profissional e empático.\n"
+            "- PROIBIDO usar sintaxe de Markdown (não use asteriscos **, #, marcadores de lista com hífen ou sublinhados).\n"
+            "- Escreva em parágrafos diretos, limpos e fluidos, adequados para visualização no aplicativo mobile.\n"
+            "- Explique com transparência o que foi constatado e os próximos passos para o entregador."
         )
+
+        import re
+
+        def sanitize_feedback(raw: str) -> str:
+            cleaned = re.sub(r"\*\*(.*?)\*\*", r"\1", raw)
+            cleaned = re.sub(r"\*(.*?)\*", r"\1", cleaned)
+            cleaned = re.sub(r"^#{1,6}\s+", "", cleaned, flags=re.MULTILINE)
+            cleaned = re.sub(r"^\s*[-*]\s+", "• ", cleaned, flags=re.MULTILINE)
+            return cleaned.strip()
 
         for model_name in settings.vision_models_list:
             try:
@@ -94,13 +107,14 @@ class GeminiVisionAdapter(AIVisionPort):
                     contents=prompt,
                 )
                 if response.text and response.text.strip():
-                    return response.text.strip()
+                    return sanitize_feedback(response.text)
             except Exception as e:
                 logger.warning(f"Model {model_name} failed polishing feedback ({e}). Cascading...")
 
-        return await self.mock_service.polish_mechanic_feedback(
+        fallback = await self.mock_service.polish_mechanic_feedback(
             final_verdict, part_names, total_estimated_brl, mechanic_notes
         )
+        return sanitize_feedback(fallback)
 
     async def generate_embedding(self, text: str) -> List[float]:
         if self.mock_mode or not settings.GEMINI_API_KEY or self._client is None:

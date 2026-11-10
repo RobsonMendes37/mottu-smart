@@ -1,5 +1,95 @@
-:80 {
+{
+	auto_https disable_redirects
+}
+
+http://161.153.2.148, http://:80 {
 	# Modern compression
+	encode zstd gzip
+
+	# Structured access logging
+	log {
+		output stdout
+		format console
+	}
+
+	# Hardened HTTP Headers
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options SAMEORIGIN
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	# Spring Boot REST API & Server-Sent Events (SSE)
+	handle /api/* {
+		reverse_proxy core-api:8080 {
+			flush_interval -1
+		}
+	}
+
+	# MinIO S3 Object Storage Bucket (Direct bucket path for AWS SigV4 compliance)
+	handle /mottu-inspections/* {
+		reverse_proxy minio:9000
+	}
+
+	# MinIO S3 Object Storage (Strip /storage prefix for legacy paths)
+	handle_path /storage/* {
+		reverse_proxy minio:9000
+	}
+
+	# Angular 19 PWA SPA Fallback
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+161.153.2.148.sslip.io, 161.153.2.148.nip.io {
+	# Modern compression
+	encode zstd gzip
+
+	# Structured access logging
+	log {
+		output stdout
+		format console
+	}
+
+	# Hardened HTTP Headers
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options SAMEORIGIN
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	# Spring Boot REST API & Server-Sent Events (SSE)
+	handle /api/* {
+		reverse_proxy core-api:8080 {
+			flush_interval -1
+		}
+	}
+
+	# MinIO S3 Object Storage Bucket (Direct bucket path for AWS SigV4 compliance)
+	handle /mottu-inspections/* {
+		reverse_proxy minio:9000
+	}
+
+	# MinIO S3 Object Storage (Strip /storage prefix for legacy paths)
+	handle_path /storage/* {
+		reverse_proxy minio:9000
+	}
+
+	# Angular 19 PWA SPA Fallback
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+https://161.153.2.148, :443 {
+	tls internal
 	encode zstd gzip
 
 	# Structured access logging

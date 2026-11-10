@@ -100,8 +100,8 @@
           </div>
 
           @if (ins.customerFeedbackText) {
-            <div class="p-3.5 rounded-md bg-[#F6F6F6] text-xs text-[#141414] leading-relaxed">
-              {{ ins.customerFeedbackText }}
+            <div class="p-3.5 rounded-md bg-[#F6F6F6] text-xs text-[#141414] leading-relaxed whitespace-pre-line">
+              {{ formatFeedback(ins.customerFeedbackText) }}
             </div>
           }
 

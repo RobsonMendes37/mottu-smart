@@ -79,6 +79,8 @@ jobs:
             trap 'echo "❌ FALHA NO DEPLOY NA LINHA $LINENO"; docker compose -f infra/docker-compose.prod.yml logs --tail=100 || true; docker compose -f infra/docker-compose.prod.yml ps -a || true' ERR
 
             echo "🚀 Atualizando repositório na VM..."
+            sudo iptables -I INPUT -p tcp --dport 80 -j ACCEPT 2>/dev/null || true
+            sudo iptables -I INPUT -p tcp --dport 443 -j ACCEPT 2>/dev/null || true
             cd /home/ubuntu/mottu-smart-ops || cd ~/mottu-smart-ops
             git fetch origin main
             git reset --hard origin/main

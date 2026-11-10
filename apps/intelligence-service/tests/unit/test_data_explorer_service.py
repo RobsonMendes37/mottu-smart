@@ -3,6 +3,7 @@ from app.domain.services.data_explorer_service import (
     answer_manager_query,
     detect_plate_or_code,
     resolve_context_yard,
+    is_greeting_or_casual,
 )
 
 
@@ -146,4 +147,44 @@ def test_resolve_context_yard_all_cases():
     assert resolve_context_yard("nessa unidade?", "Todas as Unidades (SP)", [{"text": "peças em interlagos"}]) == "Unidade Interlagos (SP-03)"
     assert resolve_context_yard("nesse galpão?", "Todas as Unidades (SP)", [{"text": "como está na lapa"}]) == "Unidade Lapa (SP-02)"
     assert resolve_context_yard("e la?", "Todas as Unidades (SP)", [{"text": "geral sem filial"}]) == "Todas as Unidades (SP)"
+
+
+def test_is_greeting_or_casual_cases():
+    assert is_greeting_or_casual("oi") is True
+    assert is_greeting_or_casual("oi monalisa") is True
+    assert is_greeting_or_casual("olá!") is True
+    assert is_greeting_or_casual("bom dia") is True
+    assert is_greeting_or_casual("boa tarde") is True
+    assert is_greeting_or_casual("tudo bem") is True
+    assert is_greeting_or_casual("fodasse vc") is True
+    assert is_greeting_or_casual("morra") is True
+    assert is_greeting_or_casual("tchau") is True
+    assert is_greeting_or_casual("opa") is True
+    assert is_greeting_or_casual("") is False
+    assert is_greeting_or_casual(None) is False
+    assert is_greeting_or_casual("qual o modelo com maior giro?") is False
+    assert is_greeting_or_casual("me dê um resumo geral de hoje") is False
+    assert is_greeting_or_casual("quais peças estão faltando no estoque?") is False
+
+
+def test_answer_manager_query_greeting_intent():
+    res = answer_manager_query("oi", "Todas as Unidades (SP)", {})
+    assert res["active_skill"] == "CONVERSATIONAL"
+    assert res["columns"] == []
+    assert res["rows"] == []
+    assert res["key_metric_label"] == ""
+    assert "Monalisa" in res["direct_answer"]
+
+
+def test_answer_manager_query_casual_or_insult():
+    res = answer_manager_query("fodasse vc", "Todas as Unidades (SP)", {})
+    assert res["active_skill"] == "CONVERSATIONAL"
+    assert res["columns"] == []
+    assert res["rows"] == []
+
+
+def test_answer_manager_query_no_false_positive_on_article_os():
+    res = answer_manager_query("quais os problemas relatados na infraestrutura?", "Todas as Unidades (SP)", {})
+    assert res["active_skill"] != "SKILL_OFICINA"
+
 

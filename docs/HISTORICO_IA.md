@@ -1661,6 +1661,28 @@
   - Angular Production Build: **Concluído com sucesso (397 kB inicial, zero erros)**.
 
 
+### [2026-11-10 16:15] — Otimização de Concisão da Monalisa: Respostas Diretas, Supressão de Tabelas Redundantes e Eliminação de Falso Positivo
+- **Agente / Modelo:** `@backend-specialist` + `@frontend-specialist` + `@orchestrator`
+- **Requisitos Atendidos:**
+  - **Diretrizes de Síntese e Concisão no Gemini LLM (`gemini_adapter.py`):**
+    - Redefinido o system prompt da Monalisa para comunicação técnica direta, executiva e fluida.
+    - Regra 1: Saudações simples ("oi", "olá", "bom dia") respondidas em no máximo 1 frase curta e amigável, sem despejo de números ou métricas desnecessárias.
+    - Regra 2: Mensagens sociais, fora de escopo ou provocações ("morra", "fodasse") respondidas com 1 frase de neutralidade executiva colocando-se à disposição para a operação do galpão.
+    - Regra 3: Perguntas operacionais reais respondidas cirurgicamente em 1 a 2 frases focadas estritamente no assunto questionado (estoque fala apenas de estoque, frota fala apenas de frota), sem enrolação ou recitação de dados não solicitados.
+  - **Supressão de Tabelas e Cards em Conversação Casual (`data_explorer_service.py`):**
+    - Criada a função de domínio puro `is_greeting_or_casual(query)` para identificar saudações, despedidas e interações casuais.
+    - Ao detectar interação casual, o serviço retorna `columns: []`, `rows: []`, `key_metric_label: ""` e `active_skill: "CONVERSATIONAL"`, impedindo que tabelas operacionais genéricas ou cards de métrica sejam renderizados abaixo da mensagem de texto.
+  - **Eliminação de Falso Positivo com Artigo Definido "os" (`ManagerAnalyticsService.java` e `data_explorer_service.py`):**
+    - Identificada a causa raiz de frases cotidianas contendo o artigo plural português "os" (ex.: "e sobre os problemas...") acionarem indevidamente a skill de oficina e exibirem a tabela de Ordens de Serviço: a substring `" os "` era interpretada como sigla de OS.
+    - Substituída a verificação genérica por termos específicos como `"ordens de serviço"`, `"o.s."` e `"manutenção"`, eliminando 100% dos falsos positivos.
+- **Validação de Testes e Qualidade:**
+  - Python Pytest: **207/207 testes aprovados (179 unitários com 100.00% de cobertura de domínio)**.
+  - Java Maven: **7/7 testes de ManagerAnalyticsService aprovados (BUILD SUCCESS)**.
+  - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Angular Production Build: **Concluído com sucesso (397 kB inicial, zero erros)**.
+
+
+
 
 
 

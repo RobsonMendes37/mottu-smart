@@ -21,6 +21,25 @@ def detect_plate_or_code(text: str) -> Optional[str]:
     return None
 
 
+def is_greeting_or_casual(query: str) -> bool:
+    """Identify simple greetings, conversational messages, insults, or social pleasantries."""
+    q = (query or "").strip().lower()
+    cleaned = "".join(c for c in q if c.isalnum() or c.isspace()).strip()
+    casual_words = {
+        "oi", "ola", "olá", "bom dia", "boa tarde", "boa noite",
+        "e ai", "e aí", "fala", "tudo bem", "como vai", "opa", "salve",
+        "morra", "fodasse", "foda-se", "tchau", "valeu", "obrigado", "obrigada", "ajuda"
+    }
+    if cleaned in casual_words:
+        return True
+    words = cleaned.split()
+    if any(w in ["morra", "fodasse", "foda-se"] for w in words):
+        return True
+    if len(words) <= 3 and any(w in ["oi", "ola", "olá", "salve", "opa"] for w in words):
+        return True
+    return False
+
+
 def resolve_context_yard(query: str, current_yard: str, history: Optional[List[Dict[str, Any]]]) -> str:
     """Resolve target yard based on query mentions or memory from conversation history."""
     q = (query or "").lower()
@@ -103,7 +122,7 @@ def answer_manager_query(
     # =========================================================================
     # 2. SKILL: OFICINA & BAIAS WMS (SKILL_OFICINA)
     # =========================================================================
-    if skill_id == "SKILL_OFICINA" or any(k in q for k in ["oficina", "baia", "ordem de serviço", " os ", "manutenção", "manutencao", "reparo", "conserto", "bancada", "mecânico"]):
+    if skill_id == "SKILL_OFICINA" or any(k in q for k in ["oficina", "baia", "ordem de serviço", "ordens de serviço", "manutenção", "manutencao", "reparo", "conserto", "bancada", "mecânico", "mecanico"]):
         orders = service_orders or [
             ["OS-7712", "MOT9Z99", "Mottu Sport 110i", "Baia 01 (Butantã)", "WAITING_BAY", "Alinhamento de guidão", "R$ 0,00 (Presencial)"],
             ["OS-7715", "POP6F21", "Honda Pop 110i", "Baia 02 (Butantã)", "IN_REPAIR", "Troca de relação e pastilha", "R$ 68,00"],
@@ -275,9 +294,25 @@ def answer_manager_query(
         }
 
     # =========================================================================
-    # 8. FALLBACK HONESTO QUANDO A IA ESTÁ OFFLINE PARA PERGUNTAS LIVRES
+    # 8. CUMPRIMENTOS, MENSAGENS SOCIAIS OU CASUAIS (SEM TABELAS OU CARDS)
     # =========================================================================
-    if not is_gemini_online and q and not any(k in q for k in ["resumo", "hoje", "indicador", "mottu", "olá", "ola", "oi", "bom dia", "boa tarde", "tudo bem", "como vai", "ajuda", "geral"]):
+    if is_greeting_or_casual(q):
+        return {
+            "direct_answer": f"Olá! Sou a Monalisa, sua assistente operacional da Mottu em {resolved_yard}. Em que posso apoiar na operação da frota e oficina hoje?",
+            "key_metric_label": "",
+            "key_metric_value": "",
+            "key_metric_trend": "",
+            "columns": [],
+            "rows": [],
+            "suggested_action_label": "",
+            "suggested_action_route": "",
+            "active_skill": "CONVERSATIONAL",
+        }
+
+    # =========================================================================
+    # 9. FALLBACK HONESTO QUANDO A IA ESTÁ OFFLINE PARA PERGUNTAS LIVRES
+    # =========================================================================
+    if not is_gemini_online and q and not any(k in q for k in ["resumo", "hoje", "indicador", "mottu", "geral", "balanço", "balanco"]):
         return {
             "direct_answer": f"Olá! No momento o motor de conversação livre está offline, mas minhas 7 Skills operacionais estão conectadas ao banco PostgreSQL da Mottu em tempo real para {resolved_yard}. Escolha uma das opções abaixo para consultar os dados ao vivo:",
             "key_metric_label": "Modo Skills Ativo",
@@ -299,7 +334,7 @@ def answer_manager_query(
         }
 
     # =========================================================================
-    # 9. RESUMO GERAL DA OPERAÇÃO / DEFAULT
+    # 10. RESUMO GERAL DA OPERAÇÃO / DEFAULT
     # =========================================================================
     summary_rows = [
         ["Frota em Locação Ativa", "16 motocicletas locadas", "36 motos no polo total", "94% de disponibilidade"],

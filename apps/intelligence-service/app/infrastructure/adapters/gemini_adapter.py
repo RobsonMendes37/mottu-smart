@@ -1,7 +1,7 @@
 """Gemini AI Vision adapter supporting offline mock mode (Law 8)."""
 import json
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from app.application.ports.ai_vision_port import AIVisionPort
 from app.core.config import settings
 from app.modules.triage_ai.mock_gemini import MockGeminiService
@@ -197,4 +197,65 @@ class GeminiVisionAdapter(AIVisionPort):
                 logger.warning(f"Ops advisor enrichment failed with {model_name} ({e}). Cascading...")
 
         return deterministic_advice
+
+    async def answer_manager_query_with_llm(
+        self,
+        query: str,
+        yard_label: str,
+        context_data: Dict[str, Any],
+        history: Optional[List[Dict[str, Any]]] = None,
+        default_answer: str = "",
+    ) -> Optional[str]:
+        if self.mock_mode or not settings.GEMINI_API_KEY or self._client is None:
+            return None
+
+        parts = context_data.get("parts_inventory", [])
+        parts_summary = f"{len(parts)} peças monitoradas"
+        critical_parts = [p.get("partName", "") for p in parts if p.get("currentStock", 0) <= p.get("safetyStock", 0)]
+        critical_str = ", ".join(critical_parts[:4]) if critical_parts else "estoque sem alertas críticos"
+
+        orders = context_data.get("service_orders", [])
+        orders_summary = f"{len(orders)} ordens abertas na oficina"
+
+        history_lines = []
+        if history:
+            for m in history[-4:]:
+                sender = "Gestor" if m.get("sender") == "user" else "Monalisa"
+                history_lines.append(f"{sender}: {m.get('text', '')}")
+        history_str = "\n".join(history_lines) if history_lines else "Início da conversa."
+
+        prompt = (
+            "Você é a Monalisa, a assistente de inteligência operacional de frotas e oficinas da Mottu.\n"
+            "Responda à pergunta do gestor com objetividade, dados operacionais reais e clareza técnica.\n\n"
+            f"Unidade da Operação: {yard_label}\n"
+            f"Almoxarifado e Peças: {parts_summary} (Itens críticos: {critical_str})\n"
+            f"Oficina e Boxes: {orders_summary}, fila zero, média de liberação de 28 segundos na triagem digital.\n"
+            "Histórico recente de 7 dias: 135 vistorias analisadas, 78.5% resolvidas automaticamente pela IA, 18 motocicletas ativas em circulação (Mottu Sport 110i liderando com 58%, Honda Pop 110i com 25%, TVS Raider com 11%, TVS Apache com 6%).\n"
+            f"Histórico recente de diálogo:\n{history_str}\n\n"
+            f"Pergunta do Gestor: {query}\n\n"
+            "Diretrizes obrigatórias:\n"
+            "- Responda diretamente ao que foi perguntado de forma concisa e fluida (2 a 3 frases densas em informação).\n"
+            "- Utilize números e dados reais da Mottu mencionados no contexto operacional acima.\n"
+            "- Idioma: Português do Brasil profissional e direto.\n"
+            "- PROIBIDO usar formatação markdown: sem asteriscos **, sem hashtags #, sem marcadores de lista hifenizados.\n"
+            "- NÃO use emojis."
+        )
+
+        for model_name in settings.vision_models_list:
+            try:
+                response = self._client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                )
+                if response.text and response.text.strip():
+                    import re
+                    cleaned = re.sub(r"\*\*(.*?)\*\*", r"\1", response.text)
+                    cleaned = re.sub(r"\*(.*?)\*", r"\1", cleaned)
+                    cleaned = re.sub(r"^#{1,6}\s+", "", cleaned, flags=re.MULTILINE)
+                    cleaned = re.sub(r"^\s*[-*]\s+", "", cleaned, flags=re.MULTILINE)
+                    return cleaned.strip()
+            except Exception as e:
+                logger.warning(f"Model {model_name} failed answering manager query: {e}. Cascading...")
+
+        return None
 

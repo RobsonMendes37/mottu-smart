@@ -687,14 +687,14 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
             this.isAiOfflineMode.set(res.isAiOffline);
           }
 
-          // Mensagem com displayedText vazio para streaming progressivo visual (0.5s)
+          // Mensagem com displayedText inicial para garantir visibilidade imediata com animação progressiva
           this.copilotMessages.update((msgs) => [
             ...msgs,
             {
               id: assistantMsgId,
               sender: 'assistant',
               text: answer,
-              displayedText: '',
+              displayedText: answer,
               time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
               metricLabel: res.keyMetricLabel,
               metricValue: res.keyMetricValue,
@@ -726,7 +726,7 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
               id: assistantMsgId,
               sender: 'assistant',
               text: fallbackAnswer,
-              displayedText: '',
+              displayedText: fallbackAnswer,
               time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
             },
           ]);
@@ -755,7 +755,12 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
     const totalDurationMs = 500; // 0.5s conforme solicitado
     const intervalMs = 25;
     const totalSteps = Math.max(1, Math.floor(totalDurationMs / intervalMs));
-    let currentStep = 0;
+    let currentStep = 1;
+
+    const initialChars = Math.max(1, Math.ceil(fullText.length / totalSteps));
+    this.copilotMessages.update((msgs) =>
+      msgs.map((m) => (m.id === messageId ? { ...m, displayedText: fullText.slice(0, initialChars) } : m))
+    );
 
     this.typewriterInterval = setInterval(() => {
       currentStep++;
@@ -855,7 +860,7 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
   speakText(text: string, msgId: number, canPlayCheck?: () => boolean): void {
     if (typeof window === 'undefined') return;
 
-    this.stopSpeech();
+    this.stopSpeech(true);
     const sessionId = ++this.currentSpeechSessionId;
 
     const spokenText = this.cleanTextForSpeech(text);
@@ -985,10 +990,10 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
     }
   }
 
-  stopSpeech(): void {
+  stopSpeech(keepTypewriter: boolean = false): void {
     this.currentSpeechSessionId++;
 
-    if (this.typewriterInterval) {
+    if (!keepTypewriter && this.typewriterInterval) {
       clearInterval(this.typewriterInterval);
       this.typewriterInterval = null;
     }

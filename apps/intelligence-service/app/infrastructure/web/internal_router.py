@@ -188,13 +188,28 @@ async def ask_analytics_data(request: DataExplorerQueryRequestDTO) -> DataExplor
         is_gemini_online=is_gemini_online,
     )
 
+    direct_answer = str(raw_answer.get("direct_answer", ""))
+
+    # Quando a pergunta for enviada em texto livre pelo gestor (sem skillId fixo) e o Gemini estiver online,
+    # gera uma resposta adaptada e inteligente com base no contexto operacional da Mottu
+    if not request.skillId and is_gemini_online:
+        llm_answer = await vision_adapter.answer_manager_query_with_llm(
+            query=request.query,
+            yard_label=request.yardLabel,
+            context_data=request.contextData,
+            history=request.history,
+            default_answer=direct_answer,
+        )
+        if llm_answer:
+            direct_answer = llm_answer
+
     return DataExplorerQueryResponseDTO(
         query=request.query,
         yardKey=request.yardKey,
         yardLabel=request.yardLabel,
         generatedAt=datetime.now(timezone.utc),
-        modelUsed="monalisa-ops-agent",
-        directAnswer=str(raw_answer.get("direct_answer", "")),
+        modelUsed="gemini-3.5-flash-lite" if is_gemini_online else "monalisa-ops-agent",
+        directAnswer=direct_answer,
         keyMetricLabel=str(raw_answer.get("key_metric_label", "")),
         keyMetricValue=str(raw_answer.get("key_metric_value", "")),
         keyMetricTrend=str(raw_answer.get("key_metric_trend", "")),

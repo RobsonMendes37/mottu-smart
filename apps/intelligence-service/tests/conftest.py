@@ -5,6 +5,12 @@ from app.main import app
 
 
 
+@pytest.fixture(autouse=True)
+def force_mock_mode_in_tests(monkeypatch):
+    from app.core.config import settings
+    monkeypatch.setattr(settings, "GEMINI_MOCK_MODE", True)
+
+
 @pytest.fixture
 def client():
     return TestClient(app)

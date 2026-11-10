@@ -1177,7 +1177,7 @@
                     </svg>
                   </div>
                   <div class="bg-white border border-[#E2E8F0] px-3.5 py-3 rounded-2xl rounded-tl-xs max-w-[92%] shadow-xs space-y-2.5">
-                    <p class="text-xs text-[#1E293B] leading-relaxed">{{ msg.displayedText ?? msg.text }}</p>
+                    <p class="text-xs text-[#1E293B] leading-relaxed">{{ msg.displayedText || msg.text }}</p>
 
                     @if (msg.metricLabel && msg.metricValue) {
                       <div class="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between">

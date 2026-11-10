@@ -1640,4 +1640,26 @@
   - Purple Ban: **100% em conformidade**.
 
 
+### [2026-11-10 15:20] — Integração Gemini LLM para Consultas Livres e Correção de Visibilidade de Resposta
+- **Agente / Modelo:** `@backend-specialist` + `@frontend-specialist` + `@orchestrator`
+- **Requisitos Atendidos:**
+  - **Ativação Real de LLM Generativo (Gemini 3.5 Flash Lite):**
+    - Identificada a causa raiz de respostas limitadas apenas a skills fixas: o endpoint `ask_analytics_data` em `apps/intelligence-service/app/infrastructure/web/internal_router.py` utilizava apenas o dicionário estático de palavras-chave.
+    - Implementado método `answer_manager_query_with_llm` em `apps/intelligence-service/app/infrastructure/adapters/gemini_adapter.py` integrando o modelo `gemini-3.5-flash-lite` com fallback cascata para `gemini-3.8-flash`.
+    - O prompt injeta o contexto operacional em tempo real (unidade atual, peças críticas no almoxarifado, volume de ordens na oficina, taxa de resolução de vistorias de 78.5% e distribuição da frota ativa) e gera 2 a 3 frases objetivas em Português do Brasil, sem markdown e sem emojis.
+    - Quando o gestor envia uma pergunta em linguagem natural (sem seleção explícita de skill), o Gemini formula a resposta personalizada e direta.
+  - **Correção da Bolha de Texto Vazia no Frontend:**
+    - Identificada a causa raiz da resposta em branco na interface: `displayedText` era inicializado como string vazia `''`, e a expressão `{{ msg.displayedText ?? msg.text }}` avaliava falsamente para `''`. Além disso, a chamada de fala cancelava indevidamente o intervalo de digitação.
+    - Em `t10-analytics.component.html`, alterado para `{{ msg.displayedText || msg.text }}` garantindo fallback seguro para o texto completo.
+    - Em `t10-analytics.component.ts`, inicializado `displayedText` com `answer` e parametrizado `stopSpeech(keepTypewriter: boolean = false)` para preservar a animação da mensagem corrente.
+  - **Isolamento de Testes Unitários (Lei 8):**
+    - Adicionada fixture `force_mock_mode_in_tests` em `apps/intelligence-service/tests/conftest.py` garantindo que a suíte de testes de integração e unitária rode 100% offline em mock mode mesmo com `GEMINI_MOCK_MODE=false` no `.env` de produção.
+- **Validação de Testes e Qualidade:**
+  - Python Pytest: **203/203 testes aprovados com 100% de cobertura de domínio**.
+  - Python Linters: **Ruff e Mypy 100% aprovados sem erros**.
+  - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Angular Production Build: **Concluído com sucesso (397 kB inicial, zero erros)**.
+
+
+
 

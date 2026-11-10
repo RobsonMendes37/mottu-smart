@@ -34,11 +34,16 @@ const BASE_URL = process.env.BASE_URL || 'https://mottu-smart.duckdns.org';
     await runTest('Entregador: Garagem T02 exibe Escudo 48h/100km e Vistoria 360', async (page) => {
       await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
       await page.locator('button:has-text("Entregador")').first().click();
-      await page.waitForURL('**/rider/**', { timeout: 10000 });
+      await page.waitForURL('**/rider/garage', { timeout: 10000 });
+
+      // Aguardar renderização da Garagem (Escudo de Retirada ou Garantia Regular)
+      const shieldBadge = page.locator('text=/Escudo de Retirada Ativo|Garantia regular/');
+      await shieldBadge.first().waitFor({ state: 'visible', timeout: 8000 });
 
       // Verificar elementos do Escudo ou Vistoria 360
+      await page.waitForSelector('text=Giro 360 de Retirada', { timeout: 8000 });
       const content = await page.content();
-      const hasEscudoOrVistoria = content.includes('Escudo') || content.includes('Vistoria') || content.includes('Retirada') || content.includes('Garantia');
+      const hasEscudoOrVistoria = content.includes('Retirada') && content.includes('Validado');
       if (!hasEscudoOrVistoria) {
         throw new Error('Nenhum indicador de garantia ou vistoria 360 encontrado na Garagem T02');
       }
@@ -67,7 +72,7 @@ const BASE_URL = process.env.BASE_URL || 'https://mottu-smart.duckdns.org';
       await page.waitForURL('**/mechanic/**', { timeout: 10000 });
 
       await page.goto(`${BASE_URL}/mechanic/queue`, { waitUntil: 'networkidle' });
-      await page.waitForSelector('text=Fila de triagem', { timeout: 8000 });
+      await page.waitForSelector('text=Fila de vistorias da unidade', { timeout: 8000 });
     });
 
   } catch (fatalErr) {

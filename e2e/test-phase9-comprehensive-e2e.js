@@ -82,26 +82,25 @@ const BASE_URL = process.env.BASE_URL || 'https://mottu-smart.duckdns.org';
       await page.waitForURL('**/rider/garage', { timeout: 10000 });
 
       // Verificar status de cobertura (Escudo de Retirada 48h ou Garantia regular da oficina)
-      const shieldBadge = page.locator('text=Escudo de Retirada Ativo, text=Garantia regular');
+      const shieldBadge = page.locator('text=/Escudo de Retirada Ativo|Garantia regular/');
       await shieldBadge.first().waitFor({ state: 'visible', timeout: 8000 });
 
-      // Verificar card "Vistoria 360 de Retirada & Dupla Validação"
-      await page.waitForSelector('text=Vistoria 360 de Retirada & Dupla Validação', { timeout: 8000 });
+      // Verificar card "Giro 360 de Retirada"
+      await page.waitForSelector('text=Giro 360 de Retirada', { timeout: 8000 });
 
       // Verificar galeria de ângulos
-      await page.waitForSelector('text=1. Frente', { timeout: 4000 });
-      await page.waitForSelector('text=2. Traseira', { timeout: 4000 });
-      await page.waitForSelector('text=3. Lateral Dir.', { timeout: 4000 });
-      await page.waitForSelector('text=4. Lateral Esq.', { timeout: 4000 });
+      await page.waitForSelector('text=Frente', { timeout: 4000 });
+      await page.waitForSelector('text=Traseira', { timeout: 4000 });
+      await page.waitForSelector('text=Lado D.', { timeout: 4000 });
+      await page.waitForSelector('text=Lado E.', { timeout: 4000 });
 
       // Verificar botão de confirmação digital ou badge de já validado
       const validateBtn = page.locator('button:has-text("Confirmar e Validar Vistoria de Retirada")');
-      const alreadyValidated = page.locator('text=Vistoria de Retirada Validada Digitalmente, text=Validado por você');
+      const alreadyValidated = page.locator('text=/Validado por você|Vistoria de Retirada Validada Digitalmente/');
 
       if (await validateBtn.isVisible()) {
         await validateBtn.click();
         await page.waitForTimeout(1000);
-        // Após clicar, deve transicionar para validado
         await alreadyValidated.first().waitFor({ state: 'visible', timeout: 8000 });
       } else {
         await alreadyValidated.first().waitFor({ state: 'visible', timeout: 5000 });
@@ -202,8 +201,8 @@ const BASE_URL = process.env.BASE_URL || 'https://mottu-smart.duckdns.org';
       await page.locator('button:has-text("Entregador")').first().click();
       await page.waitForURL('**/rider/garage', { timeout: 10000 });
 
-      // Clicar em "Ver resultado" na primeira vistoria recente
-      const resultLink = page.locator('a:has-text("Ver resultado")').first();
+      // Clicar em "Abrir →" ou "Ver resultado" na primeira vistoria recente
+      const resultLink = page.locator('a:has-text("Abrir"), a:has-text("Ver resultado")').first();
       if (await resultLink.isVisible()) {
         await resultLink.click();
         await page.waitForURL('**/rider/inspections/**/status', { timeout: 8000 });
@@ -216,7 +215,7 @@ const BASE_URL = process.env.BASE_URL || 'https://mottu-smart.duckdns.org';
 
         // Verificar presença de elementos de proteção, comitê ou parecer
         const html = await page.content();
-        const hasTechnicalDetails = html.includes('Junta Técnica') || html.includes('Liberado sem custo') || html.includes('Orçamento') || html.includes('Convocação');
+        const hasTechnicalDetails = html.includes('Junta Técnica') || html.includes('Liberado sem custo') || html.includes('Orçamento') || html.includes('Convocação') || html.includes('Parecer');
         if (!hasTechnicalDetails) {
           throw new Error('Nenhum detalhe de deliberação técnica encontrado na T04');
         }

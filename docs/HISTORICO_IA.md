@@ -1423,3 +1423,18 @@
   - Certificado SSL emitido e validado via curl: `CN=mottu-smart.duckdns.org`, emissor `Let's Encrypt CN=YE1`, protocolo `TLSv1.3`, resposta `HTTP/2 200 OK`.
   - Auditoria completa E2E Playwright: **15/15 fluxos aprovados com 100% de sucesso**.
 - **Observações:** O domínio `mottu-smart.duckdns.org` agora possui certificado SSL oficial e cadeado verde ativo no navegador para computadores e smartphones.
+
+
+### [2026-11-09 22:54] — Resolução do Erro HTTP 403 (SignatureDoesNotMatch) no Upload S3/MinIO
+- **Agente / Modelo:** `@devops-engineer` + `@systematic-debugging`
+- **Causa Raiz Identificada:**
+  - O `core-api` utiliza `S3_PUBLIC_ENDPOINT=http://161.153.2.148` para o `S3Presigner`, gerando assinaturas AWS SigV4 criptográficas travadas com o header `host: 161.153.2.148`.
+  - Quando o usuário no celular ou navegador acessava via `https://mottu-smart.duckdns.org` ou `https://161.153.2.148.sslip.io`, o browser enviava o header `Host: mottu-smart.duckdns.org`.
+  - O Caddy repassava o Host do navegador ao MinIO, causando divergência entre o Host recebido pelo MinIO e o Host assinado na URL (`SignatureDoesNotMatch`), resultando em **HTTP 403 Forbidden**.
+- **Solução Implementada:**
+  - `infra/Caddyfile`: Configurado `header_up Host 161.153.2.148` nas diretivas `reverse_proxy minio:9000` de `/mottu-inspections/*` e `/storage/*`. Assim, o Caddy assegura que o MinIO sempre receba o Host exato assinado pelo `S3Presigner`, mantendo paridade absoluta.
+  - `accident.service.ts`: Atualizado método `uploadToStorage` para sincronizar dinamicamente o protocolo e o host do navegador, evitando erros de *Mixed Content*.
+- **Validação de Testes e Produção:**
+  - Teste automatizado de ponta a ponta via `https://mottu-smart.duckdns.org`: upload binário retornou **HTTP 200 OK** e vistoria criada com status **202 QUEUED_AI**.
+  - Teste idêntico validado em `https://161.153.2.148.sslip.io`: **HTTP 200 OK**.
+  - Testes do Angular: **243/243 aprovados**.

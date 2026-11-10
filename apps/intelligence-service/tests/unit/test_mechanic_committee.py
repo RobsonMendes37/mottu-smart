@@ -96,3 +96,16 @@ def test_committee_flags_inconclusive_photo_requiring_presential_workshop():
     assert evaluation["requiresPresentialInspection"] is True
     assert "avaliação presencial" in evaluation["summary"].lower() or "presencial" in evaluation["summary"].lower()
 
+
+def test_temporal_comparison_specialist_without_baseline_photos():
+    specialist = TemporalComparisonSpecialist()
+    eval_result = specialist.evaluate(
+        part_names=["MANETE DE FREIO"],
+        has_baseline_photos=False,
+        gemini_summary="Desgaste regular"
+    )
+    assert eval_result.verdict == DamageVerdict.DESGASTE_NATURAL
+    assert eval_result.confidence == 0.75
+    assert "sem histórico prévio" in eval_result.reasoning.lower()
+
+

@@ -1,5 +1,9 @@
 """Unit tests for data_explorer_service pure domain service."""
-from app.domain.services.data_explorer_service import answer_manager_query
+from app.domain.services.data_explorer_service import (
+    answer_manager_query,
+    detect_plate_or_code,
+    resolve_context_yard,
+)
 
 
 def test_answer_manager_query_stock_intent():
@@ -118,3 +122,28 @@ def test_answer_manager_query_offline_fallback_honest():
     assert res["active_skill"] == "OFFLINE_FALLBACK"
     assert "conversação livre está offline" in res["direct_answer"]
     assert len(res["rows"]) == 7
+
+
+def test_detect_plate_or_code_cases():
+    assert detect_plate_or_code("") is None
+    assert detect_plate_or_code(None) is None
+    assert detect_plate_or_code("Verifique a OS-12345 no pátio") == "OS-12345"
+    assert detect_plate_or_code("Consulte a moto ABC1D23") == "ABC1D23"
+
+
+def test_resolve_context_yard_all_cases():
+    # Direct mentions
+    assert resolve_context_yard("como tá em guarulhos?", "", None) == "Unidade Guarulhos (SP-01)"
+    assert resolve_context_yard("como tá em sp-01?", "", None) == "Unidade Guarulhos (SP-01)"
+    assert resolve_context_yard("status interlagos", "", None) == "Unidade Interlagos (SP-03)"
+    assert resolve_context_yard("status sp-03", "", None) == "Unidade Interlagos (SP-03)"
+    assert resolve_context_yard("movimentação na lapa", "", None) == "Unidade Lapa (SP-02)"
+    assert resolve_context_yard("movimentação sp-02", "", None) == "Unidade Lapa (SP-02)"
+
+    # History resolution
+    assert resolve_context_yard("e lá?", "Todas as Unidades (SP)", None) == "Todas as Unidades (SP)"
+    assert resolve_context_yard("e por lá?", "Todas as Unidades (SP)", [{"text": "movimento em guarulhos"}]) == "Unidade Guarulhos (SP-01)"
+    assert resolve_context_yard("nessa unidade?", "Todas as Unidades (SP)", [{"text": "peças em interlagos"}]) == "Unidade Interlagos (SP-03)"
+    assert resolve_context_yard("nesse galpão?", "Todas as Unidades (SP)", [{"text": "como está na lapa"}]) == "Unidade Lapa (SP-02)"
+    assert resolve_context_yard("e la?", "Todas as Unidades (SP)", [{"text": "geral sem filial"}]) == "Todas as Unidades (SP)"
+

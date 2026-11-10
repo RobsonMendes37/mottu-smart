@@ -7,6 +7,12 @@ public record ActiveContractDto(
         UUID contractId,
         Instant pickedUpAt,
         int initialOdometerKm,
-        RentedMotorcycleDto motorcycle
+        RentedMotorcycleDto motorcycle,
+        String pickupPhotosJson,
+        boolean pickupValidatedByRider,
+        Instant pickupValidatedAt,
+        boolean isShieldActive,
+        double remainingShieldHours,
+        int remainingShieldKm
 ) {
 }

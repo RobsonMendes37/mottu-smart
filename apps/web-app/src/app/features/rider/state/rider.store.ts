@@ -152,6 +152,22 @@ export class RiderStore {
     }
   }
 
+  async validatePickup(): Promise<boolean> {
+    try {
+      const updated = await firstValueFrom(this.riderService.validatePickup());
+      const current = this.garage();
+      if (current) {
+        this.garage.set({
+          ...current,
+          activeContract: updated,
+        });
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   updateSlot(
     slotName: 'damage' | 'odometer' | 'front' | 'detail',
     key: string,

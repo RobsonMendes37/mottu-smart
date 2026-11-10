@@ -15,6 +15,9 @@ public class RentalContract {
     private final int initialOdometerKm;
     private Instant endedAt;
     private boolean active;
+    private String pickupPhotosJson;
+    private boolean pickupValidatedByRider;
+    private Instant pickupValidatedAt;
 
     public RentalContract(
             UUID id,
@@ -24,6 +27,21 @@ public class RentalContract {
             int initialOdometerKm,
             Instant endedAt,
             boolean active
+    ) {
+        this(id, riderId, motorcycleId, pickedUpAt, initialOdometerKm, endedAt, active, null, false, null);
+    }
+
+    public RentalContract(
+            UUID id,
+            UUID riderId,
+            UUID motorcycleId,
+            Instant pickedUpAt,
+            int initialOdometerKm,
+            Instant endedAt,
+            boolean active,
+            String pickupPhotosJson,
+            boolean pickupValidatedByRider,
+            Instant pickupValidatedAt
     ) {
         if (riderId == null) {
             throw new DomainValidationException("Rider ID cannot be null");
@@ -45,6 +63,9 @@ public class RentalContract {
         this.initialOdometerKm = initialOdometerKm;
         this.endedAt = endedAt;
         this.active = active;
+        this.pickupPhotosJson = pickupPhotosJson;
+        this.pickupValidatedByRider = pickupValidatedByRider;
+        this.pickupValidatedAt = pickupValidatedAt;
     }
 
     public static RentalContract create(UUID riderId, UUID motorcycleId, Instant pickedUpAt, int initialOdometerKm) {
@@ -111,5 +132,26 @@ public class RentalContract {
 
     public boolean isActive() {
         return active;
+    }
+
+    public String getPickupPhotosJson() {
+        return pickupPhotosJson;
+    }
+
+    public boolean isPickupValidatedByRider() {
+        return pickupValidatedByRider;
+    }
+
+    public Instant getPickupValidatedAt() {
+        return pickupValidatedAt;
+    }
+
+    public void validatePickup(Instant validatedAt) {
+        this.pickupValidatedByRider = true;
+        this.pickupValidatedAt = validatedAt != null ? validatedAt : Instant.now();
+    }
+
+    public void updatePickupPhotos(String pickupPhotosJson) {
+        this.pickupPhotosJson = pickupPhotosJson;
     }
 }

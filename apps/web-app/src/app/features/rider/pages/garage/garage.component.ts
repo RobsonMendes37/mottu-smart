@@ -17,6 +17,20 @@ export class GarageComponent implements OnInit {
   protected router: Router | null;
 
   quotaWarningVisible = signal<boolean>(false);
+  isValidating = signal<boolean>(false);
+  validationSuccess = signal<boolean>(false);
+
+  activeContract = computed(() => this.store.garage()?.activeContract ?? null);
+
+  baselinePhotos = computed(() => {
+    const raw = this.activeContract()?.pickupPhotosJson;
+    if (!raw) return null;
+    try {
+      return typeof raw === 'string' ? JSON.parse(raw) : raw;
+    } catch {
+      return null;
+    }
+  });
 
   motorcycle = computed(() => {
     const storeActive = this.store.activeMotorcycle;
@@ -72,6 +86,15 @@ export class GarageComponent implements OnInit {
       return;
     }
     this.router?.navigate(['/rider/inspections/new']);
+  }
+
+  async onConfirmPickup(): Promise<void> {
+    this.isValidating.set(true);
+    const ok = await this.store.validatePickup();
+    this.isValidating.set(false);
+    if (ok) {
+      this.validationSuccess.set(true);
+    }
   }
 
   onReportAccident(): void {

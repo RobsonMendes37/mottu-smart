@@ -117,16 +117,134 @@
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         <!-- Left 55% (7 cols): Optical Inspection & Telemetry -->
         <div class="lg:col-span-7 space-y-4">
+          <!-- Optical Inspection & Baseline 360 Tabbed Section -->
           <section class="bg-white border border-[#E2E2E2] rounded-lg p-4 space-y-3">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-[#141414]">Inspeção óptica (passe o cursor para zoom)</span>
+              <span class="text-xs font-bold text-[#141414]">Inspeção óptica comparativa</span>
               <span class="font-mono text-xs text-[#757575]">{{ d.reportedOdometerKm }} km informados</span>
             </div>
 
-            <app-photo-zoom-lens
-              [photoUrl]="d.photoDownloadUrl"
-              [boundingBoxes]="boundingBoxes()"
-            ></app-photo-zoom-lens>
+            <!-- Tab Switcher -->
+            <div class="flex items-center gap-1.5 p-1 bg-[#F3F3F3] rounded-lg">
+              <button
+                type="button"
+                (click)="activePhotoTab.set('current')"
+                class="flex-1 py-1.5 px-3 rounded-md text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                [class.bg-white]="activePhotoTab() === 'current'"
+                [class.text-[#141414]]="activePhotoTab() === 'current'"
+                [class.shadow-sm]="activePhotoTab() === 'current'"
+                [class.text-[#757575]]="activePhotoTab() !== 'current'"
+              >
+                <span>📸 Foto Atual da Vistoria</span>
+              </button>
+              <button
+                type="button"
+                (click)="activePhotoTab.set('baseline')"
+                class="flex-1 py-1.5 px-3 rounded-md text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                [class.bg-white]="activePhotoTab() === 'baseline'"
+                [class.text-[#141414]]="activePhotoTab() === 'baseline'"
+                [class.shadow-sm]="activePhotoTab() === 'baseline'"
+                [class.text-[#757575]]="activePhotoTab() !== 'baseline'"
+              >
+                <span>🔄 Giro 360 da Retirada (Estado Zero)</span>
+                @if (hasBaselinePhotos()) {
+                  <span class="w-2 h-2 rounded-full bg-[#05944F]"></span>
+                }
+              </button>
+            </div>
+
+            <!-- Tab Content: Current Photo -->
+            @if (activePhotoTab() === 'current') {
+              <app-photo-zoom-lens
+                [photoUrl]="d.photoDownloadUrl"
+                [boundingBoxes]="boundingBoxes()"
+              ></app-photo-zoom-lens>
+            }
+
+            <!-- Tab Content: Baseline 360 -->
+            @if (activePhotoTab() === 'baseline') {
+              @if (hasBaselinePhotos()) {
+                <div class="space-y-3">
+                  <!-- Angle Selector Buttons -->
+                  <div class="grid grid-cols-5 gap-1.5">
+                    <button
+                      type="button"
+                      (click)="selectedBaselineAngle.set('front')"
+                      class="py-1 px-2 rounded text-[11px] font-bold transition-colors cursor-pointer"
+                      [class.bg-[#141414]]="selectedBaselineAngle() === 'front'"
+                      [class.text-white]="selectedBaselineAngle() === 'front'"
+                      [class.bg-[#F3F3F3]]="selectedBaselineAngle() !== 'front'"
+                      [class.text-[#545454]]="selectedBaselineAngle() !== 'front'"
+                    >
+                      Frente
+                    </button>
+                    <button
+                      type="button"
+                      (click)="selectedBaselineAngle.set('rear')"
+                      class="py-1 px-2 rounded text-[11px] font-bold transition-colors cursor-pointer"
+                      [class.bg-[#141414]]="selectedBaselineAngle() === 'rear'"
+                      [class.text-white]="selectedBaselineAngle() === 'rear'"
+                      [class.bg-[#F3F3F3]]="selectedBaselineAngle() !== 'rear'"
+                      [class.text-[#545454]]="selectedBaselineAngle() !== 'rear'"
+                    >
+                      Traseira
+                    </button>
+                    <button
+                      type="button"
+                      (click)="selectedBaselineAngle.set('right')"
+                      class="py-1 px-2 rounded text-[11px] font-bold transition-colors cursor-pointer"
+                      [class.bg-[#141414]]="selectedBaselineAngle() === 'right'"
+                      [class.text-white]="selectedBaselineAngle() === 'right'"
+                      [class.bg-[#F3F3F3]]="selectedBaselineAngle() !== 'right'"
+                      [class.text-[#545454]]="selectedBaselineAngle() !== 'right'"
+                    >
+                      Lat. Dir.
+                    </button>
+                    <button
+                      type="button"
+                      (click)="selectedBaselineAngle.set('left')"
+                      class="py-1 px-2 rounded text-[11px] font-bold transition-colors cursor-pointer"
+                      [class.bg-[#141414]]="selectedBaselineAngle() === 'left'"
+                      [class.text-white]="selectedBaselineAngle() === 'left'"
+                      [class.bg-[#F3F3F3]]="selectedBaselineAngle() !== 'left'"
+                      [class.text-[#545454]]="selectedBaselineAngle() !== 'left'"
+                    >
+                      Lat. Esq.
+                    </button>
+                    <button
+                      type="button"
+                      (click)="selectedBaselineAngle.set('odometer')"
+                      class="py-1 px-2 rounded text-[11px] font-bold transition-colors cursor-pointer"
+                      [class.bg-[#141414]]="selectedBaselineAngle() === 'odometer'"
+                      [class.text-white]="selectedBaselineAngle() === 'odometer'"
+                      [class.bg-[#F3F3F3]]="selectedBaselineAngle() !== 'odometer'"
+                      [class.text-[#545454]]="selectedBaselineAngle() !== 'odometer'"
+                    >
+                      Odômetro
+                    </button>
+                  </div>
+
+                  <!-- Angle Photo Container -->
+                  <div class="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-[#1C1F1E] border border-[#E2E2E2] flex items-center justify-center">
+                    <img
+                      [src]="currentBaselinePhotoUrl()"
+                      alt="Foto da retirada do veículo"
+                      class="w-full h-full object-contain"
+                    />
+                    <div class="absolute bottom-2 left-2 px-2 py-1 rounded bg-black/70 text-white text-[10px] font-mono font-semibold">
+                      Retirada • Ângulo: {{ selectedBaselineAngle() }}
+                    </div>
+                  </div>
+                </div>
+              } @else {
+                <div class="p-8 text-center bg-[#F6F6F6] rounded-lg border border-dashed border-[#E2E2E2] space-y-2">
+                  <p class="text-xs font-bold text-[#141414]">Nenhuma foto 360 cadastrada na retirada deste contrato</p>
+                  <p class="text-[11px] text-[#757575]">
+                    As fotos de estado zero são registradas na expedição do veículo pelo módulo de frota.
+                  </p>
+                </div>
+              }
+            }
           </section>
 
           <!-- Contract & Pickup Telemetry -->
@@ -181,6 +299,56 @@
               </div>
             }
           </section>
+
+          <!-- AI Technical Committee Scorecard -->
+          @if (committeeEvaluation(); as comm) {
+            <section class="bg-white border border-[#E2E2E2] rounded-lg p-4 space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-[#EEEEEE]">
+                <div class="flex items-center gap-2">
+                  <h3 class="text-xs font-bold text-[#141414]">Placar da Junta Técnica Multi-IA</h3>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#F3F3F3] text-[#141414]">
+                    {{ comm.consensusScore }}
+                  </span>
+                </div>
+                <span class="text-xs font-mono text-[#046C3A] font-bold">
+                  {{ (comm.averageConfidence * 100).toFixed(0) }}% precisão média
+                </span>
+              </div>
+
+              @if (!comm.canIdentifyPartsClearly) {
+                <div class="p-2.5 rounded bg-[#FEF3C7] text-xs text-[#92400E] flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span><strong>Foto Inconclusiva:</strong> Os especialistas apontam dúvida razoável no enquadramento.</span>
+                </div>
+              }
+
+              @if (comm.dissentingOpinion) {
+                <div class="p-2.5 rounded bg-[#F8F9FA] border border-[#EEEEEE] text-xs text-[#545454]">
+                  <strong class="text-[#141414]">Voto dissidente:</strong> {{ comm.dissentingOpinion }}
+                </div>
+              }
+
+              <div class="space-y-2">
+                @for (ev of comm.evaluators; track ev.specialistRole) {
+                  <div class="p-3 rounded-md bg-[#F8F9FA] border border-[#EEEEEE] space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="font-bold text-[#141414]">{{ ev.specialistRole }}</span>
+                      <span
+                        class="px-2 py-0.5 rounded text-[10px] font-bold"
+                        [class.bg-[#E6F4EE]]="ev.verdict === 'DESGASTE_NATURAL' || ev.verdict === 'PRE_EXISTENTE'"
+                        [class.text-[#046C3A]]="ev.verdict === 'DESGASTE_NATURAL' || ev.verdict === 'PRE_EXISTENTE'"
+                        [class.bg-[#FEF3C7]]="ev.verdict === 'MAU_USO'"
+                        [class.text-[#92400E]]="ev.verdict === 'MAU_USO'"
+                      >
+                        {{ ev.verdict }} • {{ (ev.confidence * 100).toFixed(0) }}%
+                      </span>
+                    </div>
+                    <p class="text-[11px] text-[#545454] leading-relaxed">{{ ev.reasoning }}</p>
+                  </div>
+                }
+              </div>
+            </section>
+          }
         </div>
 
         <!-- Right 45% (5 cols): Decision Desk -->
@@ -313,7 +481,7 @@
               type="button"
               [disabled]="!canSubmit()"
               (click)="resolveInspection()"
-              class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] disabled:bg-[#F3F3F3] disabled:text-[#757575] text-white font-bold text-sm transition-colors"
+              class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] disabled:bg-[#F3F3F3] disabled:text-[#757575] text-white font-bold text-sm transition-colors cursor-pointer"
             >
               @if (isSubmitting()) {
                 <span>Registrando parecer...</span>
@@ -321,10 +489,86 @@
                 <span>Confirmar e enviar parecer</span>
               }
             </button>
+
+            <!-- 4th Action: Convocação Presencial no Galpão (R$ 0,00) -->
+            <button
+              type="button"
+              [disabled]="!canSubmit()"
+              (click)="openPresentialModal()"
+              class="w-full h-11 rounded-md bg-white border-2 border-[#141414] hover:bg-[#F3F3F3] disabled:opacity-40 text-[#141414] font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>🔍 Convocar para Diagnóstico Presencial no Galpão (R$ 0,00)</span>
+            </button>
           </section>
         </div>
       </div>
       }
     }
   </div>
+
+  <!-- Presential Inspection Modal -->
+  @if (isPresentialModalOpen()) {
+    <div class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" (click)="closePresentialModal()">
+      <div
+        class="w-full max-w-lg bg-white rounded-xl border border-[#E2E2E2] p-6 space-y-4 shadow-2xl"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="flex items-center justify-between pb-3 border-b border-[#EEEEEE]">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-[#141414] text-white flex items-center justify-center text-sm font-bold">
+              🔍
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-[#141414]">Convocação Presencial no Galpão</h3>
+              <p class="text-xs text-[#757575]">Isenção de custos • Abertura de OS em baia da oficina</p>
+            </div>
+          </div>
+          <button type="button" (click)="closePresentialModal()" class="w-8 h-8 rounded-md bg-[#F3F3F3] text-sm font-bold">✕</button>
+        </div>
+
+        <div class="p-3.5 rounded-lg bg-[#E6F4EE] border border-[#05944F]/30 text-xs text-[#046C3A] leading-relaxed">
+          <p class="font-bold mb-1">Garantia de Isenção para o Entregador Parceiro (R$ 0,00)</p>
+          <p>
+            Ao convocar para a oficina, o sistema registrará parecer isento (R$ 0,00), notificará o aplicativo do entregador para agendar uma data e gerará automaticamente uma Ordem de Serviço na baia WMS da unidade.
+          </p>
+        </div>
+
+        <div class="space-y-1.5">
+          <label for="presentialNotes" class="block text-xs font-bold text-[#141414]">
+            Motivo da convocação técnica (visível para o entregador)
+          </label>
+          <textarea
+            id="presentialNotes"
+            rows="3"
+            [ngModel]="presentialReasonInput()"
+            (ngModelChange)="presentialReasonInput.set($event)"
+            placeholder="Ex.: Foto não permite certificar integridade da bengala/chassi. Necessário teste de bancada no galpão..."
+            class="w-full p-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-xs text-[#141414] focus:outline-none"
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <button
+            type="button"
+            (click)="closePresentialModal()"
+            class="h-11 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-[#141414] font-semibold text-xs transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            [disabled]="isConvoking() || !presentialReasonInput().trim()"
+            (click)="submitPresentialConvocation()"
+            class="h-11 rounded-md bg-[#141414] hover:bg-black disabled:opacity-40 text-white font-bold text-xs transition-colors"
+          >
+            @if (isConvoking()) {
+              <span>Convocando...</span>
+            } @else {
+              <span>Confirmar Convocação (R$ 0,00)</span>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </app-desktop-shell>

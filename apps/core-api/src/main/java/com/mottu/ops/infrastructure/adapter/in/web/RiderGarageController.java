@@ -50,6 +50,12 @@ public class RiderGarageController {
         return ResponseEntity.ok(generateUploadUrlUseCase.generateUploadUrl(request));
     }
 
+    @PostMapping({"/contracts/validate-pickup", "/garage/validate-pickup"})
+    public ResponseEntity<com.mottu.ops.application.dto.ActiveContractDto> validatePickup(Authentication authentication) {
+        UUID riderId = extractUserId(authentication);
+        return ResponseEntity.ok(getRiderGarageUseCase.validatePickup(riderId));
+    }
+
     private UUID extractUserId(Authentication authentication) {
         if (authentication == null) {
             throw new InvalidCredentialsException("Usuário não autenticado");

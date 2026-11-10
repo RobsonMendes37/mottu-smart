@@ -12,15 +12,20 @@ import com.mottu.ops.domain.model.AccidentReportItem;
 import com.mottu.ops.domain.model.Money;
 import com.mottu.ops.domain.service.AccidentBudgetCalculator;
 import com.mottu.ops.domain.service.AccidentStateMachine;
+import com.mottu.ops.domain.enums.ServiceOrderStatus;
 import com.mottu.ops.infrastructure.adapter.in.web.sse.SseEmitterRegistry;
 import com.mottu.ops.infrastructure.adapter.out.persistence.entity.AnalyticsOutboxJpaEntity;
 import com.mottu.ops.infrastructure.adapter.out.persistence.entity.CatalogPartJpaEntity;
 import com.mottu.ops.infrastructure.adapter.out.persistence.entity.MotorcycleJpaEntity;
+import com.mottu.ops.infrastructure.adapter.out.persistence.entity.ServiceOrderJpaEntity;
 import com.mottu.ops.infrastructure.adapter.out.persistence.entity.UserJpaEntity;
+import com.mottu.ops.infrastructure.adapter.out.persistence.entity.YardJpaEntity;
 import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataAnalyticsOutboxRepository;
 import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataCatalogPartRepository;
 import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataMotorcycleRepository;
+import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataServiceOrderRepository;
 import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataUserRepository;
+import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataYardRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -41,6 +46,8 @@ public class MechanicAccidentService implements MechanicAccidentUseCase {
     private final SpringDataUserRepository userRepository;
     private final SpringDataCatalogPartRepository catalogPartRepository;
     private final SpringDataAnalyticsOutboxRepository outboxRepository;
+    private final SpringDataServiceOrderRepository serviceOrderRepository;
+    private final SpringDataYardRepository yardRepository;
     private final StoragePort storagePort;
     private final SseEmitterRegistry sseEmitterRegistry;
     private final ObjectMapper objectMapper;
@@ -53,6 +60,8 @@ public class MechanicAccidentService implements MechanicAccidentUseCase {
             SpringDataUserRepository userRepository,
             SpringDataCatalogPartRepository catalogPartRepository,
             SpringDataAnalyticsOutboxRepository outboxRepository,
+            SpringDataServiceOrderRepository serviceOrderRepository,
+            SpringDataYardRepository yardRepository,
             StoragePort storagePort,
             SseEmitterRegistry sseEmitterRegistry,
             ObjectMapper objectMapper
@@ -62,6 +71,8 @@ public class MechanicAccidentService implements MechanicAccidentUseCase {
         this.userRepository = userRepository;
         this.catalogPartRepository = catalogPartRepository;
         this.outboxRepository = outboxRepository;
+        this.serviceOrderRepository = serviceOrderRepository;
+        this.yardRepository = yardRepository;
         this.storagePort = storagePort;
         this.sseEmitterRegistry = sseEmitterRegistry;
         this.objectMapper = objectMapper;
@@ -214,6 +225,30 @@ public class MechanicAccidentService implements MechanicAccidentUseCase {
             outboxRepository.save(outbox);
         } catch (JsonProcessingException e) {
             log.error("Erro serializando outbox para acidente {}", report.getId(), e);
+        }
+
+        // Auto-generate Service Order for bay WMS
+        try {
+            MotorcycleJpaEntity moto = motorcycleRepository.findById(report.getMotorcycleId()).orElse(null);
+            UUID yardId = moto != null && moto.getYardId() != null ? moto.getYardId() :
+                    yardRepository.findAll().stream().findFirst().map(YardJpaEntity::getId).orElse(UUID.randomUUID());
+
+            ServiceOrderJpaEntity serviceOrder = new ServiceOrderJpaEntity();
+            serviceOrder.setId(UUID.randomUUID());
+            serviceOrder.setCode(String.format("OS-ACC-%04d", Math.abs(report.getId().hashCode() % 9000) + 1000));
+            serviceOrder.setMotorcycleId(report.getMotorcycleId());
+            serviceOrder.setInspectionId(null);
+            serviceOrder.setYardId(yardId);
+            serviceOrder.setBayLabel("Baia 02 • Sinistros & Colisão");
+            serviceOrder.setServiceTitle("Reparo de colisão/queda • Dossiê #" + report.getId().toString().substring(0, 4));
+            serviceOrder.setOriginLabel("SINISTRO CONFIRMADO (T13 DOSSIÊ)");
+            serviceOrder.setSlaMinutes(45);
+            serviceOrder.setStatus(ServiceOrderStatus.WAITING_BAY);
+            serviceOrder.setCreatedAt(Instant.now());
+            serviceOrder.setUpdatedAt(Instant.now());
+            serviceOrderRepository.save(serviceOrder);
+        } catch (Exception e) {
+            log.error("Erro criando ordem de serviço para sinistro {}", report.getId(), e);
         }
 
         sseEmitterRegistry.emitAccidentStatusChange(report.getId(), report.getStatus());

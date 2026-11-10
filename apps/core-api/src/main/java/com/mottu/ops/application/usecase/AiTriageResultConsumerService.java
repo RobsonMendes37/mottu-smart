@@ -121,6 +121,14 @@ public class AiTriageResultConsumerService implements AiTriageResultConsumerUseC
                 entity.setAiTechnicalSummary(payload.technicalSummary());
                 entity.setCustomerFeedbackText(payload.customerFriendlyMessage());
                 entity.setResolvedAt(now);
+                if (payload.committeeEvaluation() != null) {
+                    try {
+                        entity.setCommitteeEvaluationJson(objectMapper.writeValueAsString(payload.committeeEvaluation()));
+                    } catch (Exception e) {
+                        log.warn("Failed to serialize committee evaluation JSON", e);
+                    }
+                }
+
                 inspectionRepository.save(entity);
 
                 saveAuditLog(entity.getId(), null, "SYSTEM_AI", previousStatus, "INVALID_IMAGE", Map.of(
@@ -205,6 +213,22 @@ public class AiTriageResultConsumerService implements AiTriageResultConsumerUseC
                 entity.setCustomerFeedbackText(payload.customerFriendlyMessage());
                 entity.setResolvedAt(now);
 
+                if (payload.committeeEvaluation() != null) {
+                    try {
+                        entity.setCommitteeEvaluationJson(objectMapper.writeValueAsString(payload.committeeEvaluation()));
+                    } catch (Exception e) {
+                        log.warn("Failed to serialize committee evaluation JSON", e);
+                    }
+                }
+
+                if (payload.committeeEvaluation() != null) {
+                    try {
+                        entity.setCommitteeEvaluationJson(objectMapper.writeValueAsString(payload.committeeEvaluation()));
+                    } catch (Exception e) {
+                        log.warn("Failed to serialize committee evaluation JSON", e);
+                    }
+                }
+
                 inspectionRepository.save(entity);
 
                 saveAuditLog(entity.getId(), null, "SYSTEM_AI", previousStatus, "AUTO_RESOLVED", Map.of(
@@ -236,6 +260,14 @@ public class AiTriageResultConsumerService implements AiTriageResultConsumerUseC
                                 p.unitPriceBrl() != null ? p.unitPriceBrl() : BigDecimal.ZERO,
                                 "AI"
                         ));
+                    }
+                }
+
+                if (payload.committeeEvaluation() != null) {
+                    try {
+                        entity.setCommitteeEvaluationJson(objectMapper.writeValueAsString(payload.committeeEvaluation()));
+                    } catch (Exception e) {
+                        log.warn("Failed to serialize committee evaluation JSON", e);
                     }
                 }
 

@@ -78,10 +78,22 @@
           </div>
         </div>
 
-        <!-- 48h / 100km Protection Note -->
-        <div class="rounded-md bg-[#E6F4EE] px-3.5 py-2.5 text-xs text-[#046C3A] leading-relaxed">
-          <span class="font-bold">Garantia de retirada:</span> avarias existentes nas primeiras 48h ou 100 km e peças de desgaste natural têm custo zero.
-        </div>
+        <!-- 48h / 100km Protection Shield -->
+        @if (activeContract()?.isShieldActive) {
+          <div class="rounded-md bg-[#E6F4EE] border border-[#05944F]/30 px-3.5 py-3 text-xs text-[#046C3A] leading-relaxed flex items-start gap-2.5">
+            <span class="text-base shrink-0">🛡️</span>
+            <div>
+              <p class="font-bold">Escudo de Retirada Ativo</p>
+              <p class="mt-0.5 text-[11px]">
+                Restam <strong>{{ (activeContract()?.remainingShieldHours ?? 48) | number:'1.0-1' }}h</strong> e <strong>{{ activeContract()?.remainingShieldKm ?? 100 }} km</strong> de garantia total para avarias pré-existentes registradas com isenção automática (R$ 0,00).
+              </p>
+            </div>
+          </div>
+        } @else {
+          <div class="rounded-md bg-[#F3F3F3] px-3.5 py-2.5 text-xs text-[#545454] leading-relaxed">
+            <span class="font-bold">Garantia regular:</span> peças de desgaste natural e manutenções preventivas têm cobertura 100% gratuita nas oficinas Mottu.
+          </div>
+        }
 
         <!-- Quota Warning -->
         @if (quotaWarningVisible() || hasReachedQuota()) {
@@ -116,6 +128,83 @@
         >
           <span>Sofreu queda ou colisão? Relatar acidente em vídeo</span>
         </button>
+      </section>
+
+      <!-- Vistoria 360 de Expedição & Dupla Validação do Entregador -->
+      <section class="bg-white border border-[#E2E2E2] rounded-lg p-5 space-y-3.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">📸</span>
+            <h3 class="text-sm font-bold text-[#141414]">Giro 360 de Retirada</h3>
+          </div>
+          @if (activeContract()?.pickupValidatedByRider || validationSuccess()) {
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#E6F4EE] text-[#046C3A] text-[11px] font-bold">
+              ✓ Validado por você
+            </span>
+          } @else {
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-[11px] font-bold">
+              Aguardando confirmação
+            </span>
+          }
+        </div>
+
+        <p class="text-xs text-[#545454]">
+          Fotos registradas pela Mottu no momento da entrega da chave. Caso note qualquer arranhão ou detalhe não apontado aqui durante o período do escudo, sua vistoria será 100% coberta.
+        </p>
+
+        <!-- 4 Angles Grid + Odometer -->
+        @if (baselinePhotos(); as photos) {
+          <div class="grid grid-cols-4 gap-2 pt-1">
+            <div class="text-center">
+              <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
+                <img [src]="photos.frontPhotoUrl" alt="Frente" class="w-full h-full object-cover" onerror="this.src='/mottu-inspections/farol_dianteiro_trincado_inspecao_png_1794260378880.jpg'" />
+              </div>
+              <span class="text-[10px] text-[#757575] mt-1 block font-medium">Frente</span>
+            </div>
+            <div class="text-center">
+              <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
+                <img [src]="photos.rearPhotoUrl" alt="Traseira" class="w-full h-full object-cover" onerror="this.src='/mottu-inspections/pneu_traseiro_moto_careca_closeup_1794260393447.jpg'" />
+              </div>
+              <span class="text-[10px] text-[#757575] mt-1 block font-medium">Traseira</span>
+            </div>
+            <div class="text-center">
+              <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
+                <img [src]="photos.rightSidePhotoUrl" alt="Lateral D." class="w-full h-full object-cover" onerror="this.src='/mottu-inspections/moto_guidao_danificado_1794260367908.jpg'" />
+              </div>
+              <span class="text-[10px] text-[#757575] mt-1 block font-medium">Lado D.</span>
+            </div>
+            <div class="text-center">
+              <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
+                <img [src]="photos.leftSidePhotoUrl" alt="Lateral E." class="w-full h-full object-cover" onerror="this.src='/mottu-inspections/mottu_damage_exhaust_scratches_1794260407150.jpg'" />
+              </div>
+              <span class="text-[10px] text-[#757575] mt-1 block font-medium">Lado E.</span>
+            </div>
+          </div>
+        } @else {
+          <div class="p-4 rounded-md bg-[#F3F3F3] text-center text-xs text-[#757575]">
+            As fotos do giro 360 estão sendo sincronizadas pelo pátio da unidade.
+          </div>
+        }
+
+        <!-- Double Validation Confirmation CTA -->
+        @if (!activeContract()?.pickupValidatedByRider && !validationSuccess()) {
+          <button
+            type="button"
+            (click)="onConfirmPickup()"
+            [disabled]="isValidating()"
+            class="w-full py-2.5 px-4 rounded-md bg-[#141414] hover:bg-black text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+          >
+            @if (isValidating()) {
+              <span>Confirmando recebimento...</span>
+            } @else {
+              <span>✓ Confirmar Vistoria de Recebimento da Moto</span>
+            }
+          </button>
+        } @else {
+          <div class="rounded-md bg-[#F6F6F6] p-2.5 text-center text-[11px] text-[#046C3A] font-semibold">
+            ✓ Vistoria de recebimento confirmada digitalmente por você. Proteção ativa no contrato.
+          </div>
+        }
       </section>
 
       <!-- Quick Ecosystem Shortcuts -->

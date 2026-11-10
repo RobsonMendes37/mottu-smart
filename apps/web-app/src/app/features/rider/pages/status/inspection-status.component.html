@@ -42,6 +42,38 @@
       </section>
     }
 
+    <!-- Presential Inspection Convocatoria Banner -->
+    @if (isPresentialRequested()) {
+      <section class="bg-white border-2 border-[#141414] rounded-lg p-5 space-y-3 shadow-sm">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-full bg-[#141414] text-white flex items-center justify-center shrink-0 text-base font-bold">
+            🔍
+          </div>
+          <div class="space-y-1">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#E6F4EE] text-[#046C3A] text-xs font-bold">
+              Diagnóstico Presencial Gratuito (R$ 0,00)
+            </span>
+            <h2 class="text-base font-bold text-[#141414]">Convocação para Análise na Oficina</h2>
+            <p class="text-xs text-[#545454] leading-relaxed">
+              Nossa equipe técnica convocou sua moto para uma checagem física gratuita na bancada. Nenhuma cobrança será realizada.
+            </p>
+          </div>
+        </div>
+        <div class="p-3 rounded-md bg-[#F6F6F6] border border-[#EEEEEE] text-xs text-[#141414]">
+          <span class="font-bold">Motivo do mecânico:</span> {{ presentialReason() }}
+        </div>
+        @if (!inspection()?.appointment) {
+          <button
+            type="button"
+            (click)="openAppointmentModal()"
+            class="w-full h-11 rounded-md bg-[#05944F] hover:bg-[#047840] text-white font-bold text-xs transition-colors"
+          >
+            Escolher dia e horário para levar ao galpão
+          </button>
+        }
+      </section>
+    }
+
     <!-- Human Triage Status Card -->
     @if (isTriage()) {
       <section class="bg-white border border-[#E2E2E2] rounded-lg p-5 space-y-3">
@@ -133,6 +165,64 @@
               <p>
                 {{ appt.yardName }} • {{ appt.scheduledDate }} ({{ appt.shift === 'MORNING' ? 'Manhã 08h–12h' : 'Tarde 13h–17h' }})
               </p>
+            </div>
+          }
+
+          <!-- Inconclusive Photo Protection Alert -->
+          @if (hasLowPhotoClarity()) {
+            <div class="p-3.5 rounded-md bg-[#E6F4EE] border border-[#05944F]/40 text-xs text-[#046C3A] space-y-1">
+              <div class="flex items-center gap-2 font-bold">
+                <span>🛡️</span>
+                <span>Proteção de Certeza Técnica Ativa</span>
+              </div>
+              <p class="text-[11px] leading-relaxed">
+                Como a foto enviada não permitiu identificar 100% dos componentes com clareza irrefutável, o sistema bloqueou cobranças automáticas e direcionou o laudo sem custos para você.
+              </p>
+            </div>
+          }
+
+          <!-- AI Technical Committee Card -->
+          @if (committeeEvaluation(); as comm) {
+            <div class="border-t border-[#EEEEEE] pt-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-[#141414]">Junta Técnica Multi-IA</span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#F3F3F3] text-[#141414]">
+                    {{ comm.consensusScore }}
+                  </span>
+                </div>
+                <span class="text-[11px] font-mono text-[#757575]">
+                  {{ (comm.averageConfidence * 100).toFixed(0) }}% precisão
+                </span>
+              </div>
+
+              @if (comm.dissentingOpinion) {
+                <div class="p-2.5 rounded bg-[#FEF3C7] text-[11px] text-[#92400E]">
+                  <span class="font-bold">Nota de divergência:</span> {{ comm.dissentingOpinion }}
+                </div>
+              }
+
+              <!-- Evaluators list -->
+              <div class="space-y-2">
+                @for (ev of comm.evaluators; track ev.specialistRole) {
+                  <div class="p-2.5 rounded-md bg-[#F8F9FA] border border-[#EEEEEE] space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="font-bold text-[#141414]">{{ ev.specialistRole }}</span>
+                      <span
+                        class="px-2 py-0.5 rounded text-[10px] font-bold"
+                        [class.bg-[#E6F4EE]]="ev.verdict === 'DESGASTE_NATURAL' || ev.verdict === 'PRE_EXISTENTE'"
+                        [class.text-[#046C3A]]="ev.verdict === 'DESGASTE_NATURAL' || ev.verdict === 'PRE_EXISTENTE'"
+                        [class.bg-[#FEF3C7]]="ev.verdict === 'MAU_USO'"
+                        [class.text-[#92400E]]="ev.verdict === 'MAU_USO'"
+                      >
+                        {{ ev.verdict === 'DESGASTE_NATURAL' ? 'Desgaste' : ev.verdict === 'PRE_EXISTENTE' ? 'Pré-existente' : 'Mau Uso' }}
+                        • {{ (ev.confidence * 100).toFixed(0) }}%
+                      </span>
+                    </div>
+                    <p class="text-[11px] text-[#545454] leading-relaxed">{{ ev.reasoning }}</p>
+                  </div>
+                }
+              </div>
             </div>
           }
 

@@ -117,6 +117,15 @@ public class InspectionJpaEntity {
     @Column(name = "resolved_at")
     private Instant resolvedAt;
 
+    @Column(name = "committee_evaluation_json", columnDefinition = "jsonb")
+    private String committeeEvaluationJson;
+
+    @Column(name = "presential_inspection_requested", nullable = false)
+    private boolean presentialInspectionRequested = false;
+
+    @Column(name = "presential_request_reason", length = 255)
+    private String presentialRequestReason;
+
     public InspectionJpaEntity() {
     }
 
@@ -374,5 +383,29 @@ public class InspectionJpaEntity {
 
     public void setResolvedAt(Instant resolvedAt) {
         this.resolvedAt = resolvedAt;
+    }
+
+    public String getCommitteeEvaluationJson() {
+        return committeeEvaluationJson;
+    }
+
+    public void setCommitteeEvaluationJson(String committeeEvaluationJson) {
+        this.committeeEvaluationJson = committeeEvaluationJson;
+    }
+
+    public boolean isPresentialInspectionRequested() {
+        return presentialInspectionRequested;
+    }
+
+    public void setPresentialInspectionRequested(boolean presentialInspectionRequested) {
+        this.presentialInspectionRequested = presentialInspectionRequested;
+    }
+
+    public String getPresentialRequestReason() {
+        return presentialRequestReason;
+    }
+
+    public void setPresentialRequestReason(String presentialRequestReason) {
+        this.presentialRequestReason = presentialRequestReason;
     }
 }

@@ -76,6 +76,7 @@ describe('T07FleetComponent (Screen T07 - Yard Fleet Management Table)', () => {
       getYards: vi.fn().mockReturnValue(of(mockYards)),
       updateStatus: vi.fn(),
       registerMotorcycle: vi.fn(),
+      recordBaseline360: vi.fn().mockReturnValue(of({ success: true, registeredAt: '2026-11-08T10:00:00Z' })),
     };
 
     comp = new T07FleetComponent(mockFleetService);
@@ -209,5 +210,36 @@ describe('T07FleetComponent (Screen T07 - Yard Fleet Management Table)', () => {
 
     comp.closeInspectDrawer();
     expect(comp.selectedMotorcycle()).toBeNull();
+  });
+
+  it('TC-T07-8: Opens baseline 360 modal, submits 4 angle + odometer photos to fleetService.recordBaseline360, and reloads fleet', () => {
+    comp.ngOnInit();
+    const target = comp.motorcycles()[1]; // Available moto MOT2B34
+    comp.openBaselineModal(target);
+
+    expect(comp.isBaselineModalOpen()).toBe(true);
+    expect(comp.baselineMotorcycle()?.plate).toBe('MOT2B34');
+    expect(comp.baselineOdometerKm()).toBe(0);
+
+    comp.baselineFront.set('https://cdn.mottu.local/base/front.webp');
+    comp.baselineRear.set('https://cdn.mottu.local/base/rear.webp');
+    comp.baselineRight.set('https://cdn.mottu.local/base/right.webp');
+    comp.baselineLeft.set('https://cdn.mottu.local/base/left.webp');
+    comp.baselineOdometer.set('https://cdn.mottu.local/base/odo.webp');
+    comp.baselineOdometerKm.set(25);
+
+    comp.submitBaseline360();
+
+    expect(mockFleetService.recordBaseline360).toHaveBeenCalledWith('moto-2', {
+      frontPhotoUrl: 'https://cdn.mottu.local/base/front.webp',
+      rearPhotoUrl: 'https://cdn.mottu.local/base/rear.webp',
+      rightSidePhotoUrl: 'https://cdn.mottu.local/base/right.webp',
+      leftSidePhotoUrl: 'https://cdn.mottu.local/base/left.webp',
+      odometerPhotoUrl: 'https://cdn.mottu.local/base/odo.webp',
+      initialOdometerKm: 25,
+    });
+    expect(comp.isBaselineModalOpen()).toBe(false);
+    expect(comp.successMessage()).toContain('Giro 360 de Expedição gravado');
+    expect(mockFleetService.listMotorcycles).toHaveBeenCalled();
   });
 });

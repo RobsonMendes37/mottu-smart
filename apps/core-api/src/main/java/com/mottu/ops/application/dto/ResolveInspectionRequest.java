@@ -12,6 +12,11 @@ public record ResolveInspectionRequest(
 
         List<UUID> catalogPartIds,
 
-        String mechanicNotes
+        String mechanicNotes,
+
+        Boolean requestPresentialInspection
 ) {
+    public ResolveInspectionRequest(DamageVerdict finalVerdict, List<UUID> catalogPartIds, String mechanicNotes) {
+        this(finalVerdict, catalogPartIds, mechanicNotes, false);
+    }
 }

@@ -1448,3 +1448,29 @@
   - Invertida a ordem de deploy no `cd.yml`: agora o `docker compose build` é executado com todos os serviços **ONLINE**, e a troca para as novas imagens ocorre de forma quase instantânea via `docker compose up -d` (rolling update sem downtime).
 - **Validação:**
   - Testes de endpoints ao vivo confirmam resposta instantânea (`HTTP/2 200 OK`).
+
+
+### [2026-11-10 01:15] — `FASE 9`: Ecossistema 360, Junta Técnica Multi-IA e Integração Total de Pátio
+- **Agente / Modelo:** `@backend-specialist` + `@ai-engineer` + `@frontend-specialist` + `@qa-automation-engineer`
+- **Arquivos Criados/Alterados:**
+  - `apps/core-api/src/main/resources/db/migration/V14__baseline_360_and_committee_triage.sql` (Colunas `pickup_photos_json`, `pickup_validated_by_rider`, `pickup_validated_at`, `committee_evaluation_json`, `presential_inspection_requested`, `presential_request_reason`)
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/model/`: `SpecialistVote`, `CommitteeEvaluation`, `PresentialConvocatoria`, `Baseline360Photos`, `BaselineShieldStatus` (Hexagonal Puro, zero frameworks)
+  - `apps/core-api/src/main/java/com/mottu/ops/domain/service/`: `MechanicCommitteeConsensusEvaluator`, `PresentialInspectionPolicy` (Cálculo de consenso ponderado e proteção ao entregador)
+  - `apps/intelligence-service/app/domain/services/mechanic_committee.py`: Junta Técnica com 3 especialistas (`WearTearSpecialist`, `ImpactForensicSpecialist`, `TemporalComparisonSpecialist`), divergência dissidente e trava de foto inconclusiva
+  - `apps/intelligence-service/app/infrastructure/adapters/redis_worker.py`: Deliberação da Junta Multi-IA integrada no pipeline de triagem com persistência em JSON
+  - `apps/core-api/src/main/java/com/mottu/ops/application/`: Endpoints `POST /api/v1/rider/contracts/validate-pickup`, `POST /api/v1/fleet/motorcycles/{id}/baseline-360`, convocação presencial com abertura automática de `ServiceOrderJpaEntity` na baia da oficina (`WAITING_BAY`)
+  - `apps/web-app/src/app/features/rider/pages/garage/`: Card de Vistoria 360 de Retirada com galeria de 4 ângulos + odômetro e confirmação digital pelo entregador
+  - `apps/web-app/src/app/features/rider/pages/status/`: Card da Junta Técnica Multi-IA com placar, pareceres de especialistas, proteção de foto inconclusiva e banner de convocação presencial
+  - `apps/web-app/src/app/features/mechanic/pages/t06-workbench/`: Seletor de abas `[📸 Foto Atual]` vs `[🔄 Giro 360 da Retirada (Estado Zero)]`, painel da Junta Multi-IA e 4º botão de ação: `[🔍 Convocar para Diagnóstico Presencial no Galpão (R$ 0,00)]`
+  - `apps/web-app/src/app/features/mechanic/pages/t07-fleet/`: Botão e modal de registro de Giro 360 de Expedição na frota
+  - `e2e/test-phase9-ecosystem-360.js`: Auditoria E2E cobrindo o novo ecossistema
+- **Testes TDD Executados (`RED -> GREEN`):**
+  - Java JUnit 5 & Domain Purity: **341/341 testes passando** (`mvn test`, 100% pureza no ArchUnit)
+  - Python Pytest: **195/195 testes passando** com deliberação da Junta Multi-IA
+  - Angular Vitest: **248/248 testes passando em 38 suítes** (`npm test -- --run`)
+  - Angular Production Build: **Concluído com sucesso (391 kB inicial)**
+  - Playwright E2E: **15/15 fluxos aprovados no ambiente live**
+- **Decisões ou Observações para o Próximo Agente:**
+  - A convocação presencial gera automaticamente a Ordem de Serviço na baia WMS da unidade (`WAITING_BAY`), garantindo o fluxo *Closed Loop* sem necessidade de criação manual.
+  - O Escudo de 48h / 100km agora conta com dupla validação: expedição registrada pela equipe de pátio e confirmação digital pelo entregador na Garagem Mobile.
+- **Próxima Tarefa Liberada:** Todas as fases do projeto estão completas e validadas de ponta a ponta.

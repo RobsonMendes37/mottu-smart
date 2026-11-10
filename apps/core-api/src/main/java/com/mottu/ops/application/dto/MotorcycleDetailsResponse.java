@@ -15,6 +15,7 @@ public record MotorcycleDetailsResponse(
         MotorcycleStatus status,
         int currentOdometerKm,
         String activeRiderName,
-        Instant createdAt
+        Instant createdAt,
+        String pickupPhotosJson
 ) {
 }

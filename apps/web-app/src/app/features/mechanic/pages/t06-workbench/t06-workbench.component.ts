@@ -6,6 +6,8 @@ import { MechanicService } from '../../services/mechanic.service';
 import { PhotoZoomLensComponent } from '../../components/photo-zoom-lens/photo-zoom-lens.component';
 import { DesktopShellComponent } from '../../../../shared/layout/desktop-shell/desktop-shell.component';
 import {
+  Baseline360Photos,
+  CommitteeEvaluationData,
   DamageBoundingBox,
   DamageVerdict,
   MechanicInspectionDetailsResponse,
@@ -37,6 +39,12 @@ export class T06WorkbenchComponent implements OnInit {
   mechanicNotes = signal<string>('');
   readonly standardLaborFee = 35.0;
 
+  activePhotoTab = signal<'current' | 'baseline'>('current');
+  selectedBaselineAngle = signal<'front' | 'rear' | 'right' | 'left' | 'odometer'>('front');
+  isPresentialModalOpen = signal<boolean>(false);
+  presentialReasonInput = signal<string>('Necessidade de avaliação presencial na bancada da oficina Mottu.');
+  isConvoking = signal<boolean>(false);
+
   partsCost = computed(() => {
     const d = this.details();
     if (!d || this.selectedVerdict() !== 'MAU_USO') return 0.0;
@@ -56,7 +64,49 @@ export class T06WorkbenchComponent implements OnInit {
 
   canSubmit = computed(() => {
     const d = this.details();
-    return !this.isSubmitting() && d !== null && d.status === 'HUMAN_TRIAGE';
+    return !this.isSubmitting() && !this.isConvoking() && d !== null && d.status === 'HUMAN_TRIAGE';
+  });
+
+  committeeEvaluation = computed<CommitteeEvaluationData | null>(() => {
+    const raw = this.details()?.committeeEvaluationJson;
+    if (!raw) return null;
+    try {
+      return typeof raw === 'string' ? JSON.parse(raw) : (raw as unknown as CommitteeEvaluationData);
+    } catch {
+      return null;
+    }
+  });
+
+  baselinePhotos = computed<Baseline360Photos | null>(() => {
+    const raw = this.details()?.pickupPhotosJson;
+    if (!raw) return null;
+    try {
+      return typeof raw === 'string' ? JSON.parse(raw) : (raw as unknown as Baseline360Photos);
+    } catch {
+      return null;
+    }
+  });
+
+  hasBaselinePhotos = computed(() => {
+    const b = this.baselinePhotos();
+    return !!(b && (b.frontPhotoUrl || b.rearPhotoUrl || b.rightSidePhotoUrl || b.leftSidePhotoUrl));
+  });
+
+  currentBaselinePhotoUrl = computed(() => {
+    const b = this.baselinePhotos();
+    if (!b) return '/demo-photos/avaria-retrovisor.webp';
+    switch (this.selectedBaselineAngle()) {
+      case 'front':
+        return b.frontPhotoUrl || '/demo-photos/avaria-retrovisor.webp';
+      case 'rear':
+        return b.rearPhotoUrl || '/demo-photos/avaria-retrovisor.webp';
+      case 'right':
+        return b.rightSidePhotoUrl || '/demo-photos/avaria-retrovisor.webp';
+      case 'left':
+        return b.leftSidePhotoUrl || '/demo-photos/avaria-retrovisor.webp';
+      case 'odometer':
+        return b.odometerPhotoUrl || '/demo-photos/avaria-retrovisor.webp';
+    }
   });
 
   boundingBoxes = computed<DamageBoundingBox[]>(() => {
@@ -195,6 +245,53 @@ export class T06WorkbenchComponent implements OnInit {
       error: () => {
         this.isSubmitting.set(false);
         this.errorMessage.set('Não foi possível emitir o laudo definitivo.');
+      },
+    });
+  }
+
+  openPresentialModal(): void {
+    this.isPresentialModalOpen.set(true);
+  }
+
+  closePresentialModal(): void {
+    this.isPresentialModalOpen.set(false);
+  }
+
+  submitPresentialConvocation(): void {
+    if (!this.canSubmit()) return;
+
+    this.isConvoking.set(true);
+    this.errorMessage.set(null);
+
+    const reason = this.presentialReasonInput().trim() || 'Necessidade de avaliação presencial na bancada da oficina Mottu.';
+    const payload: ResolveInspectionRequest = {
+      finalVerdict: 'DESGASTE_NATURAL',
+      catalogPartIds: [],
+      mechanicNotes: reason,
+      requestPresentialInspection: true,
+    };
+
+    this.mechanicService.resolveInspection(this.inspectionId(), payload).subscribe({
+      next: (res) => {
+        this.isConvoking.set(false);
+        this.closePresentialModal();
+        this.resolutionResult.set(res);
+        const current = this.details();
+        if (current) {
+          this.details.set({
+            ...current,
+            status: 'HUMAN_RESOLVED',
+            finalVerdict: res.finalVerdict,
+            totalEstimatedBrl: res.totalEstimatedBrl,
+            customerFeedbackText: res.customerFeedbackText,
+            presentialInspectionRequested: true,
+            presentialRequestReason: reason,
+          });
+        }
+      },
+      error: () => {
+        this.isConvoking.set(false);
+        this.errorMessage.set('Não foi possível registrar a convocação presencial.');
       },
     });
   }

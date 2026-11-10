@@ -275,7 +275,10 @@ public class RiderInspectionService implements RiderInspectionUseCase {
                 items,
                 appointmentDto,
                 entity.getCreatedAt(),
-                entity.getResolvedAt()
+                entity.getResolvedAt(),
+                entity.getCommitteeEvaluationJson(),
+                entity.isPresentialInspectionRequested(),
+                entity.getPresentialRequestReason()
         );
     }
 

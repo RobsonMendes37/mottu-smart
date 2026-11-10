@@ -14,4 +14,5 @@ public interface FleetManagementUseCase {
     MotorcycleDetailsResponse createMotorcycle(CreateMotorcycleCommand command);
     MotorcycleDetailsResponse getMotorcycleById(UUID id);
     MotorcycleDetailsResponse updateMotorcycleStatus(UUID id, MotorcycleStatus status);
+    MotorcycleDetailsResponse recordBaseline360(UUID id, com.mottu.ops.application.dto.RecordBaseline360Command command);
 }

@@ -149,4 +149,61 @@ describe('InspectionStatusComponent (Screen T04 - SSE Live Status & Contest/Book
     );
     expect(comp.isAppointmentModalOpen()).toBe(false);
   });
+
+  it('TC-T04-7: Parses and exposes multi-AI committee evaluation data and consensus score', () => {
+    const committeeJson = JSON.stringify({
+      consensusVerdict: 'DESGASTE_NATURAL',
+      consensusScore: '3/3 Unânime',
+      isUnanimous: true,
+      canIdentifyPartsClearly: true,
+      requiresPresentialInspection: false,
+      averageConfidence: 0.95,
+      dissentingOpinion: null,
+      summary: 'Todos os 3 especialistas concordam em desgaste por uso contínuo.',
+      evaluators: [
+        { specialistRole: 'Especialista em Desgaste Natural', verdict: 'DESGASTE_NATURAL', confidence: 0.96, reasoning: 'Borracha ressecada.' },
+        { specialistRole: 'Perícia Forense de Impacto', verdict: 'DESGASTE_NATURAL', confidence: 0.94, reasoning: 'Ausência de escoriações.' },
+        { specialistRole: 'Comparador Temporal de Pátio', verdict: 'DESGASTE_NATURAL', confidence: 0.95, reasoning: 'Compatível com retirada.' },
+      ],
+    });
+
+    mockStore.currentInspection.set({
+      ...mockStore.currentInspection(),
+      committeeEvaluationJson: committeeJson,
+      presentialInspectionRequested: false,
+    });
+
+    const comm = comp.committeeEvaluation();
+    expect(comm).not.toBeNull();
+    expect(comm?.consensusScore).toBe('3/3 Unânime');
+    expect(comm?.isUnanimous).toBe(true);
+    expect(comm?.evaluators.length).toBe(3);
+    expect(comp.hasLowPhotoClarity()).toBe(false);
+    expect(comp.isPresentialRequested()).toBe(false);
+  });
+
+  it('TC-T04-8: Identifies low photo clarity and presential inspection request with reason', () => {
+    const committeeJson = JSON.stringify({
+      consensusVerdict: 'DESGASTE_NATURAL',
+      consensusScore: '2/1 Consenso',
+      isUnanimous: false,
+      canIdentifyPartsClearly: false,
+      requiresPresentialInspection: true,
+      averageConfidence: 0.72,
+      dissentingOpinion: 'Foto desfocada para validar curvatura do manete.',
+      summary: 'Dúvida razoável na imagem; convocação presencial recomendada.',
+      evaluators: [],
+    });
+
+    mockStore.currentInspection.set({
+      ...mockStore.currentInspection(),
+      committeeEvaluationJson: committeeJson,
+      presentialInspectionRequested: true,
+      presentialRequestReason: 'Foto escura no chassi inferior.',
+    });
+
+    expect(comp.hasLowPhotoClarity()).toBe(true);
+    expect(comp.isPresentialRequested()).toBe(true);
+    expect(comp.presentialReason()).toBe('Foto escura no chassi inferior.');
+  });
 });

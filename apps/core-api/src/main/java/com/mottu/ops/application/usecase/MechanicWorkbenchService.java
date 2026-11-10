@@ -38,6 +38,8 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
     private final SpringDataUserRepository userRepository;
     private final SpringDataMotorcycleRepository motorcycleRepository;
     private final SpringDataRentalContractRepository rentalContractRepository;
+    private final SpringDataServiceOrderRepository serviceOrderRepository;
+    private final SpringDataYardRepository yardRepository;
     private final FeedbackPolisherPort feedbackPolisherPort;
     private final SseEmitterRegistry sseEmitterRegistry;
     private final S3StorageProperties storageProperties;
@@ -52,6 +54,8 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
             SpringDataUserRepository userRepository,
             SpringDataMotorcycleRepository motorcycleRepository,
             SpringDataRentalContractRepository rentalContractRepository,
+            SpringDataServiceOrderRepository serviceOrderRepository,
+            SpringDataYardRepository yardRepository,
             FeedbackPolisherPort feedbackPolisherPort,
             SseEmitterRegistry sseEmitterRegistry,
             S3StorageProperties storageProperties,
@@ -65,6 +69,8 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
         this.userRepository = userRepository;
         this.motorcycleRepository = motorcycleRepository;
         this.rentalContractRepository = rentalContractRepository;
+        this.serviceOrderRepository = serviceOrderRepository;
+        this.yardRepository = yardRepository;
         this.feedbackPolisherPort = feedbackPolisherPort;
         this.sseEmitterRegistry = sseEmitterRegistry;
         this.storageProperties = storageProperties;
@@ -128,6 +134,7 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
         }
 
         String photoDownloadUrl = buildPhotoDownloadUrl(entity.getPhotoObjectKey());
+        String pickupPhotosJson = contract != null ? contract.getPickupPhotosJson() : null;
 
         List<InspectionItemDetailDto> items = inspectionItemRepository.findByInspectionId(inspectionId).stream()
                 .map(item -> new InspectionItemDetailDto(
@@ -165,7 +172,11 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
                 entity.getCustomerFeedbackText(),
                 items,
                 entity.getCreatedAt(),
-                entity.getResolvedAt()
+                entity.getResolvedAt(),
+                entity.getCommitteeEvaluationJson(),
+                entity.isPresentialInspectionRequested(),
+                entity.getPresentialRequestReason(),
+                pickupPhotosJson
         );
     }
 
@@ -186,8 +197,9 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
 
         BigDecimal laborFee = BigDecimal.ZERO;
         BigDecimal totalEstimated = BigDecimal.ZERO;
+        DamageVerdict resolvedVerdict = request.finalVerdict();
 
-        if (request.finalVerdict() == DamageVerdict.MAU_USO) {
+        if (resolvedVerdict == DamageVerdict.MAU_USO) {
             BigDecimal partsSum = selectedParts.stream()
                     .map(CatalogPartJpaEntity::getUnitPriceBrl)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -197,11 +209,22 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
 
         List<String> partNames = selectedParts.stream().map(CatalogPartJpaEntity::getPartName).toList();
         String customerFeedback = feedbackPolisherPort.polishFeedback(
-                request.finalVerdict(),
+                resolvedVerdict,
                 partNames,
                 totalEstimated,
                 request.mechanicNotes()
         );
+
+        boolean isPresential = Boolean.TRUE.equals(request.requestPresentialInspection());
+        if (isPresential) {
+            laborFee = BigDecimal.ZERO;
+            totalEstimated = BigDecimal.ZERO;
+            resolvedVerdict = DamageVerdict.DESGASTE_NATURAL;
+            customerFeedback = "Olá! Nosso mecânico avaliou sua foto e convocou uma checagem presencial gratuita na oficina (R$ 0,00) para garantir sua segurança. Agende seu comparecimento no galpão pelo app.";
+            entity.setPresentialInspectionRequested(true);
+            entity.setPresentialRequestReason(request.mechanicNotes() != null && !request.mechanicNotes().isBlank()
+                    ? request.mechanicNotes() : "Convocação para diagnóstico presencial na oficina");
+        }
 
         // Replace inspection items with mechanic selected parts
         inspectionItemRepository.deleteByInspectionId(inspectionId);
@@ -220,7 +243,7 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
         Instant now = Instant.now();
 
         entity.setStatus(InspectionStatus.HUMAN_RESOLVED);
-        entity.setFinalVerdict(request.finalVerdict());
+        entity.setFinalVerdict(resolvedVerdict);
         entity.setLaborFeeBrl(laborFee);
         entity.setTotalEstimatedBrl(totalEstimated);
         entity.setReviewedByMechanicId(mechanicId);
@@ -230,16 +253,41 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
 
         inspectionRepository.save(entity);
 
+        // Auto-generate Service Order in bay WMS
+        if (!serviceOrderRepository.existsByInspectionId(inspectionId)) {
+            MotorcycleJpaEntity moto = motorcycleRepository.findById(entity.getMotorcycleId()).orElse(null);
+            UUID yardId = moto != null && moto.getYardId() != null ? moto.getYardId() :
+                    yardRepository.findAll().stream().findFirst().map(YardJpaEntity::getId).orElse(UUID.randomUUID());
+
+            ServiceOrderJpaEntity serviceOrder = new ServiceOrderJpaEntity();
+            serviceOrder.setId(UUID.randomUUID());
+            serviceOrder.setCode(String.format("OS-2026-%04d", Math.abs(inspectionId.hashCode() % 9000) + 1000));
+            serviceOrder.setMotorcycleId(entity.getMotorcycleId());
+            serviceOrder.setInspectionId(inspectionId);
+            serviceOrder.setYardId(yardId);
+            serviceOrder.setBayLabel(isPresential ? "Baia 01 • Diagnóstico Presencial" : "Baia 01 • Reparo Vistoria");
+            serviceOrder.setServiceTitle(isPresential
+                    ? "Diagnóstico presencial solicitado pelo mecânico • Vistoria #" + inspectionId.toString().substring(0, 4)
+                    : "Manutenção pós-vistoria • #" + inspectionId.toString().substring(0, 4));
+            serviceOrder.setOriginLabel(isPresential ? "DIAGNÓSTICO PRESENCIAL CONVOCADO" : "MESA DO MECÂNICO (T06)");
+            serviceOrder.setSlaMinutes(30);
+            serviceOrder.setStatus(ServiceOrderStatus.WAITING_BAY);
+            serviceOrder.setCreatedAt(now);
+            serviceOrder.setUpdatedAt(now);
+            serviceOrderRepository.save(serviceOrder);
+        }
+
         // Record Audit Log
         saveAuditLog(inspectionId, mechanicId, "MECHANIC", previousStatus, "HUMAN_RESOLVED", Map.of(
-                "action", "MECHANIC_RESOLVED",
-                "finalVerdict", request.finalVerdict().name(),
+                "action", isPresential ? "MECHANIC_CONVOKED_PRESENTIAL" : "MECHANIC_RESOLVED",
+                "finalVerdict", resolvedVerdict.name(),
                 "totalEstimatedBrl", totalEstimated,
+                "presentialRequested", isPresential,
                 "mechanicNotes", request.mechanicNotes() != null ? request.mechanicNotes() : ""
         ));
 
         // Record Analytics Outbox
-        boolean aiMatchedMechanic = (entity.getAiVerdict() != null && entity.getAiVerdict() == request.finalVerdict());
+        boolean aiMatchedMechanic = (entity.getAiVerdict() != null && entity.getAiVerdict() == resolvedVerdict);
         saveAnalyticsOutbox(entity, aiMatchedMechanic, now);
 
         // Emit SSE
@@ -248,7 +296,7 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
         return new ResolveInspectionResponse(
                 inspectionId,
                 InspectionStatus.HUMAN_RESOLVED,
-                request.finalVerdict(),
+                resolvedVerdict,
                 totalEstimated,
                 customerFeedback
         );

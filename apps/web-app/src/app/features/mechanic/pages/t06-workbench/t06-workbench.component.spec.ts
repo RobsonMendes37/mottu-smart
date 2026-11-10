@@ -161,4 +161,64 @@ describe('T06WorkbenchComponent (Screen T06 - 55%/45% Decision Desk)', () => {
     comp.resolveInspection();
     expect(mockMechanicService.resolveInspection).not.toHaveBeenCalled();
   });
+
+  it('TC-T06-8: Tab switching between current photo and baseline 360 photos with angle selection', () => {
+    mockDetails.status = 'HUMAN_TRIAGE';
+    mockDetails.pickupPhotosJson = JSON.stringify({
+      frontPhotoUrl: 'https://cdn.mottu.local/photos/front.webp',
+      rearPhotoUrl: 'https://cdn.mottu.local/photos/rear.webp',
+      rightSidePhotoUrl: 'https://cdn.mottu.local/photos/right.webp',
+      leftSidePhotoUrl: 'https://cdn.mottu.local/photos/left.webp',
+      odometerPhotoUrl: 'https://cdn.mottu.local/photos/odo.webp',
+      registeredAt: '2026-11-06T10:00:00Z',
+    });
+
+    comp.ngOnInit();
+
+    expect(comp.activePhotoTab()).toBe('current');
+    expect(comp.hasBaselinePhotos()).toBe(true);
+
+    // Switch to baseline tab
+    comp.activePhotoTab.set('baseline');
+    expect(comp.activePhotoTab()).toBe('baseline');
+
+    // Default angle is front
+    expect(comp.selectedBaselineAngle()).toBe('front');
+    expect(comp.currentBaselinePhotoUrl()).toBe('https://cdn.mottu.local/photos/front.webp');
+
+    // Switch to rear angle
+    comp.selectedBaselineAngle.set('rear');
+    expect(comp.currentBaselinePhotoUrl()).toBe('https://cdn.mottu.local/photos/rear.webp');
+  });
+
+  it('TC-T06-9: Convocação Presencial (R$ 0,00) calls resolveInspection with requestPresentialInspection flag', () => {
+    mockDetails.status = 'HUMAN_TRIAGE';
+    comp.ngOnInit();
+
+    comp.openPresentialModal();
+    expect(comp.isPresentialModalOpen()).toBe(true);
+
+    comp.presentialReasonInput.set('Necessidade de teste de bancada na oficina');
+
+    const mockResponse: ResolveInspectionResponse = {
+      inspectionId: 'ins-uuid-1',
+      status: 'HUMAN_RESOLVED',
+      finalVerdict: 'DESGASTE_NATURAL',
+      totalEstimatedBrl: 0.0,
+      customerFeedbackText: 'Convocado para diagnóstico presencial no galpão sem custos.',
+    };
+    mockMechanicService.resolveInspection.mockReturnValue(of(mockResponse));
+
+    comp.submitPresentialConvocation();
+
+    expect(mockMechanicService.resolveInspection).toHaveBeenCalledWith('ins-uuid-1', {
+      finalVerdict: 'DESGASTE_NATURAL',
+      catalogPartIds: [],
+      mechanicNotes: 'Necessidade de teste de bancada na oficina',
+      requestPresentialInspection: true,
+    });
+    expect(comp.isPresentialModalOpen()).toBe(false);
+    expect(comp.details()?.presentialInspectionRequested).toBe(true);
+    expect(comp.resolutionResult()).toEqual(mockResponse);
+  });
 });

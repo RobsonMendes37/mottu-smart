@@ -19,7 +19,10 @@ public final class RentalContractPersistenceMapper {
                 entity.getPickedUpAt(),
                 entity.getInitialOdometerKm(),
                 entity.getEndedAt(),
-                entity.isActive()
+                entity.isActive(),
+                entity.getPickupPhotosJson(),
+                entity.isPickupValidatedByRider(),
+                entity.getPickupValidatedAt()
         );
     }
 
@@ -27,7 +30,7 @@ public final class RentalContractPersistenceMapper {
         if (domain == null) {
             return null;
         }
-        return new RentalContractJpaEntity(
+        RentalContractJpaEntity entity = new RentalContractJpaEntity(
                 domain.getId(),
                 domain.getRiderId(),
                 domain.getMotorcycleId(),
@@ -36,5 +39,9 @@ public final class RentalContractPersistenceMapper {
                 domain.getEndedAt(),
                 domain.isActive()
         );
+        entity.setPickupPhotosJson(domain.getPickupPhotosJson());
+        entity.setPickupValidatedByRider(domain.isPickupValidatedByRider());
+        entity.setPickupValidatedAt(domain.getPickupValidatedAt());
+        return entity;
     }
 }

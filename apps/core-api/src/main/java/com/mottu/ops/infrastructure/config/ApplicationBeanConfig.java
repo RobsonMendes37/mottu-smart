@@ -1,5 +1,6 @@
 package com.mottu.ops.infrastructure.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mottu.ops.application.port.in.AuthUseCase;
 import com.mottu.ops.application.port.in.ManagerUserUseCase;
 import com.mottu.ops.application.port.out.MotorcycleRepositoryPort;
@@ -76,13 +77,15 @@ public class ApplicationBeanConfig {
             MotorcycleRepositoryPort motorcycleRepositoryPort,
             YardRepositoryPort yardRepositoryPort,
             RentalContractRepositoryPort rentalContractRepositoryPort,
-            UserRepositoryPort userRepositoryPort
+            UserRepositoryPort userRepositoryPort,
+            ObjectMapper objectMapper
     ) {
         return new FleetService(
                 motorcycleRepositoryPort,
                 yardRepositoryPort,
                 rentalContractRepositoryPort,
-                userRepositoryPort
+                userRepositoryPort,
+                objectMapper
         );
     }
 }

@@ -8,6 +8,7 @@ import {
   MotorcycleModel,
   MotorcycleStatus,
   PageResponse,
+  RecordBaseline360Command,
   UpdateMotorcycleStatusCommand,
   YardResponse,
 } from '../models/mechanic.models';
@@ -73,6 +74,16 @@ export class FleetService {
   ): Observable<MotorcycleDetailsResponse> {
     return this.http.patch<MotorcycleDetailsResponse>(
       `/api/v1/fleet/motorcycles/${id}/status`,
+      command
+    );
+  }
+
+  recordBaseline360(
+    id: string,
+    command: RecordBaseline360Command
+  ): Observable<MotorcycleDetailsResponse> {
+    return this.http.post<MotorcycleDetailsResponse>(
+      `/api/v1/fleet/motorcycles/${id}/baseline-360`,
       command
     );
   }

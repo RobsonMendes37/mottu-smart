@@ -170,11 +170,19 @@
                   <td class="py-3.5 px-4 text-xs text-[#545454]">
                     {{ m.activeRiderName || '— No pátio' }}
                   </td>
-                  <td class="py-3.5 px-4 text-right">
+                  <td class="py-3.5 px-4 text-right space-x-2 whitespace-nowrap">
+                    <button
+                      type="button"
+                      (click)="openBaselineModal(m)"
+                      class="px-2.5 h-8 rounded-md bg-[#E6F4EE] hover:bg-[#cbe8db] text-xs font-bold text-[#046C3A] transition-colors cursor-pointer"
+                      title="Registrar fotos 360 de estado zero"
+                    >
+                      📸 Giro 360
+                    </button>
                     <button
                       type="button"
                       (click)="openInspectDrawer(m)"
-                      class="px-3 h-8 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-xs font-semibold text-[#141414] transition-colors"
+                      class="px-3 h-8 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-xs font-semibold text-[#141414] transition-colors cursor-pointer"
                     >
                       Gerenciar
                     </button>
@@ -361,6 +369,16 @@
               Esta moto possui contrato de locação ativo em rua. O status será liberado automaticamente no encerramento ou recolha de sinistro.
             </p>
           }
+          <div class="pt-2 border-t border-[#EEEEEE] space-y-2">
+            <span class="block text-xs font-bold text-[#141414]">Vistoria de Expedição</span>
+            <button
+              type="button"
+              (click)="openBaselineModal(sel)"
+              class="w-full h-11 rounded-md bg-[#E6F4EE] hover:bg-[#cbe8db] text-[#046C3A] text-xs font-bold transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>📸 Registrar Giro 360 de Estado Zero</span>
+            </button>
+          </div>
         </div>
 
         <button
@@ -371,6 +389,133 @@
           Fechar painel
         </button>
       </aside>
+    </div>
+  }
+
+  <!-- Modal: Baseline 360 Dispatch Recording -->
+  @if (isBaselineModalOpen()) {
+    <div class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" (click)="closeBaselineModal()">
+      <div
+        class="w-full max-w-2xl bg-white rounded-xl border border-[#E2E2E2] p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="flex items-center justify-between pb-3 border-b border-[#EEEEEE]">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-[#E6F4EE] text-[#05944F] flex items-center justify-center text-lg font-bold">
+              📸
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-[#141414]">Giro 360 de Expedição (Estado Zero)</h3>
+              <p class="text-xs text-[#757575]">
+                Moto <span class="font-mono font-bold text-[#141414]">{{ baselineMotorcycle()?.plate }}</span> • {{ formatModel(baselineMotorcycle()?.model || '') }}
+              </p>
+            </div>
+          </div>
+          <button type="button" (click)="closeBaselineModal()" class="w-8 h-8 rounded-md bg-[#F3F3F3] text-sm font-bold">✕</button>
+        </div>
+
+        @if (baselineError()) {
+          <div role="alert" class="p-3 rounded-md bg-[#FEE2E2] text-xs font-medium text-[#B91C1C]">
+            {{ baselineError() }}
+          </div>
+        }
+
+        <p class="text-xs text-[#545454] leading-relaxed">
+          Registre as fotos dos 4 ângulos e o hodômetro da moto antes da liberação ao entregador parceiro. Esse registro ativa o Escudo de 48h / 100km e serve de prova irrefutável na comparação temporal da inteligência artificial.
+        </p>
+
+        <!-- Form Fields for the 5 Photos -->
+        <div class="space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="baseFront" class="block text-xs font-semibold text-[#545454] mb-1">1. Frente (Farol e Painel)</label>
+              <input
+                id="baseFront"
+                type="text"
+                [ngModel]="baselineFront()"
+                (ngModelChange)="baselineFront.set($event)"
+                class="w-full h-10 px-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-xs text-[#141414] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label for="baseRear" class="block text-xs font-semibold text-[#545454] mb-1">2. Traseira (Lanterna e Placa)</label>
+              <input
+                id="baseRear"
+                type="text"
+                [ngModel]="baselineRear()"
+                (ngModelChange)="baselineRear.set($event)"
+                class="w-full h-10 px-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-xs text-[#141414] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label for="baseRight" class="block text-xs font-semibold text-[#545454] mb-1">3. Lateral Direita (Escapamento e Pedal)</label>
+              <input
+                id="baseRight"
+                type="text"
+                [ngModel]="baselineRight()"
+                (ngModelChange)="baselineRight.set($event)"
+                class="w-full h-10 px-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-xs text-[#141414] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label for="baseLeft" class="block text-xs font-semibold text-[#545454] mb-1">4. Lateral Esquerda (Corrente e Carenagem)</label>
+              <input
+                id="baseLeft"
+                type="text"
+                [ngModel]="baselineLeft()"
+                (ngModelChange)="baselineLeft.set($event)"
+                class="w-full h-10 px-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-xs text-[#141414] focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div>
+              <label for="baseOdo" class="block text-xs font-semibold text-[#545454] mb-1">5. Foto do Hodômetro</label>
+              <input
+                id="baseOdo"
+                type="text"
+                [ngModel]="baselineOdometer()"
+                (ngModelChange)="baselineOdometer.set($event)"
+                class="w-full h-10 px-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-xs text-[#141414] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label for="baseOdoKm" class="block text-xs font-semibold text-[#545454] mb-1">Quilometragem Inicial (km)</label>
+              <input
+                id="baseOdoKm"
+                type="number"
+                min="0"
+                [ngModel]="baselineOdometerKm()"
+                (ngModelChange)="baselineOdometerKm.set($event)"
+                class="w-full h-10 px-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] font-mono text-xs text-[#141414] focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-[#EEEEEE]">
+          <button
+            type="button"
+            (click)="closeBaselineModal()"
+            class="h-11 rounded-md bg-[#F3F3F3] hover:bg-[#E2E2E2] text-[#141414] font-semibold text-xs transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            [disabled]="isSubmittingBaseline()"
+            (click)="submitBaseline360()"
+            class="h-11 rounded-md bg-[#05944F] hover:bg-[#047840] disabled:opacity-40 text-white font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+          >
+            @if (isSubmittingBaseline()) {
+              <span>Salvando fotos 360...</span>
+            } @else {
+              <span>Salvar Giro 360 de Expedição</span>
+            }
+          </button>
+        </div>
+      </div>
     </div>
   }
 </app-desktop-shell>

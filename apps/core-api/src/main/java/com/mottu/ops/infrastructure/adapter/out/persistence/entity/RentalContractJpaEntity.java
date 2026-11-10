@@ -51,6 +51,15 @@ public class RentalContractJpaEntity {
     @Column(name = "paid_at")
     private Instant paidAt;
 
+    @Column(name = "pickup_photos_json", columnDefinition = "jsonb")
+    private String pickupPhotosJson;
+
+    @Column(name = "pickup_validated_by_rider", nullable = false)
+    private boolean pickupValidatedByRider = false;
+
+    @Column(name = "pickup_validated_at")
+    private Instant pickupValidatedAt;
+
     public RentalContractJpaEntity() {
     }
 
@@ -174,5 +183,29 @@ public class RentalContractJpaEntity {
 
     public void setPaidAt(Instant paidAt) {
         this.paidAt = paidAt;
+    }
+
+    public String getPickupPhotosJson() {
+        return pickupPhotosJson;
+    }
+
+    public void setPickupPhotosJson(String pickupPhotosJson) {
+        this.pickupPhotosJson = pickupPhotosJson;
+    }
+
+    public boolean isPickupValidatedByRider() {
+        return pickupValidatedByRider;
+    }
+
+    public void setPickupValidatedByRider(boolean pickupValidatedByRider) {
+        this.pickupValidatedByRider = pickupValidatedByRider;
+    }
+
+    public Instant getPickupValidatedAt() {
+        return pickupValidatedAt;
+    }
+
+    public void setPickupValidatedAt(Instant pickupValidatedAt) {
+        this.pickupValidatedAt = pickupValidatedAt;
     }
 }

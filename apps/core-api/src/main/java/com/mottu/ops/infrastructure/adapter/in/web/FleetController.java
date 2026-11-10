@@ -59,4 +59,12 @@ public class FleetController {
     ) {
         return ResponseEntity.ok(fleetManagementUseCase.updateMotorcycleStatus(id, command.status()));
     }
+
+    @PostMapping("/{id}/baseline-360")
+    public ResponseEntity<MotorcycleDetailsResponse> recordBaseline360(
+            @PathVariable UUID id,
+            @Valid @RequestBody com.mottu.ops.application.dto.RecordBaseline360Command command
+    ) {
+        return ResponseEntity.ok(fleetManagementUseCase.recordBaseline360(id, command));
+    }
 }

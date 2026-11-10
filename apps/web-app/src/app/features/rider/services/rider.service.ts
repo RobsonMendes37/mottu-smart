@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   RiderGarageResponse,
+  ActiveContract,
   UploadUrlRequest,
   UploadUrlResponse,
   CreateInspectionRequest,
@@ -30,6 +31,10 @@ export class RiderService {
 
   getGarage(): Observable<RiderGarageResponse> {
     return this.http.get<RiderGarageResponse>('/api/v1/rider/garage');
+  }
+
+  validatePickup(): Observable<ActiveContract> {
+    return this.http.post<ActiveContract>('/api/v1/rider/contracts/validate-pickup', {});
   }
 
   getUploadUrl(request: UploadUrlRequest): Observable<UploadUrlResponse> {

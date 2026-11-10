@@ -31,3 +31,4 @@ class TriageResultPayloadDTO(BaseModel):
     matchedParts: Optional[List[MatchedPartDTO]] = None
     technicalSummary: Optional[str] = None
     customerFriendlyMessage: Optional[str] = None
+    committeeEvaluation: Optional[dict] = None

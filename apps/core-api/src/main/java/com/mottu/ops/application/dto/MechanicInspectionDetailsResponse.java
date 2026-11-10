@@ -34,6 +34,10 @@ public record MechanicInspectionDetailsResponse(
         String customerFeedbackText,
         List<InspectionItemDetailDto> items,
         Instant createdAt,
-        Instant resolvedAt
+        Instant resolvedAt,
+        String committeeEvaluationJson,
+        boolean presentialInspectionRequested,
+        String presentialRequestReason,
+        String pickupPhotosJson
 ) {
 }

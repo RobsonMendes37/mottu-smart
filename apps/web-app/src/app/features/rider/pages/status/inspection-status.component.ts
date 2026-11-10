@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RiderStore } from '../../state/rider.store';
 import { AuthService } from '../../../../core/services/auth.service';
-import { AppointmentShift } from '../../models/rider.models';
+import { AppointmentShift, CommitteeEvaluationData } from '../../models/rider.models';
 import { MobileShellComponent } from '../../../../shared/layout/mobile-shell/mobile-shell.component';
 
 @Component({
@@ -74,6 +74,29 @@ export class InspectionStatusComponent implements OnInit, OnDestroy {
 
   contestedOnce = computed(() => {
     return this.inspection()?.contestedOnce ?? false;
+  });
+
+  committeeEvaluation = computed<CommitteeEvaluationData | null>(() => {
+    const raw = this.inspection()?.committeeEvaluationJson;
+    if (!raw) return null;
+    try {
+      return typeof raw === 'string' ? JSON.parse(raw) : (raw as unknown as CommitteeEvaluationData);
+    } catch {
+      return null;
+    }
+  });
+
+  isPresentialRequested = computed(() => {
+    return !!this.inspection()?.presentialInspectionRequested;
+  });
+
+  presentialReason = computed(() => {
+    return this.inspection()?.presentialRequestReason || 'Convocação para avaliação técnica detalhada na oficina.';
+  });
+
+  hasLowPhotoClarity = computed(() => {
+    const c = this.committeeEvaluation();
+    return c ? !c.canIdentifyPartsClearly : false;
   });
 
   totalPriceDisplay = computed(() => {

@@ -80,12 +80,54 @@ export interface MechanicInspectionDetailsResponse {
   items: InspectionItemDetailDto[];
   createdAt: string;
   resolvedAt: string | null;
+  committeeEvaluationJson?: string | null;
+  presentialInspectionRequested?: boolean;
+  presentialRequestReason?: string | null;
+  pickupPhotosJson?: string | null;
 }
 
 export interface ResolveInspectionRequest {
   finalVerdict: DamageVerdict;
   catalogPartIds: string[];
   mechanicNotes: string;
+  requestPresentialInspection?: boolean;
+}
+
+export interface Baseline360Photos {
+  frontPhotoUrl?: string;
+  rearPhotoUrl?: string;
+  rightSidePhotoUrl?: string;
+  leftSidePhotoUrl?: string;
+  odometerPhotoUrl?: string;
+  registeredAt?: string;
+}
+
+export interface SpecialistEvaluator {
+  specialistRole: string;
+  verdict: DamageVerdict;
+  confidence: number;
+  reasoning: string;
+}
+
+export interface CommitteeEvaluationData {
+  consensusVerdict: DamageVerdict;
+  consensusScore: string;
+  isUnanimous: boolean;
+  canIdentifyPartsClearly: boolean;
+  requiresPresentialInspection: boolean;
+  averageConfidence: number;
+  dissentingOpinion?: string | null;
+  summary: string;
+  evaluators: SpecialistEvaluator[];
+}
+
+export interface RecordBaseline360Command {
+  frontPhotoUrl: string;
+  rearPhotoUrl: string;
+  rightSidePhotoUrl: string;
+  leftSidePhotoUrl: string;
+  odometerPhotoUrl: string;
+  initialOdometerKm: number;
 }
 
 export interface ResolveInspectionResponse {

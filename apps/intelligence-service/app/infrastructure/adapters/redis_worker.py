@@ -10,6 +10,7 @@ from app.application.ports.queue_port import QueuePort
 from app.core.config import settings
 from app.domain.crag_evaluator import CRAG_AMBIGUITY_DELTA, CRAG_MIN_SIMILARITY_THRESHOLD
 from app.domain.enums import MotorcycleModel
+from app.domain.services.mechanic_committee import MechanicCommittee
 from app.domain.vtex_normalizer import is_consumable_part, parse_motorcycle_model
 from app.infrastructure.adapters.gemini_adapter import AIUnavailableException, GeminiVisionAdapter
 from app.infrastructure.adapters.postgres_pgvector import PostgresPgVectorAdapter
@@ -72,6 +73,7 @@ class TriageJobWorker:
         self.queue_adapter = queue_adapter or RedisQueueAdapter()
         self.vision_adapter = vision_adapter or GeminiVisionAdapter()
         self.catalog_adapter = catalog_adapter or PostgresPgVectorAdapter()
+        self.committee = MechanicCommittee()
         self.is_running: bool = False
         self._stop_event = asyncio.Event()
 
@@ -184,11 +186,31 @@ class TriageJobWorker:
             })
 
         is_valid_photo = bool(triage_raw.get("isValidMotorcyclePhoto", True))
+        tech_summary = triage_raw.get("technicalSummary", "Vistoria analisada pela IA.")
+        part_names = [p["partName"] for p in matched_parts_dto]
+
+        committee_eval = self.committee.deliberate(
+            part_names=part_names,
+            km_driven=job.kmDrivenSincePickup,
+            hours_since_pickup=job.hoursSincePickup,
+            has_baseline_photos=True,
+            baseline_summary="Giro 360 de entrega da moto",
+            gemini_summary=tech_summary,
+            is_clear_photo=is_valid_photo and adjusted_confidence >= 0.60
+        )
+
         if not is_valid_photo:
             suggested_verdict = "MAU_USO"
             customer_message = (
                 "Olá! A imagem enviada não parece ser de uma motocicleta ou está muito escura/ilegível para identificação. "
                 "Por favor, tire uma nova foto bem iluminada focando no componente da moto que precisa de avaliação."
+            )
+        # Inconclusive photo protection: zero automatic charge
+        elif not committee_eval.get("canIdentifyPartsClearly", True):
+            suggested_verdict = committee_eval.get("consensusVerdict", "DESGASTE_NATURAL")
+            customer_message = (
+                "Olá! Registramos sua foto. Para sua total proteção, como não foi possível identificar 100% das peças com precisão remota, "
+                "nenhuma cobrança automática foi gerada e nosso mecânico fará a triagem técnica na oficina."
             )
         # Apply 48h / 100km exemption rule (UC-08, UC-11)
         elif job.hoursSincePickup <= 48.0 and job.kmDrivenSincePickup <= 100 and job.reportedContext in ("RECEIVED_LIKE_THIS", "WITHDRAWAL"):
@@ -197,14 +219,14 @@ class TriageJobWorker:
                 f"Olá! Identificamos o dano apontado. Como você retirou a moto há menos de 48h "
                 f"({job.hoursSincePickup:.1f}h) e rodou {job.kmDrivenSincePickup} km, o reparo é totalmente isento de cobrança (R$ 0,00)."
             )
-        elif has_natural_wear:
+        elif has_natural_wear or committee_eval.get("consensusVerdict") == "DESGASTE_NATURAL":
             suggested_verdict = "DESGASTE_NATURAL"
             customer_message = (
                 "Olá! Identificamos que a peça indicada trata-se de desgaste natural pelo uso regular. "
                 "A substituição na oficina é 100% gratuita (R$ 0,00)."
             )
         else:
-            suggested_verdict = "MAU_USO"
+            suggested_verdict = committee_eval.get("consensusVerdict", "MAU_USO")
             customer_message = triage_raw.get("customerFriendlyMessage") or (
                 "Olá! Identificamos avaria decorrente de uso/impacto recente. Encaminhado para revisão técnica no galpão."
             )
@@ -217,8 +239,9 @@ class TriageJobWorker:
             "confidence": round(adjusted_confidence, 2),
             "suggestedVerdict": suggested_verdict,
             "matchedParts": matched_parts_dto,
-            "technicalSummary": triage_raw.get("technicalSummary", "Vistoria analisada pela IA."),
+            "technicalSummary": tech_summary,
             "customerFriendlyMessage": customer_message,
+            "committeeEvaluation": committee_eval,
         }
 
         await self.queue_adapter.push_triage_result(success_result)

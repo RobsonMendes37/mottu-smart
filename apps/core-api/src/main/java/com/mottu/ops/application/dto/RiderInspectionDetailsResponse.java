@@ -28,6 +28,9 @@ public record RiderInspectionDetailsResponse(
         List<InspectionItemDetailDto> items,
         Object appointment,
         Instant createdAt,
-        Instant resolvedAt
+        Instant resolvedAt,
+        String committeeEvaluationJson,
+        boolean presentialInspectionRequested,
+        String presentialRequestReason
 ) {
 }

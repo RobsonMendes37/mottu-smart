@@ -7,6 +7,7 @@ import {
   FleetMotorcycleResponse,
   MotorcycleModel,
   MotorcycleStatus,
+  RecordBaseline360Command,
   YardResponse,
 } from '../../models/mechanic.models';
 import { DesktopShellComponent } from '../../../../shared/layout/desktop-shell/desktop-shell.component';
@@ -62,6 +63,18 @@ export class T07FleetComponent implements OnInit {
   newModel = signal<MotorcycleModel>('MOTTU_SPORT_110I');
   newYardId = signal<string>('');
   newOdometer = signal<number>(0);
+
+  // Baseline 360 Modal Signals
+  isBaselineModalOpen = signal<boolean>(false);
+  baselineMotorcycle = signal<FleetMotorcycleResponse | null>(null);
+  baselineFront = signal<string>('/demo-photos/vistoria-frente.webp');
+  baselineRear = signal<string>('/demo-photos/vistoria-traseira.webp');
+  baselineRight = signal<string>('/demo-photos/vistoria-lateral-direita.webp');
+  baselineLeft = signal<string>('/demo-photos/vistoria-lateral-esquerda.webp');
+  baselineOdometer = signal<string>('/demo-photos/vistoria-odometro.webp');
+  baselineOdometerKm = signal<number>(0);
+  isSubmittingBaseline = signal<boolean>(false);
+  baselineError = signal<string | null>(null);
 
   readonly availableModels: { value: MotorcycleModel; label: string }[] = [
     { value: 'MOTTU_SPORT_110I', label: 'Mottu Sport 110i' },
@@ -213,11 +226,65 @@ export class T07FleetComponent implements OnInit {
 
   openInspectDrawer(moto: FleetMotorcycleResponse): void {
     this.isModalOpen.set(false);
+    this.isBaselineModalOpen.set(false);
     this.selectedMotorcycle.set(moto);
   }
 
   closeInspectDrawer(): void {
     this.selectedMotorcycle.set(null);
+  }
+
+  openBaselineModal(moto: FleetMotorcycleResponse): void {
+    this.isModalOpen.set(false);
+    this.selectedMotorcycle.set(null);
+    this.baselineMotorcycle.set(moto);
+    this.baselineOdometerKm.set(moto.currentOdometerKm || 0);
+    this.baselineFront.set('/demo-photos/vistoria-frente.webp');
+    this.baselineRear.set('/demo-photos/vistoria-traseira.webp');
+    this.baselineRight.set('/demo-photos/vistoria-lateral-direita.webp');
+    this.baselineLeft.set('/demo-photos/vistoria-lateral-esquerda.webp');
+    this.baselineOdometer.set('/demo-photos/vistoria-odometro.webp');
+    this.baselineError.set(null);
+    this.isBaselineModalOpen.set(true);
+  }
+
+  closeBaselineModal(): void {
+    this.isBaselineModalOpen.set(false);
+    this.baselineMotorcycle.set(null);
+    this.baselineError.set(null);
+  }
+
+  submitBaseline360(): void {
+    const moto = this.baselineMotorcycle();
+    if (!moto) return;
+
+    this.isSubmittingBaseline.set(true);
+    this.baselineError.set(null);
+
+    const command: RecordBaseline360Command = {
+      frontPhotoUrl: this.baselineFront().trim(),
+      rearPhotoUrl: this.baselineRear().trim(),
+      rightSidePhotoUrl: this.baselineRight().trim(),
+      leftSidePhotoUrl: this.baselineLeft().trim(),
+      odometerPhotoUrl: this.baselineOdometer().trim(),
+      initialOdometerKm: Number(this.baselineOdometerKm()) || 0,
+    };
+
+    this.fleetService.recordBaseline360(moto.id, command).subscribe({
+      next: () => {
+        this.isSubmittingBaseline.set(false);
+        this.closeBaselineModal();
+        this.successMessage.set(`Giro 360 de Expedição gravado com sucesso para moto ${moto.plate}!`);
+        setTimeout(() => this.successMessage.set(null), 4000);
+        this.loadMotorcycles();
+      },
+      error: (err) => {
+        this.isSubmittingBaseline.set(false);
+        this.baselineError.set(
+          err?.error?.detail || 'Erro ao registrar fotos da vistoria 360.'
+        );
+      },
+    });
   }
 
   getStatusBadge(status: MotorcycleStatus): StatusBadgeInfo {

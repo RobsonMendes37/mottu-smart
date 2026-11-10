@@ -6,4 +6,5 @@ import java.util.UUID;
 
 public interface GetRiderGarageUseCase {
     RiderGarageResponse getGarageForRider(UUID riderId);
+    com.mottu.ops.application.dto.ActiveContractDto validatePickup(UUID riderId);
 }

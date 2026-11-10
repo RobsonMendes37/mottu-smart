@@ -35,6 +35,12 @@ export interface ActiveContract {
   pickedUpAt: string;
   initialOdometerKm: number;
   motorcycle: RentedMotorcycle;
+  pickupPhotosJson?: string | null;
+  pickupValidatedByRider?: boolean;
+  pickupValidatedAt?: string | null;
+  isShieldActive?: boolean;
+  remainingShieldHours?: number;
+  remainingShieldKm?: number;
 }
 
 export interface RecentInspection {
@@ -93,6 +99,25 @@ export interface YardAppointmentInfo {
   createdAt: string;
 }
 
+export interface SpecialistEvaluator {
+  specialistRole: string;
+  verdict: DamageVerdict;
+  confidence: number;
+  reasoning: string;
+}
+
+export interface CommitteeEvaluationData {
+  consensusVerdict: DamageVerdict;
+  consensusScore: string;
+  isUnanimous: boolean;
+  canIdentifyPartsClearly: boolean;
+  requiresPresentialInspection: boolean;
+  averageConfidence: number;
+  dissentingOpinion?: string | null;
+  summary: string;
+  evaluators: SpecialistEvaluator[];
+}
+
 export interface RiderInspectionDetails {
   id: string;
   status: InspectionStatus;
@@ -112,6 +137,9 @@ export interface RiderInspectionDetails {
   appointment: YardAppointmentInfo | null;
   createdAt: string;
   resolvedAt: string | null;
+  committeeEvaluationJson?: string | null;
+  presentialInspectionRequested?: boolean;
+  presentialRequestReason?: string | null;
 }
 
 export interface SseStatusChangeEvent {

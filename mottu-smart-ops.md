@@ -242,6 +242,37 @@ mottu-smart-ops/
   - **Dependencies:** `TASK-26`
   - **INPUT → OUTPUT → VERIFY:** Executar todos os 329 testes no Java, 185 no Python, 232 no Angular, registrar no histórico, subir para o GitHub e validar na VM de produção.
 
+### FASE 9 — Ecossistema 360, Junta Técnica Multi-IA e Integração Total de Pátio
+- [x] **`TASK-28` — Hexagonal Domain & Flyway Migration: Vistoria 360 de Retirada, Escudo 48h/100km e Consenso da Junta Multi-IA**
+  - **Agent:** `backend-specialist` | **Skills:** `tdd-workflow`, `api-patterns`, `clean-code`
+  - **Pasta Permitida:** `apps/core-api/`
+  - **Dependencies:** `TASK-27`
+  - **INPUT → OUTPUT → VERIFY:** Implementar `V14__baseline_360_and_committee_triage.sql`, classes de domínio puras `SpecialistVote`, `CommitteeEvaluation`, `MechanicCommitteeConsensusEvaluator`, `PresentialInspectionPolicy`, `Baseline360Photos`, `BaselineShieldStatus` e testes unitários com 100% pureza -> `mvn -f apps/core-api/pom.xml test -Dtest=*Committee*,*Baseline*,*Presential*` passa com 100%.
+
+- [x] **`TASK-29` — Intelligence Service: Junta Técnica Virtual (Desgaste, Impacto e Comparador Temporal 360) + Proteção Inconclusiva**
+  - **Agent:** `ai-engineer` + `backend-specialist` | **Skills:** `python-patterns`, `tdd-workflow`, `clean-code`
+  - **Pasta Permitida:** `apps/intelligence-service/`
+  - **Dependencies:** `TASK-28`
+  - **INPUT → OUTPUT → VERIFY:** Implementar `app/domain/services/mechanic_committee.py` (`WearTearSpecialist`, `ImpactForensicSpecialist`, `TemporalComparisonSpecialist`, `MechanicCommittee`) com deliberação ponderada, opinião dissidente e proteção de foto inconclusiva -> `cd apps/intelligence-service && .venv/bin/pytest tests/unit/test_mechanic_committee.py` passa (12/12) e suíte completa 195/195 passa.
+
+- [x] **`TASK-30` — Backend Spring Boot Core API: Endpoints de Expedição 360, Validação pelo Entregador e Convocação Presencial com Abertura Automática de OS WMS**
+  - **Agent:** `backend-specialist` | **Skills:** `api-patterns`, `database-design`, `tdd-workflow`
+  - **Pasta Permitida:** `apps/core-api/`
+  - **Dependencies:** `TASK-29`
+  - **INPUT → OUTPUT → VERIFY:** Integrar `POST /api/v1/fleet/motorcycles/{id}/baseline-360`, `POST /api/v1/rider/contracts/validate-pickup`, enriquecer `RiderGarageResponse`, atualizar `MechanicWorkbenchService` com `requestPresentialInspection` gerando OS em baia WMS e criar `Baseline360AndCommitteeIntegrationTest` -> `mvn -f apps/core-api/pom.xml test` passa com 341/341 testes.
+
+- [x] **`TASK-31` — Frontend Angular 19: Telas Mobile e Desktop Atualizadas (T02 Garagem, T04 Status, T06 Bancada e T07 Frota)**
+  - **Agent:** `frontend-specialist` | **Skills:** `frontend-architecture`, `frontend-design`, `clean-code`
+  - **Pasta Permitida:** `apps/web-app/`
+  - **Dependencies:** `TASK-30`
+  - **INPUT → OUTPUT → VERIFY:** Implementar banner e card de Vistoria 360 na Garagem `T02`, card de Junta Técnica Multi-IA e proteção na `T04`, abas de foto comparativa 360 e botão de convocação presencial na `T06`, e modal de giro 360 de expedição na `T07` -> `npm test -- --run` passa (248/248 testes em 38 suítes) e `npm run build -- --configuration production` conclui sem erros.
+
+- [x] **`TASK-32` — Verificação Completa Multi-Stack, Registro em `docs/HISTORICO_IA.md` e Atualização em Produção**
+  - **Agent:** `devops-engineer` + `qa-automation-engineer` | **Skills:** `verify-changes`, `deployment-procedures`
+  - **Pasta Permitida:** Repositório completo
+  - **Dependencies:** `TASK-31`
+  - **INPUT → OUTPUT → VERIFY:** Rodar suítes de teste de todas as camadas (Java 341 testes, Python 195 testes, Angular 248 testes), atualizar documentação de histórico e subir commit/push para deploy contínuo em produção.
+
 ---
 
 ## 6. Phase X: Checklist Obrigatório de Conclusão

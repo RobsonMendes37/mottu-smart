@@ -15,6 +15,20 @@ public record TriageResultPayloadDto(
         DamageVerdict suggestedVerdict,
         List<MatchedPartDto> matchedParts,
         String technicalSummary,
-        String customerFriendlyMessage
+        String customerFriendlyMessage,
+        Object committeeEvaluation
 ) {
+    public TriageResultPayloadDto(
+            UUID inspectionId,
+            UUID correlationId,
+            String outcome,
+            Boolean isValidMotorcyclePhoto,
+            BigDecimal confidence,
+            DamageVerdict suggestedVerdict,
+            List<MatchedPartDto> matchedParts,
+            String technicalSummary,
+            String customerFriendlyMessage
+    ) {
+        this(inspectionId, correlationId, outcome, isValidMotorcyclePhoto, confidence, suggestedVerdict, matchedParts, technicalSummary, customerFriendlyMessage, null);
+    }
 }

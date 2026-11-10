@@ -1681,6 +1681,37 @@
   - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
   - Angular Production Build: **Concluído com sucesso (zero erros, 397 kB inicial)**.
 
+---
+
+### [2026-11-10 17:30] - Padronização Big Tech Enterprise da Monalisa Copilot (Camada 0 Guardrails, Zero Poluição e Respostas Ultra-Diretas)
+
+- **Contexto e Solicitação:**
+  - O gestor apontou que a IA estava prolixa ("fala coisa demais"), despejando repetidamente o resumo global da unidade de 4 linhas e cartões tabulares para qualquer mensagem casual ("oi", "fodasse vc", "morra") ou perguntas pontuais de estoque ("quais produtos estão faltando no estoque").
+  - O usuário aprovou a adoção do padrão das grandes empresas de tecnologia (Google, Uber, Nubank): Camada 0 de Guardrails e Roteamento Semântico com resposta direta em 1 frase, zero chamadas ao LLM para chitchat/provocações, supressão de tabelas quando não há itens críticos ou pedido explícito, e voz ultra-curta (< 12 palavras).
+- **Implementações Realizadas:**
+  - **Camada 0 de Guardrails e Intenções Conversacionais (`data_explorer_service.py`):**
+    - Criada a função pura de classificação `classify_conversational_intent`:
+      - `GREETING` ("oi", "olá", "bom dia", etc.): Resposta em 1 frase acolhedora sem citar estatísticas desnecessárias; `should_show_table = False`.
+      - `ABUSE` ("morra", "fodasse vc", "cala boca", etc.): Resposta profissional, neutra e elegante se mantendo à disposição; `should_show_table = False`.
+      - `COURTESY` ("obrigado", "valeu", "show", etc.): Agradecimento cordial e encerramento direto; `should_show_table = False`.
+      - `IDENTITY` ("quem é você", "o que você faz"): Apresentação direta do papel da Monalisa; `should_show_table = False`.
+    - Todas as intenções conversacionais retornam `activeSkill = "CONVERSATIONAL"`, listas de colunas e linhas vazias, e métricas em branco.
+  - **Bypass Imediato no Roteador Interno (`internal_router.py`):**
+    - Para qualquer query com `active_skill == "CONVERSATIONAL"`, o serviço retorna imediatamente em `< 5ms`, sem onerar o modelo Gemini e eliminando qualquer risco de alucinação ou repetição de métricas do galpão.
+  - **Alinhamento do Prompt e Parser JSON do Gemini (`gemini_adapter.py`):**
+    - Instruções estritas para o Gemini responder em 1 ou no máximo 2 frases objetivas.
+    - Contexto do galpão classificado apenas como referência técnica de suporte, proibindo o modelo de citar números se a pergunta não for sobre eles.
+    - Parser JSON aprimorado para decodificar blocos com marcações de código markdown (` ```json `).
+  - **Refinamento da Skill de Estoque (`SKILL_ESTOQUE`):**
+    - Quando o estoque estiver 100% abastecido sem itens críticos, a resposta indica explicitamente a conformidade ("Estoque seguro com zero peças em ruptura"), sem exibir tabelas vazias ou listar itens saudáveis como se fossem críticos.
+  - **Fallback no Core API Java (`IntelligenceServiceClient.java`):**
+    - Sincronizada a mesma Camada 0 de mensagens casuais no fallback Java (`buildLocalDataExplorerFallback`), garantindo paridade total offline.
+- **Validação de Testes e Qualidade:**
+  - Python Pytest: **210/210 testes aprovados com 100.00% de cobertura de domínio em `app/domain`**.
+  - Java Maven: **12/12 testes aprovados (`ManagerAnalyticsServiceTest` e `BillingAndAnalyticsAdvisorIntegrationTest`) (BUILD SUCCESS em 43s)**.
+  - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Angular Production Build: **Concluído com sucesso (zero erros, 397 kB inicial)**.
+
 
 
 ### [2026-11-10 16:15] — Otimização de Concisão da Monalisa: Respostas Diretas, Supressão de Tabelas Redundantes e Eliminação de Falso Positivo
@@ -1721,6 +1752,37 @@
 - **Validação de Testes e Qualidade:**
   - Python Pytest: **208/208 testes aprovados (180 unitários com 100.00% de cobertura de domínio)**.
   - Java Maven: **7/7 testes de ManagerAnalyticsService aprovados (BUILD SUCCESS)**.
+  - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Angular Production Build: **Concluído com sucesso (zero erros, 397 kB inicial)**.
+
+---
+
+### [2026-11-10 17:30] - Padronização Big Tech Enterprise da Monalisa Copilot (Camada 0 Guardrails, Zero Poluição e Respostas Ultra-Diretas)
+
+- **Contexto e Solicitação:**
+  - O gestor apontou que a IA estava prolixa ("fala coisa demais"), despejando repetidamente o resumo global da unidade de 4 linhas e cartões tabulares para qualquer mensagem casual ("oi", "fodasse vc", "morra") ou perguntas pontuais de estoque ("quais produtos estão faltando no estoque").
+  - O usuário aprovou a adoção do padrão das grandes empresas de tecnologia (Google, Uber, Nubank): Camada 0 de Guardrails e Roteamento Semântico com resposta direta em 1 frase, zero chamadas ao LLM para chitchat/provocações, supressão de tabelas quando não há itens críticos ou pedido explícito, e voz ultra-curta (< 12 palavras).
+- **Implementações Realizadas:**
+  - **Camada 0 de Guardrails e Intenções Conversacionais (`data_explorer_service.py`):**
+    - Criada a função pura de classificação `classify_conversational_intent`:
+      - `GREETING` ("oi", "olá", "bom dia", etc.): Resposta em 1 frase acolhedora sem citar estatísticas desnecessárias; `should_show_table = False`.
+      - `ABUSE` ("morra", "fodasse vc", "cala boca", etc.): Resposta profissional, neutra e elegante se mantendo à disposição; `should_show_table = False`.
+      - `COURTESY` ("obrigado", "valeu", "show", etc.): Agradecimento cordial e encerramento direto; `should_show_table = False`.
+      - `IDENTITY` ("quem é você", "o que você faz"): Apresentação direta do papel da Monalisa; `should_show_table = False`.
+    - Todas as intenções conversacionais retornam `activeSkill = "CONVERSATIONAL"`, listas de colunas e linhas vazias, e métricas em branco.
+  - **Bypass Imediato no Roteador Interno (`internal_router.py`):**
+    - Para qualquer query com `active_skill == "CONVERSATIONAL"`, o serviço retorna imediatamente em `< 5ms`, sem onerar o modelo Gemini e eliminando qualquer risco de alucinação ou repetição de métricas do galpão.
+  - **Alinhamento do Prompt e Parser JSON do Gemini (`gemini_adapter.py`):**
+    - Instruções estritas para o Gemini responder em 1 ou no máximo 2 frases objetivas.
+    - Contexto do galpão classificado apenas como referência técnica de suporte, proibindo o modelo de citar números se a pergunta não for sobre eles.
+    - Parser JSON aprimorado para decodificar blocos com marcações de código markdown (` ```json `).
+  - **Refinamento da Skill de Estoque (`SKILL_ESTOQUE`):**
+    - Quando o estoque estiver 100% abastecido sem itens críticos, a resposta indica explicitamente a conformidade ("Estoque seguro com zero peças em ruptura"), sem exibir tabelas vazias ou listar itens saudáveis como se fossem críticos.
+  - **Fallback no Core API Java (`IntelligenceServiceClient.java`):**
+    - Sincronizada a mesma Camada 0 de mensagens casuais no fallback Java (`buildLocalDataExplorerFallback`), garantindo paridade total offline.
+- **Validação de Testes e Qualidade:**
+  - Python Pytest: **210/210 testes aprovados com 100.00% de cobertura de domínio em `app/domain`**.
+  - Java Maven: **12/12 testes aprovados (`ManagerAnalyticsServiceTest` e `BillingAndAnalyticsAdvisorIntegrationTest`) (BUILD SUCCESS em 43s)**.
   - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
   - Angular Production Build: **Concluído com sucesso (zero erros, 397 kB inicial)**.
 

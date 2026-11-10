@@ -192,6 +192,28 @@ async def ask_analytics_data(request: DataExplorerQueryRequestDTO) -> DataExplor
     spoken_answer = str(raw_answer.get("spoken_answer", "") or direct_answer)
     should_show_table = bool(raw_answer.get("should_show_table", True))
 
+    # Padrão Big Tech Camada 0: Saudações, cortesias ou provocações retornam imediatamente sem chamar LLM
+    if raw_answer.get("active_skill") == "CONVERSATIONAL":
+        return DataExplorerQueryResponseDTO(
+            query=request.query,
+            yardKey=request.yardKey,
+            yardLabel=request.yardLabel,
+            generatedAt=datetime.now(timezone.utc),
+            modelUsed="monalisa-ops-agent",
+            directAnswer=direct_answer,
+            spokenAnswer=spoken_answer,
+            shouldShowTable=False,
+            keyMetricLabel="",
+            keyMetricValue="",
+            keyMetricTrend="",
+            columns=[],
+            rows=[],
+            suggestedActionLabel="",
+            suggestedActionRoute="",
+            activeSkill="CONVERSATIONAL",
+            isAiOffline=not is_gemini_online,
+        )
+
     # Quando a pergunta for enviada em texto livre pelo gestor (sem skillId fixo) e o Gemini estiver online,
     # gera uma resposta adaptada e inteligente com base no contexto operacional da Mottu
     if not request.skillId and is_gemini_online:

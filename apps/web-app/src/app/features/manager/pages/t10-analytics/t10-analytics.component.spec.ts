@@ -168,8 +168,19 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
     expect(comp.selectedHorizon()).toBe(15);
     expect(mockManagerService.getAiAdvisorAdvice).toHaveBeenCalledWith('ALL', 15, 'ALL', 'NORMAL');
 
+    comp.setSystemCategory('TIRES_WHEELS');
+    expect(comp.selectedSystemCategory()).toBe('TIRES_WHEELS');
+    expect(comp.getSelectedSystemLabel()).toBe('Pneus e Rodas');
+    expect(comp.displayedStockoutAlerts().every((a) => a.systemCategory === 'TIRES_WHEELS')).toBe(true);
+
+    comp.setSystemCategory('ENGINE_TRANSMISSION');
+    expect(comp.selectedSystemCategory()).toBe('ENGINE_TRANSMISSION');
+    expect(comp.getSelectedSystemLabel()).toBe('Motor e Câmbio');
+    expect(comp.displayedStockoutAlerts().every((a) => a.systemCategory === 'ENGINE_TRANSMISSION')).toBe(true);
+
     comp.setSystemCategory('BRAKE_HANDLEBAR');
     expect(comp.selectedSystemCategory()).toBe('BRAKE_HANDLEBAR');
+    expect(comp.getSelectedSystemLabel()).toBe('Freio e Guidão');
 
     comp.setScenario('RAIN_PEAK');
     expect(comp.selectedScenario()).toBe('RAIN_PEAK');

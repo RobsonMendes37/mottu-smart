@@ -21,23 +21,62 @@ def detect_plate_or_code(text: str) -> Optional[str]:
     return None
 
 
+def classify_conversational_intent(query: str) -> Optional[str]:
+    """Identify conversational intents: GREETING, COURTESY, IDENTITY, ABUSE, or None."""
+    if not query:
+        return None
+    q = query.strip().lower()
+    cleaned = "".join(c for c in q if c.isalnum() or c.isspace()).strip()
+    words = cleaned.split()
+    if not words:
+        return None
+
+    # 1. Abuse, insult, or extreme frustration
+    abuse_terms = [
+        "morra", "fodasse", "foda-se", "foda", "vai se fuder", "vai se foder",
+        "vsf", "vtmnc", "cala boca", "cala a boca", "idiota", "burra", "lixo"
+    ]
+    if any(term in cleaned for term in ["vai se fuder", "vai se foder", "cala boca", "cala a boca"]):
+        return "ABUSE"
+    if any(w in ["morra", "fodasse", "foda-se", "idiota", "burra", "lixo", "vsf"] for w in words):
+        return "ABUSE"
+
+    # 2. Courtesy / gratitude / pleasantries
+    courtesy_words = {
+        "obrigado", "obrigada", "valeu", "show", "show de bola",
+        "blz", "beleza", "tchau", "ate mais", "até mais", "otimo", "ótimo",
+        "perfeito", "maravilha", "top", "legal", "valeu monalisa"
+    }
+    if cleaned in courtesy_words:
+        return "COURTESY"
+    if len(words) <= 3 and any(w in ["obrigado", "obrigada", "valeu", "tchau"] for w in words):
+        return "COURTESY"
+
+    # 3. Identity / role
+    identity_phrases = [
+        "quem e voce", "quem é você", "quem e vc", "quem é vc",
+        "o que voce faz", "o que você faz", "o que vc faz",
+        "como voce funciona", "como você funciona", "qual o seu papel"
+    ]
+    if any(p in cleaned for p in identity_phrases):
+        return "IDENTITY"
+
+    # 4. Greetings
+    greeting_words = {
+        "oi", "ola", "olá", "bom dia", "boa tarde", "boa noite",
+        "e ai", "e aí", "fala", "tudo bem", "como vai", "opa", "salve", "ajuda"
+    }
+    if cleaned in greeting_words:
+        return "GREETING"
+    if len(words) <= 3 and any(w in ["oi", "ola", "olá", "salve", "opa", "fala"] for w in words):
+        return "GREETING"
+
+    return None
+
+
 def is_greeting_or_casual(query: str) -> bool:
     """Identify simple greetings, conversational messages, insults, or social pleasantries."""
-    q = (query or "").strip().lower()
-    cleaned = "".join(c for c in q if c.isalnum() or c.isspace()).strip()
-    casual_words = {
-        "oi", "ola", "olá", "bom dia", "boa tarde", "boa noite",
-        "e ai", "e aí", "fala", "tudo bem", "como vai", "opa", "salve",
-        "morra", "fodasse", "foda-se", "tchau", "valeu", "obrigado", "obrigada", "ajuda"
-    }
-    if cleaned in casual_words:
-        return True
-    words = cleaned.split()
-    if any(w in ["morra", "fodasse", "foda-se"] for w in words):
-        return True
-    if len(words) <= 3 and any(w in ["oi", "ola", "olá", "salve", "opa"] for w in words):
-        return True
-    return False
+    return classify_conversational_intent(query) is not None
 
 
 def resolve_context_yard(query: str, current_yard: str, history: Optional[List[Dict[str, Any]]]) -> str:
@@ -86,6 +125,68 @@ def answer_manager_query(
     service_orders = context_data.get("service_orders", [])
     pending_users = context_data.get("pending_users", [])
     plate_record = context_data.get("plate_record", {})
+
+    # =========================================================================
+    # CAMADA 0: GUARDRAILS & INTENÇÕES CONVERSACIONAIS (SEM CONSULTA AO BANCO)
+    # =========================================================================
+    conv_intent = classify_conversational_intent(q) if not skill_id else None
+    if conv_intent:
+        if conv_intent == "ABUSE":
+            return {
+                "direct_answer": "Entendido. Permaneço à disposição caso precise de apoio técnico na gestão de frotas, oficinas ou estoques da Mottu.",
+                "spoken_answer": "Permaneço à disposição para apoiar a operação.",
+                "should_show_table": False,
+                "key_metric_label": "",
+                "key_metric_value": "",
+                "key_metric_trend": "",
+                "columns": [],
+                "rows": [],
+                "suggested_action_label": "",
+                "suggested_action_route": "",
+                "active_skill": "CONVERSATIONAL",
+            }
+        if conv_intent == "COURTESY":
+            return {
+                "direct_answer": "Por nada! Qualquer apoio que precisar com a frota, peças ou vistorias, conte comigo.",
+                "spoken_answer": "Disponha! Bom trabalho no galpão.",
+                "should_show_table": False,
+                "key_metric_label": "",
+                "key_metric_value": "",
+                "key_metric_trend": "",
+                "columns": [],
+                "rows": [],
+                "suggested_action_label": "",
+                "suggested_action_route": "",
+                "active_skill": "CONVERSATIONAL",
+            }
+        if conv_intent == "IDENTITY":
+            return {
+                "direct_answer": f"Sou a Monalisa, inteligência operacional da Mottu em {resolved_yard}. Monitoro frotas, oficinas, peças e vistorias em tempo real.",
+                "spoken_answer": "Sou a Monalisa, copiloto operacional da Mottu.",
+                "should_show_table": False,
+                "key_metric_label": "",
+                "key_metric_value": "",
+                "key_metric_trend": "",
+                "columns": [],
+                "rows": [],
+                "suggested_action_label": "",
+                "suggested_action_route": "",
+                "active_skill": "CONVERSATIONAL",
+            }
+        # GREETING
+        return {
+            "direct_answer": f"Olá! Sou a Monalisa, sua assistente operacional da Mottu em {resolved_yard}. Em que posso apoiar na operação da frota e oficina hoje?",
+            "spoken_answer": "Olá! Estou à disposição para ajudar na operação.",
+            "should_show_table": False,
+            "key_metric_label": "",
+            "key_metric_value": "",
+            "key_metric_trend": "",
+            "columns": [],
+            "rows": [],
+            "suggested_action_label": "",
+            "suggested_action_route": "",
+            "active_skill": "CONVERSATIONAL",
+        }
 
     # =========================================================================
     # 1. SKILL: BUSCA POR PLACA OU CÓDIGO DE OS (SKILL_BUSCA_PLACA)
@@ -199,14 +300,41 @@ def answer_manager_query(
                     "Nível seguro"
                 ])
 
+        if not critical_items and not parts_inventory:
+            return {
+                "direct_answer": f"Foram identificados 0 itens com necessidade de reposição preventiva em {resolved_yard}.",
+                "spoken_answer": "Zero itens críticos de reposição.",
+                "should_show_table": True,
+                "key_metric_label": "SKUs em Atenção / Ruptura",
+                "key_metric_value": "0 Peças Críticas",
+                "key_metric_trend": "Estoque sem alertas de ruptura",
+                "columns": ["SKU", "Componente e Modelo", "Saldo em Almoxarifado", "Consumo Médio", "Previsão p/ Ruptura", "Lote Sugerido"],
+                "rows": [],
+                "suggested_action_label": "Ir para Almoxarifado WMS",
+                "suggested_action_route": "/mechanic/operations",
+                "active_skill": "SKILL_ESTOQUE",
+            }
+
         count = len(critical_items)
+        has_critical = any("CRÍTICO" in r[4] for r in critical_items)
+        if has_critical:
+            direct_ans = f"Foram identificados {count} itens com necessidade de reposição preventiva em {resolved_yard} para evitar paralisação de baias."
+            spoken_ans = f"Identificados {count} itens para reposição preventiva no galpão."
+            metric_val = f"{count} Peças Críticas"
+            metric_trend = "Reposição prioritária sugerida"
+        else:
+            direct_ans = f"O estoque em {resolved_yard} opera com segurança: componentes monitorados com saldo estável e sem ruptura iminente."
+            spoken_ans = "Estoque estável sem itens em ruptura."
+            metric_val = f"{count} Peças Monitoradas"
+            metric_trend = "Estoque com margem segura"
+
         return {
-            "direct_answer": f"Foram identificados {count} itens com necessidade de reposição preventiva em {resolved_yard} para evitar paralisação de baias.",
-            "spoken_answer": f"Identificados {count} itens para reposição preventiva no galpão.",
+            "direct_answer": direct_ans,
+            "spoken_answer": spoken_ans,
             "should_show_table": True,
-            "key_metric_label": "SKUs em Atenção / Ruptura",
-            "key_metric_value": f"{count} Peças Críticas",
-            "key_metric_trend": "Reposição prioritária sugerida",
+            "key_metric_label": "SKUs em Atenção / Ruptura" if has_critical else "Almoxarifado em Equilíbrio",
+            "key_metric_value": metric_val,
+            "key_metric_trend": metric_trend,
             "columns": ["SKU", "Componente e Modelo", "Saldo em Almoxarifado", "Consumo Médio", "Previsão p/ Ruptura", "Lote Sugerido"],
             "rows": critical_items,
             "suggested_action_label": "Ir para Almoxarifado WMS",
@@ -310,25 +438,7 @@ def answer_manager_query(
         }
 
     # =========================================================================
-    # 8. CUMPRIMENTOS, MENSAGENS SOCIAIS OU CASUAIS (SEM TABELAS OU CARDS)
-    # =========================================================================
-    if is_greeting_or_casual(q):
-        return {
-            "direct_answer": f"Olá! Sou a Monalisa, sua assistente operacional da Mottu em {resolved_yard}. Em que posso apoiar na operação da frota e oficina hoje?",
-            "spoken_answer": "Olá! Estou à disposição para ajudar na operação.",
-            "should_show_table": False,
-            "key_metric_label": "",
-            "key_metric_value": "",
-            "key_metric_trend": "",
-            "columns": [],
-            "rows": [],
-            "suggested_action_label": "",
-            "suggested_action_route": "",
-            "active_skill": "CONVERSATIONAL",
-        }
-
-    # =========================================================================
-    # 9. FALLBACK HONESTO QUANDO A IA ESTÁ OFFLINE PARA PERGUNTAS LIVRES
+    # 8. FALLBACK HONESTO QUANDO A IA ESTÁ OFFLINE PARA PERGUNTAS LIVRES
     # =========================================================================
     if not is_gemini_online and q and not any(k in q for k in ["resumo", "hoje", "indicador", "mottu", "geral", "balanço", "balanco"]):
         return {
@@ -354,8 +464,9 @@ def answer_manager_query(
         }
 
     # =========================================================================
-    # 10. RESUMO GERAL DA OPERAÇÃO / DEFAULT
+    # 9. RESUMO GERAL DA OPERAÇÃO / DEFAULT
     # =========================================================================
+    wants_table = any(k in q for k in ["resumo", "tabela", "relatorio", "relatório", "indicador", "geral", "balanço", "balanco", "hoje"])
     summary_rows = [
         ["Frota em Locação Ativa", "16 motocicletas locadas", "36 motos no polo total", "94% de disponibilidade"],
         ["Vistorias sem Fila Humana", "78,5% automatizadas", "Média de 28 segundos", "28,5h economizadas para a oficina"],
@@ -365,12 +476,12 @@ def answer_manager_query(
     return {
         "direct_answer": f"Olá! Sou a Monalisa, sua assistente operacional da Mottu. A operação de {resolved_yard} está com alta eficiência: 78,5% das vistorias foram resolvidas automaticamente, com fila zero na oficina e 16 motos em locação ativa.",
         "spoken_answer": "Operação estável com fila zero e setenta e oito por cento das vistorias automatizadas.",
-        "should_show_table": True,
-        "key_metric_label": "Eficiência Global da Unidade",
-        "key_metric_value": "78,5% Automatizado",
-        "key_metric_trend": "28,5 horas poupadas na semana",
-        "columns": ["Indicador Operacional", "Valor Atual", "Métrica de Comparação", "Impacto no Galpão"],
-        "rows": summary_rows,
+        "should_show_table": wants_table,
+        "key_metric_label": "Eficiência Global da Unidade" if wants_table else "",
+        "key_metric_value": "78,5% Automatizado" if wants_table else "",
+        "key_metric_trend": "28,5 horas poupadas na semana" if wants_table else "",
+        "columns": ["Indicador Operacional", "Valor Atual", "Métrica de Comparação", "Impacto no Galpão"] if wants_table else [],
+        "rows": summary_rows if wants_table else [],
         "suggested_action_label": "Ver Indicadores Detalhados",
         "suggested_action_route": "/manager/analytics",
         "active_skill": "SKILL_GERAL",

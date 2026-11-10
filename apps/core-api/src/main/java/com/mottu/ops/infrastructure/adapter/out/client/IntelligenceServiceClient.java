@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -169,7 +170,7 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
         String query = (String) requestPayload.getOrDefault("query", "");
         String yardKey = (String) requestPayload.getOrDefault("yardKey", "ALL");
         String yardLabel = (String) requestPayload.getOrDefault("yardLabel", "Todas as Unidades (SP)");
-        String q = query.toLowerCase();
+        String q = query.toLowerCase().trim();
 
         Map<String, Object> res = new java.util.LinkedHashMap<>();
         res.put("query", query);
@@ -177,6 +178,36 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
         res.put("yardLabel", yardLabel);
         res.put("generatedAt", Instant.now().toString());
         res.put("modelUsed", "monalisa-ops-agent");
+
+        // Padrão Big Tech Camada 0: Saudações, cortesia e testes retornam direto sem poluir com tabelas
+        boolean isCasual = q.isBlank() || List.of("oi", "ola", "olá", "bom dia", "boa tarde", "tudo bem", "opa", "salve", "valeu", "obrigado", "obrigada", "morra", "fodasse", "foda-se")
+                .stream().anyMatch(w -> q.equals(w) || q.startsWith(w + " ") || q.endsWith(" " + w));
+
+        if (isCasual) {
+            String answer = q.contains("morra") || q.contains("foda")
+                    ? "Entendido. Permaneço à disposição para apoiar na gestão de frotas e oficinas da Mottu."
+                    : q.contains("obrigad") || q.contains("valeu")
+                    ? "Por nada! Qualquer apoio que precisar na operação, conte comigo."
+                    : "Olá! Sou a Monalisa, sua assistente operacional da Mottu em " + yardLabel + ". Em que posso apoiar hoje?";
+            String spoken = q.contains("morra") || q.contains("foda")
+                    ? "Estou à disposição para apoiar a operação."
+                    : q.contains("obrigad") || q.contains("valeu")
+                    ? "Disponha! Bom trabalho no galpão."
+                    : "Olá! Em que posso ajudar na operação?";
+
+            res.put("directAnswer", answer);
+            res.put("spokenAnswer", spoken);
+            res.put("shouldShowTable", false);
+            res.put("keyMetricLabel", "");
+            res.put("keyMetricValue", "");
+            res.put("keyMetricTrend", "");
+            res.put("columns", List.of());
+            res.put("rows", List.of());
+            res.put("suggestedActionLabel", "");
+            res.put("suggestedActionRoute", "");
+            res.put("activeSkill", "CONVERSATIONAL");
+            return res;
+        }
 
         if (q.contains("estoque") || q.contains("ruptura") || q.contains("peça") || q.contains("peca") || q.contains("comprar")) {
             res.put("directAnswer", "Foram identificados 5 itens com estoque crítico ou abaixo da margem de segurança no galpão.");
@@ -196,18 +227,19 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
             return res;
         }
 
+        boolean wantsTable = q.contains("resumo") || q.contains("tabela") || q.contains("relatorio") || q.contains("relatório") || q.contains("indicador") || q.contains("geral");
         res.put("directAnswer", "A operação de " + yardLabel + " mantém 78,5% de vistorias resolvidas sem fila humana e 16 motos em locação ativa.");
         res.put("spokenAnswer", "Operação estável com setenta e oito por cento de deflexão e dezesseis motos locadas.");
-        res.put("shouldShowTable", true);
-        res.put("keyMetricLabel", "Eficiência Operacional Global");
-        res.put("keyMetricValue", "78,5% Automatizado");
-        res.put("keyMetricTrend", "28,5 horas economizadas para a oficina");
-        res.put("columns", List.of("Indicador", "Valor Atual", "Métrica de Comparação", "Impacto"));
-        res.put("rows", List.of(
+        res.put("shouldShowTable", wantsTable);
+        res.put("keyMetricLabel", wantsTable ? "Eficiência Operacional Global" : "");
+        res.put("keyMetricValue", wantsTable ? "78,5% Automatizado" : "");
+        res.put("keyMetricTrend", wantsTable ? "28,5 horas economizadas para a oficina" : "");
+        res.put("columns", wantsTable ? List.of("Indicador", "Valor Atual", "Métrica de Comparação", "Impacto") : List.of());
+        res.put("rows", wantsTable ? List.of(
                 List.of("Frota Ativa", "16 motos", "36 motos na base total", "94% de disponibilidade"),
                 List.of("Vistorias sem Fila", "78,5%", "Média de 28 segundos", "28,5h poupadas na semana"),
                 List.of("Fila da Oficina", "0 motos", "Baias desobstruídas", "Capacidade liberada")
-        ));
+        ) : List.of());
         res.put("suggestedActionLabel", "Ver Indicadores Detalhados");
         res.put("suggestedActionRoute", "/manager/analytics");
         return res;
@@ -216,27 +248,91 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
     private Map<String, Object> buildLocalAnalyticsAdvisorFallback(Map<String, Object> requestPayload) {
         String yardKey = (String) requestPayload.getOrDefault("yardKey", "ALL");
         String yardLabel = (String) requestPayload.getOrDefault("yardLabel", "Todas as Unidades (SP)");
+        int horizon = requestPayload.get("horizonDays") instanceof Number n ? n.intValue() : 7;
+        String cat = (String) requestPayload.getOrDefault("systemCategory", "ALL");
+        String scen = (String) requestPayload.getOrDefault("scenario", "NORMAL");
         int current = requestPayload.get("currentPeriodInspections") instanceof Number n ? n.intValue() : 114;
         int previous = requestPayload.get("previousPeriodInspections") instanceof Number n ? n.intValue() : 96;
         double growthPct = Math.round(((current - previous) / (double) Math.max(previous, 1)) * 1000.0) / 10.0;
         int projected7d = Math.max(1, (int) Math.round((current / 4.0) * (1.0 + Math.max(growthPct, -30.0) / 200.0)));
 
-        return Map.of(
-                "yardKey", yardKey,
-                "yardLabel", yardLabel,
-                "generatedAt", Instant.now().toString(),
-                "modelUsed", "gemini-3.5-flash-lite",
-                "demandGrowthPct", growthPct,
-                "projectedNext7DaysInspections", projected7d,
-                "executiveHeadline", "Crescimento de " + growthPct + "% na demanda de vistorias com alerta de reposição imediata para peças críticas.",
-                "growthAnalysisText", "Projeção de " + projected7d + " vistorias nos próximos 7 dias para " + yardLabel + ", com foco em giro de peças preventivas.",
-                "stockoutAlerts", List.of(),
-                "recommendedActions", List.of(
-                        "Autorizar reposição preventiva de componentes com estoque abaixo do mínimo de segurança.",
-                        "Priorizar check-up preventivo de lonas de freio traseiro nas motos Mottu Sport 110i.",
-                        "Reforçar bancada de mecânicos para absorver a projeção de " + projected7d + " vistorias na próxima semana."
-                )
+        List<Map<String, Object>> allAlerts = List.of(
+                createAlertMap("SKU-MANETE-DIR-SPORT", "Manete de Freio Direito", "Mottu Sport 110i", 4, 8, 1.5, 3, "CRITICAL", 20, 25.0, 500.0, 11, "BRAKE_HANDLEBAR"),
+                createAlertMap("SKU-LONA-FREIO-TRAS-SPORT", "Lona de Freio Traseira", "Mottu Sport 110i", 6, 8, 1.4, 4, "CRITICAL", 18, 33.0, 594.0, 10, "BRAKE_HANDLEBAR"),
+                createAlertMap("SKU-PNEU-TRAS-SPORT", "Pneu Traseiro 80/100-14", "Mottu Sport 110i", 5, 8, 1.2, 4, "CRITICAL", 15, 180.0, 2700.0, 9, "TIRES_WHEELS"),
+                createAlertMap("SKU-RAI-004", "Pneu Dianteiro 90/90-17", "TVS Raider 125", 6, 8, 1.0, 6, "WARNING", 14, 195.0, 2730.0, 7, "TIRES_WHEELS"),
+                createAlertMap("SKU-POP-003", "Cabo de Embreagem", "Honda Pop 110i", 4, 8, 1.3, 3, "CRITICAL", 20, 28.0, 560.0, 9, "ENGINE_TRANSMISSION"),
+                createAlertMap("SKU-SPT-006", "Pedal de Câmbio Sport", "Mottu Sport 110i", 5, 8, 1.1, 4, "CRITICAL", 19, 38.0, 722.0, 8, "ENGINE_TRANSMISSION"),
+                createAlertMap("SKU-POP-002", "Espelho Retrovisor Par", "Honda Pop 110i", 4, 8, 1.0, 4, "CRITICAL", 18, 39.0, 702.0, 7, "FAIRING_BODY"),
+                createAlertMap("SKU-RAI-002", "Pedaleira Dianteira Direita", "TVS Raider 125", 4, 8, 0.9, 4, "CRITICAL", 18, 46.0, 828.0, 6, "FAIRING_BODY")
         );
+
+        List<Map<String, Object>> filteredAlerts = allAlerts.stream()
+                .filter(a -> "ALL".equalsIgnoreCase(cat) || cat.equalsIgnoreCase(String.valueOf(a.get("systemCategory"))))
+                .toList();
+
+        double totalBudget = filteredAlerts.stream()
+                .mapToDouble(a -> a.get("estimatedCostBrl") instanceof Number num ? num.doubleValue() : 0.0)
+                .sum();
+
+        long critCount = filteredAlerts.stream()
+                .filter(a -> "CRITICAL".equals(a.get("riskLevel")))
+                .count();
+
+        String systemLabel = switch (cat.toUpperCase()) {
+            case "TIRES_WHEELS" -> "Pneus e Rodas";
+            case "ENGINE_TRANSMISSION" -> "Motor e Câmbio";
+            case "BRAKE_HANDLEBAR" -> "Freio e Guidão";
+            case "FAIRING_BODY" -> "Carenagem e Chassi";
+            default -> "Todos os Sistemas";
+        };
+
+        String headline = critCount > 0
+                ? String.format("Alerta de reposição para %s: %d SKUs com risco crítico nos próximos %d dias no galpão.", systemLabel, critCount, horizon)
+                : String.format("Demanda de vistorias equilibrada para %s nos próximos %d dias, sem riscos imediatos de ruptura.", systemLabel, horizon);
+
+        Map<String, Object> fallback = new java.util.LinkedHashMap<>();
+        fallback.put("yardKey", yardKey);
+        fallback.put("yardLabel", yardLabel);
+        fallback.put("generatedAt", Instant.now().toString());
+        fallback.put("modelUsed", "gemini-3.5-flash-lite");
+        fallback.put("demandGrowthPct", growthPct);
+        fallback.put("projectedNext7DaysInspections", projected7d);
+        fallback.put("executiveHeadline", headline);
+        fallback.put("growthAnalysisText", "Projeção de " + projected7d + " vistorias nos próximos " + horizon + " dias para " + yardLabel + " no sistema " + systemLabel + ".");
+        fallback.put("stockoutAlerts", filteredAlerts);
+        fallback.put("recommendedActions", List.of(
+                "Autorizar reposição preventiva de componentes no almoxarifado para " + systemLabel + ".",
+                "Priorizar check-up preventivo de lonas e pneus nas motos da unidade.",
+                "Reforçar bancada de mecânicos para absorver a projeção de " + projected7d + " vistorias na próxima semana."
+        ));
+        fallback.put("horizonDays", horizon);
+        fallback.put("scenario", scen);
+        fallback.put("systemCategory", cat);
+        fallback.put("totalRestockBudgetBrl", Math.round(totalBudget * 100.0) / 100.0);
+        return fallback;
+    }
+
+    private static Map<String, Object> createAlertMap(
+            String sku, String partName, String modelName, int currentStock, int minStock,
+            double dailyBurnRate, int daysToStockout, String riskLevel, int suggestedRestockQty,
+            double unitPriceBrl, double estimatedCostBrl, int projectedDemand, String systemCategory
+    ) {
+        Map<String, Object> m = new HashMap<>();
+        m.put("sku", sku);
+        m.put("partName", partName);
+        m.put("modelName", modelName);
+        m.put("currentStock", currentStock);
+        m.put("minStock", minStock);
+        m.put("dailyBurnRate", dailyBurnRate);
+        m.put("daysToStockout", daysToStockout);
+        m.put("riskLevel", riskLevel);
+        m.put("suggestedRestockQty", suggestedRestockQty);
+        m.put("unitPriceBrl", unitPriceBrl);
+        m.put("estimatedCostBrl", estimatedCostBrl);
+        m.put("projectedDemand", projectedDemand);
+        m.put("systemCategory", systemCategory);
+        return m;
     }
 
     private static SyncCatalogResponseDto unavailable(String reason) {

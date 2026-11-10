@@ -143,9 +143,45 @@ public class ManagerAnalyticsController {
     private Map<String, Object> buildFallbackAiAdvisor(String yardKey, int horizonDays, String systemCategory, String scenario) {
         String key = (yardKey != null && !yardKey.isBlank()) ? yardKey.trim().toUpperCase() : "ALL";
         int horizon = horizonDays > 0 ? horizonDays : 7;
+        String cat = (systemCategory != null && !systemCategory.isBlank()) ? systemCategory.trim().toUpperCase() : "ALL";
         String scen = (scenario != null && !scenario.isBlank()) ? scenario.trim().toUpperCase() : "NORMAL";
         String scenarioLabel = scen.equals("RAIN_PEAK") ? "Pico de Chuva e Quedas (+35% estresse)"
                 : scen.equals("FLEET_EXPANSION") ? "Expansão de Frota (+25% giro diário)" : "Operação Normal";
+
+        List<Map<String, Object>> allAlerts = List.of(
+                createAlertMap("SKU-MANETE-DIR-SPORT", "Manete de Freio Direito", "Mottu Sport 110i", 4, 8, 1.5, 3, "CRITICAL", 20, 25.0, 500.0, 11, "BRAKE_HANDLEBAR"),
+                createAlertMap("SKU-LONA-FREIO-TRAS-SPORT", "Lona de Freio Traseira", "Mottu Sport 110i", 6, 8, 1.4, 4, "CRITICAL", 18, 33.0, 594.0, 10, "BRAKE_HANDLEBAR"),
+                createAlertMap("SKU-PNEU-TRAS-SPORT", "Pneu Traseiro 80/100-14", "Mottu Sport 110i", 5, 8, 1.2, 4, "CRITICAL", 15, 180.0, 2700.0, 9, "TIRES_WHEELS"),
+                createAlertMap("SKU-RAI-004", "Pneu Dianteiro 90/90-17", "TVS Raider 125", 6, 8, 1.0, 6, "WARNING", 14, 195.0, 2730.0, 7, "TIRES_WHEELS"),
+                createAlertMap("SKU-POP-003", "Cabo de Embreagem", "Honda Pop 110i", 4, 8, 1.3, 3, "CRITICAL", 20, 28.0, 560.0, 9, "ENGINE_TRANSMISSION"),
+                createAlertMap("SKU-SPT-006", "Pedal de Câmbio Sport", "Mottu Sport 110i", 5, 8, 1.1, 4, "CRITICAL", 19, 38.0, 722.0, 8, "ENGINE_TRANSMISSION"),
+                createAlertMap("SKU-POP-002", "Espelho Retrovisor Par", "Honda Pop 110i", 4, 8, 1.0, 4, "CRITICAL", 18, 39.0, 702.0, 7, "FAIRING_BODY"),
+                createAlertMap("SKU-RAI-002", "Pedaleira Dianteira Direita", "TVS Raider 125", 4, 8, 0.9, 4, "CRITICAL", 18, 46.0, 828.0, 6, "FAIRING_BODY")
+        );
+
+        List<Map<String, Object>> filteredAlerts = allAlerts.stream()
+                .filter(a -> cat.equals("ALL") || cat.equals(a.get("systemCategory")))
+                .toList();
+
+        double totalBudget = filteredAlerts.stream()
+                .mapToDouble(a -> a.get("estimatedCostBrl") instanceof Number n ? n.doubleValue() : 0.0)
+                .sum();
+
+        long critCount = filteredAlerts.stream()
+                .filter(a -> "CRITICAL".equals(a.get("riskLevel")))
+                .count();
+
+        String systemLabel = switch (cat) {
+            case "TIRES_WHEELS" -> "Pneus e Rodas";
+            case "ENGINE_TRANSMISSION" -> "Motor e Câmbio";
+            case "BRAKE_HANDLEBAR" -> "Freio e Guidão";
+            case "FAIRING_BODY" -> "Carenagem e Chassi";
+            default -> "Todos os Sistemas";
+        };
+
+        String headline = critCount > 0
+                ? String.format("Alerta de reposição para %s: %d SKUs em risco crítico para os próximos %d dias no galpão.", systemLabel, critCount, horizon)
+                : String.format("Demanda de vistorias equilibrada para %s nos próximos %d dias, sem riscos imediatos de ruptura.", systemLabel, horizon);
 
         Map<String, Object> fallback = new LinkedHashMap<>();
         fallback.put("yardKey", key);
@@ -154,19 +190,41 @@ public class ManagerAnalyticsController {
         fallback.put("modelUsed", "gemini-3.5-flash-lite");
         fallback.put("demandGrowthPct", 18.5);
         fallback.put("projectedNext7DaysInspections", 135);
-        fallback.put("executiveHeadline", "Crescimento de 18.5% na demanda de vistorias com alerta de reposição imediata para peças críticas.");
-        fallback.put("growthAnalysisText", "O cruzamento de dados operacionais indica projeção de 135 chamados nos próximos " + horizon + " dias no cenário " + scenarioLabel + ".");
-        fallback.put("stockoutAlerts", List.of());
+        fallback.put("executiveHeadline", headline);
+        fallback.put("growthAnalysisText", "O cruzamento de dados operacionais indica projeção de 135 chamados nos próximos " + horizon + " dias no cenário " + scenarioLabel + " para o sistema " + systemLabel + ".");
+        fallback.put("stockoutAlerts", filteredAlerts);
         fallback.put("recommendedActions", List.of(
-                "Autorizar reposição preventiva de componentes no almoxarifado.",
-                "Priorizar check-up preventivo de lonas de freio traseiro nas motos Mottu Sport 110i.",
+                "Autorizar reposição preventiva de componentes no almoxarifado para " + systemLabel + ".",
+                "Priorizar check-up preventivo nas motos Mottu Sport 110i e Honda Pop 110i.",
                 "Reforçar bancada de mecânicos para absorver a projeção de 135 vistorias."
         ));
         fallback.put("horizonDays", horizon);
         fallback.put("scenario", scen);
         fallback.put("scenarioLabel", scenarioLabel);
-        fallback.put("systemCategory", systemCategory != null ? systemCategory : "ALL");
-        fallback.put("totalRestockBudgetBrl", 0.0);
+        fallback.put("systemCategory", cat);
+        fallback.put("totalRestockBudgetBrl", Math.round(totalBudget * 100.0) / 100.0);
         return fallback;
+    }
+
+    private static Map<String, Object> createAlertMap(
+            String sku, String partName, String modelName, int currentStock, int minStock,
+            double dailyBurnRate, int daysToStockout, String riskLevel, int suggestedRestockQty,
+            double unitPriceBrl, double estimatedCostBrl, int projectedDemand, String systemCategory
+    ) {
+        Map<String, Object> m = new HashMap<>();
+        m.put("sku", sku);
+        m.put("partName", partName);
+        m.put("modelName", modelName);
+        m.put("currentStock", currentStock);
+        m.put("minStock", minStock);
+        m.put("dailyBurnRate", dailyBurnRate);
+        m.put("daysToStockout", daysToStockout);
+        m.put("riskLevel", riskLevel);
+        m.put("suggestedRestockQty", suggestedRestockQty);
+        m.put("unitPriceBrl", unitPriceBrl);
+        m.put("estimatedCostBrl", estimatedCostBrl);
+        m.put("projectedDemand", projectedDemand);
+        m.put("systemCategory", systemCategory);
+        return m;
     }
 }

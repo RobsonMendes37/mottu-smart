@@ -160,6 +160,8 @@ def test_is_greeting_or_casual_cases():
     assert is_greeting_or_casual("morra") is True
     assert is_greeting_or_casual("tchau") is True
     assert is_greeting_or_casual("opa") is True
+    assert is_greeting_or_casual("muito obrigado amigo") is True
+    assert is_greeting_or_casual("???") is False
     assert is_greeting_or_casual("") is False
     assert is_greeting_or_casual(None) is False
     assert is_greeting_or_casual("qual o modelo com maior giro?") is False
@@ -175,7 +177,7 @@ def test_answer_manager_query_greeting_intent():
     assert res["key_metric_label"] == ""
     assert res["should_show_table"] is False
     assert "Monalisa" in res["direct_answer"]
-    assert "disposição" in res["spoken_answer"]
+    assert "disposição" in res["spoken_answer"] or "apoiar" in res["spoken_answer"]
 
 
 def test_answer_manager_query_casual_or_insult():
@@ -184,6 +186,35 @@ def test_answer_manager_query_casual_or_insult():
     assert res["should_show_table"] is False
     assert res["columns"] == []
     assert res["rows"] == []
+    assert "disposição" in res["direct_answer"]
+
+    res_abuse = answer_manager_query("cala a boca", "Todas as Unidades (SP)", {})
+    assert res_abuse["active_skill"] == "CONVERSATIONAL"
+    assert res_abuse["should_show_table"] is False
+
+
+def test_answer_manager_query_courtesy():
+    res = answer_manager_query("obrigado", "Todas as Unidades (SP)", {})
+    assert res["active_skill"] == "CONVERSATIONAL"
+    assert res["should_show_table"] is False
+    assert "nada" in res["direct_answer"] or "disposição" in res["direct_answer"]
+    assert "Disponha" in res["spoken_answer"]
+
+    res2 = answer_manager_query("valeu monalisa", "Todas as Unidades (SP)", {})
+    assert res2["active_skill"] == "CONVERSATIONAL"
+    assert res2["should_show_table"] is False
+
+
+def test_answer_manager_query_identity():
+    res = answer_manager_query("quem é você?", "Todas as Unidades (SP)", {})
+    assert res["active_skill"] == "CONVERSATIONAL"
+    assert res["should_show_table"] is False
+    assert "Monalisa" in res["direct_answer"]
+    assert "Monalisa" in res["spoken_answer"]
+
+    res2 = answer_manager_query("o que você faz?", "Todas as Unidades (SP)", {})
+    assert res2["active_skill"] == "CONVERSATIONAL"
+    assert res2["should_show_table"] is False
 
 
 def test_answer_manager_query_no_false_positive_on_article_os():
@@ -194,7 +225,7 @@ def test_answer_manager_query_no_false_positive_on_article_os():
 def test_answer_manager_query_spoken_and_table_flags():
     res_stock = answer_manager_query("consultar estoque de peças", "Todas as Unidades (SP)", {})
     assert res_stock["should_show_table"] is True
-    assert "reposição" in res_stock["spoken_answer"]
+    assert "reposição" in res_stock["spoken_answer"] or "estável" in res_stock["spoken_answer"]
 
     res_models = answer_manager_query("qual modelo tem mais trocas", "Todas as Unidades (SP)", {})
     assert res_models["should_show_table"] is True

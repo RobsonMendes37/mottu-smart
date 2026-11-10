@@ -37,14 +37,14 @@ const DEFAULT_AI_ADVISOR: OpsAdvisorResponseDto = {
   demandGrowthPct: 18.4,
   projectedNext7DaysInspections: 135,
   executiveHeadline:
-    'Crescimento de 18,4% na demanda de vistorias com alerta de reposição imediata para peças de freio e guidão.',
+    'Crescimento de 18,4% na demanda de vistorias com alerta de reposição preventiva de componentes nos galpões.',
   growthAnalysisText:
     'Identificada aceleração de revisões nas motos Mottu Sport 110i e Honda Pop 110i, recomendando reposição preventiva no almoxarifado para manter as baias com liberação em até 30 minutos.',
   horizonDays: 7,
   scenario: 'NORMAL',
   scenarioLabel: 'Operação Padrão',
   systemCategory: 'ALL',
-  totalRestockBudgetBrl: 1137.50,
+  totalRestockBudgetBrl: 8614.00,
   stockoutAlerts: [
     {
       sku: 'SKU-SPORT-001',
@@ -62,40 +62,115 @@ const DEFAULT_AI_ADVISOR: OpsAdvisorResponseDto = {
       systemCategory: 'BRAKE_HANDLEBAR',
     },
     {
-      sku: 'SKU-POP-002',
-      partName: 'Espelho Retrovisor Esquerdo',
-      modelName: 'Honda Pop 110i',
+      sku: 'SKU-SPORT-002',
+      partName: 'Lona de Freio Traseira Sport',
+      modelName: 'Mottu Sport 110i',
+      currentStock: 6,
+      minStock: 8,
+      dailyBurnRate: 1.4,
+      daysToStockout: 4,
+      riskLevel: 'CRITICAL',
+      suggestedRestockQty: 18,
+      unitPriceBrl: 33.00,
+      estimatedCostBrl: 594.00,
+      projectedDemand: 10,
+      systemCategory: 'BRAKE_HANDLEBAR',
+    },
+    {
+      sku: 'SKU-PNEU-TRAS-SPORT',
+      partName: 'Pneu Traseiro 80/100-14',
+      modelName: 'Mottu Sport 110i',
       currentStock: 5,
-      minStock: 6,
-      dailyBurnRate: 1.0,
-      daysToStockout: 5,
-      riskLevel: 'WARNING',
+      minStock: 8,
+      dailyBurnRate: 1.2,
+      daysToStockout: 4,
+      riskLevel: 'CRITICAL',
       suggestedRestockQty: 15,
-      unitPriceBrl: 42.50,
-      estimatedCostBrl: 637.50,
+      unitPriceBrl: 180.00,
+      estimatedCostBrl: 2700.00,
+      projectedDemand: 9,
+      systemCategory: 'TIRES_WHEELS',
+    },
+    {
+      sku: 'SKU-RAI-004',
+      partName: 'Pneu Dianteiro 90/90-17',
+      modelName: 'TVS Raider 125',
+      currentStock: 6,
+      minStock: 8,
+      dailyBurnRate: 1.0,
+      daysToStockout: 6,
+      riskLevel: 'WARNING',
+      suggestedRestockQty: 14,
+      unitPriceBrl: 195.00,
+      estimatedCostBrl: 2730.00,
+      projectedDemand: 7,
+      systemCategory: 'TIRES_WHEELS',
+    },
+    {
+      sku: 'SKU-POP-003',
+      partName: 'Cabo de Embreagem',
+      modelName: 'Honda Pop 110i',
+      currentStock: 4,
+      minStock: 8,
+      dailyBurnRate: 1.3,
+      daysToStockout: 3,
+      riskLevel: 'CRITICAL',
+      suggestedRestockQty: 20,
+      unitPriceBrl: 28.00,
+      estimatedCostBrl: 560.00,
+      projectedDemand: 9,
+      systemCategory: 'ENGINE_TRANSMISSION',
+    },
+    {
+      sku: 'SKU-SPT-006',
+      partName: 'Pedal de Câmbio Sport',
+      modelName: 'Mottu Sport 110i',
+      currentStock: 5,
+      minStock: 8,
+      dailyBurnRate: 1.1,
+      daysToStockout: 4,
+      riskLevel: 'CRITICAL',
+      suggestedRestockQty: 19,
+      unitPriceBrl: 38.00,
+      estimatedCostBrl: 722.00,
+      projectedDemand: 8,
+      systemCategory: 'ENGINE_TRANSMISSION',
+    },
+    {
+      sku: 'SKU-POP-002',
+      partName: 'Espelho Retrovisor Par',
+      modelName: 'Honda Pop 110i',
+      currentStock: 4,
+      minStock: 8,
+      dailyBurnRate: 1.0,
+      daysToStockout: 4,
+      riskLevel: 'CRITICAL',
+      suggestedRestockQty: 18,
+      unitPriceBrl: 39.00,
+      estimatedCostBrl: 702.00,
       projectedDemand: 7,
       systemCategory: 'FAIRING_BODY',
     },
     {
-      sku: 'SKU-SPORT-002',
-      partName: 'Lona de Freio Traseira Sport',
-      modelName: 'Mottu Sport 110i',
-      currentStock: 28,
-      minStock: 12,
-      dailyBurnRate: 2.1,
-      daysToStockout: 13,
-      riskLevel: 'HEALTHY',
-      suggestedRestockQty: 0,
-      unitPriceBrl: 33.00,
-      estimatedCostBrl: 0.00,
-      projectedDemand: 15,
-      systemCategory: 'BRAKE_HANDLEBAR',
+      sku: 'SKU-RAI-002',
+      partName: 'Pedaleira Dianteira Direita',
+      modelName: 'TVS Raider 125',
+      currentStock: 4,
+      minStock: 8,
+      dailyBurnRate: 0.9,
+      daysToStockout: 4,
+      riskLevel: 'CRITICAL',
+      suggestedRestockQty: 18,
+      unitPriceBrl: 46.00,
+      estimatedCostBrl: 828.00,
+      projectedDemand: 6,
+      systemCategory: 'FAIRING_BODY',
     },
   ],
   recommendedActions: [
-    'Autorizar reposição imediata de +20 un. de Manete de Freio Direito (SKU-SPORT-001) para evitar parada de baia em 3 dias.',
-    'Priorizar check-up preventivo de lonas de freio traseiro nas motos Mottu Sport 110i acima de 10.000 km.',
-    'Reforçar bancada do turno da manhã na unidade Butantã para absorver a projeção de 135 vistorias nos próximos 7 dias.',
+    'Autorizar reposição imediata de peças em risco crítico para evitar parada de baia nos próximos dias.',
+    'Priorizar check-up preventivo de lonas e pneus nas motos Mottu Sport 110i acima de 10.000 km.',
+    'Reforçar bancada de mecânicos para absorver a projeção de 135 vistorias nos próximos 7 dias.',
   ],
 };
 
@@ -166,20 +241,30 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
     },
   ];
 
+  displayedStockoutAlerts = computed(() => {
+    const alerts = this.aiAdvisor()?.stockoutAlerts || [];
+    const cat = this.selectedSystemCategory();
+    if (!cat || cat === 'ALL') return alerts;
+    return alerts.filter((a) => (a.systemCategory || '').toUpperCase() === cat.toUpperCase());
+  });
+
   totalStockoutBudget = computed(() => {
-    const adv = this.aiAdvisor();
-    if (adv?.totalRestockBudgetBrl && adv.totalRestockBudgetBrl > 0) {
-      return adv.totalRestockBudgetBrl;
-    }
-    return (adv?.stockoutAlerts || []).reduce(
+    const alerts = this.displayedStockoutAlerts();
+    return alerts.reduce(
       (sum, a) => sum + (a.estimatedCostBrl || (a.suggestedRestockQty * (a.unitPriceBrl || 25))),
       0
     );
   });
 
   criticalAlertsCount = computed(() => {
-    return (this.aiAdvisor()?.stockoutAlerts || []).filter((a) => a.riskLevel === 'CRITICAL').length;
+    return this.displayedStockoutAlerts().filter((a) => a.riskLevel === 'CRITICAL').length;
   });
+
+  getSelectedSystemLabel(): string {
+    const cat = this.selectedSystemCategory();
+    const opt = this.systemCategoryOptions.find((o) => o.value === cat);
+    return opt ? opt.label : 'Todos os Sistemas';
+  }
 
   // Google-Grade Conversational AI Data Explorer Signals
   searchQuery = signal<string>('Quais peças estão com estoque crítico?');

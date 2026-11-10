@@ -1,4 +1,5 @@
 """Gemini AI Vision adapter supporting offline mock mode (Law 8)."""
+import asyncio
 import json
 import logging
 from typing import Any, Dict, List, Optional
@@ -174,11 +175,14 @@ class GeminiVisionAdapter(AIVisionPort):
             try:
                 from google.genai import types
 
-                response = self._client.models.generate_content(
-                    model=model_name,
-                    contents=prompt,
-                    config=types.GenerateContentConfig(response_mime_type="application/json"),
-                )
+                def call_model():
+                    return self._client.models.generate_content(
+                        model=model_name,
+                        contents=prompt,
+                        config=types.GenerateContentConfig(response_mime_type="application/json"),
+                    )
+
+                response = await asyncio.wait_for(asyncio.to_thread(call_model), timeout=3.5)
                 if response.text and response.text.strip():
                     parsed = json.loads(response.text)
                     return {
@@ -225,40 +229,50 @@ class GeminiVisionAdapter(AIVisionPort):
         history_str = "\n".join(history_lines) if history_lines else "Início da conversa."
 
         prompt = (
-            "Você é a Monalisa, a assistente operacional de frotas e oficinas da Mottu.\n"
-            "Sua comunicação é direta, executiva, técnica e natural. Você NUNCA enrola, NÃO repete métricas desnecessárias.\n\n"
-            f"Contexto do Galpão ({yard_label}):\n"
-            f"- Peças: {parts_summary} (críticos: {critical_str})\n"
-            f"- Oficina: {orders_summary}, fila zerada\n"
-            "- Vistorias (7d): 135 vistorias, 78.5% automatizadas, 18 motos ativas (58% Mottu Sport 110i, 25% Honda Pop 110i, 11% TVS Raider, 6% TVS Apache)\n\n"
+            "Você é a Monalisa, a copiloto técnica e operacional de frotas e oficinas da Mottu.\n"
+            "Sua comunicação é extremamente direta, profissional e concisa. Responda estritamente à pergunta do gestor em 1 a 2 frases.\n"
+            "NUNCA cite números, métricas de contexto ou frotas se a pergunta não for especificamente sobre elas.\n\n"
+            f"Dados Operacionais de {yard_label} (Apenas referência interna de suporte):\n"
+            f"- Peças: {parts_summary} ({critical_str})\n"
+            f"- Oficina: {orders_summary}, fila liberada\n"
+            "- Vistorias: 78.5% deflexão sem fila, operação estável\n\n"
             f"Histórico recente:\n{history_str}\n\n"
             f"Mensagem do Usuário: {query}\n\n"
-            "Retorne estritamente um JSON com 3 campos:\n"
+            "Retorne estritamente um JSON no seguinte formato:\n"
             "{\n"
-            '  "direct_answer": "Texto objetivo para a tela (1 a 2 frases com dados específicos da pergunta). Sem markdown, sem hashtags, sem emojis.",\n'
-            '  "spoken_answer": "Frase falada ultra-curta e natural para voz (máximo 15 palavras). Natural para TTS.",\n'
+            '  "direct_answer": "Texto objetivo em 1 ou no máximo 2 frases. Sem markdown, sem hashtags, sem emojis.",\n'
+            '  "spoken_answer": "Frase falada ultra-curta e natural para voz (máximo 12 palavras).",\n'
             '  "should_show_table": false\n'
             "}\n\n"
             "Regras Inquebráveis:\n"
-            "1. Cumprimentos simples (ex: 'oi', 'olá', 'bom dia') ou mensagens sociais: direct_answer em 1 frase curta sem números; spoken_answer ultra-curto ('Oi! À disposição.'); should_show_table = false.\n"
-            "2. Provocações ou testes (ex: 'morra', 'fodasse'): direct_answer e spoken_answer em 1 frase neutra profissional se colocando à disposição; should_show_table = false.\n"
-            "3. Perguntas operacionais reais: direct_answer em 1 a 2 frases DIRETO ao ponto. spoken_answer resume o ponto chave em até 12 palavras. should_show_table = true apenas se o usuário pediu lista, tabela, histórico de modelos ou comparação detalhada.\n"
-            "4. PROIBIDO usar formatação markdown: sem asteriscos **, sem hashtags #, sem marcadores hifenizados. PROIBIDO emojis."
+            "1. Defina 'should_show_table' como true APENAS se o usuário pedir explicitamente para ver lista, tabela, histórico de modelos ou comparação detalhada.\n"
+            "2. Se a pergunta for sobre estabilidade operacional, infraestrutura sem falhas ou estoque abastecido, responda de forma direta e defina should_show_table como false.\n"
+            "3. PROIBIDO usar formatação markdown: sem asteriscos **, sem hashtags #, sem marcadores hifenizados. PROIBIDO emojis."
         )
 
         for model_name in settings.vision_models_list:
             try:
                 from google.genai import types
-                response = self._client.models.generate_content(
-                    model=model_name,
-                    contents=prompt,
-                    config=types.GenerateContentConfig(response_mime_type="application/json"),
-                )
+
+                def call_query_model():
+                    return self._client.models.generate_content(
+                        model=model_name,
+                        contents=prompt,
+                        config=types.GenerateContentConfig(response_mime_type="application/json"),
+                    )
+
+                response = await asyncio.wait_for(asyncio.to_thread(call_query_model), timeout=4.0)
                 if response.text and response.text.strip():
                     raw_text = response.text.strip()
                     import re
                     try:
-                        data = json.loads(raw_text)
+                        clean_json = raw_text
+                        if "```json" in clean_json:
+                            clean_json = clean_json.split("```json")[1].split("```")[0].strip()
+                        elif "```" in clean_json:
+                            clean_json = clean_json.split("```")[1].split("```")[0].strip()
+
+                        data = json.loads(clean_json)
                         if isinstance(data, dict):
                             direct = str(data.get("direct_answer", "")).strip()
                             spoken = str(data.get("spoken_answer", "")).strip() or direct

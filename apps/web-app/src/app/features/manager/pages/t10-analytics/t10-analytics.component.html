@@ -664,6 +664,9 @@
                       @default { Operação Padrão (1.0x) }
                     }
                   </span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-[#F3F4F6] text-[#1E293B] border border-[#E2E8F0] font-mono text-[11px] font-bold">
+                    Sistema: {{ getSelectedSystemLabel() }}
+                  </span>
                 </div>
                 <p class="text-xs text-[#757575] mt-0.5">
                   Simulação de estresse de estoque e demanda com modelos estatísticos e análise executiva da IA.
@@ -850,7 +853,7 @@
             <div class="space-y-2">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-[#141414]">Alertas de ruptura e reposição de estoque sugerida</span>
-                <span class="text-[11px] text-[#757575]">Simulação calculada sobre {{ aiAdvisor().stockoutAlerts.length }} itens filtrados</span>
+                <span class="text-[11px] text-[#757575]">Simulação calculada sobre {{ displayedStockoutAlerts().length }} itens filtrados</span>
               </div>
 
               <div class="overflow-x-auto border border-[#E2E2E2] rounded-lg">
@@ -870,7 +873,7 @@
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-[#EEEEEE]">
-                    @for (alert of aiAdvisor().stockoutAlerts; track alert.sku) {
+                    @for (alert of displayedStockoutAlerts(); track alert.sku) {
                       <tr class="hover:bg-[#F6F6F6]/60">
                         <td class="py-3 px-3 font-mono font-semibold text-[#141414]">{{ alert.sku }}</td>
                         <td class="py-3 px-3">

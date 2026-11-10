@@ -2,7 +2,7 @@
 	auto_https disable_redirects
 }
 
-http://161.153.2.148, http://:80 {
+http://161.153.2.148, http://mottu-smart.duckdns.org, http://:80 {
 	# Modern compression
 	encode zstd gzip
 
@@ -45,7 +45,7 @@ http://161.153.2.148, http://:80 {
 	}
 }
 
-161.153.2.148.sslip.io, 161.153.2.148.nip.io {
+mottu-smart.duckdns.org, 161.153.2.148.sslip.io, 161.153.2.148.nip.io {
 	# Modern compression
 	encode zstd gzip
 

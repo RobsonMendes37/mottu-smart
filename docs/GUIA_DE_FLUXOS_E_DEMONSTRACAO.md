@@ -2,7 +2,7 @@
 
 > **Documento Oficial de Apresentação e Demonstração Operacional**  
 > **Versão do Sistema:** 2.2.0 (Uber Clean Fleet — Design System v2.0)  
-> **Ambiente de Demonstração Online:** [http://161.153.2.148:18088](http://161.153.2.148:18088) *(ou http://mottu-smart.duckdns.org:18088)*
+> **Ambiente de Demonstração Online:** [https://mottu-smart.duckdns.org](https://mottu-smart.duckdns.org) *(ou https://161.153.2.148.sslip.io)*
 
 ---
 

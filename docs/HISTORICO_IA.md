@@ -1599,3 +1599,27 @@
   - Production Build: **Concluído com sucesso (397 kB inicial, zero warnings de compilação)**.
   - Conformidade de Paleta: **100% de adesão aos tokens `DESIGN.md` e rigoroso Purple Ban**.
 
+
+### [2026-11-10 14:45] — Correção de Sobreposição de Voz, Streaming Visual (~0.5s), Nova Voz Neural Thalita e Modo Operacional
+- **Agente / Modelo:** `@frontend-specialist` + `@ai-engineer` + `@orchestrator`
+- **Requisitos Atendidos:**
+  - **Prevenção Rígida de Sobreposição de Vozes:**
+    - Ao enviar nova mensagem (`sendCopilotMessage`), o sistema cancela imediatamente qualquer reprodução de áudio, sintetizador Web Speech e requisições HTTP em trânsito de TTS (`this.stopSpeech()`).
+    - Implementação de token de sessão `currentSpeechSessionId`: respostas assíncronas de áudio de requisições anteriores são automaticamente descartadas sem sobrepor mensagens novas.
+  - **Streaming Progressivo de Texto (Efeito Typewriter de ~0.5s):**
+    - Em vez de despejar todo o texto instantaneamente, a resposta da Monalisa é revelada de forma fluida ao longo de 500ms (0.5s).
+    - O áudio neural é requisitado e preparado em paralelo durante esse intervalo, iniciando a reprodução exatamente parelha ao término da digitação visual.
+  - **Upgrade de Voz Neural de Estúdio (Thalita Multilingual Neural):**
+    - Substituição da voz padrão no backend (`apps/intelligence-service/app/infrastructure/web/internal_router.py`) de `pt-BR-FranciscaNeural` para `pt-BR-ThalitaMultilingualNeural`.
+    - Thalita é o modelo neural mais recente da Microsoft para Português do Brasil, com prosódia conversacional natural, micropausas de respiração e entonação humana expressiva.
+  - **Ajuste de Status da IA e Eliminação de Alerta "Offline":**
+    - Correção da checagem de estado no adaptador Gemini (`is_mock_mode` -> `is_online`), eliminando o falso-negativo no router.
+    - Atualização do badge no frontend: substituído o alerta de advertência laranja `Skills (Offline)` pelo selo enterprise neutro `Modo Operacional` em verde Mottu (`#15803D`).
+    - No fallback das queries livres, a Monalisa apresenta mensagem acolhedora e direta conectada ao banco PostgreSQL, orientando o gestor com as 7 skills disponíveis sem mensagens técnicas alarmantes.
+- **Validação de Testes e Qualidade:**
+  - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Angular Production Build: **100% de sucesso**.
+  - Python Pytest: **203/203 testes aprovados com 100% de cobertura de domínio**.
+  - Python Linters: **Ruff e Mypy 100% aprovados sem erros**.
+
+

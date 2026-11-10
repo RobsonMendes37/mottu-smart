@@ -1083,11 +1083,11 @@
                     class="px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wide flex items-center gap-1"
                     [class.bg-[#05944F]]="!isAiOfflineMode()"
                     [class.text-white]="!isAiOfflineMode()"
-                    [class.bg-[#D97706]]="isAiOfflineMode()"
+                    [class.bg-[#15803D]]="isAiOfflineMode()"
                     [class.text-white]="isAiOfflineMode()"
                   >
                     <span class="w-1.5 h-1.5 rounded-full bg-white" [class.animate-pulse]="!isAiOfflineMode()"></span>
-                    <span>{{ isAiOfflineMode() ? 'Skills (Offline)' : 'Online' }}</span>
+                    <span>{{ isAiOfflineMode() ? 'Modo Operacional' : 'Online' }}</span>
                   </span>
                 </div>
                 <p class="text-[10px] text-[#A3A3A3] font-medium">Inteligência Operacional • Mottu</p>
@@ -1171,7 +1171,7 @@
                     M
                   </div>
                   <div class="bg-white border border-[#E2E8F0] px-3.5 py-3 rounded-2xl rounded-tl-xs max-w-[92%] shadow-xs space-y-2.5">
-                    <p class="text-xs text-[#1E293B] leading-relaxed">{{ msg.text }}</p>
+                    <p class="text-xs text-[#1E293B] leading-relaxed">{{ msg.displayedText ?? msg.text }}</p>
 
                     @if (msg.metricLabel && msg.metricValue) {
                       <div class="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between">

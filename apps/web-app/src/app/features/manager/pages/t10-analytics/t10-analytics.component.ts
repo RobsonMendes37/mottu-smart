@@ -1,8 +1,9 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ManagerService } from '../../services/manager.service';
 import {
   AnalyticsSummaryResponseDto,
@@ -104,7 +105,7 @@ const DEFAULT_AI_ADVISOR: OpsAdvisorResponseDto = {
   imports: [CommonModule, FormsModule, RouterLink, DesktopShellComponent],
   templateUrl: './t10-analytics.component.html',
 })
-export class T10AnalyticsComponent implements OnInit {
+export class T10AnalyticsComponent implements OnInit, OnDestroy {
   private managerService: ManagerService;
   private sanitizer: DomSanitizer;
 
@@ -498,6 +499,10 @@ export class T10AnalyticsComponent implements OnInit {
   private recognition: any = null;
   private availableVoices: any[] = [];
   private currentAudioPlayer: HTMLAudioElement | null = null;
+  private currentAudioUrl: string | null = null;
+  private currentTtsSub: Subscription | null = null;
+  private currentSpeechSessionId = 0;
+  private typewriterInterval: any = null;
 
   readonly operationalSkills = [
     { id: 'SKILL_ESTOQUE', label: 'Estoque Crítico' },
@@ -513,6 +518,7 @@ export class T10AnalyticsComponent implements OnInit {
     id: number;
     sender: 'user' | 'assistant';
     text: string;
+    displayedText?: string;
     time: string;
     metricLabel?: string;
     metricValue?: string;
@@ -523,6 +529,7 @@ export class T10AnalyticsComponent implements OnInit {
       id: 1,
       sender: 'assistant',
       text: 'Olá! Sou a Monalisa, sua assistente operacional da Mottu. Pode me perguntar sobre a frota, escolher uma das Skills abaixo ou falar no microfone.',
+      displayedText: 'Olá! Sou a Monalisa, sua assistente operacional da Mottu. Pode me perguntar sobre a frota, escolher uma das Skills abaixo ou falar no microfone.',
       time: 'Agora',
     },
   ]);
@@ -649,6 +656,9 @@ export class T10AnalyticsComponent implements OnInit {
     const prompt = (customPrompt ?? this.copilotInput()).trim();
     if (!prompt) return;
 
+    // Cancela imediatamente qualquer áudio, requisição ou animação anterior para evitar sobreposição de vozes
+    this.stopSpeech();
+
     const userMsgId = Date.now();
     const nowStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
@@ -677,12 +687,14 @@ export class T10AnalyticsComponent implements OnInit {
             this.isAiOfflineMode.set(res.isAiOffline);
           }
 
+          // Mensagem com displayedText vazio para streaming progressivo visual (0.5s)
           this.copilotMessages.update((msgs) => [
             ...msgs,
             {
               id: assistantMsgId,
               sender: 'assistant',
               text: answer,
+              displayedText: '',
               time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
               metricLabel: res.keyMetricLabel,
               metricValue: res.keyMetricValue,
@@ -691,9 +703,15 @@ export class T10AnalyticsComponent implements OnInit {
             },
           ]);
 
-          // Falar automaticamente se a chave de voz estiver ativada
+          // Efeito de digitação suave em 0.5s (500ms)
+          let typewriterFinished = false;
+          this.animateTypewriter(assistantMsgId, answer, () => {
+            typewriterFinished = true;
+          });
+
+          // Disparo sincronizado da voz (carrega em paralelo e inicia parelho ao término da digitação)
           if (this.autoVoiceEnabled()) {
-            this.speakText(answer, assistantMsgId);
+            this.speakText(answer, assistantMsgId, () => typewriterFinished);
           }
         },
         error: () => {
@@ -708,18 +726,58 @@ export class T10AnalyticsComponent implements OnInit {
               id: assistantMsgId,
               sender: 'assistant',
               text: fallbackAnswer,
+              displayedText: '',
               time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
             },
           ]);
 
+          let typewriterFinished = false;
+          this.animateTypewriter(assistantMsgId, fallbackAnswer, () => {
+            typewriterFinished = true;
+          });
+
           if (this.autoVoiceEnabled()) {
-            this.speakText(fallbackAnswer, assistantMsgId);
+            this.speakText(fallbackAnswer, assistantMsgId, () => typewriterFinished);
           }
         },
       });
     } else {
       this.copilotLoading.set(false);
     }
+  }
+
+  animateTypewriter(messageId: number, fullText: string, onComplete?: () => void): void {
+    if (this.typewriterInterval) {
+      clearInterval(this.typewriterInterval);
+      this.typewriterInterval = null;
+    }
+
+    const totalDurationMs = 500; // 0.5s conforme solicitado
+    const intervalMs = 25;
+    const totalSteps = Math.max(1, Math.floor(totalDurationMs / intervalMs));
+    let currentStep = 0;
+
+    this.typewriterInterval = setInterval(() => {
+      currentStep++;
+      const progress = currentStep / totalSteps;
+      const charCount = Math.min(fullText.length, Math.ceil(progress * fullText.length));
+      const partial = fullText.slice(0, charCount);
+
+      this.copilotMessages.update((msgs) =>
+        msgs.map((m) => (m.id === messageId ? { ...m, displayedText: partial } : m))
+      );
+
+      if (currentStep >= totalSteps) {
+        if (this.typewriterInterval) {
+          clearInterval(this.typewriterInterval);
+          this.typewriterInterval = null;
+        }
+        this.copilotMessages.update((msgs) =>
+          msgs.map((m) => (m.id === messageId ? { ...m, displayedText: fullText } : m))
+        );
+        if (onComplete) onComplete();
+      }
+    }, intervalMs);
   }
 
   cleanTextForSpeech(text: string): string {
@@ -759,13 +817,25 @@ export class T10AnalyticsComponent implements OnInit {
     const ptVoices = this.availableVoices.filter((v: any) => v.lang && v.lang.toLowerCase().startsWith('pt'));
     if (ptVoices.length === 0) return null;
 
-    // 1. PRIORIDADE MÁXIMA: Voz Oficial do Google (Google português do Brasil)
+    // 1. Voz Oficial do Google (Google português do Brasil)
     const googleVoice = ptVoices.find((v: any) =>
       v.name.toLowerCase().includes('google') && (v.lang.includes('BR') || v.lang.includes('pt'))
     );
     if (googleVoice) return googleVoice;
 
-    // 2. Voz feminina pt-BR natural para Monalisa
+    // 2. Microsoft Thalita Online (Natural)
+    const thalitaVoice = ptVoices.find((v: any) =>
+      v.name.toLowerCase().includes('thalita') && v.lang.includes('BR')
+    );
+    if (thalitaVoice) return thalitaVoice;
+
+    // 3. Vozes Naturais / Neurais pt-BR
+    const naturalVoice = ptVoices.find((v: any) =>
+      (v.name.includes('Natural') || v.name.includes('Neural') || v.name.includes('Online')) && v.lang.includes('BR')
+    );
+    if (naturalVoice) return naturalVoice;
+
+    // 4. Voz feminina pt-BR para Monalisa
     const femaleVoice = ptVoices.find((v: any) =>
       v.name.includes('Francisca') ||
       v.name.includes('Maria') ||
@@ -776,83 +846,113 @@ export class T10AnalyticsComponent implements OnInit {
     );
     if (femaleVoice) return femaleVoice;
 
-    // 2. Microsoft Natural/Neural
-    const msVoice = ptVoices.find((v: any) =>
-      (v.name.includes('Natural') || v.name.includes('Neural') || v.name.includes('Online')) && v.lang.includes('BR')
-    );
-    if (msVoice) return msVoice;
-
     const ptBrVoice = ptVoices.find((v: any) => v.lang === 'pt-BR');
     if (ptBrVoice) return ptBrVoice;
 
     return ptVoices[0];
   }
 
-  speakText(text: string, msgId: number): void {
+  speakText(text: string, msgId: number, canPlayCheck?: () => boolean): void {
     if (typeof window === 'undefined') return;
 
     this.stopSpeech();
+    const sessionId = ++this.currentSpeechSessionId;
 
     const spokenText = this.cleanTextForSpeech(text);
     if (!spokenText) return;
 
-    // Prioridade Google: Se o navegador (ex.: Chrome no Android/Desktop/Mac) possuir a voz oficial do Google,
-    // utiliza-a diretamente com 0ms de latência e timbre autêntico do Google.
-    const googleVoice = this.getBestPtVoice();
-    const hasGoogleNativeVoice = googleVoice && googleVoice.name.toLowerCase().includes('google');
-
-    if (hasGoogleNativeVoice) {
-      this.speakWithWebSpeech(spokenText, msgId);
-      return;
-    }
-
-    // 1. Tentar áudio neural gerado no servidor (Francisca Neural pt-BR)
+    // 1. Tentar áudio neural gerado no servidor (Thalita Multilingual Neural pt-BR)
     if (this.managerService?.generateSpeechAudio) {
-      this.managerService.generateSpeechAudio(spokenText).subscribe({
+      this.currentTtsSub = this.managerService.generateSpeechAudio(spokenText).subscribe({
         next: (blob) => {
+          // Descarta se a sessão de voz foi cancelada ou substituída por outra mensagem
+          if (sessionId !== this.currentSpeechSessionId) return;
+
           if (blob && blob.size > 200) {
             try {
-              const audioUrl = URL.createObjectURL(blob);
-              this.currentAudioPlayer = new Audio(audioUrl);
-              this.isSpeaking.set(true);
-              this.speakingMessageId.set(msgId);
-              this.currentAudioPlayer.onended = () => {
-                this.isSpeaking.set(false);
-                this.speakingMessageId.set(null);
+              if (this.currentAudioUrl) {
+                try {
+                  URL.revokeObjectURL(this.currentAudioUrl);
+                } catch {}
+              }
+              this.currentAudioUrl = URL.createObjectURL(blob);
+              const player = new Audio(this.currentAudioUrl);
+              this.currentAudioPlayer = player;
+
+              const triggerPlayback = () => {
+                if (sessionId !== this.currentSpeechSessionId) return;
+                this.isSpeaking.set(true);
+                this.speakingMessageId.set(msgId);
+                player.play().catch(() => {
+                  if (sessionId === this.currentSpeechSessionId) {
+                    this.speakWithWebSpeech(spokenText, msgId, sessionId);
+                  }
+                });
               };
-              this.currentAudioPlayer.onerror = () => {
-                this.speakWithWebSpeech(spokenText, msgId);
+
+              player.onended = () => {
+                if (sessionId === this.currentSpeechSessionId) {
+                  this.isSpeaking.set(false);
+                  this.speakingMessageId.set(null);
+                }
               };
-              this.currentAudioPlayer.play().catch(() => {
-                this.speakWithWebSpeech(spokenText, msgId);
-              });
+              player.onerror = () => {
+                if (sessionId === this.currentSpeechSessionId) {
+                  this.speakWithWebSpeech(spokenText, msgId, sessionId);
+                }
+              };
+
+              // Se a digitação (0.5s) ainda estiver acontecendo, aguarda para iniciar parelho
+              if (canPlayCheck && !canPlayCheck()) {
+                const waitCheck = setInterval(() => {
+                  if (sessionId !== this.currentSpeechSessionId) {
+                    clearInterval(waitCheck);
+                    return;
+                  }
+                  if (canPlayCheck()) {
+                    clearInterval(waitCheck);
+                    triggerPlayback();
+                  }
+                }, 40);
+                setTimeout(() => {
+                  clearInterval(waitCheck);
+                  if (sessionId === this.currentSpeechSessionId && !this.isSpeaking()) {
+                    triggerPlayback();
+                  }
+                }, 520);
+              } else {
+                triggerPlayback();
+              }
               return;
             } catch {
-              this.speakWithWebSpeech(spokenText, msgId);
+              this.speakWithWebSpeech(spokenText, msgId, sessionId);
               return;
             }
           }
-          this.speakWithWebSpeech(spokenText, msgId);
+          this.speakWithWebSpeech(spokenText, msgId, sessionId);
         },
         error: () => {
-          this.speakWithWebSpeech(spokenText, msgId);
+          if (sessionId === this.currentSpeechSessionId) {
+            this.speakWithWebSpeech(spokenText, msgId, sessionId);
+          }
         },
       });
       return;
     }
 
-    this.speakWithWebSpeech(spokenText, msgId);
+    this.speakWithWebSpeech(spokenText, msgId, sessionId);
   }
 
-  speakWithWebSpeech(spokenText: string, msgId: number): void {
+  speakWithWebSpeech(spokenText: string, msgId: number, sessionId: number): void {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    if (sessionId !== this.currentSpeechSessionId) return;
 
     try {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(spokenText);
       utterance.lang = 'pt-BR';
       utterance.rate = 1.0;
-      utterance.pitch = 1.05;
+      utterance.pitch = 1.0;
 
       const bestVoice = this.getBestPtVoice();
       if (bestVoice) {
@@ -863,37 +963,74 @@ export class T10AnalyticsComponent implements OnInit {
       this.speakingMessageId.set(msgId);
 
       utterance.onend = () => {
-        this.isSpeaking.set(false);
-        this.speakingMessageId.set(null);
+        if (sessionId === this.currentSpeechSessionId) {
+          this.isSpeaking.set(false);
+          this.speakingMessageId.set(null);
+        }
       };
 
       utterance.onerror = () => {
-        this.isSpeaking.set(false);
-        this.speakingMessageId.set(null);
+        if (sessionId === this.currentSpeechSessionId) {
+          this.isSpeaking.set(false);
+          this.speakingMessageId.set(null);
+        }
       };
 
       window.speechSynthesis.speak(utterance);
     } catch {
-      this.isSpeaking.set(false);
-      this.speakingMessageId.set(null);
+      if (sessionId === this.currentSpeechSessionId) {
+        this.isSpeaking.set(false);
+        this.speakingMessageId.set(null);
+      }
     }
   }
 
   stopSpeech(): void {
+    this.currentSpeechSessionId++;
+
+    if (this.typewriterInterval) {
+      clearInterval(this.typewriterInterval);
+      this.typewriterInterval = null;
+    }
+
+    if (this.currentTtsSub) {
+      this.currentTtsSub.unsubscribe();
+      this.currentTtsSub = null;
+    }
+
     if (this.currentAudioPlayer) {
       try {
         this.currentAudioPlayer.pause();
-        this.currentAudioPlayer.currentTime = 0;
+        this.currentAudioPlayer.removeAttribute('src');
+        this.currentAudioPlayer.load();
       } catch {}
       this.currentAudioPlayer = null;
     }
+
+    if (this.currentAudioUrl) {
+      try {
+        URL.revokeObjectURL(this.currentAudioUrl);
+      } catch {}
+      this.currentAudioUrl = null;
+    }
+
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       try {
         window.speechSynthesis.cancel();
       } catch {}
     }
+
     this.isSpeaking.set(false);
     this.speakingMessageId.set(null);
+  }
+
+  ngOnDestroy(): void {
+    this.stopSpeech();
+    if (this.recognition) {
+      try {
+        this.recognition.stop();
+      } catch {}
+    }
   }
 
   loadDetailedAnalytics(): void {

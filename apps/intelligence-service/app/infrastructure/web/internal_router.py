@@ -177,7 +177,7 @@ async def generate_ops_advice(request: AnalyticsAdvisorRequestDTO) -> AnalyticsA
 async def ask_analytics_data(request: DataExplorerQueryRequestDTO) -> DataExplorerQueryResponseDTO:
     """Analyze a natural language manager query and return structured Monalisa analytics."""
     vision_adapter = GeminiVisionAdapter()
-    is_gemini_online = not getattr(vision_adapter, "is_mock_mode", True)
+    is_gemini_online = vision_adapter.is_online
 
     raw_answer = answer_manager_query(
         query=request.query,
@@ -209,12 +209,12 @@ async def ask_analytics_data(request: DataExplorerQueryRequestDTO) -> DataExplor
 
 @router.post("/analytics/tts")
 async def generate_monalisa_speech(request: TextToSpeechRequestDTO):
-    """Synthesize high-fidelity Brazilian Portuguese neural speech (pt-BR-FranciscaNeural)."""
+    """Synthesize high-fidelity Brazilian Portuguese neural speech (pt-BR-ThalitaMultilingualNeural)."""
     text = (request.text or "").strip()
     if not text:
         return Response(status_code=204)
 
-    voice = request.voice or "pt-BR-FranciscaNeural"
+    voice = request.voice or "pt-BR-ThalitaMultilingualNeural"
     try:
         import edge_tts
         communicate = edge_tts.Communicate(text, voice)

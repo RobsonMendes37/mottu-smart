@@ -27,6 +27,14 @@ class GeminiVisionAdapter(AIVisionPort):
                 logger.warning(f"Failed to initialize Google GenAI Client: {e}. Falling back to mock.")
                 self.mock_mode = True
 
+    @property
+    def is_mock_mode(self) -> bool:
+        return self.mock_mode
+
+    @property
+    def is_online(self) -> bool:
+        return not self.mock_mode and self._client is not None
+
     async def inspect_damage_photo(self, photo_bytes: bytes, context_prompt: str) -> Dict[str, Any]:
         if self.mock_mode or not settings.GEMINI_API_KEY or self._client is None:
             return await self.mock_service.inspect_damage_photo(photo_bytes, context_prompt)

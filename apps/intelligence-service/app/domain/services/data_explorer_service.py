@@ -277,7 +277,7 @@ def answer_manager_query(
     # =========================================================================
     # 8. FALLBACK HONESTO QUANDO A IA ESTÁ OFFLINE PARA PERGUNTAS LIVRES
     # =========================================================================
-    if not is_gemini_online and q and not any(k in q for k in ["resumo", "hoje", "indicador", "mottu", "olá", "ola", "bom dia", "boa tarde"]):
+    if not is_gemini_online and q and not any(k in q for k in ["resumo", "hoje", "indicador", "mottu", "olá", "ola", "oi", "bom dia", "boa tarde", "tudo bem", "como vai", "ajuda", "geral"]):
         return {
             "direct_answer": f"Olá! No momento o motor de conversação livre está offline, mas minhas 7 Skills operacionais estão conectadas ao banco PostgreSQL da Mottu em tempo real para {resolved_yard}. Escolha uma das opções abaixo para consultar os dados ao vivo:",
             "key_metric_label": "Modo Skills Ativo",

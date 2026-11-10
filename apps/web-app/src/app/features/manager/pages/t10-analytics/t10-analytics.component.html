@@ -1066,8 +1066,11 @@
           <div class="bg-[#141414] text-white px-4 py-3 flex items-center justify-between border-b border-[#262626]">
             <div class="flex items-center gap-3">
               <div class="relative">
-                <div class="w-8 h-8 rounded-full bg-[#05944F] text-white flex items-center justify-center font-black text-sm shadow-xs tracking-tight">
-                  M
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#05944F] to-[#036837] text-white flex items-center justify-center shadow-xs border border-white/20">
+                  <svg class="w-5 h-5" viewBox="0 0 32 32" fill="none">
+                    <path d="M6 24.5L9.8 7.5C10.1 6.4 11.2 5.8 12.2 6.1C13.1 6.4 13.8 7.2 14 8.2L16 16.5L18 8.2C18.2 7.2 18.9 6.4 19.8 6.1C20.8 5.8 21.9 6.4 22.2 7.5L26 24.5" stroke="white" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 19.8L16.7 21.8L18.8 22.5L16.7 23.2L16 25.2L15.3 23.2L13.2 22.5L15.3 21.8L16 19.8Z" fill="#FBBF24"/>
+                  </svg>
                 </div>
                 <!-- Micro-insígnia de inteligência -->
                 <span class="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#141414] text-[#F59E0B] border border-white">
@@ -1167,8 +1170,11 @@
                 </div>
               } @else {
                 <div class="flex items-start gap-2.5">
-                  <div class="w-6 h-6 rounded-full bg-[#E6F4EE] text-[#05944F] font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5 border border-[#B7E2CD]">
-                    M
+                  <div class="w-6 h-6 rounded-full bg-[#E6F4EE] text-[#05944F] flex items-center justify-center shrink-0 mt-0.5 border border-[#B7E2CD]">
+                    <svg class="w-4 h-4" viewBox="0 0 32 32" fill="none">
+                      <path d="M6 24.5L9.8 7.5C10.1 6.4 11.2 5.8 12.2 6.1C13.1 6.4 13.8 7.2 14 8.2L16 16.5L18 8.2C18.2 7.2 18.9 6.4 19.8 6.1C20.8 5.8 21.9 6.4 22.2 7.5L26 24.5" stroke="#05944F" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M16 19.8L16.7 21.8L18.8 22.5L16.7 23.2L16 25.2L15.3 23.2L13.2 22.5L15.3 21.8L16 19.8Z" fill="#D97706"/>
+                    </svg>
                   </div>
                   <div class="bg-white border border-[#E2E8F0] px-3.5 py-3 rounded-2xl rounded-tl-xs max-w-[92%] shadow-xs space-y-2.5">
                     <p class="text-xs text-[#1E293B] leading-relaxed">{{ msg.displayedText ?? msg.text }}</p>
@@ -1296,17 +1302,18 @@
         </div>
       }
 
-      <!-- Main Floating Action Button (FAB) - Ícone M com Brilhinho nas pontas (Sem nome, compacto no Mobile) -->
+      <!-- Main Floating Action Button (FAB) - Ícone M Estilizado com Brilhinho nas pontas -->
       <button
         type="button"
         (click)="toggleCopilot()"
         title="Abrir Monalisa (IA Operacional)"
-        class="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-[#05944F] hover:bg-[#047840] text-white shadow-2xl flex items-center justify-center border-2 border-white transition-all transform hover:scale-105 active:scale-95 relative cursor-pointer group"
+        class="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-[#05944F] to-[#036837] hover:from-[#047840] hover:to-[#02522B] text-white shadow-2xl flex items-center justify-center border-2 border-white transition-all transform hover:scale-105 active:scale-95 relative cursor-pointer group"
       >
-        <!-- Letra M Centralizada -->
-        <span class="font-black text-xl sm:text-2xl text-white tracking-tight drop-shadow-xs">
-          M
-        </span>
+        <!-- Ícone M Monalisa Estilizado SVG com Spark Dourado -->
+        <svg class="w-7 h-7 sm:w-8 sm:h-8 drop-shadow-xs" viewBox="0 0 32 32" fill="none">
+          <path d="M6 24.5L9.8 7.5C10.1 6.4 11.2 5.8 12.2 6.1C13.1 6.4 13.8 7.2 14 8.2L16 16.5L18 8.2C18.2 7.2 18.9 6.4 19.8 6.1C20.8 5.8 21.9 6.4 22.2 7.5L26 24.5" stroke="white" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 19.8L16.7 21.8L18.8 22.5L16.7 23.2L16 25.2L15.3 23.2L13.2 22.5L15.3 21.8L16 19.8Z" fill="#FBBF24"/>
+        </svg>
 
         <!-- Brilho nas pontas (Sparkle no topo superior direito) -->
         <span class="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#141414] text-[#F59E0B] border border-white shadow-xs group-hover:rotate-12 transition-transform">

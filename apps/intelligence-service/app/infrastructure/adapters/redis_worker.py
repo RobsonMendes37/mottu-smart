@@ -183,8 +183,15 @@ class TriageJobWorker:
                 "isNaturalWear": is_wear,
             })
 
+        is_valid_photo = bool(triage_raw.get("isValidMotorcyclePhoto", True))
+        if not is_valid_photo:
+            suggested_verdict = "MAU_USO"
+            customer_message = (
+                "Olá! A imagem enviada não parece ser de uma motocicleta ou está muito escura/ilegível para identificação. "
+                "Por favor, tire uma nova foto bem iluminada focando no componente da moto que precisa de avaliação."
+            )
         # Apply 48h / 100km exemption rule (UC-08, UC-11)
-        if job.hoursSincePickup <= 48.0 and job.kmDrivenSincePickup <= 100 and job.reportedContext in ("RECEIVED_LIKE_THIS", "WITHDRAWAL"):
+        elif job.hoursSincePickup <= 48.0 and job.kmDrivenSincePickup <= 100 and job.reportedContext in ("RECEIVED_LIKE_THIS", "WITHDRAWAL"):
             suggested_verdict = "PRE_EXISTENTE"
             customer_message = (
                 f"Olá! Identificamos o dano apontado. Como você retirou a moto há menos de 48h "
@@ -206,7 +213,7 @@ class TriageJobWorker:
             "inspectionId": job.inspectionId,
             "correlationId": job.correlationId,
             "outcome": "SUCCESS",
-            "isValidMotorcyclePhoto": bool(triage_raw.get("isValidMotorcyclePhoto", True)),
+            "isValidMotorcyclePhoto": is_valid_photo,
             "confidence": round(adjusted_confidence, 2),
             "suggestedVerdict": suggested_verdict,
             "matchedParts": matched_parts_dto,

@@ -33,15 +33,19 @@ class GeminiVisionAdapter(AIVisionPort):
 
         from google.genai import types
         prompt = (
-            f"You are an expert motorcycle damage triage inspector for Mottu.\n"
-            f"Analyze the inspection photo considering this context:\n{context_prompt}\n"
-            "Return a JSON object with:\n"
-            "- isValidMotorcyclePhoto (bool)\n"
-            "- confidence (float between 0.0 and 1.0)\n"
-            "- suggestedVerdict ('PRE_EXISTENTE', 'DESGASTE_NATURAL', or 'MAU_USO')\n"
-            "- matchedParts: list of objects with partName (str), unitPriceBrl (float), isNaturalWear (bool)\n"
-            "- technicalSummary (str)\n"
-            "- customerFriendlyMessage (str)\n"
+            "Você é um perito técnico e avaliador sênior de triagem de avarias de motocicletas para a Mottu.\n"
+            f"Analise a foto da vistoria considerando este contexto operacional:\n{context_prompt}\n\n"
+            "Diretrizes obrigatórias de linguagem:\n"
+            "- TODAS as respostas, descrições e mensagens DEVEM ser estritamente em Português do Brasil (pt-BR).\n"
+            "- Se a imagem NÃO for de uma motocicleta ou estiver ilegível, retorne isValidMotorcyclePhoto como false e em customerFriendlyMessage explique de forma educada e clara que a foto não é de uma moto ou não permitiu identificar o veículo.\n"
+            "- customerFriendlyMessage: mensagem empática e profissional para o entregador parceiro, sem jargões complexos e SEM qualquer formatação markdown (sem asteriscos **, sem hashtags #, sem marcadores hifenizados).\n\n"
+            "Retorne EXCLUSIVAMENTE um objeto JSON com as seguintes chaves:\n"
+            "- isValidMotorcyclePhoto (bool): true se for foto nítida de motocicleta/componente de moto, false se for foto de objeto alheio, animal, pessoa, paisagem ou totalmente ilegível\n"
+            "- confidence (float entre 0.0 e 1.0): grau de certeza técnica da identificação\n"
+            "- suggestedVerdict ('PRE_EXISTENTE', 'DESGASTE_NATURAL' ou 'MAU_USO')\n"
+            "- matchedParts: lista de objetos contendo partName (str em português), unitPriceBrl (float), isNaturalWear (bool)\n"
+            "- technicalSummary (str em português): síntese técnica da avaria para o mecânico\n"
+            "- customerFriendlyMessage (str em português): mensagem clara e acolhedora enviada ao entregador\n"
         )
 
         last_error = None

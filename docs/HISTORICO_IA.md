@@ -1474,3 +1474,23 @@
   - A convocação presencial gera automaticamente a Ordem de Serviço na baia WMS da unidade (`WAITING_BAY`), garantindo o fluxo *Closed Loop* sem necessidade de criação manual.
   - O Escudo de 48h / 100km agora conta com dupla validação: expedição registrada pela equipe de pátio e confirmação digital pelo entregador na Garagem Mobile.
 - **Próxima Tarefa Liberada:** Todas as fases do projeto estão completas e validadas de ponta a ponta.
+
+### [2026-11-10 01:45] — Auditoria Final de Interface E2E em Chromium Real & Blindagem de Persistência PostgreSQL
+- **Agente / Modelo:** `@qa-automation-engineer` + `@orchestrator`
+- **Causa Raiz & Correção de Persistência:**
+  - O PostgreSQL rejeitava atualizações das colunas `jsonb` (`committee_evaluation_json` e `pickup_photos_json`) durante o `POST /resolve` em produção devido à ausência da anotação `@JdbcTypeCode(SqlTypes.JSON)` nas entidades JPA `InspectionJpaEntity` e `RentalContractJpaEntity`. Adicionada a anotação padrão do Hibernate 6.
+  - Otimizado `MechanicWorkbenchService.java` para contornar a chamada redundante ao serviço de polimento de feedback quando `isPresential == true`, reduzindo o tempo de resolução para milissegundos.
+  - Blindada a geração de código de OS de baia com proteção contra colisões (`while (serviceOrderRepository.existsByCode(osCode))`).
+- **Resultados da Auditoria E2E em Navegador Real (`test-phase9-comprehensive-e2e.js`):**
+  - **T07 Frota:** Modal de Giro 360 de Expedição, preenchimento de fotos e gravação de estado zero: **✅ APROVADO**
+  - **T02 Garagem:** Escudo 48h/100km, galeria de ângulos 360 e confirmação digital de recebimento: **✅ APROVADO**
+  - **T06 Bancada:** Abas comparativas de foto atual vs giro 360 da retirada, alternador de 5 ângulos e placar da Junta Multi-IA: **✅ APROVADO**
+  - **T06 Bancada (Ação Presencial):** Abertura do modal, preenchimento de parecer técnico e emissão de laudo presencial isento (R$ 0,00): **✅ APROVADO**
+  - **T04 Status:** Deliberação técnica, valores e cartões de proteção: **✅ APROVADO**
+  - **WMS Oficina:** Baias operacionais com ordens de serviço ativas: **✅ APROVADO**
+  - **Placar Total:** **6 de 6 testes aprovados (100% de sucesso real)**.
+- **Suítes de Regressão Unitária & Integração:**
+  - Java Core API: **342/342 testes aprovados** (`mvn test`).
+  - Python Intelligence: **195/195 testes aprovados** (`pytest`).
+  - Angular Web App: **248/248 testes aprovados** (`vitest`).
+

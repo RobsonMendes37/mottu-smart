@@ -189,6 +189,8 @@ async def ask_analytics_data(request: DataExplorerQueryRequestDTO) -> DataExplor
     )
 
     direct_answer = str(raw_answer.get("direct_answer", ""))
+    spoken_answer = str(raw_answer.get("spoken_answer", "") or direct_answer)
+    should_show_table = bool(raw_answer.get("should_show_table", True))
 
     # Quando a pergunta for enviada em texto livre pelo gestor (sem skillId fixo) e o Gemini estiver online,
     # gera uma resposta adaptada e inteligente com base no contexto operacional da Mottu
@@ -201,7 +203,20 @@ async def ask_analytics_data(request: DataExplorerQueryRequestDTO) -> DataExplor
             default_answer=direct_answer,
         )
         if llm_answer:
-            direct_answer = llm_answer
+            if isinstance(llm_answer, dict):
+                direct_answer = str(llm_answer.get("direct_answer") or direct_answer)
+                spoken_answer = str(llm_answer.get("spoken_answer") or direct_answer)
+                if "should_show_table" in llm_answer:
+                    should_show_table = bool(llm_answer["should_show_table"])
+            elif isinstance(llm_answer, str):
+                direct_answer = llm_answer
+                spoken_answer = llm_answer
+
+    columns = list(raw_answer.get("columns", [])) if should_show_table else []
+    rows = list(raw_answer.get("rows", [])) if should_show_table else []
+    metric_label = str(raw_answer.get("key_metric_label", "")) if should_show_table else ""
+    metric_value = str(raw_answer.get("key_metric_value", "")) if should_show_table else ""
+    metric_trend = str(raw_answer.get("key_metric_trend", "")) if should_show_table else ""
 
     return DataExplorerQueryResponseDTO(
         query=request.query,
@@ -210,11 +225,13 @@ async def ask_analytics_data(request: DataExplorerQueryRequestDTO) -> DataExplor
         generatedAt=datetime.now(timezone.utc),
         modelUsed="gemini-3.5-flash-lite" if is_gemini_online else "monalisa-ops-agent",
         directAnswer=direct_answer,
-        keyMetricLabel=str(raw_answer.get("key_metric_label", "")),
-        keyMetricValue=str(raw_answer.get("key_metric_value", "")),
-        keyMetricTrend=str(raw_answer.get("key_metric_trend", "")),
-        columns=list(raw_answer.get("columns", [])),
-        rows=list(raw_answer.get("rows", [])),
+        spokenAnswer=spoken_answer,
+        shouldShowTable=should_show_table,
+        keyMetricLabel=metric_label,
+        keyMetricValue=metric_value,
+        keyMetricTrend=metric_trend,
+        columns=columns,
+        rows=rows,
         suggestedActionLabel=str(raw_answer.get("suggested_action_label", "")),
         suggestedActionRoute=str(raw_answer.get("suggested_action_route", "")),
         activeSkill=raw_answer.get("active_skill"),

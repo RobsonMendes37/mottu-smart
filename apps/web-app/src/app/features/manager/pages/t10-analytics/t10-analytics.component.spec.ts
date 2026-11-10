@@ -205,6 +205,8 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
     mockManagerService.askDataExplorer = vi.fn().mockReturnValue(of({
       query: 'Estoque Crítico',
       directAnswer: 'Demanda de reposição calculada com sucesso.',
+      spokenAnswer: 'Três itens com estoque crítico no galpão.',
+      shouldShowTable: true,
       keyMetricLabel: 'Peças em Falta',
       keyMetricValue: '3 SKUs Críticos',
       keyMetricTrend: 'Alta',
@@ -228,6 +230,8 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
     expect(comp.copilotMessages().length).toBeGreaterThanOrEqual(2);
     const lastMsg = comp.copilotMessages()[comp.copilotMessages().length - 1];
     expect(lastMsg.text).toContain('Demanda de reposição');
+    expect(lastMsg.spokenText).toBe('Três itens com estoque crítico no galpão.');
+    expect(lastMsg.shouldShowTable).toBe(true);
     expect(lastMsg.rows?.length).toBe(1);
 
     // Audio methods run safely

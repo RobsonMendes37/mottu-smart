@@ -123,6 +123,8 @@ def test_analytics_ask_success():
     assert response.status_code == 200
     data = response.json()
     assert "directAnswer" in data
+    assert "spokenAnswer" in data
+    assert data["shouldShowTable"] is True
     assert "keyMetricLabel" in data
     assert "keyMetricValue" in data
     assert len(data["columns"]) > 0

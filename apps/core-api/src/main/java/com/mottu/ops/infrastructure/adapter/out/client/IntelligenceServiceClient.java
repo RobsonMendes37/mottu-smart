@@ -180,6 +180,8 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
 
         if (q.contains("estoque") || q.contains("ruptura") || q.contains("peça") || q.contains("peca") || q.contains("comprar")) {
             res.put("directAnswer", "Foram identificados 5 itens com estoque crítico ou abaixo da margem de segurança no galpão.");
+            res.put("spokenAnswer", "Identificados cinco itens com estoque crítico no galpão.");
+            res.put("shouldShowTable", true);
             res.put("keyMetricLabel", "Itens em Ruptura Iminente");
             res.put("keyMetricValue", "5 SKUs Críticos");
             res.put("keyMetricTrend", "Ação de compra imediata recomendada");
@@ -195,6 +197,8 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
         }
 
         res.put("directAnswer", "A operação de " + yardLabel + " mantém 78,5% de vistorias resolvidas sem fila humana e 16 motos em locação ativa.");
+        res.put("spokenAnswer", "Operação estável com setenta e oito por cento de deflexão e dezesseis motos locadas.");
+        res.put("shouldShowTable", true);
         res.put("keyMetricLabel", "Eficiência Operacional Global");
         res.put("keyMetricValue", "78,5% Automatizado");
         res.put("keyMetricTrend", "28,5 horas economizadas para a oficina");

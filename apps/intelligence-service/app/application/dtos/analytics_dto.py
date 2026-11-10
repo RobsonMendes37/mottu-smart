@@ -77,6 +77,8 @@ class DataExplorerQueryResponseDTO(BaseModel):
     generatedAt: datetime
     modelUsed: str = "monalisa-ops-agent"
     directAnswer: str
+    spokenAnswer: Optional[str] = None
+    shouldShowTable: bool = True
     keyMetricLabel: str
     keyMetricValue: str
     keyMetricTrend: str

@@ -520,6 +520,8 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
     sender: 'user' | 'assistant';
     text: string;
     displayedText?: string;
+    spokenText?: string;
+    shouldShowTable?: boolean;
     time: string;
     metricLabel?: string;
     metricValue?: string;
@@ -531,6 +533,8 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
       sender: 'assistant',
       text: 'Olá! Sou a Monalisa, sua assistente operacional da Mottu. Pode me perguntar sobre a frota, escolher uma das Skills abaixo ou falar no microfone.',
       displayedText: 'Olá! Sou a Monalisa, sua assistente operacional da Mottu. Pode me perguntar sobre a frota, escolher uma das Skills abaixo ou falar no microfone.',
+      spokenText: 'Olá! Sou a Monalisa. Em que posso apoiar na operação?',
+      shouldShowTable: false,
       time: 'Agora',
     },
   ]);
@@ -683,6 +687,8 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
           this.copilotLoading.set(false);
           const assistantMsgId = Date.now() + 1;
           const answer = res.directAnswer || 'Análise operacional concluída com sucesso com os dados de pátio e estoque.';
+          const spoken = res.spokenAnswer || answer;
+          const shouldShowTable = res.shouldShowTable !== false;
 
           if (res.isAiOffline !== undefined) {
             this.isAiOfflineMode.set(res.isAiOffline);
@@ -696,6 +702,8 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
               sender: 'assistant',
               text: answer,
               displayedText: answer,
+              spokenText: spoken,
+              shouldShowTable,
               time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
               metricLabel: res.keyMetricLabel,
               metricValue: res.keyMetricValue,
@@ -710,9 +718,9 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
             typewriterFinished = true;
           });
 
-          // Disparo sincronizado da voz (carrega em paralelo e inicia parelho ao término da digitação)
+          // Disparo sincronizado da voz ultra-curta e executiva (15 palavras / 2 a 3 segundos)
           if (this.autoVoiceEnabled()) {
-            this.speakText(answer, assistantMsgId, () => typewriterFinished);
+            this.speakText(spoken, assistantMsgId, () => typewriterFinished);
           }
         },
         error: () => {
@@ -720,6 +728,7 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
           this.isAiOfflineMode.set(true);
           const assistantMsgId = Date.now() + 1;
           const fallbackAnswer = `Com base nos dados consolidados da unidade ${this.selectedYardFilter()}: temos ${this.activeBiSnapshot().totalInspections} vistorias analisadas, com ${this.activeBiSnapshot().aiPrecisionPct} de resoluções diretas e projeção de ${this.aiAdvisor().projectedNext7DaysInspections} atendimentos para os próximos ${this.selectedHorizon()} dias.`;
+          const fallbackSpoken = `Operação da unidade ${this.selectedYardFilter()} com ${this.activeBiSnapshot().totalInspections} vistorias analisadas.`;
 
           this.copilotMessages.update((msgs) => [
             ...msgs,
@@ -728,6 +737,8 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
               sender: 'assistant',
               text: fallbackAnswer,
               displayedText: fallbackAnswer,
+              spokenText: fallbackSpoken,
+              shouldShowTable: false,
               time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
             },
           ]);
@@ -738,7 +749,7 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
           });
 
           if (this.autoVoiceEnabled()) {
-            this.speakText(fallbackAnswer, assistantMsgId, () => typewriterFinished);
+            this.speakText(fallbackSpoken, assistantMsgId, () => typewriterFinished);
           }
         },
       });

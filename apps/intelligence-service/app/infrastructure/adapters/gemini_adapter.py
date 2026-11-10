@@ -205,7 +205,7 @@ class GeminiVisionAdapter(AIVisionPort):
         context_data: Dict[str, Any],
         history: Optional[List[Dict[str, Any]]] = None,
         default_answer: str = "",
-    ) -> Optional[str]:
+    ) -> Optional[Dict[str, Any]]:
         if self.mock_mode or not settings.GEMINI_API_KEY or self._client is None:
             return None
 
@@ -226,35 +226,66 @@ class GeminiVisionAdapter(AIVisionPort):
 
         prompt = (
             "Você é a Monalisa, a assistente operacional de frotas e oficinas da Mottu.\n"
-            "Sua comunicação é direta, executiva, técnica e natural. Você NUNCA enrola, NÃO repete métricas que não foram solicitadas e NÃO despeja estatísticas desnecessárias.\n\n"
+            "Sua comunicação é direta, executiva, técnica e natural. Você NUNCA enrola, NÃO repete métricas desnecessárias.\n\n"
             f"Contexto do Galpão ({yard_label}):\n"
             f"- Peças: {parts_summary} (críticos: {critical_str})\n"
             f"- Oficina: {orders_summary}, fila zerada\n"
             "- Vistorias (7d): 135 vistorias, 78.5% automatizadas, 18 motos ativas (58% Mottu Sport 110i, 25% Honda Pop 110i, 11% TVS Raider, 6% TVS Apache)\n\n"
             f"Histórico recente:\n{history_str}\n\n"
             f"Mensagem do Usuário: {query}\n\n"
+            "Retorne estritamente um JSON com 3 campos:\n"
+            "{\n"
+            '  "direct_answer": "Texto objetivo para a tela (1 a 2 frases com dados específicos da pergunta). Sem markdown, sem hashtags, sem emojis.",\n'
+            '  "spoken_answer": "Frase falada ultra-curta e natural para voz (máximo 15 palavras). Natural para TTS.",\n'
+            '  "should_show_table": false\n'
+            "}\n\n"
             "Regras Inquebráveis:\n"
-            "1. Cumprimentos simples (ex: 'oi', 'olá', 'bom dia') ou mensagens sociais: Responda em no máximo 1 FRASE curta e natural cumprimentando e se colocando à disposição. NUNCA cite métricas de frota ou números num cumprimento.\n"
-            "2. Mensagens fora de escopo, xingamentos ou testes (ex: 'morra', 'fodasse'): Mantenha a compostura profissional e responda em 1 FRASE neutra se colocando à disposição para a operação.\n"
-            "3. Perguntas operacionais reais: Seja cirúrgica e responda em 1 a 2 frases DIRETO ao ponto. Se a pergunta for sobre estoque, fale APENAS de estoque. Se for sobre motos/frota, fale APENAS de frota. Não despeje dados de outros assuntos não solicitados.\n"
-            "4. Idioma: Português do Brasil natural e profissional, sem clichês de robô.\n"
-            "5. PROIBIDO usar formatação markdown: sem asteriscos **, sem hashtags #, sem marcadores hifenizados.\n"
-            "6. PROIBIDO usar emojis."
+            "1. Cumprimentos simples (ex: 'oi', 'olá', 'bom dia') ou mensagens sociais: direct_answer em 1 frase curta sem números; spoken_answer ultra-curto ('Oi! À disposição.'); should_show_table = false.\n"
+            "2. Provocações ou testes (ex: 'morra', 'fodasse'): direct_answer e spoken_answer em 1 frase neutra profissional se colocando à disposição; should_show_table = false.\n"
+            "3. Perguntas operacionais reais: direct_answer em 1 a 2 frases DIRETO ao ponto. spoken_answer resume o ponto chave em até 12 palavras. should_show_table = true apenas se o usuário pediu lista, tabela, histórico de modelos ou comparação detalhada.\n"
+            "4. PROIBIDO usar formatação markdown: sem asteriscos **, sem hashtags #, sem marcadores hifenizados. PROIBIDO emojis."
         )
 
         for model_name in settings.vision_models_list:
             try:
+                from google.genai import types
                 response = self._client.models.generate_content(
                     model=model_name,
                     contents=prompt,
+                    config=types.GenerateContentConfig(response_mime_type="application/json"),
                 )
                 if response.text and response.text.strip():
+                    raw_text = response.text.strip()
                     import re
-                    cleaned = re.sub(r"\*\*(.*?)\*\*", r"\1", response.text)
+                    try:
+                        data = json.loads(raw_text)
+                        if isinstance(data, dict):
+                            direct = str(data.get("direct_answer", "")).strip()
+                            spoken = str(data.get("spoken_answer", "")).strip() or direct
+                            should_show = bool(data.get("should_show_table", False))
+                            direct = re.sub(r"\*\*(.*?)\*\*", r"\1", direct)
+                            direct = re.sub(r"^#{1,6}\s+", "", direct, flags=re.MULTILINE)
+                            spoken = re.sub(r"\*\*(.*?)\*\*", r"\1", spoken)
+                            spoken = re.sub(r"^#{1,6}\s+", "", spoken, flags=re.MULTILINE)
+                            return {
+                                "direct_answer": direct,
+                                "spoken_answer": spoken,
+                                "should_show_table": should_show,
+                            }
+                    except Exception:
+                        pass
+
+                    cleaned = re.sub(r"\*\*(.*?)\*\*", r"\1", raw_text)
                     cleaned = re.sub(r"\*(.*?)\*", r"\1", cleaned)
                     cleaned = re.sub(r"^#{1,6}\s+", "", cleaned, flags=re.MULTILINE)
                     cleaned = re.sub(r"^\s*[-*]\s+", "", cleaned, flags=re.MULTILINE)
-                    return cleaned.strip()
+                    clean_str = cleaned.strip()
+                    first_sent = clean_str.split(".")[0] + "." if "." in clean_str else clean_str
+                    return {
+                        "direct_answer": clean_str,
+                        "spoken_answer": first_sent[:80],
+                        "should_show_table": False,
+                    }
             except Exception as e:
                 logger.warning(f"Model {model_name} failed answering manager query: {e}. Cascading...")
 

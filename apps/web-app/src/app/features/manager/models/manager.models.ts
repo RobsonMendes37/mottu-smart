@@ -201,6 +201,8 @@ export interface OpsDataExplorerResponseDto {
   generatedAt: string;
   modelUsed: string;
   directAnswer: string;
+  spokenAnswer?: string;
+  shouldShowTable?: boolean;
   keyMetricLabel: string;
   keyMetricValue: string;
   keyMetricTrend: string;

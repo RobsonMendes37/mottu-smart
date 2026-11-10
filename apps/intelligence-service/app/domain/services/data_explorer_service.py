@@ -103,6 +103,8 @@ def answer_manager_query(
         }
         return {
             "direct_answer": f"Ficha operacional da motocicleta {record.get('plate', plate)} ({record.get('model', 'Mottu Sport 110i')}): Odômetro em {record.get('odometerKm', 14250)} km, locada para {record.get('currentRider', 'Entregador Ativo')} e última vistoria aprovada como {record.get('lastInspectionVerdict', 'Isenta')}.",
+            "spoken_answer": f"Ficha técnica da moto {record.get('plate', plate)} localizada com sucesso.",
+            "should_show_table": True,
             "key_metric_label": f"Ficha da Moto • {plate}",
             "key_metric_value": f"{record.get('status', 'RENTED')}",
             "key_metric_trend": f"Odômetro: {record.get('odometerKm', 14250)} km",
@@ -131,6 +133,8 @@ def answer_manager_query(
         count_waiting = sum(1 for o in orders if "WAITING" in str(o))
         return {
             "direct_answer": f"Na oficina de {resolved_yard}, existem {len(orders)} ordens de serviço ativas no momento, com {count_waiting} moto aguardando alocação em baia de mecânico e capacidade de atendimento estável.",
+            "spoken_answer": f"Temos {len(orders)} ordens de serviço na oficina e {count_waiting} aguardando baia.",
+            "should_show_table": True,
             "key_metric_label": "Ordens de Serviço em Aberto",
             "key_metric_value": f"{len(orders)} Motos em Oficina",
             "key_metric_trend": f"{count_waiting} aguardando baia",
@@ -152,6 +156,8 @@ def answer_manager_query(
         ]
         return {
             "direct_answer": f"Existem {len(users)} cadastros pendentes de homologação pelo gestor em {resolved_yard}. A liberação rápida garante maior volume de entregadores ativos na rua.",
+            "spoken_answer": f"Existem {len(users)} cadastros pendentes de homologação pelo gestor.",
+            "should_show_table": True,
             "key_metric_label": "Fila de Aprovação de Acessos",
             "key_metric_value": f"{len(users)} Cadastros Pendentes",
             "key_metric_trend": "Prioridade de liberação hoje",
@@ -196,6 +202,8 @@ def answer_manager_query(
         count = len(critical_items)
         return {
             "direct_answer": f"Foram identificados {count} itens com necessidade de reposição preventiva em {resolved_yard} para evitar paralisação de baias.",
+            "spoken_answer": f"Identificados {count} itens para reposição preventiva no galpão.",
+            "should_show_table": True,
             "key_metric_label": "SKUs em Atenção / Ruptura",
             "key_metric_value": f"{count} Peças Críticas",
             "key_metric_trend": "Reposição prioritária sugerida",
@@ -217,6 +225,8 @@ def answer_manager_query(
         ]
         return {
             "direct_answer": f"Em {resolved_yard}, 79,7% das vistorias foram 100% isentas ao entregador (desgaste natural ou avaria pré-existente protegida pelo Giro 360) e apenas 20,3% geraram cobrança de peças.",
+            "spoken_answer": "Quase oitenta por cento das vistorias foram isentas sem custos ao entregador.",
+            "should_show_table": True,
             "key_metric_label": "Taxa de Isenção Contratual",
             "key_metric_value": "79,7% Isenções",
             "key_metric_trend": "Alinhado com a meta Mottu (> 75%)",
@@ -239,6 +249,8 @@ def answer_manager_query(
         ]
         return {
             "direct_answer": f"A Mottu Sport 110i concentra 58% do fluxo operacional em {resolved_yard}, mantendo 81% de resolução autônoma pela IA sem necessidade de triagem humana na oficina.",
+            "spoken_answer": "Mottu Sport cento e dez i lidera a frota com cinquenta e oito por cento do giro.",
+            "should_show_table": True,
             "key_metric_label": "Modelo com Maior Giro",
             "key_metric_value": "Mottu Sport 110i (58%)",
             "key_metric_trend": "Alta eficiência operacional",
@@ -261,6 +273,8 @@ def answer_manager_query(
         ]
         return {
             "direct_answer": "A Unidade Butantã (SP-04) lidera o volume com 54 vistorias encerradas e tempo médio de apenas 28 segundos por análise da IA.",
+            "spoken_answer": "A unidade Butantã lidera o volume com cinquenta e quatro vistorias.",
+            "should_show_table": True,
             "key_metric_label": "Polo de Maior Volume",
             "key_metric_value": "Butantã (SP-04) • 54 Vistorias",
             "key_metric_trend": "Fila zero na bancada agora",
@@ -283,6 +297,8 @@ def answer_manager_query(
         ]
         return {
             "direct_answer": "Existem 17 contratos de locação ativos na rede de SP. A taxa de adimplência na data atual é de 88,2%, com 2 contratos pendentes de conciliação Pix.",
+            "spoken_answer": "Taxa de adimplência em oitenta e oito por cento com contratos em dia.",
+            "should_show_table": True,
             "key_metric_label": "Faturamento Semanal Estimado",
             "key_metric_value": "R$ 3.486,00 / semana",
             "key_metric_trend": "88,2% Adimplência Pix",
@@ -299,6 +315,8 @@ def answer_manager_query(
     if is_greeting_or_casual(q):
         return {
             "direct_answer": f"Olá! Sou a Monalisa, sua assistente operacional da Mottu em {resolved_yard}. Em que posso apoiar na operação da frota e oficina hoje?",
+            "spoken_answer": "Olá! Estou à disposição para ajudar na operação.",
+            "should_show_table": False,
             "key_metric_label": "",
             "key_metric_value": "",
             "key_metric_trend": "",
@@ -315,6 +333,8 @@ def answer_manager_query(
     if not is_gemini_online and q and not any(k in q for k in ["resumo", "hoje", "indicador", "mottu", "geral", "balanço", "balanco"]):
         return {
             "direct_answer": f"Olá! No momento o motor de conversação livre está offline, mas minhas 7 Skills operacionais estão conectadas ao banco PostgreSQL da Mottu em tempo real para {resolved_yard}. Escolha uma das opções abaixo para consultar os dados ao vivo:",
+            "spoken_answer": "Modo de conversa livre offline. As sete skills operacionais estão ativas.",
+            "should_show_table": True,
             "key_metric_label": "Modo Skills Ativo",
             "key_metric_value": "7 Skills Conectadas ao Banco",
             "key_metric_trend": "Consultas sob demanda prontas",
@@ -344,6 +364,8 @@ def answer_manager_query(
     ]
     return {
         "direct_answer": f"Olá! Sou a Monalisa, sua assistente operacional da Mottu. A operação de {resolved_yard} está com alta eficiência: 78,5% das vistorias foram resolvidas automaticamente, com fila zero na oficina e 16 motos em locação ativa.",
+        "spoken_answer": "Operação estável com fila zero e setenta e oito por cento das vistorias automatizadas.",
+        "should_show_table": True,
         "key_metric_label": "Eficiência Global da Unidade",
         "key_metric_value": "78,5% Automatizado",
         "key_metric_trend": "28,5 horas poupadas na semana",

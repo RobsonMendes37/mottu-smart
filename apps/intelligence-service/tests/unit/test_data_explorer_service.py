@@ -173,12 +173,15 @@ def test_answer_manager_query_greeting_intent():
     assert res["columns"] == []
     assert res["rows"] == []
     assert res["key_metric_label"] == ""
+    assert res["should_show_table"] is False
     assert "Monalisa" in res["direct_answer"]
+    assert "disposição" in res["spoken_answer"]
 
 
 def test_answer_manager_query_casual_or_insult():
     res = answer_manager_query("fodasse vc", "Todas as Unidades (SP)", {})
     assert res["active_skill"] == "CONVERSATIONAL"
+    assert res["should_show_table"] is False
     assert res["columns"] == []
     assert res["rows"] == []
 
@@ -186,5 +189,16 @@ def test_answer_manager_query_casual_or_insult():
 def test_answer_manager_query_no_false_positive_on_article_os():
     res = answer_manager_query("quais os problemas relatados na infraestrutura?", "Todas as Unidades (SP)", {})
     assert res["active_skill"] != "SKILL_OFICINA"
+
+
+def test_answer_manager_query_spoken_and_table_flags():
+    res_stock = answer_manager_query("consultar estoque de peças", "Todas as Unidades (SP)", {})
+    assert res_stock["should_show_table"] is True
+    assert "reposição" in res_stock["spoken_answer"]
+
+    res_models = answer_manager_query("qual modelo tem mais trocas", "Todas as Unidades (SP)", {})
+    assert res_models["should_show_table"] is True
+    assert "Sport" in res_models["spoken_answer"]
+
 
 

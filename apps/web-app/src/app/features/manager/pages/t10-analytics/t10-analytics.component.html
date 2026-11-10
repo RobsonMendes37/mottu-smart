@@ -1199,7 +1199,7 @@
                     }
 
                     <!-- Tabela de Dados Sob Demanda (Enterprise Data Table) -->
-                    @if (msg.columns && msg.columns.length > 0 && msg.rows && msg.rows.length > 0) {
+                    @if (msg.shouldShowTable !== false && msg.columns && msg.columns.length > 0 && msg.rows && msg.rows.length > 0) {
                       <div class="mt-2 overflow-x-auto border border-[#E2E8F0] rounded-lg bg-white">
                         <table class="w-full text-left text-[10px]">
                           <thead class="bg-[#F1F5F9] text-[#475569] font-bold border-b border-[#E2E8F0]">
@@ -1226,7 +1226,7 @@
                       <span class="text-[9px] text-[#94A3B8] font-mono">{{ msg.time }}</span>
                       <button
                         type="button"
-                        (click)="speakingMessageId() === msg.id ? stopSpeech() : speakText(msg.text, msg.id)"
+                        (click)="speakingMessageId() === msg.id ? stopSpeech() : speakText(msg.spokenText || msg.text, msg.id)"
                         class="px-2 py-0.5 rounded-md text-[10px] font-semibold transition-colors flex items-center gap-1 cursor-pointer"
                         [class.bg-[#E6F4EE]]="speakingMessageId() !== msg.id"
                         [class.text-[#05944F]]="speakingMessageId() !== msg.id"

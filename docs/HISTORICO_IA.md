@@ -1661,6 +1661,28 @@
   - Angular Production Build: **Concluído com sucesso (397 kB inicial, zero erros)**.
 
 
+### [2026-11-10 16:38] — Arquitetura Enterprise Dual-Channel: Voz Ultra-Curta (SpokenAnswer) e Structured Outputs com Decisão Dinâmica de Tabela
+- **Agente / Modelo:** `@backend-specialist` + `@frontend-specialist` + `@orchestrator`
+- **Requisitos Atendidos:**
+  - **Padrão Dual-Channel Response (`display_answer` vs `spoken_answer`):**
+    - Implementada a separação enterprise entre o canal visual e o canal auditivo.
+    - O texto visual (`directAnswer`) mantém a precisão técnica e detalhamento para leitura em tela.
+    - O texto falado (`spokenAnswer`) é sintetizado para fala ultra-curta, natural e executiva (máximo de 12 a 15 palavras, ~2 a 3 segundos de áudio), eliminando recitações longas de porcentagens ou números que sobrecarregavam o motor neural.
+    - O frontend Angular passa a enviar `spokenText` diretamente ao motor TTS (`speakText`), sincronizado com a animação de digitação visual.
+  - **Structured Outputs no Gemini LLM com JSON Schema Estrito (`gemini_adapter.py`):**
+    - O adaptador do Gemini agora gera conteúdo estruturado via `application/json`, preenchendo `direct_answer`, `spoken_answer` e `should_show_table`.
+    - O modelo avalia inteligentemente a intenção da pergunta e decide se é necessário desenhar tabelas analíticas (`should_show_table: true/false`).
+  - **Decisão Dinâmica de Tabela & Generative UI (`data_explorer_service.py` e `internal_router.py`):**
+    - Se a intenção for casual, cumprimento, ou não exigir dados tabulares, `should_show_table` é `false` e as listas de `columns` e `rows` são suprimidas, evitando poluição visual.
+    - Atualizados os contratos DTO no Python (`DataExplorerQueryResponseDTO`), Java (`IntelligenceServiceClient`, `ManagerAnalyticsService`, `ManagerAnalyticsController`) e Angular (`OpsDataExplorerResponseDto`).
+- **Validação de Testes e Qualidade:**
+  - Python Pytest: **208/208 testes aprovados (180 unitários com 100.00% de cobertura de domínio)**.
+  - Java Maven: **7/7 testes de ManagerAnalyticsService aprovados (BUILD SUCCESS)**.
+  - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Angular Production Build: **Concluído com sucesso (zero erros, 397 kB inicial)**.
+
+
+
 ### [2026-11-10 16:15] — Otimização de Concisão da Monalisa: Respostas Diretas, Supressão de Tabelas Redundantes e Eliminação de Falso Positivo
 - **Agente / Modelo:** `@backend-specialist` + `@frontend-specialist` + `@orchestrator`
 - **Requisitos Atendidos:**
@@ -1680,6 +1702,28 @@
   - Java Maven: **7/7 testes de ManagerAnalyticsService aprovados (BUILD SUCCESS)**.
   - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
   - Angular Production Build: **Concluído com sucesso (397 kB inicial, zero erros)**.
+
+
+### [2026-11-10 16:38] — Arquitetura Enterprise Dual-Channel: Voz Ultra-Curta (SpokenAnswer) e Structured Outputs com Decisão Dinâmica de Tabela
+- **Agente / Modelo:** `@backend-specialist` + `@frontend-specialist` + `@orchestrator`
+- **Requisitos Atendidos:**
+  - **Padrão Dual-Channel Response (`display_answer` vs `spoken_answer`):**
+    - Implementada a separação enterprise entre o canal visual e o canal auditivo.
+    - O texto visual (`directAnswer`) mantém a precisão técnica e detalhamento para leitura em tela.
+    - O texto falado (`spokenAnswer`) é sintetizado para fala ultra-curta, natural e executiva (máximo de 12 a 15 palavras, ~2 a 3 segundos de áudio), eliminando recitações longas de porcentagens ou números que sobrecarregavam o motor neural.
+    - O frontend Angular passa a enviar `spokenText` diretamente ao motor TTS (`speakText`), sincronizado com a animação de digitação visual.
+  - **Structured Outputs no Gemini LLM com JSON Schema Estrito (`gemini_adapter.py`):**
+    - O adaptador do Gemini agora gera conteúdo estruturado via `application/json`, preenchendo `direct_answer`, `spoken_answer` e `should_show_table`.
+    - O modelo avalia inteligentemente a intenção da pergunta e decide se é necessário desenhar tabelas analíticas (`should_show_table: true/false`).
+  - **Decisão Dinâmica de Tabela & Generative UI (`data_explorer_service.py` e `internal_router.py`):**
+    - Se a intenção for casual, cumprimento, ou não exigir dados tabulares, `should_show_table` é `false` e as listas de `columns` e `rows` são suprimidas, evitando poluição visual.
+    - Atualizados os contratos DTO no Python (`DataExplorerQueryResponseDTO`), Java (`IntelligenceServiceClient`, `ManagerAnalyticsService`, `ManagerAnalyticsController`) e Angular (`OpsDataExplorerResponseDto`).
+- **Validação de Testes e Qualidade:**
+  - Python Pytest: **208/208 testes aprovados (180 unitários com 100.00% de cobertura de domínio)**.
+  - Java Maven: **7/7 testes de ManagerAnalyticsService aprovados (BUILD SUCCESS)**.
+  - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Angular Production Build: **Concluído com sucesso (zero erros, 397 kB inicial)**.
+
 
 
 

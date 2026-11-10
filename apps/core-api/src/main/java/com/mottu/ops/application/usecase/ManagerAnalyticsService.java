@@ -471,6 +471,8 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
             fallback.put("generatedAt", Instant.now().toString());
             fallback.put("modelUsed", "monalisa-ops-agent");
             fallback.put("directAnswer", "Operação estável em " + label + " com 78,5% de deflexão autônoma e 16 motos em locação ativa.");
+            fallback.put("spokenAnswer", "Operação estável com setenta e oito por cento de deflexão e dezesseis motos locadas.");
+            fallback.put("shouldShowTable", true);
             fallback.put("keyMetricLabel", "Eficiência Global");
             fallback.put("keyMetricValue", "78,5% Automatizado");
             fallback.put("keyMetricTrend", "28,5h economizadas para a oficina");

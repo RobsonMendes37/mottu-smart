@@ -1438,3 +1438,13 @@
   - Teste automatizado de ponta a ponta via `https://mottu-smart.duckdns.org`: upload binário retornou **HTTP 200 OK** e vistoria criada com status **202 QUEUED_AI**.
   - Teste idêntico validado em `https://161.153.2.148.sslip.io`: **HTTP 200 OK**.
   - Testes do Angular: **243/243 aprovados**.
+
+
+### [2026-11-09 23:01] — Eliminação do Downtime durante Deploy (Correção de 502/504 Bad Gateway / Gateway Timeout)
+- **Agente / Modelo:** `@devops-engineer`
+- **Causa Raiz do Erro 504:**
+  - O script `.github/workflows/cd.yml` executava `docker compose down` antes de iniciar o `docker compose build`. Como a compilação do container web levava ~1.5 minuto na VM, todo o tráfego ficava fora do ar durante a compilação, gerando erro **502 Bad Gateway** e **504 Gateway Timeout** para os usuários conectados naquele instante.
+- **Solução Implementada:**
+  - Invertida a ordem de deploy no `cd.yml`: agora o `docker compose build` é executado com todos os serviços **ONLINE**, e a troca para as novas imagens ocorre de forma quase instantânea via `docker compose up -d` (rolling update sem downtime).
+- **Validação:**
+  - Testes de endpoints ao vivo confirmam resposta instantânea (`HTTP/2 200 OK`).

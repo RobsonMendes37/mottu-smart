@@ -102,14 +102,13 @@ jobs:
             rm -f infra/.env
             cp -f .env infra/.env
 
-            echo "🚀 Liberando memória e parando containers..."
-            docker compose -f infra/docker-compose.prod.yml down --remove-orphans || true
-            docker system prune -f || true
-            echo "🚀 Fazendo build dos containers via Docker Compose..."
+            echo "🚀 Fazendo build dos containers via Docker Compose (serviços ativos sem downtime)..."
             docker compose -f infra/docker-compose.prod.yml build
-            echo "🚀 Subindo stack com imagens atualizadas..."
+
+            echo "🚀 Aplicando atualização dos containers com novas imagens..."
             docker compose -f infra/docker-compose.prod.yml up -d --remove-orphans
             docker compose -f infra/docker-compose.prod.yml run --rm minio-create-buckets || true
+            docker system prune -f || true
 
             echo "🚀 Aguardando Core API inicializar e ficar pronta..."
             for i in $(seq 1 30); do

@@ -500,13 +500,13 @@ export class T10AnalyticsComponent implements OnInit {
   private currentAudioPlayer: HTMLAudioElement | null = null;
 
   readonly operationalSkills = [
-    { id: 'SKILL_ESTOQUE', label: 'Estoque Crítico', icon: '📦' },
-    { id: 'SKILL_FROTA', label: 'Status da Frota', icon: '🏍️' },
-    { id: 'SKILL_OFICINA', label: 'Baias da Oficina', icon: '🔧' },
-    { id: 'SKILL_VISTORIAS', label: 'Vistorias & Junta', icon: '🛡️' },
-    { id: 'SKILL_FINANCEIRO', label: 'Financeiro & Sinistros', icon: '💰' },
-    { id: 'SKILL_APROVACOES', label: 'Aprovações', icon: '👥' },
-    { id: 'SKILL_BUSCA_PLACA', label: 'Buscar Placa / OS', icon: '🔍' },
+    { id: 'SKILL_ESTOQUE', label: 'Estoque Crítico' },
+    { id: 'SKILL_FROTA', label: 'Status da Frota' },
+    { id: 'SKILL_OFICINA', label: 'Baias da Oficina' },
+    { id: 'SKILL_VISTORIAS', label: 'Vistorias & Deflexão' },
+    { id: 'SKILL_FINANCEIRO', label: 'Financeiro & Avarias' },
+    { id: 'SKILL_APROVACOES', label: 'Aprovações Pendentes' },
+    { id: 'SKILL_BUSCA_PLACA', label: 'Consultar Placa / OS' },
   ];
 
   readonly copilotMessages = signal<Array<{
@@ -759,15 +759,20 @@ export class T10AnalyticsComponent implements OnInit {
     const ptVoices = this.availableVoices.filter((v: any) => v.lang && v.lang.toLowerCase().startsWith('pt'));
     if (ptVoices.length === 0) return null;
 
-    // Priorizar voz feminina pt-BR para Monalisa
+    // 1. PRIORIDADE MÁXIMA: Voz Oficial do Google (Google português do Brasil)
+    const googleVoice = ptVoices.find((v: any) =>
+      v.name.toLowerCase().includes('google') && (v.lang.includes('BR') || v.lang.includes('pt'))
+    );
+    if (googleVoice) return googleVoice;
+
+    // 2. Voz feminina pt-BR natural para Monalisa
     const femaleVoice = ptVoices.find((v: any) =>
       v.name.includes('Francisca') ||
       v.name.includes('Maria') ||
       v.name.includes('Luciana') ||
       v.name.includes('Yara') ||
       v.name.includes('Heloisa') ||
-      v.name.includes('Leticia') ||
-      (v.name.toLowerCase().includes('google') && v.name.includes('Brasil'))
+      v.name.includes('Leticia')
     );
     if (femaleVoice) return femaleVoice;
 
@@ -790,6 +795,16 @@ export class T10AnalyticsComponent implements OnInit {
 
     const spokenText = this.cleanTextForSpeech(text);
     if (!spokenText) return;
+
+    // Prioridade Google: Se o navegador (ex.: Chrome no Android/Desktop/Mac) possuir a voz oficial do Google,
+    // utiliza-a diretamente com 0ms de latência e timbre autêntico do Google.
+    const googleVoice = this.getBestPtVoice();
+    const hasGoogleNativeVoice = googleVoice && googleVoice.name.toLowerCase().includes('google');
+
+    if (hasGoogleNativeVoice) {
+      this.speakWithWebSpeech(spokenText, msgId);
+      return;
+    }
 
     // 1. Tentar áudio neural gerado no servidor (Francisca Neural pt-BR)
     if (this.managerService?.generateSpeechAudio) {

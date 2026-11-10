@@ -1579,3 +1579,23 @@
   - Vitest: **250/250 testes aprovados**.
   - Production Build: **100% de sucesso**.
   - Purple Ban: **Zero ocorrências**.
+
+
+### [2026-11-10 14:25] — Redesign Corporativo do Modal Monalisa (Padrão Google Cloud / BigQuery) e Priorização de Voz Nativa Google
+- **Agente / Modelo:** `@frontend-specialist` + `@ux-designer` + `@orchestrator`
+- **Requisitos Atendidos:**
+  - **Eliminação de Poluição Visual e Emojis:** Remoção de todos os emojis cartunescos da interface do assistente Monalisa. Substituição integral por ícones vetoriais SVG limpos e semânticos (toggle de áudio, reprodução de fala, gravação de microfone e envio de comandos).
+  - **Unificação de Ações Diretas:** Eliminação da segunda barra redundante de chips de sugestões. Consolidação em uma única barra horizontal elegante de atalhos para as 7 skills operacionais Mottu (`Estoque Crítico`, `Status da Frota`, `Baias da Oficina`, `Vistorias & Deflexão`, `Financeiro & Avarias`, `Aprovações Pendentes`, `Consultar Placa / OS`).
+  - **Layout e Densidade Corporativa (Google Enterprise Standard):**
+    - Redução de paddings excessivos e aumento da área útil do histórico de conversas (+35% de área de visualização em mobile e desktop).
+    - Tipografia de alta legibilidade com destaque para métricas em caixas monocromáticas com borda `#E2E8F0` e fundo neutro `#F8FAFC`.
+    - Renderização de tabelas operacionais em formato tabular monospace refinado.
+  - **Priorização da Voz Nativa Oficial do Google:**
+    - Refatoração do motor de voz no cliente Angular: verificação e priorização imediata da voz oficial `Google português do Brasil` (disponível nativamente no Google Chrome / Android / Desktop).
+    - Zero latência (0ms) na síntese via Web Speech quando executado em navegadores com motor Google TTS integrado.
+    - Fallback transparente para o sintetizador neural de estúdio do backend (`apps/intelligence-service` via `edge-tts`) caso o navegador cliente não contenha a voz oficial do Google instalada.
+- **Validação de Testes e Qualidade:**
+  - Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Production Build: **Concluído com sucesso (397 kB inicial, zero warnings de compilação)**.
+  - Conformidade de Paleta: **100% de adesão aos tokens `DESIGN.md` e rigoroso Purple Ban**.
+

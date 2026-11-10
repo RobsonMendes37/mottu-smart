@@ -1412,3 +1412,14 @@
   - Angular Vitest: **243/243 testes passando (38 suítes)**.
   - Angular Production Build: **Concluído com sucesso (391 kB inicial)**.
   - Java Core API: **Compilação e testes validados com sucesso**.
+
+
+### [2026-11-09 22:28] — Ativação de HTTPS com Certificado Let's Encrypt para `mottu-smart.duckdns.org`
+- **Agente / Modelo:** `@devops-engineer` + `@systematic-debugging`
+- **Arquivos Criados/Alterados:**
+  - `infra/Caddyfile` (Adicionado `mottu-smart.duckdns.org` nos blocos de porta 80 e porta 443 TLS automático)
+  - `docs/GUIA_DE_FLUXOS_E_DEMONSTRACAO.md` (Atualizado link oficial de demonstração para `https://mottu-smart.duckdns.org`)
+- **Testes e Verificação:**
+  - Certificado SSL emitido e validado via curl: `CN=mottu-smart.duckdns.org`, emissor `Let's Encrypt CN=YE1`, protocolo `TLSv1.3`, resposta `HTTP/2 200 OK`.
+  - Auditoria completa E2E Playwright: **15/15 fluxos aprovados com 100% de sucesso**.
+- **Observações:** O domínio `mottu-smart.duckdns.org` agora possui certificado SSL oficial e cadeado verde ativo no navegador para computadores e smartphones.

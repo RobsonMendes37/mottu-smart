@@ -357,7 +357,7 @@
               </h3>
               <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#E6F4EE] text-[#046C3A] text-[11px] font-bold">
                 <span class="w-1.5 h-1.5 rounded-full bg-[#05944F]"></span>
-                {{ isOfflineFallback() ? 'Base local' : 'BigQuery sincronizado' }}
+                {{ isOfflineFallback() ? 'Base local' : 'Telemetria em tempo real' }}
               </span>
             </div>
             <p class="text-xs text-[#757575] mt-0.5">
@@ -698,7 +698,7 @@
                   Parâmetros de Cruzamento Preditivo
                 </span>
                 <span class="text-[11px] text-[#757575] font-mono">
-                  Base: BigQuery fact_inspections + Catálogo VTEX
+                  Base: Vistorias da Frota + Catálogo Loja Mottu
                 </span>
               </div>
 
@@ -829,8 +829,8 @@
             <!-- Executive Headline & Growth Metrics -->
             <div class="p-4 rounded-lg bg-[#F6F6F6] border border-[#E2E2E2] space-y-2.5">
               <div class="flex items-center gap-2">
-                <span class="px-2 py-0.5 rounded bg-[#141414] text-white font-mono text-[10px] font-bold">
-                  Diagnóstico IA (Gemini + BigQuery)
+                <span class="px-2 py-0.5 rounded bg-[#05944F] text-white font-mono text-[10px] font-bold">
+                  Plano Operacional Recomendado
                 </span>
                 <span class="text-[11px] font-mono text-[#757575]">
                   {{ aiAdvisor().scenarioLabel || 'Cenário Nominal' }}
@@ -963,11 +963,11 @@
               <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-[#05944F]"></span>
                 <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#141414]">
-                  Google Looker Studio • Painel Corporativo BigQuery
+                  Painel Gerencial e Indicadores de Frota
                 </h4>
               </div>
               <p class="text-xs text-[#545454] mt-0.5">
-                Relatório executivo integrado para diretoria e conselho operacional.
+                Visão executiva de custos, tempo de oficina e eficiência das unidades.
               </p>
             </div>
 
@@ -978,7 +978,7 @@
                 rel="noopener noreferrer"
                 class="px-4 h-9 rounded-md bg-[#141414] hover:bg-[#05944F] text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors shadow-xs"
               >
-                <span>Abrir Looker Studio Direto</span>
+                <span>Abrir Relatório Completo</span>
                 <span>↗</span>
               </a>
               <button
@@ -1007,12 +1007,12 @@
                     📊
                   </div>
                   <div>
-                    <h5 class="text-sm font-bold text-[#141414]">Relatório Executivo Looker Studio (Conector BigQuery)</h5>
-                    <p class="text-xs text-[#757575]">Conexão direta com dataset `mottu_ops_analytics.fact_inspections`</p>
+                    <h5 class="text-sm font-bold text-[#141414]">Relatório Executivo da Operação</h5>
+                    <p class="text-xs text-[#757575]">Visão consolidada de tempos de atendimento, custos e produtividade</p>
                   </div>
                 </div>
                 <span class="px-3 py-1 rounded-full bg-[#E6F4EE] text-[#046C3A] text-xs font-bold font-mono">
-                  Sincronizado via NDJSON
+                  Atualizado em tempo real
                 </span>
               </div>
 
@@ -1029,9 +1029,9 @@
                   <span class="text-[11px] font-semibold text-[#05944F]">Tabela oficial VTEX Loja Mottu</span>
                 </div>
                 <div class="p-4 rounded-lg bg-[#F6F6F6] border border-[#E2E2E2]">
-                  <span class="text-[11px] font-bold text-[#757575] uppercase">Acurácia Global do Comitê IA</span>
+                  <span class="text-[11px] font-bold text-[#757575] uppercase">Acurácia das Vistorias Automatizadas</span>
                   <p class="text-2xl font-extrabold font-mono text-[#046C3A] mt-1">94,8%</p>
-                  <span class="text-[11px] font-semibold text-[#046C3A]">Validação de 3 peritos técnicos</span>
+                  <span class="text-[11px] font-semibold text-[#046C3A]">Validação técnica em pátio</span>
                 </div>
               </div>
 
@@ -1056,41 +1056,64 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- FLOATING AI VOICE COPILOT (Google-Grade Enterprise Voice Assistant)       -->
+    <!-- ALEXANDRE • ASSISTENTE OPERACIONAL (Voz pt-BR, Microfone e Gestão)        -->
     <!-- ========================================================================= -->
     <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       <!-- Chat Drawer Window -->
       @if (isCopilotOpen()) {
-        <div class="mb-3 w-[380px] max-w-[calc(100vw-2rem)] bg-white border border-[#E2E2E2] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-200">
-          <!-- Copilot Header -->
+        <div class="mb-3 w-[390px] max-w-[calc(100vw-2rem)] bg-white border border-[#E2E2E2] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-200">
+          <!-- Alexandre Header -->
           <div class="bg-[#141414] text-white p-4 flex items-center justify-between border-b border-[#262626]">
             <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-full bg-[#05944F] flex items-center justify-center font-bold text-sm text-white shadow-xs">
-                ⚡
+              <div class="w-9 h-9 rounded-full bg-[#05944F] flex items-center justify-center font-bold text-base text-white shadow-xs">
+                🤖
               </div>
               <div>
                 <div class="flex items-center gap-1.5">
-                  <h4 class="text-xs font-bold text-white">Mottu AI Copilot</h4>
+                  <h4 class="text-xs font-bold text-white">Alexandre</h4>
                   <span class="px-1.5 py-0.2 rounded bg-[#05944F] text-[9px] font-extrabold uppercase tracking-wide">
-                    Voz pt-BR
+                    Online
                   </span>
                 </div>
-                <p class="text-[10px] text-[#A3A3A3]">Gemini 3.5 + BigQuery Analytics</p>
+                <p class="text-[10px] text-[#A3A3A3]">Assistente de Operações Mottu</p>
               </div>
             </div>
 
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-2">
+              <!-- Chave de Resposta por Voz (Auto Voice Toggle) -->
+              <button
+                type="button"
+                (click)="toggleAutoVoice()"
+                [title]="autoVoiceEnabled() ? 'Voz ativada (clique para silenciar)' : 'Voz silenciada (clique para ativar fala)'"
+                class="px-2.5 h-7 rounded-md text-[11px] font-bold flex items-center gap-1.5 transition-colors border"
+                [class.bg-[#05944F]]="autoVoiceEnabled()"
+                [class.border-[#05944F]]="autoVoiceEnabled()"
+                [class.text-white]="autoVoiceEnabled()"
+                [class.bg-[#262626]]="!autoVoiceEnabled()"
+                [class.border-[#404040]]="!autoVoiceEnabled()"
+                [class.text-[#A3A3A3]]="!autoVoiceEnabled()"
+              >
+                @if (autoVoiceEnabled()) {
+                  <span>🔊</span>
+                  <span class="text-[10px]">Voz On</span>
+                } @else {
+                  <span>🔇</span>
+                  <span class="text-[10px]">Voz Off</span>
+                }
+              </button>
+
               @if (isSpeaking()) {
                 <button
                   type="button"
                   (click)="stopSpeech()"
-                  title="Parar áudio da IA"
+                  title="Parar áudio"
                   class="px-2 h-7 rounded bg-[#DC2626] hover:bg-[#B91C1C] text-white text-[11px] font-bold flex items-center gap-1 transition-colors"
                 >
                   <span class="animate-pulse">⏹</span>
                   <span>Parar</span>
                 </button>
               }
+
               <button
                 type="button"
                 (click)="toggleCopilot()"
@@ -1114,7 +1137,7 @@
               } @else {
                 <div class="flex items-start gap-2">
                   <div class="w-6 h-6 rounded-full bg-[#E6F4EE] text-[#05944F] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
-                    IA
+                    🤖
                   </div>
                   <div class="bg-white border border-[#E2E2E2] px-3.5 py-2.5 rounded-2xl rounded-tl-xs max-w-[85%] shadow-xs space-y-2">
                     <p class="text-xs text-[#141414] leading-relaxed">{{ msg.text }}</p>
@@ -1153,7 +1176,7 @@
             @if (copilotLoading()) {
               <div class="flex items-center gap-2 text-xs text-[#757575] py-2">
                 <div class="w-5 h-5 rounded-full border-2 border-[#05944F] border-t-transparent animate-spin"></div>
-                <span>Consultando BigQuery e gerando laudo...</span>
+                <span>Alexandre está analisando os dados...</span>
               </div>
             }
           </div>
@@ -1172,43 +1195,84 @@
             }
           </div>
 
-          <!-- Input Footer -->
-          <form (ngSubmit)="sendCopilotMessage()" class="p-3 bg-white border-t border-[#EEEEEE] flex items-center gap-2">
-            <input
-              type="text"
-              name="copilotMsg"
-              [ngModel]="copilotInput()"
-              (ngModelChange)="copilotInput.set($event)"
-              placeholder="Pergunte sobre custos, avarias, frotas..."
-              class="flex-1 h-10 px-3 rounded-lg bg-[#F6F6F6] border border-[#E2E2E2] focus:bg-white focus:border-[#141414] text-xs text-[#141414] placeholder-[#757575] focus:outline-none"
-            />
-            <button
-              type="submit"
-              [disabled]="copilotLoading() || !copilotInput().trim()"
-              class="h-10 px-3.5 rounded-lg bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white text-xs font-bold transition-colors shrink-0 flex items-center gap-1"
-            >
-              <span>Enviar</span>
-              <span>→</span>
-            </button>
-          </form>
+          <!-- Input Footer with Voice Input / Mic -->
+          <div class="p-3 bg-white border-t border-[#EEEEEE] space-y-2">
+            @if (isListening()) {
+              <div class="flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#FEF2F2] border border-[#FECACA] text-xs text-[#DC2626]">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#DC2626] animate-ping"></span>
+                  <span class="font-bold">Ouvindo você... Fale sua pergunta</span>
+                </div>
+                <button
+                  type="button"
+                  (click)="toggleSpeechRecognition()"
+                  class="text-[10px] font-bold underline text-[#DC2626] hover:text-[#991B1B]"
+                >
+                  Cancelar
+                </button>
+              </div>
+            }
+
+            <form (ngSubmit)="sendCopilotMessage()" class="flex items-center gap-2">
+              <div class="relative flex-1">
+                <input
+                  type="text"
+                  name="copilotMsg"
+                  [ngModel]="copilotInput()"
+                  (ngModelChange)="copilotInput.set($event)"
+                  placeholder="Pergunte ou clique no microfone..."
+                  class="w-full h-10 pl-3 pr-10 rounded-lg bg-[#F6F6F6] border border-[#E2E2E2] focus:bg-white focus:border-[#141414] text-xs text-[#141414] placeholder-[#757575] focus:outline-none"
+                />
+
+                <!-- Mic Button inside input -->
+                <button
+                  type="button"
+                  (click)="toggleSpeechRecognition()"
+                  [title]="isListening() ? 'Parar gravação' : 'Falar por voz com o Alexandre'"
+                  class="absolute right-2 top-1.5 w-7 h-7 rounded-md flex items-center justify-center text-sm transition-all"
+                  [class.bg-[#DC2626]]="isListening()"
+                  [class.text-white]="isListening()"
+                  [class.hover:bg-[#E2E2E2]]="!isListening()"
+                  [class.text-[#545454]]="!isListening()"
+                >
+                  @if (isListening()) {
+                    <span class="animate-pulse">⏹</span>
+                  } @else {
+                    <span>🎤</span>
+                  }
+                </button>
+              </div>
+
+              <button
+                type="submit"
+                [disabled]="copilotLoading() || !copilotInput().trim()"
+                class="h-10 px-3.5 rounded-lg bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white text-xs font-bold transition-colors shrink-0 flex items-center gap-1"
+              >
+                <span>Enviar</span>
+                <span>→</span>
+              </button>
+            </form>
+          </div>
         </div>
       }
 
-      <!-- Main Floating Action Button (FAB) -->
+      <!-- Main Floating Action Button (FAB) - Persona Alexandre -->
       <button
         type="button"
         (click)="toggleCopilot()"
-        title="Abrir Mottu AI Voice Copilot"
-        class="h-14 px-4 rounded-full bg-[#05944F] hover:bg-[#047840] text-white font-bold text-xs shadow-2xl flex items-center gap-2.5 border-2 border-white transition-all transform hover:scale-105 active:scale-95"
+        title="Falar com Alexandre (Assistente Operacional Mottu)"
+        class="h-14 px-5 rounded-full bg-[#05944F] hover:bg-[#047840] text-white font-bold text-xs shadow-2xl flex items-center gap-2.5 border-2 border-white transition-all transform hover:scale-105 active:scale-95"
       >
-        <span class="text-lg">🤖</span>
-        <span class="font-bold tracking-wide">Mottu IA Copilot</span>
+        <span class="text-xl">🤖</span>
+        <span class="font-extrabold tracking-wide">Alexandre</span>
         @if (isSpeaking()) {
           <span class="flex items-center gap-0.5">
             <span class="w-1 h-3 bg-white animate-bounce rounded-full"></span>
             <span class="w-1 h-4 bg-white animate-bounce rounded-full delay-75"></span>
             <span class="w-1 h-2 bg-white animate-bounce rounded-full delay-150"></span>
           </span>
+        } @else if (isListening()) {
+          <span class="w-2.5 h-2.5 rounded-full bg-[#EF4444] animate-ping"></span>
         }
       </button>
     </div>

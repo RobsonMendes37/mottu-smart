@@ -449,6 +449,8 @@ export class T10AnalyticsComponent implements OnInit {
     this.loadSummary();
     this.loadDetailedAnalytics();
     this.loadAiAdvisor();
+    this.initVoices();
+    this.initSpeechRecognition();
   }
 
   loadSummary(): void {
@@ -480,13 +482,20 @@ export class T10AnalyticsComponent implements OnInit {
   }
 
   // =========================================================================
-  // FLOATING AI VOICE COPILOT
+  // ALEXANDRE • ASSISTENTE OPERACIONAL DE PÁTIO (VOICE & AI COPILOT)
   // =========================================================================
   readonly isCopilotOpen = signal<boolean>(false);
   readonly copilotInput = signal<string>('');
   readonly copilotLoading = signal<boolean>(false);
   readonly isSpeaking = signal<boolean>(false);
   readonly speakingMessageId = signal<number | null>(null);
+  readonly autoVoiceEnabled = signal<boolean>(true);
+
+  // Reconhecimento de Voz (Microfone do Usuário)
+  readonly isListening = signal<boolean>(false);
+  readonly speechRecognitionSupported = signal<boolean>(false);
+  private recognition: any = null;
+  private availableVoices: any[] = [];
 
   readonly copilotMessages = signal<Array<{
     id: number;
@@ -499,7 +508,7 @@ export class T10AnalyticsComponent implements OnInit {
     {
       id: 1,
       sender: 'assistant',
-      text: 'Olá! Sou o Mottu AI Copilot. Posso responder qualquer dúvida operacional sobre a frota, consumo de peças, previsão de estresse de estoque ou indicadores da unidade.',
+      text: 'Olá! Sou o Alexandre, assistente de operações da Mottu. Pode me perguntar sobre peças em falta, motos com avarias ou indicadores de hoje — ou aperte o microfone para falar comigo.',
       time: 'Agora',
     },
   ]);
@@ -511,11 +520,110 @@ export class T10AnalyticsComponent implements OnInit {
     'Qual proporção de vistorias resolvida sem fila?',
   ];
 
+  initVoices(): void {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    const updateVoices = () => {
+      try {
+        const voices = window.speechSynthesis.getVoices();
+        if (voices && voices.length > 0) {
+          this.availableVoices = voices;
+        }
+      } catch {
+        // Safe SSR / JSDOM guard
+      }
+    };
+    updateVoices();
+    try {
+      window.speechSynthesis.onvoiceschanged = updateVoices;
+    } catch {
+      // Ignore
+    }
+  }
+
+  initSpeechRecognition(): void {
+    if (typeof window === 'undefined') return;
+    try {
+      const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRec) {
+        this.speechRecognitionSupported.set(true);
+        this.recognition = new SpeechRec();
+        this.recognition.lang = 'pt-BR';
+        this.recognition.continuous = false;
+        this.recognition.interimResults = true;
+
+        this.recognition.onstart = () => {
+          this.isListening.set(true);
+        };
+
+        this.recognition.onresult = (event: any) => {
+          let transcript = '';
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            transcript += event.results[i][0].transcript;
+          }
+          if (transcript) {
+            this.copilotInput.set(transcript);
+          }
+        };
+
+        this.recognition.onerror = () => {
+          this.isListening.set(false);
+        };
+
+        this.recognition.onend = () => {
+          this.isListening.set(false);
+          const spoken = this.copilotInput().trim();
+          if (spoken) {
+            this.sendCopilotMessage();
+          }
+        };
+      }
+    } catch {
+      // Safe fallback
+    }
+  }
+
+  toggleSpeechRecognition(): void {
+    if (typeof window === 'undefined') return;
+    if (!this.speechRecognitionSupported() || !this.recognition) {
+      this.copilotInput.set('Como está a frota e vistorias hoje?');
+      return;
+    }
+
+    if (this.isListening()) {
+      try {
+        this.recognition.stop();
+      } catch {}
+      this.isListening.set(false);
+    } else {
+      this.stopSpeech();
+      this.copilotInput.set('');
+      try {
+        this.recognition.start();
+      } catch {
+        this.isListening.set(false);
+      }
+    }
+  }
+
+  toggleAutoVoice(): void {
+    const next = !this.autoVoiceEnabled();
+    this.autoVoiceEnabled.set(next);
+    if (!next) {
+      this.stopSpeech();
+    }
+  }
+
   toggleCopilot(): void {
     const nextState = !this.isCopilotOpen();
     this.isCopilotOpen.set(nextState);
     if (!nextState) {
       this.stopSpeech();
+      if (this.isListening() && this.recognition) {
+        try {
+          this.recognition.stop();
+        } catch {}
+        this.isListening.set(false);
+      }
     }
   }
 
@@ -539,7 +647,7 @@ export class T10AnalyticsComponent implements OnInit {
         next: (res) => {
           this.copilotLoading.set(false);
           const assistantMsgId = Date.now() + 1;
-          const answer = res.directAnswer || 'Análise operacional concluída com dados consolidados do BigQuery e catálogo.';
+          const answer = res.directAnswer || 'Análise operacional concluída com sucesso com os dados de pátio e estoque.';
 
           this.copilotMessages.update((msgs) => [
             ...msgs,
@@ -553,13 +661,15 @@ export class T10AnalyticsComponent implements OnInit {
             },
           ]);
 
-          // Falar automaticamente o laudo executivo
-          this.speakText(answer, assistantMsgId);
+          // Falar automaticamente se a chave de voz estiver ativada
+          if (this.autoVoiceEnabled()) {
+            this.speakText(answer, assistantMsgId);
+          }
         },
         error: () => {
           this.copilotLoading.set(false);
           const assistantMsgId = Date.now() + 1;
-          const fallbackAnswer = `Com base nos dados consolidados da unidade ${this.selectedYardFilter()}: temos ${this.activeBiSnapshot().totalInspections} vistorias analisadas, com índice de deflexão de ${this.activeBiSnapshot().aiPrecisionPct} e demanda projetada de ${this.aiAdvisor().projectedNext7DaysInspections} unidades para os próximos ${this.selectedHorizon()} dias.`;
+          const fallbackAnswer = `Com base nos dados consolidados da unidade ${this.selectedYardFilter()}: temos ${this.activeBiSnapshot().totalInspections} vistorias analisadas, com ${this.activeBiSnapshot().aiPrecisionPct} de resoluções diretas e projeção de ${this.aiAdvisor().projectedNext7DaysInspections} atendimentos para os próximos ${this.selectedHorizon()} dias.`;
 
           this.copilotMessages.update((msgs) => [
             ...msgs,
@@ -571,7 +681,9 @@ export class T10AnalyticsComponent implements OnInit {
             },
           ]);
 
-          this.speakText(fallbackAnswer, assistantMsgId);
+          if (this.autoVoiceEnabled()) {
+            this.speakText(fallbackAnswer, assistantMsgId);
+          }
         },
       });
     } else {
@@ -579,21 +691,84 @@ export class T10AnalyticsComponent implements OnInit {
     }
   }
 
+  cleanTextForSpeech(text: string): string {
+    if (!text) return '';
+    return text
+      .replace(/R\$\s*(\d+)[,.](\d{2})/g, '$1 reais e $2 centavos')
+      .replace(/R\$\s*(\d+)/g, '$1 reais')
+      .replace(/(\d+)[,.](\d+)%/g, '$1 vírgula $2 por cento')
+      .replace(/(\d+)%/g, '$1 por cento')
+      .replace(/\bkm\/h\b/gi, 'quilômetros por hora')
+      .replace(/\bkm\b/gi, 'quilômetros')
+      .replace(/\bun\.\b/gi, 'unidades')
+      .replace(/\bSP-04\b/gi, 'unidade Butantã')
+      .replace(/\bSP-01\b/gi, 'unidade Guarulhos')
+      .replace(/\bSP-03\b/gi, 'unidade Interlagos')
+      .replace(/\bSP-02\b/gi, 'unidade Lapa')
+      .replace(/\bTMA\b/g, 'tempo médio de atendimento')
+      .replace(/\bVTEX\b/gi, 'Loja Mottu')
+      .replace(/\bSKU\b/gi, 'código de peça')
+      .replace(/[*#_`~]/g, '')
+      .replace(/https?:\/\/\S+/g, '')
+      .replace(/[\(\)\[\]]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  getBestPtVoice(): any {
+    if (!this.availableVoices || this.availableVoices.length === 0) {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        try {
+          this.availableVoices = window.speechSynthesis.getVoices() || [];
+        } catch {
+          return null;
+        }
+      }
+    }
+    const ptVoices = this.availableVoices.filter((v: any) => v.lang && v.lang.toLowerCase().startsWith('pt'));
+    if (ptVoices.length === 0) return null;
+
+    // 1. Google pt-BR Neural (Natural Chrome voice)
+    const googleVoice = ptVoices.find((v: any) =>
+      v.name.toLowerCase().includes('google') && (v.lang === 'pt-BR' || v.name.toLowerCase().includes('brasil'))
+    );
+    if (googleVoice) return googleVoice;
+
+    // 2. Microsoft Natural/Neural (Edge / Windows high quality)
+    const msVoice = ptVoices.find((v: any) =>
+      (v.name.includes('Natural') || v.name.includes('Neural') || v.name.includes('Online')) && v.lang.includes('BR')
+    );
+    if (msVoice) return msVoice;
+
+    // 3. Apple Luciana / Felipe (Mac / iOS natural)
+    const appleVoice = ptVoices.find((v: any) =>
+      v.name.includes('Luciana') || v.name.includes('Felipe') || v.name.includes('Maria')
+    );
+    if (appleVoice) return appleVoice;
+
+    // 4. Any pt-BR voice
+    const ptBrVoice = ptVoices.find((v: any) => v.lang === 'pt-BR');
+    if (ptBrVoice) return ptBrVoice;
+
+    return ptVoices[0];
+  }
+
   speakText(text: string, msgId: number): void {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    const spokenText = this.cleanTextForSpeech(text);
+    if (!spokenText) return;
+
+    const utterance = new SpeechSynthesisUtterance(spokenText);
     utterance.lang = 'pt-BR';
-    utterance.rate = 1.05;
+    utterance.rate = 1.0;
     utterance.pitch = 1.0;
 
-    // Buscar voz em português se disponível
-    const voices = window.speechSynthesis.getVoices();
-    const ptVoice = voices.find((v) => v.lang.startsWith('pt-BR') || v.lang.startsWith('pt'));
-    if (ptVoice) {
-      utterance.voice = ptVoice;
+    const bestVoice = this.getBestPtVoice();
+    if (bestVoice) {
+      utterance.voice = bestVoice;
     }
 
     this.isSpeaking.set(true);

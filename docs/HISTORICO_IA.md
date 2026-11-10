@@ -1512,3 +1512,17 @@
 - **Validação de Testes:**
   - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
   - Angular Production Build: **Compilado com 100% de sucesso**.
+
+
+### [2026-11-10 02:18] — Assistente Operacional Alexandre (Persona, Entrada por Microfone, Chave de Voz e Higienização Fonética)
+- **Agente / Modelo:** `@frontend-specialist` + `@ai-engineer`
+- **Requisitos Atendidos:**
+  - Substituição da persona genérica pelo robô operacional da empresa: **"Alexandre"** (`[🤖 Alexandre]`).
+  - Remoção de jargões técnicos do card gerencial (eliminadas referências a "BigQuery", "gemini-3.5-flash-lite", "NDJSON", "fact_inspections", substituídas por terminologia executiva de pátio e frota).
+  - Adição de chave seletora de resposta por voz no topo do chat (`[🔊 Voz On]` / `[🔇 Voz Off]`), ativa por padrão.
+  - Implementação de entrada de voz do gestor via **Web Speech Recognition (`webkitSpeechRecognition`)**: botão de microfone `🎤` com indicador sonoro e visual em tempo real (`[🔴 Ouvindo você...]`). Ao terminar de falar, a pergunta é automaticamente enviada para o Alexandre.
+  - Motor de higienização fonética (`cleanTextForSpeech`): conversão de moedas (`R$ 35,00` -> `35 reais`), percentuais (`78,5%` -> `78 vírgula 5 por cento`), siglas de unidades (`SP-04` -> `unidade Butantã`) e remoção de caracteres de formatação/markdown para fala natural.
+  - Carregamento assíncrono de vozes neurais brasileiras com prioridade para Google e Microsoft Natural (`pt-BR`).
+- **Validação de Testes:**
+  - Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Production Build: **Concluído com sucesso (394 kB inicial)**.

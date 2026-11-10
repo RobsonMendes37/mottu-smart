@@ -181,10 +181,25 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
     expect(comp.criticalAlertsCount()).toBeGreaterThanOrEqual(1);
   });
 
-  it('TC-T10-15: Floating Voice Copilot toggles, sends messages, and supports speech synthesis', () => {
+  it('TC-T10-15: Floating Voice Copilot Alexandre toggles, sends messages, cleans speech text, and toggles voice controls', () => {
     expect(comp.isCopilotOpen()).toBe(false);
+    expect(comp.autoVoiceEnabled()).toBe(true);
+    expect(comp.copilotMessages()[0].text).toContain('Alexandre');
+
     comp.toggleCopilot();
     expect(comp.isCopilotOpen()).toBe(true);
+
+    // Toggle voice switch
+    comp.toggleAutoVoice();
+    expect(comp.autoVoiceEnabled()).toBe(false);
+    comp.toggleAutoVoice();
+    expect(comp.autoVoiceEnabled()).toBe(true);
+
+    // Text speech sanitizer
+    const sanitized = comp.cleanTextForSpeech('Troca de manete R$ 35,00 com 78,5% de deflexão em SP-04.');
+    expect(sanitized).toContain('35 reais');
+    expect(sanitized).toContain('78 vírgula 5 por cento');
+    expect(sanitized).toContain('unidade Butantã');
 
     mockManagerService.askDataExplorer = vi.fn().mockReturnValue(of({
       query: 'Crescimento de demanda',
@@ -207,6 +222,7 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
     // Speech control methods run safely
     expect(() => comp.speakText('Teste de voz', 999)).not.toThrow();
     expect(() => comp.stopSpeech()).not.toThrow();
+    expect(() => comp.toggleSpeechRecognition()).not.toThrow();
     expect(comp.isSpeaking()).toBe(false);
 
     comp.toggleCopilot();

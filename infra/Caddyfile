@@ -29,12 +29,16 @@ http://161.153.2.148, http://mottu-smart.duckdns.org, http://:80 {
 
 	# MinIO S3 Object Storage Bucket (Direct bucket path for AWS SigV4 compliance)
 	handle /mottu-inspections/* {
-		reverse_proxy minio:9000
+		reverse_proxy minio:9000 {
+			header_up Host 161.153.2.148
+		}
 	}
 
 	# MinIO S3 Object Storage (Strip /storage prefix for legacy paths)
 	handle_path /storage/* {
-		reverse_proxy minio:9000
+		reverse_proxy minio:9000 {
+			header_up Host 161.153.2.148
+		}
 	}
 
 	# Angular 19 PWA SPA Fallback
@@ -72,12 +76,16 @@ mottu-smart.duckdns.org, 161.153.2.148.sslip.io, 161.153.2.148.nip.io {
 
 	# MinIO S3 Object Storage Bucket (Direct bucket path for AWS SigV4 compliance)
 	handle /mottu-inspections/* {
-		reverse_proxy minio:9000
+		reverse_proxy minio:9000 {
+			header_up Host 161.153.2.148
+		}
 	}
 
 	# MinIO S3 Object Storage (Strip /storage prefix for legacy paths)
 	handle_path /storage/* {
-		reverse_proxy minio:9000
+		reverse_proxy minio:9000 {
+			header_up Host 161.153.2.148
+		}
 	}
 
 	# Angular 19 PWA SPA Fallback
@@ -115,12 +123,16 @@ https://161.153.2.148, :443 {
 
 	# MinIO S3 Object Storage Bucket (Direct bucket path for AWS SigV4 compliance)
 	handle /mottu-inspections/* {
-		reverse_proxy minio:9000
+		reverse_proxy minio:9000 {
+			header_up Host 161.153.2.148
+		}
 	}
 
 	# MinIO S3 Object Storage (Strip /storage prefix for legacy paths)
 	handle_path /storage/* {
-		reverse_proxy minio:9000
+		reverse_proxy minio:9000 {
+			header_up Host 161.153.2.148
+		}
 	}
 
 	# Angular 19 PWA SPA Fallback

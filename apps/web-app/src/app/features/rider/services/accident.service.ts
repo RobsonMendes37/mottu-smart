@@ -44,7 +44,23 @@ export class AccidentService {
   }
 
   async uploadToStorage(uploadUrl: string, file: File | Blob, contentType: string): Promise<void> {
-    const response = await fetch(uploadUrl, {
+    let targetUrl = uploadUrl;
+    if (typeof window !== 'undefined' && window.location) {
+      try {
+        const parsedUrl = new URL(uploadUrl);
+        parsedUrl.protocol = window.location.protocol;
+        if (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          parsedUrl.host = window.location.host;
+        }
+        targetUrl = parsedUrl.toString();
+      } catch {
+        if (window.location.protocol === 'https:' && uploadUrl.startsWith('http://')) {
+          targetUrl = uploadUrl.replace('http://', 'https://');
+        }
+      }
+    }
+
+    const response = await fetch(targetUrl, {
       method: 'PUT',
       headers: {
         'Content-Type': contentType,

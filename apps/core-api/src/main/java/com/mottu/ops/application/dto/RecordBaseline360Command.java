@@ -25,3 +25,4 @@ public record RecordBaseline360Command(
         Integer initialOdometerKm
 ) {
 }
+

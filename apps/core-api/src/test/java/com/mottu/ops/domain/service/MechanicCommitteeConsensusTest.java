@@ -75,3 +75,4 @@ class MechanicCommitteeConsensusTest {
                 .hasMessageContaining("comitê");
     }
 }
+

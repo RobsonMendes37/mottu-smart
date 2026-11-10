@@ -207,15 +207,9 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
             totalEstimated = partsSum.add(laborFee);
         }
 
-        List<String> partNames = selectedParts.stream().map(CatalogPartJpaEntity::getPartName).toList();
-        String customerFeedback = feedbackPolisherPort.polishFeedback(
-                resolvedVerdict,
-                partNames,
-                totalEstimated,
-                request.mechanicNotes()
-        );
-
         boolean isPresential = Boolean.TRUE.equals(request.requestPresentialInspection());
+        String customerFeedback;
+
         if (isPresential) {
             laborFee = BigDecimal.ZERO;
             totalEstimated = BigDecimal.ZERO;
@@ -224,6 +218,14 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
             entity.setPresentialInspectionRequested(true);
             entity.setPresentialRequestReason(request.mechanicNotes() != null && !request.mechanicNotes().isBlank()
                     ? request.mechanicNotes() : "Convocação para diagnóstico presencial na oficina");
+        } else {
+            List<String> partNames = selectedParts.stream().map(CatalogPartJpaEntity::getPartName).toList();
+            customerFeedback = feedbackPolisherPort.polishFeedback(
+                    resolvedVerdict,
+                    partNames,
+                    totalEstimated,
+                    request.mechanicNotes()
+            );
         }
 
         // Replace inspection items with mechanic selected parts
@@ -261,7 +263,11 @@ public class MechanicWorkbenchService implements MechanicWorkbenchUseCase {
 
             ServiceOrderJpaEntity serviceOrder = new ServiceOrderJpaEntity();
             serviceOrder.setId(UUID.randomUUID());
-            serviceOrder.setCode(String.format("OS-2026-%04d", Math.abs(inspectionId.hashCode() % 9000) + 1000));
+            String osCode = String.format("OS-2026-%04d", Math.abs(inspectionId.hashCode() % 9000) + 1000);
+            while (serviceOrderRepository.existsByCode(osCode)) {
+                osCode = String.format("OS-2026-%04d", Math.abs(UUID.randomUUID().hashCode() % 9000) + 1000);
+            }
+            serviceOrder.setCode(osCode);
             serviceOrder.setMotorcycleId(entity.getMotorcycleId());
             serviceOrder.setInspectionId(inspectionId);
             serviceOrder.setYardId(yardId);

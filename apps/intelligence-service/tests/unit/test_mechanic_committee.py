@@ -95,3 +95,4 @@ def test_committee_flags_inconclusive_photo_requiring_presential_workshop():
     assert evaluation["canIdentifyPartsClearly"] is False
     assert evaluation["requiresPresentialInspection"] is True
     assert "avaliação presencial" in evaluation["summary"].lower() or "presencial" in evaluation["summary"].lower()
+

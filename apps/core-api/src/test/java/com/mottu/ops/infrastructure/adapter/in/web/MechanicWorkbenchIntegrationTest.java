@@ -305,6 +305,37 @@ class MechanicWorkbenchIntegrationTest {
         assertTrue(outbox.getPayloadJson().contains("\"aiMatchedMechanic\":false"));
     }
 
+    @Test
+    @DisplayName("UC-10-Presential: POST /api/v1/mechanic/inspections/{id}/resolve with requestPresentialInspection marks presential and sets zero cost")
+    @WithMockUser(username = "mecanico@mottu-ops.local", roles = "MECHANIC")
+    void shouldResolveInspectionWithPresentialConvocation() throws Exception {
+        InspectionJpaEntity ticket = createTriageTicket("t-resolve-presential", QueuePriorityReason.LOW_AI_CONFIDENCE, 2, Instant.now());
+        ticket.setAiVerdict(DamageVerdict.MAU_USO);
+        ticket.setAiConfidence(BigDecimal.valueOf(0.650));
+        inspectionRepository.save(ticket);
+
+        ResolveInspectionRequest request = new ResolveInspectionRequest(
+                DamageVerdict.DESGASTE_NATURAL,
+                List.of(),
+                "Foto com reflexo forte, necessário diagnóstico presencial.",
+                true
+        );
+
+        mockMvc.perform(post("/api/v1/mechanic/inspections/" + ticket.getId() + "/resolve")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.inspectionId").value(ticket.getId().toString()))
+                .andExpect(jsonPath("$.status").value("HUMAN_RESOLVED"))
+                .andExpect(jsonPath("$.finalVerdict").value("DESGASTE_NATURAL"))
+                .andExpect(jsonPath("$.totalEstimatedBrl").value(0.00))
+                .andExpect(jsonPath("$.customerFeedbackText").value(containsString("presencial gratuita")));
+
+        InspectionJpaEntity updated = inspectionRepository.findById(ticket.getId()).orElseThrow();
+        assertTrue(updated.isPresentialInspectionRequested());
+        assertEquals("Foto com reflexo forte, necessário diagnóstico presencial.", updated.getPresentialRequestReason());
+    }
+
     // =========================================================================
     // UC-09: Rider Single Contestation
     // =========================================================================

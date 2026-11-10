@@ -83,3 +83,4 @@ const BASE_URL = process.env.BASE_URL || 'https://mottu-smart.duckdns.org';
     if (failedCount > 0) process.exit(1);
   }
 })();
+

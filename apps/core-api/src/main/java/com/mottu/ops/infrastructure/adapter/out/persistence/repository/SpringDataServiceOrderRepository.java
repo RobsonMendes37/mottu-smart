@@ -13,6 +13,8 @@ public interface SpringDataServiceOrderRepository extends JpaRepository<ServiceO
 
     Optional<ServiceOrderJpaEntity> findByCode(String code);
 
+    boolean existsByCode(String code);
+
     boolean existsByInspectionId(UUID inspectionId);
 
     List<ServiceOrderJpaEntity> findAllByOrderByCreatedAtDesc();

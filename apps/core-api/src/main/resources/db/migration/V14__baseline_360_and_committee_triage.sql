@@ -128,3 +128,4 @@ SET committee_evaluation_json = jsonb_build_object(
         )
     )
 WHERE id = 'd2000000-0000-0000-0000-000000000003';
+

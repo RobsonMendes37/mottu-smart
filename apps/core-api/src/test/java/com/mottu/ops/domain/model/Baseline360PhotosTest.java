@@ -66,3 +66,4 @@ class Baseline360PhotosTest {
         )).isInstanceOf(IllegalArgumentException.class);
     }
 }
+

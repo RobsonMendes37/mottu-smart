@@ -6,6 +6,8 @@ import com.mottu.ops.domain.enums.QueuePriorityReason;
 import com.mottu.ops.domain.enums.ReportedOriginContext;
 import com.mottu.ops.domain.enums.SafetyRiskLevel;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -117,6 +119,7 @@ public class InspectionJpaEntity {
     @Column(name = "resolved_at")
     private Instant resolvedAt;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "committee_evaluation_json", columnDefinition = "jsonb")
     private String committeeEvaluationJson;
 

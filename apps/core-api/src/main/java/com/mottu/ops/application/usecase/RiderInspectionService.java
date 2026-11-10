@@ -385,7 +385,11 @@ public class RiderInspectionService implements RiderInspectionUseCase {
         if (!serviceOrderRepository.existsByInspectionId(inspectionId)) {
             ServiceOrderJpaEntity serviceOrder = new ServiceOrderJpaEntity();
             serviceOrder.setId(UUID.randomUUID());
-            serviceOrder.setCode(String.format("OS-2026-%04d", Math.abs(inspectionId.hashCode() % 9000) + 1000));
+            String osCode = String.format("OS-2026-%04d", Math.abs(inspectionId.hashCode() % 9000) + 1000);
+            while (serviceOrderRepository.existsByCode(osCode)) {
+                osCode = String.format("OS-2026-%04d", Math.abs(UUID.randomUUID().hashCode() % 9000) + 1000);
+            }
+            serviceOrder.setCode(osCode);
             serviceOrder.setMotorcycleId(entity.getMotorcycleId());
             serviceOrder.setInspectionId(inspectionId);
             serviceOrder.setYardId(yard.getId());

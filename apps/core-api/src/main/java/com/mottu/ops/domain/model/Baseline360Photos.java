@@ -30,3 +30,4 @@ public record Baseline360Photos(
                odometerPhotoUrl != null;
     }
 }
+

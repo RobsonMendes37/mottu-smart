@@ -1,6 +1,6 @@
 """Data transfer objects for AI Triage background jobs and results (docs/02 §6.5)."""
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class TriageJobPayloadDTO(BaseModel):

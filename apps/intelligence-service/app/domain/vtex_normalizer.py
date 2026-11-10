@@ -146,7 +146,7 @@ def is_part_compatible_with_model(part_name: str, target_model: MotorcycleModel)
 def normalize_vtex_item(raw_item: Dict[str, Any], model: MotorcycleModel) -> PartCatalogItem:
     """Normalizes raw VTEX JSON product dictionary into domain PartCatalogItem."""
     name = str(raw_item.get("productName") or raw_item.get("part_name") or "").strip()
-    
+
     sku = str(raw_item.get("sku") or raw_item.get("vtex_sku") or "").strip()
     if not sku:
         items = raw_item.get("items")

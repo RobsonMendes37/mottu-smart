@@ -6,9 +6,7 @@ from typing import Any, Dict, List, Optional
 import httpx
 import redis.asyncio as redis
 from app.application.dtos.accident_job_dto import (
-    AccidentDeduplicatedPartDTO,
     AccidentJobPayloadDTO,
-    AccidentResultPayloadDTO,
 )
 from app.core.config import settings
 from app.domain.accident_deduplicator import deduplicate_detected_parts

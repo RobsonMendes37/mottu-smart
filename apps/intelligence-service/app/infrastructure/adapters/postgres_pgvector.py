@@ -1,6 +1,6 @@
 """PostgreSQL pgvector adapter for catalog parts storage and similarity search (Law 8)."""
 import logging
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 import asyncpg
 from app.application.ports.catalog_repository_port import CatalogRepositoryPort
 from app.core.config import settings

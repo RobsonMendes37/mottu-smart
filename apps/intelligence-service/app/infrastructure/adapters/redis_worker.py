@@ -5,7 +5,7 @@ import logging
 from typing import Any, Dict, List, Optional
 import httpx
 import redis.asyncio as redis
-from app.application.dtos.triage_job_dto import MatchedPartDTO, TriageJobPayloadDTO, TriageResultPayloadDTO
+from app.application.dtos.triage_job_dto import TriageJobPayloadDTO
 from app.application.ports.queue_port import QueuePort
 from app.core.config import settings
 from app.domain.crag_evaluator import CRAG_AMBIGUITY_DELTA, CRAG_MIN_SIMILARITY_THRESHOLD

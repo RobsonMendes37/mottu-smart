@@ -1,6 +1,6 @@
 """Internal API router for Java ↔ Python communication (docs/02 §6.5, UC-11)."""
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import List
 from fastapi import APIRouter, Depends, Response
 from app.application.dtos.catalog_dto import CatalogSyncRequestDTO, CatalogSyncResponseDTO
 from app.application.dtos.feedback_dto import FeedbackPolishRequestDTO, FeedbackPolishResponseDTO
@@ -12,7 +12,6 @@ from app.application.dtos.analytics_dto import (
     StockoutAlertDTO,
     TextToSpeechRequestDTO,
 )
-from app.domain.enums import MotorcycleModel
 from app.domain.models import PartCatalogItem
 from app.domain.services.analytics_forecaster import (
     build_deterministic_ops_advice,
@@ -20,7 +19,7 @@ from app.domain.services.analytics_forecaster import (
     evaluate_stockout_risks,
 )
 from app.domain.services.data_explorer_service import answer_manager_query
-from app.domain.vtex_normalizer import extract_compatible_models, normalize_vtex_item, parse_motorcycle_model
+from app.domain.vtex_normalizer import extract_compatible_models, normalize_vtex_item
 from app.infrastructure.adapters.gemini_adapter import GeminiVisionAdapter
 from app.infrastructure.adapters.postgres_pgvector import PostgresPgVectorAdapter
 from app.infrastructure.security.auth import verify_internal_token
@@ -225,7 +224,7 @@ async def generate_monalisa_speech(request: TextToSpeechRequestDTO):
                 audio_bytes.extend(chunk["data"])
         if audio_bytes:
             return Response(content=bytes(audio_bytes), media_type="audio/mpeg")
-    except Exception as ex:
+    except Exception:
         # Graceful fallback: return 204 so frontend uses local Web Speech API
         pass
 

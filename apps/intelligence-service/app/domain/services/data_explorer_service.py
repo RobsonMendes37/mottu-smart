@@ -64,10 +64,7 @@ def answer_manager_query(
     detected_code = detect_plate_or_code(query)
 
     parts_inventory = context_data.get("parts_inventory", [])
-    fleet_stats = context_data.get("fleet_stats", {})
     service_orders = context_data.get("service_orders", [])
-    inspection_stats = context_data.get("inspection_stats", {})
-    billing_stats = context_data.get("billing_stats", {})
     pending_users = context_data.get("pending_users", [])
     plate_record = context_data.get("plate_record", {})
 

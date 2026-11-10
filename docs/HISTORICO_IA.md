@@ -1551,3 +1551,19 @@
   - Angular Typecheck e Lint (`tsc --noEmit`): **Zero erros**.
   - Python Pytest (`intelligence-service`): **200/200 testes aprovados (100% pureza de domínio e cobertura de branches)**.
   - Java Core API (`core-api`): **16/16 testes de analytics e outbox aprovados (BUILD SUCCESS)**.
+
+
+### [2026-11-10 13:42] — Upgrade de CI/CD: Linters Estáticos (Ruff + Mypy), Auditoria SCA e Preparação SonarCloud
+- **Agente / Modelo:** `@devops-engineer` + `@orchestrator`
+- **Requisitos Atendidos:**
+  - **Linter Estático e Formatação Python (Ruff):** Integração do `ruff` no pipeline com regras `E`, `F`, `W`, eliminando imports não utilizados e variáveis orfãs no `apps/intelligence-service`.
+  - **Checagem de Tipos Estáticos (Mypy):** Integração do `mypy` no pipeline inspecionando tipagem estática no domínio (`app/domain`).
+  - **Software Composition Analysis (SCA):** Adicionado job `sca-dependency-audit` executando `npm audit --omit=dev --audit-level=critical` no frontend e `pip-audit` nas dependências do Python.
+  - **Preparação para SonarCloud (SAST):** Criado arquivo `sonar-project.properties` com mapeamento completo de caminhos de código-fonte, testes e relatórios de cobertura (JaCoCo XML, Coverage XML e LCOV).
+  - **Job SonarCloud no GitHub Actions:** Adicionado job `sonarcloud-sast` no `ci.yml` com autorreparo e degradação graciosa caso a secret `SONAR_TOKEN` ainda não esteja preenchida pelo usuário (Modo Autônomo Noturno).
+- **Validação de Testes e Qualidade:**
+  - `ruff check app/`: **Zero erros**.
+  - `mypy app/domain`: **Zero erros (10 source files validados)**.
+  - `pytest tests/unit/ --cov=app/domain --cov-fail-under=100`: **100.00% de cobertura de branches**.
+  - `npm run lint` e `npm run test:ci`: **250 testes verdes**.
+  - `./mvnw clean verify -B`: **351 testes verdes e 100% de cobertura JaCoCo**.

@@ -1,6 +1,6 @@
 """Catalog repository port interface."""
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List
 from app.domain.enums import MotorcycleModel
 from app.domain.models import PartCatalogItem
 

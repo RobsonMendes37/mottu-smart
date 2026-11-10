@@ -3,7 +3,7 @@ import json
 import logging
 import os
 import tempfile
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 from app.core.config import settings
 from app.infrastructure.adapters.gemini_adapter import AIUnavailableException
 from app.modules.triage_ai.mock_gemini import MockGeminiService

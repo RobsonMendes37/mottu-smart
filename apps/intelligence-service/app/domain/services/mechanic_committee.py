@@ -5,7 +5,7 @@ and 360 Baseline Temporal Comparison) to evaluate motorcycle damages, reach cons
 and detect inconclusive photos that require in-person workshop inspection.
 """
 from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from app.domain.enums import DamageVerdict
 
 

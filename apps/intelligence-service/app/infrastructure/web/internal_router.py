@@ -1,7 +1,7 @@
 """Internal API router for Java ↔ Python communication (docs/02 §6.5, UC-11)."""
 from datetime import datetime, timezone
-from typing import List
-from fastapi import APIRouter, Depends
+from typing import List, Optional
+from fastapi import APIRouter, Depends, Response
 from app.application.dtos.catalog_dto import CatalogSyncRequestDTO, CatalogSyncResponseDTO
 from app.application.dtos.feedback_dto import FeedbackPolishRequestDTO, FeedbackPolishResponseDTO
 from app.application.dtos.analytics_dto import (
@@ -10,6 +10,7 @@ from app.application.dtos.analytics_dto import (
     DataExplorerQueryRequestDTO,
     DataExplorerQueryResponseDTO,
     StockoutAlertDTO,
+    TextToSpeechRequestDTO,
 )
 from app.domain.enums import MotorcycleModel
 from app.domain.models import PartCatalogItem
@@ -175,11 +176,17 @@ async def generate_ops_advice(request: AnalyticsAdvisorRequestDTO) -> AnalyticsA
 
 @router.post("/analytics/ask", response_model=DataExplorerQueryResponseDTO)
 async def ask_analytics_data(request: DataExplorerQueryRequestDTO) -> DataExplorerQueryResponseDTO:
-    """Analyze a natural language manager query and return structured Google-grade analytics."""
+    """Analyze a natural language manager query and return structured Monalisa analytics."""
+    vision_adapter = GeminiVisionAdapter()
+    is_gemini_online = not getattr(vision_adapter, "is_mock_mode", True)
+
     raw_answer = answer_manager_query(
         query=request.query,
         yard_label=request.yardLabel,
         context_data=request.contextData,
+        history=request.history,
+        skill_id=request.skillId,
+        is_gemini_online=is_gemini_online,
     )
 
     return DataExplorerQueryResponseDTO(
@@ -187,7 +194,7 @@ async def ask_analytics_data(request: DataExplorerQueryRequestDTO) -> DataExplor
         yardKey=request.yardKey,
         yardLabel=request.yardLabel,
         generatedAt=datetime.now(timezone.utc),
-        modelUsed="gemini-3.5-flash-lite",
+        modelUsed="monalisa-ops-agent",
         directAnswer=str(raw_answer.get("direct_answer", "")),
         keyMetricLabel=str(raw_answer.get("key_metric_label", "")),
         keyMetricValue=str(raw_answer.get("key_metric_value", "")),
@@ -196,4 +203,30 @@ async def ask_analytics_data(request: DataExplorerQueryRequestDTO) -> DataExplor
         rows=list(raw_answer.get("rows", [])),
         suggestedActionLabel=str(raw_answer.get("suggested_action_label", "")),
         suggestedActionRoute=str(raw_answer.get("suggested_action_route", "")),
+        activeSkill=raw_answer.get("active_skill"),
+        isAiOffline=not is_gemini_online,
     )
+
+
+@router.post("/analytics/tts")
+async def generate_monalisa_speech(request: TextToSpeechRequestDTO):
+    """Synthesize high-fidelity Brazilian Portuguese neural speech (pt-BR-FranciscaNeural)."""
+    text = (request.text or "").strip()
+    if not text:
+        return Response(status_code=204)
+
+    voice = request.voice or "pt-BR-FranciscaNeural"
+    try:
+        import edge_tts
+        communicate = edge_tts.Communicate(text, voice)
+        audio_bytes = bytearray()
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                audio_bytes.extend(chunk["data"])
+        if audio_bytes:
+            return Response(content=bytes(audio_bytes), media_type="audio/mpeg")
+    except Exception as ex:
+        # Graceful fallback: return 204 so frontend uses local Web Speech API
+        pass
+
+    return Response(status_code=204)

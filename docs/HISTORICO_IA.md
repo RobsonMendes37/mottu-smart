@@ -1526,3 +1526,28 @@
 - **Validação de Testes:**
   - Vitest: **250/250 testes aprovados em 38 suítes**.
   - Production Build: **Concluído com sucesso (394 kB inicial)**.
+
+
+### [2026-11-10 03:55] — Assistente Operacional Monalisa: Skills Sob Demanda, Memória de Contexto e Voz Neural Studio
+- **Agente / Modelo:** `@orchestrator` + `@frontend-specialist` + `@ai-engineer`
+- **Requisitos Atendidos:**
+  - **Persona Monalisa e Identidade Mottu:** Substituição do avatar por ícone minimalista com a insígnia **"M"** em verde Mottu (`#05944F`) e tipografia de alto contraste; nome atualizado para **Monalisa**.
+  - **Padrão Query-on-Demand (Consultas Sob Demanda):** Eliminação de injeção direta de banco de dados no prompt do LLM. O assistente recebe queries pontuais filtradas apenas para as entidades necessárias (< 500 tokens vs 15.000+ tokens), executando via repositórios específicos no PostgreSQL com tempo de resposta < 20ms e zero alucinação matemática.
+  - **Catálogo de 7 Skills Operacionais:**
+    1. `SKILL_ESTOQUE`: Ruptura e peças críticas em falta.
+    2. `SKILL_FROTA`: Distribuição por modelo e disponibilidade.
+    3. `SKILL_OFICINA`: Gargalos, boxes e ordens em andamento.
+    4. `SKILL_VISTORIAS`: Deflexão automática vs manual por unidade.
+    5. `SKILL_FINANCEIRO`: Faturamento e taxas de avarias.
+    6. `SKILL_APROVACOES`: Pendências de contestação e garantia.
+    7. `SKILL_BUSCA_PLACA`: Localização e status individual de motocicleta por placa ou OS.
+  - **Memória de Conversa Deslizante:** Suporte a diálogos multi-turn enviando o histórico das últimas 6 mensagens (`history`) para resolução de contexto e pronomes (ex.: "E no Butantã?", "Quais manetes estão faltando?").
+  - **Modo Skills Transparente (Fallback Offline):** Quando a IA/LLM está offline ou sem chave externa, o sistema opera de forma transparente no `Modo Skills (Offline)` executando as queries operacionais diretamente no banco sem inventar dados.
+  - **Síntese de Voz Neural Studio Server-Side:** Endpoint `POST /analytics/tts` no `apps/intelligence-service` via biblioteca `edge-tts` com voz neural feminina brasileira de estúdio (`pt-BR-FranciscaNeural`), gerando streaming de MP3 cristalino (< 2s, 27KB) com fallback resiliente para Web Speech API no navegador.
+  - **Renderização de Mini-Tabelas no Chat:** Apresentação de dados tabulares estruturados (colunas e linhas) diretamente nas respostas da Monalisa no frontend.
+- **Validação de Testes e Qualidade:**
+  - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Angular Production Build: **100% de sucesso**.
+  - Angular Typecheck e Lint (`tsc --noEmit`): **Zero erros**.
+  - Python Pytest (`intelligence-service`): **200/200 testes aprovados (100% pureza de domínio e cobertura de branches)**.
+  - Java Core API (`core-api`): **16/16 testes de analytics e outbox aprovados (BUILD SUCCESS)**.

@@ -181,10 +181,11 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
     expect(comp.criticalAlertsCount()).toBeGreaterThanOrEqual(1);
   });
 
-  it('TC-T10-15: Floating Voice Copilot Alexandre toggles, sends messages, cleans speech text, and toggles voice controls', () => {
+  it('TC-T10-15: Floating Voice Copilot Monalisa toggles, executes skills, sends messages, and manages audio', () => {
     expect(comp.isCopilotOpen()).toBe(false);
     expect(comp.autoVoiceEnabled()).toBe(true);
-    expect(comp.copilotMessages()[0].text).toContain('Alexandre');
+    expect(comp.operationalSkills.length).toBe(7);
+    expect(comp.copilotMessages()[0].text).toContain('Monalisa');
 
     comp.toggleCopilot();
     expect(comp.isCopilotOpen()).toBe(true);
@@ -202,24 +203,34 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
     expect(sanitized).toContain('unidade Butantã');
 
     mockManagerService.askDataExplorer = vi.fn().mockReturnValue(of({
-      query: 'Crescimento de demanda',
-      directAnswer: 'Demanda cresceu 18,4% no período.',
-      keyMetricLabel: 'Crescimento',
-      keyMetricValue: '+18.4%',
+      query: 'Estoque Crítico',
+      directAnswer: 'Demanda de reposição calculada com sucesso.',
+      keyMetricLabel: 'Peças em Falta',
+      keyMetricValue: '3 SKUs Críticos',
       keyMetricTrend: 'Alta',
       yardLabel: 'Todas as Unidades (SP)',
       suggestedActionLabel: 'Ver peças',
-      suggestedActionRoute: '/manager/catalog',
-      columns: ['Métrica'],
-      rows: [['+18.4%']],
+      suggestedActionRoute: '/mechanic/operations',
+      columns: ['SKU', 'Saldo'],
+      rows: [['SKU-01', '4 un.']],
+      activeSkill: 'SKILL_ESTOQUE',
+      isAiOffline: false,
     }));
 
-    comp.sendCopilotMessage('Crescimento de demanda');
+    // Execute skill
+    comp.executeSkill('SKILL_ESTOQUE', 'Estoque Crítico');
+    expect(mockManagerService.askDataExplorer).toHaveBeenCalledWith(
+      'Estoque Crítico',
+      'ALL',
+      'SKILL_ESTOQUE',
+      expect.any(Array)
+    );
     expect(comp.copilotMessages().length).toBeGreaterThanOrEqual(2);
     const lastMsg = comp.copilotMessages()[comp.copilotMessages().length - 1];
-    expect(lastMsg.text).toContain('Demanda cresceu 18,4%');
+    expect(lastMsg.text).toContain('Demanda de reposição');
+    expect(lastMsg.rows?.length).toBe(1);
 
-    // Speech control methods run safely
+    // Audio methods run safely
     expect(() => comp.speakText('Teste de voz', 999)).not.toThrow();
     expect(() => comp.stopSpeech()).not.toThrow();
     expect(() => comp.toggleSpeechRecognition()).not.toThrow();

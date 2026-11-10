@@ -179,10 +179,23 @@ export class ManagerService {
     return this.http.patch(`/api/v1/mechanic/operations/stock/${sku}`, { delta });
   }
 
-  askDataExplorer(query: string, yardKey: string = 'ALL'): Observable<OpsDataExplorerResponseDto> {
+  askDataExplorer(
+    query: string,
+    yardKey: string = 'ALL',
+    skillId?: string,
+    history?: Array<{ sender: string; text: string }>
+  ): Observable<OpsDataExplorerResponseDto> {
     return this.http.post<OpsDataExplorerResponseDto>(
       '/api/v1/manager/analytics/ask',
-      { query, yardKey }
+      { query, yardKey, skillId, history }
+    );
+  }
+
+  generateSpeechAudio(text: string): Observable<Blob> {
+    return this.http.post(
+      '/api/v1/manager/analytics/tts',
+      { text },
+      { responseType: 'blob' }
     );
   }
 }

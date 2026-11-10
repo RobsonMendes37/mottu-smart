@@ -77,3 +77,44 @@ def test_answer_manager_query_stock_intent_healthy_fallback():
     res = answer_manager_query("consultar peças e almoxarifado", "Unidade Butantã", context)
     assert len(res["rows"]) == 1
     assert "14 dias (ESTÁVEL)" in res["rows"][0][4]
+
+
+def test_answer_manager_query_plate_skill():
+    res = answer_manager_query("qual a situação da placa MOT1A23?", "Todas as Unidades (SP)", {})
+    assert res["active_skill"] == "SKILL_BUSCA_PLACA"
+    assert "Ficha da Moto" in res["key_metric_label"]
+    assert len(res["rows"]) >= 4
+
+
+def test_answer_manager_query_workshop_skill():
+    res = answer_manager_query("como estão as baias da oficina?", "Unidade Butantã", {}, skill_id="SKILL_OFICINA")
+    assert res["active_skill"] == "SKILL_OFICINA"
+    assert "Ordens de Serviço" in res["key_metric_label"]
+    assert len(res["rows"]) >= 1
+
+
+def test_answer_manager_query_approvals_skill():
+    res = answer_manager_query("tem entregador pendente de aprovação?", "Todas as Unidades (SP)", {})
+    assert res["active_skill"] == "SKILL_APROVACOES"
+    assert "Fila de Aprovação" in res["key_metric_label"]
+
+
+def test_answer_manager_query_memory_resolution():
+    history = [
+        {"sender": "user", "text": "Como está o estoque na Unidade Butantã (SP-04)?"},
+        {"sender": "assistant", "text": "Temos 3 peças críticas no Butantã."},
+    ]
+    res = answer_manager_query("e quantas motos temos por lá?", "Todas as Unidades (SP)", {}, history=history)
+    assert "Butantã" in res["direct_answer"]
+
+
+def test_answer_manager_query_offline_fallback_honest():
+    res = answer_manager_query(
+        "qual a sua opinião sobre o mercado de delivery na américa latina?",
+        "Todas as Unidades (SP)",
+        {},
+        is_gemini_online=False,
+    )
+    assert res["active_skill"] == "OFFLINE_FALLBACK"
+    assert "conversação livre está offline" in res["direct_answer"]
+    assert len(res["rows"]) == 7

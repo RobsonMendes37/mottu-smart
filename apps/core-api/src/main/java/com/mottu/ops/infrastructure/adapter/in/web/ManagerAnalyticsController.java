@@ -67,7 +67,7 @@ public class ManagerAnalyticsController {
         String query = body != null && body.containsKey("query") ? String.valueOf(body.get("query")) : "resumo de hoje";
         String yardKey = body != null && body.containsKey("yardKey") ? String.valueOf(body.get("yardKey")) : "ALL";
         try {
-            return ResponseEntity.ok(managerAnalyticsUseCase.queryOperationalData(query, yardKey));
+            return ResponseEntity.ok(managerAnalyticsUseCase.queryOperationalData(body != null ? body : Map.of("query", query, "yardKey", yardKey)));
         } catch (Exception ex) {
             log.error("Error in askDataExplorer for query {}, returning safe fallback", query, ex);
             Map<String, Object> fallback = new LinkedHashMap<>();
@@ -75,7 +75,7 @@ public class ManagerAnalyticsController {
             fallback.put("yardKey", yardKey);
             fallback.put("yardLabel", "Todas as Unidades (SP)");
             fallback.put("generatedAt", Instant.now().toString());
-            fallback.put("modelUsed", "gemini-3.5-flash-lite");
+            fallback.put("modelUsed", "monalisa-ops-agent");
             fallback.put("directAnswer", "Operação estável com 78,5% de deflexão autônoma e 16 motos em locação ativa.");
             fallback.put("keyMetricLabel", "Eficiência Global");
             fallback.put("keyMetricValue", "78,5% Automatizado");
@@ -89,6 +89,18 @@ public class ManagerAnalyticsController {
             fallback.put("suggestedActionRoute", "/manager/analytics");
             return ResponseEntity.ok(fallback);
         }
+    }
+
+    @PostMapping(value = "/tts", produces = "audio/mpeg")
+    public ResponseEntity<byte[]> generateSpeech(@RequestBody(required = false) Map<String, Object> body) {
+        String text = body != null && body.containsKey("text") ? String.valueOf(body.get("text")) : "";
+        byte[] audio = managerAnalyticsUseCase.generateSpeech(text);
+        if (audio == null || audio.length == 0) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok()
+                .header("Content-Type", "audio/mpeg")
+                .body(audio);
     }
 
     private DetailedAnalyticsResponseDto buildFallbackDetailedAnalytics() {

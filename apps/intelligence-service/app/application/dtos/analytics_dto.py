@@ -1,6 +1,6 @@
 """DTOs for Analytics Advisor operations."""
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
@@ -66,6 +66,8 @@ class DataExplorerQueryRequestDTO(BaseModel):
     yardKey: str = "ALL"
     yardLabel: str = "Todas as Unidades (SP)"
     contextData: dict = Field(default_factory=dict)
+    history: List[dict] = Field(default_factory=list)
+    skillId: Optional[str] = None
 
 
 class DataExplorerQueryResponseDTO(BaseModel):
@@ -73,7 +75,7 @@ class DataExplorerQueryResponseDTO(BaseModel):
     yardKey: str
     yardLabel: str
     generatedAt: datetime
-    modelUsed: str = "gemini-3.5-flash-lite"
+    modelUsed: str = "monalisa-ops-agent"
     directAnswer: str
     keyMetricLabel: str
     keyMetricValue: str
@@ -82,3 +84,10 @@ class DataExplorerQueryResponseDTO(BaseModel):
     rows: List[List[str]]
     suggestedActionLabel: str
     suggestedActionRoute: str
+    activeSkill: Optional[str] = None
+    isAiOffline: bool = False
+
+
+class TextToSpeechRequestDTO(BaseModel):
+    text: str
+    voice: str = "pt-BR-FranciscaNeural"

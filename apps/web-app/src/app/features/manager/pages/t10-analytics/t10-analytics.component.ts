@@ -482,7 +482,7 @@ export class T10AnalyticsComponent implements OnInit {
   }
 
   // =========================================================================
-  // ALEXANDRE • ASSISTENTE OPERACIONAL DE PÁTIO (VOICE & AI COPILOT)
+  // MONALISA • ASSISTENTE OPERACIONAL DE PÁTIO (VOICE & SKILLS AGENT)
   // =========================================================================
   readonly isCopilotOpen = signal<boolean>(false);
   readonly copilotInput = signal<string>('');
@@ -490,12 +490,24 @@ export class T10AnalyticsComponent implements OnInit {
   readonly isSpeaking = signal<boolean>(false);
   readonly speakingMessageId = signal<number | null>(null);
   readonly autoVoiceEnabled = signal<boolean>(true);
+  readonly isAiOfflineMode = signal<boolean>(false);
 
   // Reconhecimento de Voz (Microfone do Usuário)
   readonly isListening = signal<boolean>(false);
   readonly speechRecognitionSupported = signal<boolean>(false);
   private recognition: any = null;
   private availableVoices: any[] = [];
+  private currentAudioPlayer: HTMLAudioElement | null = null;
+
+  readonly operationalSkills = [
+    { id: 'SKILL_ESTOQUE', label: 'Estoque Crítico', icon: '📦' },
+    { id: 'SKILL_FROTA', label: 'Status da Frota', icon: '🏍️' },
+    { id: 'SKILL_OFICINA', label: 'Baias da Oficina', icon: '🔧' },
+    { id: 'SKILL_VISTORIAS', label: 'Vistorias & Junta', icon: '🛡️' },
+    { id: 'SKILL_FINANCEIRO', label: 'Financeiro & Sinistros', icon: '💰' },
+    { id: 'SKILL_APROVACOES', label: 'Aprovações', icon: '👥' },
+    { id: 'SKILL_BUSCA_PLACA', label: 'Buscar Placa / OS', icon: '🔍' },
+  ];
 
   readonly copilotMessages = signal<Array<{
     id: number;
@@ -504,11 +516,13 @@ export class T10AnalyticsComponent implements OnInit {
     time: string;
     metricLabel?: string;
     metricValue?: string;
+    columns?: string[];
+    rows?: string[][];
   }>>([
     {
       id: 1,
       sender: 'assistant',
-      text: 'Olá! Sou o Alexandre, assistente de operações da Mottu. Pode me perguntar sobre peças em falta, motos com avarias ou indicadores de hoje — ou aperte o microfone para falar comigo.',
+      text: 'Olá! Sou a Monalisa, sua assistente operacional da Mottu. Pode me perguntar sobre a frota, escolher uma das Skills abaixo ou falar no microfone.',
       time: 'Agora',
     },
   ]);
@@ -519,6 +533,10 @@ export class T10AnalyticsComponent implements OnInit {
     'Resumo do crescimento de demanda no mês',
     'Qual proporção de vistorias resolvida sem fila?',
   ];
+
+  executeSkill(skillId: string, skillLabel: string): void {
+    this.sendCopilotMessage(skillLabel, skillId);
+  }
 
   initVoices(): void {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
@@ -627,7 +645,7 @@ export class T10AnalyticsComponent implements OnInit {
     }
   }
 
-  sendCopilotMessage(customPrompt?: string): void {
+  sendCopilotMessage(customPrompt?: string, skillId?: string): void {
     const prompt = (customPrompt ?? this.copilotInput()).trim();
     if (!prompt) return;
 
@@ -642,12 +660,22 @@ export class T10AnalyticsComponent implements OnInit {
     this.copilotInput.set('');
     this.copilotLoading.set(true);
 
+    // Context memory: take last 6 messages
+    const history = this.copilotMessages().slice(-6).map((m) => ({
+      sender: m.sender,
+      text: m.text,
+    }));
+
     if (this.managerService?.askDataExplorer) {
-      this.managerService.askDataExplorer(prompt, this.selectedYardFilter()).subscribe({
+      this.managerService.askDataExplorer(prompt, this.selectedYardFilter(), skillId, history).subscribe({
         next: (res) => {
           this.copilotLoading.set(false);
           const assistantMsgId = Date.now() + 1;
           const answer = res.directAnswer || 'Análise operacional concluída com sucesso com os dados de pátio e estoque.';
+
+          if (res.isAiOffline !== undefined) {
+            this.isAiOfflineMode.set(res.isAiOffline);
+          }
 
           this.copilotMessages.update((msgs) => [
             ...msgs,
@@ -658,6 +686,8 @@ export class T10AnalyticsComponent implements OnInit {
               time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
               metricLabel: res.keyMetricLabel,
               metricValue: res.keyMetricValue,
+              columns: res.columns,
+              rows: res.rows,
             },
           ]);
 
@@ -668,6 +698,7 @@ export class T10AnalyticsComponent implements OnInit {
         },
         error: () => {
           this.copilotLoading.set(false);
+          this.isAiOfflineMode.set(true);
           const assistantMsgId = Date.now() + 1;
           const fallbackAnswer = `Com base nos dados consolidados da unidade ${this.selectedYardFilter()}: temos ${this.activeBiSnapshot().totalInspections} vistorias analisadas, com ${this.activeBiSnapshot().aiPrecisionPct} de resoluções diretas e projeção de ${this.aiAdvisor().projectedNext7DaysInspections} atendimentos para os próximos ${this.selectedHorizon()} dias.`;
 
@@ -728,25 +759,24 @@ export class T10AnalyticsComponent implements OnInit {
     const ptVoices = this.availableVoices.filter((v: any) => v.lang && v.lang.toLowerCase().startsWith('pt'));
     if (ptVoices.length === 0) return null;
 
-    // 1. Google pt-BR Neural (Natural Chrome voice)
-    const googleVoice = ptVoices.find((v: any) =>
-      v.name.toLowerCase().includes('google') && (v.lang === 'pt-BR' || v.name.toLowerCase().includes('brasil'))
+    // Priorizar voz feminina pt-BR para Monalisa
+    const femaleVoice = ptVoices.find((v: any) =>
+      v.name.includes('Francisca') ||
+      v.name.includes('Maria') ||
+      v.name.includes('Luciana') ||
+      v.name.includes('Yara') ||
+      v.name.includes('Heloisa') ||
+      v.name.includes('Leticia') ||
+      (v.name.toLowerCase().includes('google') && v.name.includes('Brasil'))
     );
-    if (googleVoice) return googleVoice;
+    if (femaleVoice) return femaleVoice;
 
-    // 2. Microsoft Natural/Neural (Edge / Windows high quality)
+    // 2. Microsoft Natural/Neural
     const msVoice = ptVoices.find((v: any) =>
       (v.name.includes('Natural') || v.name.includes('Neural') || v.name.includes('Online')) && v.lang.includes('BR')
     );
     if (msVoice) return msVoice;
 
-    // 3. Apple Luciana / Felipe (Mac / iOS natural)
-    const appleVoice = ptVoices.find((v: any) =>
-      v.name.includes('Luciana') || v.name.includes('Felipe') || v.name.includes('Maria')
-    );
-    if (appleVoice) return appleVoice;
-
-    // 4. Any pt-BR voice
     const ptBrVoice = ptVoices.find((v: any) => v.lang === 'pt-BR');
     if (ptBrVoice) return ptBrVoice;
 
@@ -754,42 +784,98 @@ export class T10AnalyticsComponent implements OnInit {
   }
 
   speakText(text: string, msgId: number): void {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    if (typeof window === 'undefined') return;
 
-    window.speechSynthesis.cancel();
+    this.stopSpeech();
 
     const spokenText = this.cleanTextForSpeech(text);
     if (!spokenText) return;
 
-    const utterance = new SpeechSynthesisUtterance(spokenText);
-    utterance.lang = 'pt-BR';
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
-
-    const bestVoice = this.getBestPtVoice();
-    if (bestVoice) {
-      utterance.voice = bestVoice;
+    // 1. Tentar áudio neural gerado no servidor (Francisca Neural pt-BR)
+    if (this.managerService?.generateSpeechAudio) {
+      this.managerService.generateSpeechAudio(spokenText).subscribe({
+        next: (blob) => {
+          if (blob && blob.size > 200) {
+            try {
+              const audioUrl = URL.createObjectURL(blob);
+              this.currentAudioPlayer = new Audio(audioUrl);
+              this.isSpeaking.set(true);
+              this.speakingMessageId.set(msgId);
+              this.currentAudioPlayer.onended = () => {
+                this.isSpeaking.set(false);
+                this.speakingMessageId.set(null);
+              };
+              this.currentAudioPlayer.onerror = () => {
+                this.speakWithWebSpeech(spokenText, msgId);
+              };
+              this.currentAudioPlayer.play().catch(() => {
+                this.speakWithWebSpeech(spokenText, msgId);
+              });
+              return;
+            } catch {
+              this.speakWithWebSpeech(spokenText, msgId);
+              return;
+            }
+          }
+          this.speakWithWebSpeech(spokenText, msgId);
+        },
+        error: () => {
+          this.speakWithWebSpeech(spokenText, msgId);
+        },
+      });
+      return;
     }
 
-    this.isSpeaking.set(true);
-    this.speakingMessageId.set(msgId);
+    this.speakWithWebSpeech(spokenText, msgId);
+  }
 
-    utterance.onend = () => {
+  speakWithWebSpeech(spokenText: string, msgId: number): void {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(spokenText);
+      utterance.lang = 'pt-BR';
+      utterance.rate = 1.0;
+      utterance.pitch = 1.05;
+
+      const bestVoice = this.getBestPtVoice();
+      if (bestVoice) {
+        utterance.voice = bestVoice;
+      }
+
+      this.isSpeaking.set(true);
+      this.speakingMessageId.set(msgId);
+
+      utterance.onend = () => {
+        this.isSpeaking.set(false);
+        this.speakingMessageId.set(null);
+      };
+
+      utterance.onerror = () => {
+        this.isSpeaking.set(false);
+        this.speakingMessageId.set(null);
+      };
+
+      window.speechSynthesis.speak(utterance);
+    } catch {
       this.isSpeaking.set(false);
       this.speakingMessageId.set(null);
-    };
-
-    utterance.onerror = () => {
-      this.isSpeaking.set(false);
-      this.speakingMessageId.set(null);
-    };
-
-    window.speechSynthesis.speak(utterance);
+    }
   }
 
   stopSpeech(): void {
+    if (this.currentAudioPlayer) {
+      try {
+        this.currentAudioPlayer.pause();
+        this.currentAudioPlayer.currentTime = 0;
+      } catch {}
+      this.currentAudioPlayer = null;
+    }
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
+      try {
+        window.speechSynthesis.cancel();
+      } catch {}
     }
     this.isSpeaking.set(false);
     this.speakingMessageId.set(null);

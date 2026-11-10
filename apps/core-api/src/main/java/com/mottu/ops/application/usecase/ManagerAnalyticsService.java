@@ -2,6 +2,7 @@ package com.mottu.ops.application.usecase;
 
 import com.mottu.ops.application.dto.AnalyticsSummaryResponseDto;
 import com.mottu.ops.application.port.in.ManagerAnalyticsUseCase;
+import com.mottu.ops.domain.enums.AccountStatus;
 import com.mottu.ops.domain.enums.DamageVerdict;
 import com.mottu.ops.domain.enums.InspectionStatus;
 import com.mottu.ops.domain.enums.MotorcycleModel;
@@ -10,6 +11,7 @@ import com.mottu.ops.infrastructure.adapter.in.web.dto.analytics.*;
 import com.mottu.ops.infrastructure.adapter.out.client.IntelligenceServiceClient;
 import com.mottu.ops.infrastructure.adapter.out.persistence.entity.*;
 import com.mottu.ops.infrastructure.adapter.out.persistence.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +38,8 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
     private final SpringDataYardRepository yardRepository;
     private final IntelligenceServiceClient intelligenceServiceClient;
     private final String lookerStudioEmbedUrl;
+    private final SpringDataServiceOrderRepository serviceOrderRepository;
+    private final SpringDataUserRepository userRepository;
 
     public ManagerAnalyticsService(
             SpringDataMotorcycleRepository motorcycleRepository,
@@ -44,7 +48,22 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
             SpringDataCatalogPartRepository catalogPartRepository,
             SpringDataYardRepository yardRepository,
             IntelligenceServiceClient intelligenceServiceClient,
-            @Value("${mottu.looker.embed-url:https://lookerstudio.google.com/embed/reporting/mottu-smart-ops-bi}") String lookerStudioEmbedUrl
+            String lookerStudioEmbedUrl
+    ) {
+        this(motorcycleRepository, inspectionRepository, inspectionItemRepository, catalogPartRepository, yardRepository, intelligenceServiceClient, lookerStudioEmbedUrl, null, null);
+    }
+
+    @Autowired
+    public ManagerAnalyticsService(
+            SpringDataMotorcycleRepository motorcycleRepository,
+            SpringDataInspectionRepository inspectionRepository,
+            SpringDataInspectionItemRepository inspectionItemRepository,
+            SpringDataCatalogPartRepository catalogPartRepository,
+            SpringDataYardRepository yardRepository,
+            IntelligenceServiceClient intelligenceServiceClient,
+            @Value("${mottu.looker.embed-url:https://lookerstudio.google.com/embed/reporting/mottu-smart-ops-bi}") String lookerStudioEmbedUrl,
+            @Autowired(required = false) SpringDataServiceOrderRepository serviceOrderRepository,
+            @Autowired(required = false) SpringDataUserRepository userRepository
     ) {
         this.motorcycleRepository = motorcycleRepository;
         this.inspectionRepository = inspectionRepository;
@@ -53,6 +72,8 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
         this.yardRepository = yardRepository;
         this.intelligenceServiceClient = intelligenceServiceClient;
         this.lookerStudioEmbedUrl = lookerStudioEmbedUrl;
+        this.serviceOrderRepository = serviceOrderRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -356,33 +377,90 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
 
     @Override
     public Map<String, Object> queryOperationalData(String query, String yardKey) {
-        String key = (yardKey == null || yardKey.isBlank()) ? "ALL" : yardKey;
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("query", query != null ? query : "resumo de hoje");
+        payload.put("yardKey", yardKey != null ? yardKey : "ALL");
+        return queryOperationalData(payload);
+    }
+
+    @Override
+    public Map<String, Object> queryOperationalData(Map<String, Object> payload) {
+        String safeQuery = payload != null && payload.containsKey("query") ? String.valueOf(payload.get("query")).trim() : "resumo de hoje";
+        String key = payload != null && payload.containsKey("yardKey") ? String.valueOf(payload.get("yardKey")) : "ALL";
         String label = resolveYardLabel(key);
-        String safeQuery = (query == null || query.isBlank()) ? "resumo de hoje" : query.trim();
+        String skillId = payload != null && payload.containsKey("skillId") ? String.valueOf(payload.get("skillId")) : null;
+        Object historyObj = payload != null ? payload.get("history") : null;
 
         try {
-            List<CatalogPartJpaEntity> allParts = catalogPartRepository.findAll();
-            List<Map<String, Object>> partsInventory = allParts.stream()
-                    .map(p -> {
-                        Map<String, Object> item = new HashMap<>();
-                        item.put("sku", p.getVtexSku());
-                        item.put("part_name", p.getPartName());
-                        item.put("model_name", formatModelName(p.getMotorcycleModel()));
-                        item.put("stock_quantity", p.getStockQuantity());
-                        item.put("min_stock_quantity", p.getMinStockQuantity());
-                        item.put("daily_burn_rate", p.getStockQuantity() <= p.getMinStockQuantity() ? 1.5 : 0.8);
-                        return item;
-                    })
-                    .collect(Collectors.toList());
-
             Map<String, Object> contextData = new HashMap<>();
-            contextData.put("parts_inventory", partsInventory);
+            String qLower = safeQuery.toLowerCase();
+
+            // ON-DEMAND QUERYING (Zero Full-DB Dump)
+            boolean isStock = "SKILL_ESTOQUE".equals(skillId) || qLower.contains("estoque") || qLower.contains("peça") || qLower.contains("peca") || qLower.contains("ruptura");
+            boolean isWorkshop = "SKILL_OFICINA".equals(skillId) || qLower.contains("oficina") || qLower.contains("baia") || qLower.contains("ordem de serviço") || qLower.contains(" os ");
+            boolean isApprovals = "SKILL_APROVACOES".equals(skillId) || qLower.contains("aprova") || qLower.contains("pendente");
+
+            if ((isStock || "SKILL_GERAL".equals(skillId) || qLower.contains("resumo")) && catalogPartRepository != null) {
+                List<CatalogPartJpaEntity> allParts = catalogPartRepository.findAll();
+                List<Map<String, Object>> partsInventory = allParts.stream()
+                        .map(p -> {
+                            Map<String, Object> item = new HashMap<>();
+                            item.put("sku", p.getVtexSku());
+                            item.put("part_name", p.getPartName());
+                            item.put("model_name", formatModelName(p.getMotorcycleModel()));
+                            item.put("stock_quantity", p.getStockQuantity());
+                            item.put("min_stock_quantity", p.getMinStockQuantity());
+                            item.put("daily_burn_rate", p.getStockQuantity() <= p.getMinStockQuantity() ? 1.5 : 0.8);
+                            return item;
+                        })
+                        .collect(Collectors.toList());
+                contextData.put("parts_inventory", partsInventory);
+            }
+
+            if (isWorkshop && serviceOrderRepository != null) {
+                List<ServiceOrderJpaEntity> orders = serviceOrderRepository.findAllByOrderByCreatedAtDesc();
+                List<List<String>> formattedOrders = orders.stream()
+                        .limit(10)
+                        .map(o -> List.of(
+                                o.getCode(),
+                                "MOTO",
+                                "Mottu Sport 110i",
+                                o.getBayLabel() != null ? o.getBayLabel() : "Baia Operacional",
+                                o.getStatus().name(),
+                                o.getServiceTitle() != null ? o.getServiceTitle() : "Diagnóstico",
+                                "R$ 0,00"
+                        ))
+                        .collect(Collectors.toList());
+                contextData.put("service_orders", formattedOrders);
+            }
+
+            if (isApprovals && userRepository != null) {
+                List<UserJpaEntity> pending = userRepository.findByStatus(AccountStatus.PENDING_APPROVAL);
+                List<List<String>> formattedUsers = pending.stream()
+                        .limit(10)
+                        .map(u -> List.of(
+                                u.getId().toString().substring(0, 8),
+                                u.getFullName(),
+                                u.getRole().name(),
+                                u.getEmail(),
+                                "Aguardando Homologação",
+                                "Fila Ativa"
+                        ))
+                        .collect(Collectors.toList());
+                contextData.put("pending_users", formattedUsers);
+            }
 
             Map<String, Object> requestPayload = new HashMap<>();
             requestPayload.put("query", safeQuery);
             requestPayload.put("yardKey", key);
             requestPayload.put("yardLabel", label);
             requestPayload.put("contextData", contextData);
+            if (skillId != null && !skillId.isBlank()) {
+                requestPayload.put("skillId", skillId);
+            }
+            if (historyObj instanceof List<?> hList) {
+                requestPayload.put("history", hList);
+            }
 
             return intelligenceServiceClient.queryAnalyticsData(requestPayload);
         } catch (Exception ex) {
@@ -392,7 +470,7 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
             fallback.put("yardKey", key);
             fallback.put("yardLabel", label);
             fallback.put("generatedAt", Instant.now().toString());
-            fallback.put("modelUsed", "gemini-3.5-flash-lite");
+            fallback.put("modelUsed", "monalisa-ops-agent");
             fallback.put("directAnswer", "Operação estável em " + label + " com 78,5% de deflexão autônoma e 16 motos em locação ativa.");
             fallback.put("keyMetricLabel", "Eficiência Global");
             fallback.put("keyMetricValue", "78,5% Automatizado");
@@ -406,6 +484,11 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
             fallback.put("suggestedActionRoute", "/manager/analytics");
             return fallback;
         }
+    }
+
+    @Override
+    public byte[] generateSpeech(String text) {
+        return intelligenceServiceClient.generateSpeech(text);
     }
 
     private String formatYardKey(String name) {

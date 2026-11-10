@@ -146,6 +146,25 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
         return buildLocalDataExplorerFallback(requestPayload);
     }
 
+    public byte[] generateSpeech(String text) {
+        if (text == null || text.isBlank()) {
+            return new byte[0];
+        }
+        try {
+            byte[] response = restClient.post()
+                    .uri(intelligenceServiceUrl + "/internal/v1/analytics/tts")
+                    .header("X-Internal-Token", internalToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("text", text, "voice", "pt-BR-FranciscaNeural"))
+                    .retrieve()
+                    .body(byte[].class);
+            return response != null ? response : new byte[0];
+        } catch (Exception e) {
+            log.warn("Intelligence service TTS unavailable ({}), client will use local Web Speech", e.getMessage());
+            return new byte[0];
+        }
+    }
+
     private Map<String, Object> buildLocalDataExplorerFallback(Map<String, Object> requestPayload) {
         String query = (String) requestPayload.getOrDefault("query", "");
         String yardKey = (String) requestPayload.getOrDefault("yardKey", "ALL");
@@ -157,7 +176,7 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
         res.put("yardKey", yardKey);
         res.put("yardLabel", yardLabel);
         res.put("generatedAt", Instant.now().toString());
-        res.put("modelUsed", "gemini-3.5-flash-lite");
+        res.put("modelUsed", "monalisa-ops-agent");
 
         if (q.contains("estoque") || q.contains("ruptura") || q.contains("peça") || q.contains("peca") || q.contains("comprar")) {
             res.put("directAnswer", "Foram identificados 5 itens com estoque crítico ou abaixo da margem de segurança no galpão.");

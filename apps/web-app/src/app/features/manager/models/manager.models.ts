@@ -208,4 +208,6 @@ export interface OpsDataExplorerResponseDto {
   rows: string[][];
   suggestedActionLabel: string;
   suggestedActionRoute: string;
+  activeSkill?: string;
+  isAiOffline?: boolean;
 }

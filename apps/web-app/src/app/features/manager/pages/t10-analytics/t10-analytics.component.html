@@ -1056,23 +1056,29 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- ALEXANDRE • ASSISTENTE OPERACIONAL (Voz pt-BR, Microfone e Gestão)        -->
+    <!-- MONALISA • ASSISTENTE OPERACIONAL (Ícone M, Skills sob Demanda e Voz)     -->
     <!-- ========================================================================= -->
     <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       <!-- Chat Drawer Window -->
       @if (isCopilotOpen()) {
-        <div class="mb-3 w-[390px] max-w-[calc(100vw-2rem)] bg-white border border-[#E2E2E2] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-200">
-          <!-- Alexandre Header -->
+        <div class="mb-3 w-[410px] max-w-[calc(100vw-2rem)] bg-white border border-[#E2E2E2] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-200">
+          <!-- Monalisa Header -->
           <div class="bg-[#141414] text-white p-4 flex items-center justify-between border-b border-[#262626]">
             <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-full bg-[#05944F] flex items-center justify-center font-bold text-base text-white shadow-xs">
-                🤖
+              <div class="w-9 h-9 rounded-full bg-[#05944F] text-white flex items-center justify-center font-extrabold text-base shadow-xs tracking-wider">
+                M
               </div>
               <div>
-                <div class="flex items-center gap-1.5">
-                  <h4 class="text-xs font-bold text-white">Alexandre</h4>
-                  <span class="px-1.5 py-0.2 rounded bg-[#05944F] text-[9px] font-extrabold uppercase tracking-wide">
-                    Online
+                <div class="flex items-center gap-2">
+                  <h4 class="text-xs font-bold text-white">Monalisa</h4>
+                  <span
+                    class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wide"
+                    [class.bg-[#05944F]]="!isAiOfflineMode()"
+                    [class.text-white]="!isAiOfflineMode()"
+                    [class.bg-[#D97706]]="isAiOfflineMode()"
+                    [class.text-white]="isAiOfflineMode()"
+                  >
+                    {{ isAiOfflineMode() ? 'Modo Skills (Offline)' : 'Online' }}
                   </span>
                 </div>
                 <p class="text-[10px] text-[#A3A3A3]">Assistente de Operações Mottu</p>
@@ -1124,8 +1130,26 @@
             </div>
           </div>
 
+          <!-- Operational Skills Toolbar -->
+          <div class="px-3 py-2 bg-[#F6F6F6] border-b border-[#EAEAEA] flex items-center gap-1.5 overflow-x-auto scrollbar-thin">
+            <span class="text-[10px] font-extrabold text-[#757575] uppercase tracking-wider shrink-0 mr-1">
+              Skills:
+            </span>
+            @for (sk of operationalSkills; track sk.id) {
+              <button
+                type="button"
+                (click)="executeSkill(sk.id, sk.label)"
+                [disabled]="copilotLoading()"
+                class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white hover:bg-[#05944F] hover:text-white text-[#141414] border border-[#E2E2E2] shadow-2xs whitespace-nowrap shrink-0 transition-colors flex items-center gap-1 active:scale-95"
+              >
+                <span>{{ sk.icon }}</span>
+                <span>{{ sk.label }}</span>
+              </button>
+            }
+          </div>
+
           <!-- Messages Body -->
-          <div class="p-4 space-y-3 max-h-[340px] overflow-y-auto bg-[#FBFBFB] text-xs">
+          <div class="p-4 space-y-3 max-h-[350px] overflow-y-auto bg-[#FBFBFB] text-xs">
             @for (msg of copilotMessages(); track msg.id) {
               @if (msg.sender === 'user') {
                 <div class="flex justify-end">
@@ -1136,16 +1160,40 @@
                 </div>
               } @else {
                 <div class="flex items-start gap-2">
-                  <div class="w-6 h-6 rounded-full bg-[#E6F4EE] text-[#05944F] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
-                    🤖
+                  <div class="w-6 h-6 rounded-full bg-[#E6F4EE] text-[#05944F] font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                    M
                   </div>
-                  <div class="bg-white border border-[#E2E2E2] px-3.5 py-2.5 rounded-2xl rounded-tl-xs max-w-[85%] shadow-xs space-y-2">
+                  <div class="bg-white border border-[#E2E2E2] px-3.5 py-2.5 rounded-2xl rounded-tl-xs max-w-[90%] shadow-xs space-y-2">
                     <p class="text-xs text-[#141414] leading-relaxed">{{ msg.text }}</p>
 
                     @if (msg.metricLabel && msg.metricValue) {
                       <div class="p-2 rounded bg-[#F6F6F6] border border-[#E8E8E8] flex items-center justify-between">
                         <span class="text-[10px] font-bold text-[#757575] uppercase">{{ msg.metricLabel }}</span>
                         <span class="text-xs font-mono font-extrabold text-[#05944F]">{{ msg.metricValue }}</span>
+                      </div>
+                    }
+
+                    <!-- Data Table Returned by On-Demand Skill Query -->
+                    @if (msg.columns && msg.columns.length > 0 && msg.rows && msg.rows.length > 0) {
+                      <div class="mt-2 overflow-x-auto border border-[#E2E2E2] rounded-lg bg-white">
+                        <table class="w-full text-left text-[10px]">
+                          <thead class="bg-[#F6F6F6] text-[#757575] font-bold border-b border-[#E2E2E2]">
+                            <tr>
+                              @for (col of msg.columns; track col) {
+                                <th class="px-2 py-1.5 whitespace-nowrap">{{ col }}</th>
+                              }
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (row of msg.rows.slice(0, 4); track $index) {
+                              <tr class="border-b border-[#F0F0F0] last:border-0 hover:bg-[#FBFBFB]">
+                                @for (cell of row; track $index) {
+                                  <td class="px-2 py-1.5 whitespace-nowrap text-[#141414] font-medium">{{ cell }}</td>
+                                }
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
                       </div>
                     }
 
@@ -1176,7 +1224,7 @@
             @if (copilotLoading()) {
               <div class="flex items-center gap-2 text-xs text-[#757575] py-2">
                 <div class="w-5 h-5 rounded-full border-2 border-[#05944F] border-t-transparent animate-spin"></div>
-                <span>Alexandre está analisando os dados...</span>
+                <span>Monalisa está consultando os dados operacionais...</span>
               </div>
             }
           </div>
@@ -1220,7 +1268,7 @@
                   name="copilotMsg"
                   [ngModel]="copilotInput()"
                   (ngModelChange)="copilotInput.set($event)"
-                  placeholder="Pergunte ou clique no microfone..."
+                  placeholder="Pergunte à Monalisa ou use o microfone..."
                   class="w-full h-10 pl-3 pr-10 rounded-lg bg-[#F6F6F6] border border-[#E2E2E2] focus:bg-white focus:border-[#141414] text-xs text-[#141414] placeholder-[#757575] focus:outline-none"
                 />
 
@@ -1228,7 +1276,7 @@
                 <button
                   type="button"
                   (click)="toggleSpeechRecognition()"
-                  [title]="isListening() ? 'Parar gravação' : 'Falar por voz com o Alexandre'"
+                  [title]="isListening() ? 'Parar gravação' : 'Falar por voz com a Monalisa'"
                   class="absolute right-2 top-1.5 w-7 h-7 rounded-md flex items-center justify-center text-sm transition-all"
                   [class.bg-[#DC2626]]="isListening()"
                   [class.text-white]="isListening()"
@@ -1256,15 +1304,17 @@
         </div>
       }
 
-      <!-- Main Floating Action Button (FAB) - Persona Alexandre -->
+      <!-- Main Floating Action Button (FAB) - Persona Monalisa (Ícone M) -->
       <button
         type="button"
         (click)="toggleCopilot()"
-        title="Falar com Alexandre (Assistente Operacional Mottu)"
-        class="h-14 px-5 rounded-full bg-[#05944F] hover:bg-[#047840] text-white font-bold text-xs shadow-2xl flex items-center gap-2.5 border-2 border-white transition-all transform hover:scale-105 active:scale-95"
+        title="Falar com Monalisa (Assistente Operacional Mottu)"
+        class="h-14 px-4.5 rounded-full bg-[#05944F] hover:bg-[#047840] text-white font-bold text-xs shadow-2xl flex items-center gap-2.5 border-2 border-white transition-all transform hover:scale-105 active:scale-95"
       >
-        <span class="text-xl">🤖</span>
-        <span class="font-extrabold tracking-wide">Alexandre</span>
+        <div class="w-7 h-7 rounded-full bg-white text-[#05944F] font-extrabold flex items-center justify-center text-xs shadow-xs">
+          M
+        </div>
+        <span class="font-extrabold tracking-wide">Monalisa</span>
         @if (isSpeaking()) {
           <span class="flex items-center gap-0.5">
             <span class="w-1 h-3 bg-white animate-bounce rounded-full"></span>

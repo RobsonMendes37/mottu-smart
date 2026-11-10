@@ -59,11 +59,23 @@ class Baseline360PhotosTest {
     }
 
     @Test
-    @DisplayName("Deve lançar exceção se fotos obrigatórias forem nulas ou vazias")
+    @DisplayName("Deve lançar exceção se fotos obrigatórias forem nulas ou vazias ou odômetro negativo")
     void shouldThrowWhenAnglesMissing() {
         assertThatThrownBy(() -> new Baseline360Photos(
                 null, "rear.jpg", "right.jpg", "left.jpg", "odo.jpg", 100, Instant.now()
         )).isInstanceOf(IllegalArgumentException.class);
+
+        assertThatThrownBy(() -> new Baseline360Photos(
+                "front.jpg", "rear.jpg", "right.jpg", "left.jpg", "odo.jpg", -10, Instant.now()
+        )).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("Deve retornar escudo inativo quando pickup date for nula")
+    void shouldHandleNullPickupAtInShield() {
+        BaselineShieldStatus shield = BaselineShieldStatus.calculate(null, 1000, 1050, Instant.now());
+        assertThat(shield.isShieldActive()).isFalse();
+        assertThat(shield.remainingHours()).isEqualTo(0.0);
     }
 }
 

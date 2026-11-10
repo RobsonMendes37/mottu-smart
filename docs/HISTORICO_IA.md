@@ -1567,3 +1567,15 @@
   - `pytest tests/unit/ --cov=app/domain --cov-fail-under=100`: **100.00% de cobertura de branches**.
   - `npm run lint` e `npm run test:ci`: **250 testes verdes**.
   - `./mvnw clean verify -B`: **351 testes verdes e 100% de cobertura JaCoCo**.
+
+
+### [2026-11-10 13:48] — Otimização Mobile: Botão Flutuante Compacto (Ícone M com Brilho) e Modal Simplificado Monalisa
+- **Agente / Modelo:** `@frontend-specialist` + `@ux-designer`
+- **Requisitos Atendidos:**
+  - **Botão Flutuante (FAB) Compacto:** Removido texto extenso ("Monalisa") do botão flutuante. A interface agora adota um design circular compacto de 52px (`w-13 h-13 sm:w-14 sm:h-14`), otimizado para toque e sem poluição visual em telas mobile.
+  - **Ícone M com Brilho:** Letra "M" centralizada em alto relevo com micro-insígnia de brilho (`✦` / 4-pointed star) no canto superior direito, conferindo identidade visual elegante de inteligência artificial.
+  - **Modal Simplificado Monalisa:** Ao abrir, exibe layout responsivo ajustado para telas móveis (`w-[calc(100vw-2rem)] sm:w-[380px]`), cabeçalho limpo com nome "Monalisa", status de conexão, toggle de voz compacto e barra de input ergonômica.
+- **Validação de Testes e Qualidade:**
+  - Vitest: **250/250 testes aprovados**.
+  - Production Build: **100% de sucesso**.
+  - Purple Ban: **Zero ocorrências**.

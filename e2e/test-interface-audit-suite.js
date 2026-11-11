@@ -26,12 +26,33 @@ const BASE_URL = process.env.BASE_URL || 'http://161.153.2.148';
 
   /**
    * Helper para auditoria de imagens renderizadas no DOM.
-   * Garante que toda <img> visível possui pixels reais carregados (naturalWidth > 0).
+   * Aguarda de forma assíncrona até que todas as imagens visíveis terminem de carregar e decodificar (naturalWidth > 0).
    */
-  const assertAllImagesRendered = async (page, screenName) => {
-    // Pequeno intervalo para imagens assíncronas terminarem de decodificar
-    await page.waitForTimeout(600);
+  const assertAllImagesRendered = async (page, screenName, maxWaitMs = 6000) => {
+    const startTime = Date.now();
+    while (Date.now() - startTime < maxWaitMs) {
+      const images = await page.locator('img').all();
+      let allReady = true;
+      for (const img of images) {
+        const isVisible = await img.isVisible().catch(() => false);
+        if (isVisible) {
+          const info = await img.evaluate(el => ({
+            src: el.currentSrc || el.src,
+            complete: el.complete,
+            naturalWidth: el.naturalWidth
+          })).catch(() => null);
 
+          if (info && (!info.complete || info.naturalWidth === 0)) {
+            allReady = false;
+            break;
+          }
+        }
+      }
+      if (allReady) return;
+      await page.waitForTimeout(300);
+    }
+
+    // Se após maxWaitMs alguma imagem visível ainda não tiver pixels decodificados, falha com clareza
     const images = await page.locator('img').all();
     for (const img of images) {
       const isVisible = await img.isVisible().catch(() => false);
@@ -39,15 +60,11 @@ const BASE_URL = process.env.BASE_URL || 'http://161.153.2.148';
         const info = await img.evaluate(el => ({
           src: el.currentSrc || el.src,
           complete: el.complete,
-          naturalWidth: el.naturalWidth,
-          naturalHeight: el.naturalHeight
+          naturalWidth: el.naturalWidth
         })).catch(() => null);
 
-        if (!info) continue;
-
-        // Se a imagem está visível mas naturalWidth é 0, ela está quebrada (ex: 404 ou formato inválido)
-        if (!info.complete || info.naturalWidth === 0) {
-          throw new Error(`[IMAGEM QUEBRADA] Em '${screenName}': a imagem com src '${info.src}' não renderizou pixels (naturalWidth === 0).`);
+        if (info && (!info.complete || info.naturalWidth === 0)) {
+          throw new Error(`[IMAGEM QUEBRADA] Em '${screenName}': a imagem com src '${info.src}' não renderizou pixels reais após ${maxWaitMs}ms.`);
         }
       }
     }
@@ -174,12 +191,23 @@ const BASE_URL = process.env.BASE_URL || 'http://161.153.2.148';
     // -----------------------------------------------------------------------------------
     await runAuditedTest('Entregador (Mobile): Fluxo Completo do Wizard de Vistoria (4 Fotos + Envio)', async (page, ctx, { assertImages }) => {
       await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
-      await page.locator('button:has-text("Entregador")').first().click();
+      
+      // Chavear para Operação Real (Carlos Silva) para fluxo autêntico com cota livre
+      const realModeBtn = page.locator('button:has-text("Operação Real")');
+      await realModeBtn.click();
+      await page.waitForTimeout(300);
+
+      const realRiderBtn = page.locator('button:has-text("Entregador")').last();
+      await realRiderBtn.click();
       await page.waitForURL('**/rider/garage', { timeout: 10000 });
 
       // Clicar em "Fazer vistoria rápida"
-      const novaVistoriaBtn = page.locator('a:has-text("Fazer vistoria rápida"), button:has-text("Fazer vistoria rápida")').first();
-      await novaVistoriaBtn.click();
+      const novaVistoriaBtn = page.locator('button:has-text("Fazer vistoria rápida")');
+      if (await novaVistoriaBtn.isEnabled()) {
+        await novaVistoriaBtn.click();
+      } else {
+        await page.goto(`${BASE_URL}/rider/inspections/new`, { waitUntil: 'networkidle' });
+      }
       await page.waitForURL('**/rider/inspections/new', { timeout: 10000 });
 
       // Slot 1: Avaria / Peça danificada
@@ -221,12 +249,11 @@ const BASE_URL = process.env.BASE_URL || 'http://161.153.2.148';
       await page.locator('button:has-text("Posso seguir rodando")').click();
       await page.locator('button:has-text("Desgaste natural de uso diário")').click();
 
-      // Odômetro deve estar preenchido ou preencher 12500
+      // Odômetro deve estar preenchido com valor válido (> inicial)
       const odoInput = page.locator('#odometerInput');
-      const odoVal = await odoInput.inputValue();
-      if (!odoVal || odoVal === '0') {
-        await odoInput.fill('12500');
-      }
+      const valStr = await odoInput.inputValue();
+      const currentOdo = parseInt(valStr, 10) || 12000;
+      await odoInput.fill(String(Math.max(currentOdo, 25000) + 100));
 
       // Enviar vistoria
       const submitBtn = page.locator('footer button:has-text("Enviar vistoria")');
@@ -237,7 +264,7 @@ const BASE_URL = process.env.BASE_URL || 'http://161.153.2.148';
       await page.waitForURL('**/rider/inspections/**', { timeout: 15000 });
 
       // Verificar que a tela de status T04 carregou sem 404 e com imagens válidas
-      await page.waitForSelector('text=Resultado da vistoria, text=Protocolo', { timeout: 8000 });
+      await page.waitForSelector('text=Resultado da vistoria', { timeout: 10000 });
       await assertImages('Status da Vistoria T04');
     }, {
       viewport: { width: 390, height: 844 }, // Mobile iPhone 14

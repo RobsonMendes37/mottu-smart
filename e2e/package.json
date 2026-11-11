@@ -11,6 +11,7 @@
     "test:tier4": "playwright test tests/tier4-scenarios",
     "test:mock": "cross-env E2E_CONTRACT_MODE=mock playwright test",
     "test:live": "cross-env E2E_CONTRACT_MODE=live playwright test",
+    "test:audit": "node test-interface-audit-suite.js",
     "test:report": "playwright show-report"
   },
   "devDependencies": {

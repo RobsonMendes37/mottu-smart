@@ -97,6 +97,18 @@ services:
           mc cp /mock-photos/avaria-pneu.webp myminio/$${S3_BUCKET_NAME:-mottu-inspections}/inspections/sample-pneu.webp || true
           mc cp /mock-photos/avaria-farol.webp myminio/$${S3_BUCKET_NAME:-mottu-inspections}/inspections/sample-farol.webp || true
           mc cp /mock-photos/avaria-escapamento.webp myminio/$${S3_BUCKET_NAME:-mottu-inspections}/inspections/sample-escapamento.webp || true
+          mc cp /mock-photos/avaria-painel.webp myminio/$${S3_BUCKET_NAME:-mottu-inspections}/inspections/sample-painel.webp || true
+          # Baseline 360 photos for Expedição & Estado Zero
+          mc cp /mock-photos/avaria-farol.jpg myminio/$${S3_BUCKET_NAME:-mottu-inspections}/baseline_front_mottu_sport.jpg || true
+          mc cp /mock-photos/avaria-pneu.jpg myminio/$${S3_BUCKET_NAME:-mottu-inspections}/baseline_rear_mottu_sport.jpg || true
+          mc cp /mock-photos/avaria-retrovisor.jpg myminio/$${S3_BUCKET_NAME:-mottu-inspections}/baseline_right_mottu_sport.jpg || true
+          mc cp /mock-photos/avaria-escapamento.jpg myminio/$${S3_BUCKET_NAME:-mottu-inspections}/baseline_left_mottu_sport.jpg || true
+          mc cp /mock-photos/avaria-painel.jpg myminio/$${S3_BUCKET_NAME:-mottu-inspections}/baseline_odometer_10000.jpg || true
+          # Legacy realistic seed names
+          mc cp /mock-photos/avaria-farol.jpg myminio/$${S3_BUCKET_NAME:-mottu-inspections}/farol_dianteiro_trincado_inspecao_png_1794260378880.jpg || true
+          mc cp /mock-photos/avaria-manete.jpg myminio/$${S3_BUCKET_NAME:-mottu-inspections}/moto_guidao_danificado_1794260367908.jpg || true
+          mc cp /mock-photos/avaria-pneu.jpg myminio/$${S3_BUCKET_NAME:-mottu-inspections}/pneu_traseiro_moto_careca_closeup_1794260393447.jpg || true
+          mc cp /mock-photos/avaria-escapamento.jpg myminio/$${S3_BUCKET_NAME:-mottu-inspections}/mottu_damage_exhaust_scratches_1794260407150.jpg || true
         fi
         exit 0
     environment:

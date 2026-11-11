@@ -118,7 +118,7 @@
             @if (ins.photoDownloadUrl) {
               <img
                 [src]="ins.photoDownloadUrl"
-                (error)="$any($event.target).src = '/demo-photos/avaria-retrovisor.webp'"
+                (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-retrovisor.webp'"
                 alt="Foto enviada na vistoria"
                 class="w-16 h-16 rounded-md object-cover border border-[#E2E2E2] shrink-0"
               />

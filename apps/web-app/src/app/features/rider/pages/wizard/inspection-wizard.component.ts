@@ -101,6 +101,13 @@ export class InspectionWizardComponent implements OnInit {
       const garage = this.store.garage();
       if (garage?.activeContract) {
         this.reportedOdometer.set(garage.activeContract.motorcycle.currentOdometerKm);
+      } else if (typeof this.store.loadGarage === 'function') {
+        this.store.loadGarage().then(() => {
+          const loaded = this.store.garage();
+          if (loaded?.activeContract && this.reportedOdometer() === 0) {
+            this.reportedOdometer.set(loaded.activeContract.motorcycle.currentOdometerKm);
+          }
+        }).catch(() => {});
       }
     }
     this.reportedContext.set(this.store.reportedContext());
@@ -164,6 +171,7 @@ export class InspectionWizardComponent implements OnInit {
       // Keep on current slot so user sees their photo confirmed without screen flashing
       this.activeSlot.set(slot);
     } catch (err: any) {
+      console.error('[InspectionWizard] Falha no processamento/upload da foto:', err);
       this.uploadErrorMessage.set(err.message || 'Falha ao processar e enviar foto');
     } finally {
       this.isUploading.set(false);

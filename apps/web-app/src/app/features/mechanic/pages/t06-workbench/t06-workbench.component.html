@@ -228,6 +228,7 @@
                   <div class="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-[#1C1F1E] border border-[#E2E2E2] flex items-center justify-center">
                     <img
                       [src]="currentBaselinePhotoUrl()"
+                      (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-retrovisor.webp'"
                       alt="Foto da retirada do veículo"
                       class="w-full h-full object-contain"
                     />

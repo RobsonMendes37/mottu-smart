@@ -157,25 +157,25 @@
           <div class="grid grid-cols-4 gap-2 pt-1">
             <div class="text-center">
               <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
-                <img [src]="photos.frontPhotoUrl" alt="Frente" class="w-full h-full object-cover" onerror="this.src='/mottu-inspections/farol_dianteiro_trincado_inspecao_png_1794260378880.jpg'" />
+                <img [src]="photos.frontPhotoUrl" alt="Frente" class="w-full h-full object-cover" (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-farol.webp'" />
               </div>
               <span class="text-[10px] text-[#757575] mt-1 block font-medium">Frente</span>
             </div>
             <div class="text-center">
               <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
-                <img [src]="photos.rearPhotoUrl" alt="Traseira" class="w-full h-full object-cover" onerror="this.src='/mottu-inspections/pneu_traseiro_moto_careca_closeup_1794260393447.jpg'" />
+                <img [src]="photos.rearPhotoUrl" alt="Traseira" class="w-full h-full object-cover" (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-pneu.webp'" />
               </div>
               <span class="text-[10px] text-[#757575] mt-1 block font-medium">Traseira</span>
             </div>
             <div class="text-center">
               <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
-                <img [src]="photos.rightSidePhotoUrl" alt="Lateral D." class="w-full h-full object-cover" onerror="this.src='/mottu-inspections/moto_guidao_danificado_1794260367908.jpg'" />
+                <img [src]="photos.rightSidePhotoUrl" alt="Lateral D." class="w-full h-full object-cover" (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-retrovisor.webp'" />
               </div>
               <span class="text-[10px] text-[#757575] mt-1 block font-medium">Lado D.</span>
             </div>
             <div class="text-center">
               <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
-                <img [src]="photos.leftSidePhotoUrl" alt="Lateral E." class="w-full h-full object-cover" onerror="this.src='/mottu-inspections/mottu_damage_exhaust_scratches_1794260407150.jpg'" />
+                <img [src]="photos.leftSidePhotoUrl" alt="Lateral E." class="w-full h-full object-cover" (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-escapamento.webp'" />
               </div>
               <span class="text-[10px] text-[#757575] mt-1 block font-medium">Lado E.</span>
             </div>

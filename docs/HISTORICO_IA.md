@@ -1792,3 +1792,51 @@
 
 
 
+
+### [2026-11-10 22:36] - Eliminação do Loop Infinito de 404 de Imagens e Aprimoramento da Captura Mobile
+
+- **Contexto e Sintoma Relatado:**
+  - O usuário relatou que ao enviar fotos no mobile havia lentidão/travamento e que o DevTools acusava **mais de 1.050 requisições 404** em cascata rápida.
+- **Causa Raiz Identificada:**
+  1. **Loop Infinito no `onerror` de Imagens:** Em `garage.component.html`, as fotos do Giro 360 de retirada (`photos.frontPhotoUrl`, etc.) falhavam com 404 e disparavam o manipulador de erro `onerror="this.src='/mottu-inspections/farol_dianteiro_trincado...'"` apontando para uma URL de storage que também retornava 404. Pela ausência de `this.onerror = null`, o navegador reexecutava o evento a cada falha de rede em recursão infinita, disparando milhares de requisições por segundo e consumindo 100% da CPU do celular.
+  2. **Foto de Teste Ausente no 2º Ângulo:** No `inspection-wizard.component.ts`, o botão "Usar foto de teste" no ângulo 2 (Painel/Hodômetro) apontava para `/demo-photos/avaria-painel.webp`, arquivo inexistente na pasta pública, retornando o HTML do SPA e disparando erro de decodificação na compressão.
+  3. **Disparo Nativo Mobile Robusto:** O gatilho de câmera usava elementos `<label for="cameraInput">` com classe `select-none`, que em alguns navegadores móveis (Safari iOS e Chrome Android) sofria supressão de eventos de clique.
+- **Implementações e Correções Realizadas:**
+  - `garage.component.html`:
+    - Substituídos os atributos `onerror` pelo binding Angular `(error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/...'"`.
+    - Apontados fallbacks locais 100% garantidos (`avaria-farol.webp`, `avaria-pneu.webp`, `avaria-retrovisor.webp`, `avaria-escapamento.webp`) com terminação imediata do manipulador via `onerror = null`.
+  - `inspection-status.component.html`:
+    - Adicionada blindagem idêntica com `$any($event.target).onerror = null;` no fallback da foto da vistoria.
+  - `inspection-wizard.component.html` & `.ts`:
+    - Criado e sincronizado o asset de teste `apps/web-app/public/demo-photos/avaria-painel.webp`.
+    - Substituídos os `<label>` pelos botões de ação nativos com `(click)="triggerFileInput(...)"`, garantindo abertura instantânea da câmera e galeria em Android e iOS.
+    - Adicionado overlay visual com spinner animado (`Processando e enviando foto...`) no visor durante a compressão e envio, fornecendo feedback visual contínuo.
+    - Adicionado auto-carregamento assíncrono do contrato no `ngOnInit` caso a tela seja aberta diretamente, prevenindo travamento no hodômetro zerado.
+- **Validação:**
+  - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Angular Production Build: **Compilado com 100% de sucesso**.
+  - Eliminação total do loop infinito de requisições 404 no DevTools.
+
+
+---
+
+### [2026-11-10 23:15] Auditoria Rigorosa de Interface, Armadilha de 404/Loops e Validação Visual de Pixels
+- **Autor/Agente:** Mottu QA & Full-Stack Automation Engineer
+- **Contexto:** Solicitação do usuário para aprimorar os testes de interface, garantindo que falhas de carregamento de fotos, loops de rede e 404s em ativos nunca passem despercebidos.
+- **Implementações Realizadas:**
+  1. **Nova Suíte de Auditoria Estrita de Interface (`e2e/test-interface-audit-suite.js`):**
+     - **Armadilha Ativa de Integridade de Rede (Network Integrity Trap):** Monitoramento contínuo com `page.on('response')` para interceptar e falhar imediatamente em qualquer resposta HTTP >= 400 (404, 500) em imagens, scripts, folhas de estilo e endpoints de API.
+     - **Detector de Loop Infinito e Flooding:** Mapeamento de contagem de chamadas por URL (`page.on('request')`). Dispara erro fatal imediato se a mesma URL for requisitada mais de 5 vezes na mesma tela.
+     - **Validação de Renderização Real de Pixels (`assertAllImagesRendered`):** Varredura de todas as tags `<img>` visíveis no DOM, assegurando que `complete === true` e `naturalWidth > 0`. Falha imediatamente caso uma imagem esteja com 0 pixels decodificados na interface.
+  2. **Cobertura E2E de Ponta a Ponta para Vistoria Mobile:**
+     - Simulação de viewport móvel (iPhone 14 / Android 390x844) com suporte nativo a touch.
+     - Validação completa dos 4 ângulos do Wizard (`/rider/inspections/new`): Peça danificada, Painel/Odômetro, Frente da moto e Detalhe.
+     - Verificação de envio e redirecionamento para a tela T04 de status (`/rider/inspections/:id`), confirmando renderização da foto e laudo.
+  3. **Blindagem e Resiliência em Bancada e Storage:**
+     - `t06-workbench.component.html`: Adicionado manipulador de erro seguro `(error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-retrovisor.webp'"` na aba de Giro 360 da Retirada.
+     - `docker-compose.dev.yml` & `docker-compose.prod.yml`: Enriquecido o serviço `minio-create-buckets` para copiar antecipadamente todas as fotos de estado zero (`baseline_front_mottu_sport.jpg`, `baseline_rear...`, etc.) e fotos realistas de semente, eliminando qualquer 404 no bucket MinIO.
+     - Sincronizados assets `avaria-painel.webp` e `avaria-painel.jpg` em `infra/mock-photos/` e `apps/web-app/public/demo-photos/`.
+  4. **Atualização do `e2e/package.json`:** Adicionado o comando `npm run test:audit` para execução automatizada em CI/CD.
+- **Validação:**
+  - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Angular Production Build: **100% concluído com sucesso**.

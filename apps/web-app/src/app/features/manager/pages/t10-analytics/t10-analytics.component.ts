@@ -618,9 +618,9 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
     {
       id: 1,
       sender: 'assistant',
-      text: 'Olá! Sou a Monalisa, sua assistente operacional da Mottu. Pode me perguntar sobre a frota, escolher uma das Skills abaixo ou falar no microfone.',
-      displayedText: 'Olá! Sou a Monalisa, sua assistente operacional da Mottu. Pode me perguntar sobre a frota, escolher uma das Skills abaixo ou falar no microfone.',
-      spokenText: 'Olá! Sou a Monalisa. Em que posso apoiar na operação?',
+      text: 'Olá! Sou a Melisa, sua assistente operacional da Mottu. Pode me perguntar sobre a frota, escolher uma das Skills abaixo ou falar no microfone.',
+      displayedText: 'Olá! Sou a Melisa, sua assistente operacional da Mottu. Pode me perguntar sobre a frota, escolher uma das Skills abaixo ou falar no microfone.',
+      spokenText: 'Olá! Sou a Melisa. Em que posso apoiar na operação?',
       shouldShowTable: false,
       time: 'Agora',
     },
@@ -984,7 +984,7 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
     );
     if (naturalVoice) return naturalVoice;
 
-    // 4. Voz feminina pt-BR para Monalisa
+    // 4. Voz feminina pt-BR para Melisa
     const femaleVoice = ptVoices.find((v: any) =>
       v.name.includes('Francisca') ||
       v.name.includes('Maria') ||

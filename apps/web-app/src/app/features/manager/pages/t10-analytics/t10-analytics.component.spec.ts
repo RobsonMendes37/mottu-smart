@@ -192,11 +192,11 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
     expect(comp.criticalAlertsCount()).toBeGreaterThanOrEqual(1);
   });
 
-  it('TC-T10-15: Floating Voice Copilot Monalisa toggles, executes skills, sends messages, and manages audio', () => {
+  it('TC-T10-15: Floating Voice Copilot Melisa toggles, executes skills, sends messages, and manages audio', () => {
     expect(comp.isCopilotOpen()).toBe(false);
     expect(comp.autoVoiceEnabled()).toBe(true);
     expect(comp.operationalSkills.length).toBe(7);
-    expect(comp.copilotMessages()[0].text).toContain('Monalisa');
+    expect(comp.copilotMessages()[0].text).toContain('Melisa');
 
     comp.toggleCopilot();
     expect(comp.isCopilotOpen()).toBe(true);

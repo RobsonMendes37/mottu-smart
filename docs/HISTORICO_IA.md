@@ -1942,3 +1942,21 @@
   - Angular Vitest: **10/10 testes unitários de autenticação aprovados com 100% de sucesso**.
   - Angular Production Build: **100% compilado em 6.2s**.
   - Script Visual Playwright: snapshot verificado e aprovado em Desktop (1440x900) e Mobile (390x844).
+
+### [2026-11-13 08:25] — Renomeação da Assistente para Melisa & Harmonização do Fluxo de Login com Card Elevado
+- **Agente / Modelo:** `@frontend-specialist` + `@backend-specialist` + `@clean-code`
+- **Motivação:** O usuário solicitou que a personagem 3D represente a assistente e que o nome dela fosse alterado de Monalisa para **Melisa**. Além disso, solicitou adicionar um título profissional em branco na base da imagem falando diretamente da plataforma, e estruturar o login com fluxo visual elegante (card elevado sobre fundo suave, eliminando a sensação de campos soltos no vazio).
+- **Implementações Realizadas:**
+  1. **Renomeação Integral da Assistente para Melisa:**
+     - `apps/intelligence-service/`: `data_explorer_service.py` atualizado com saídas diretas e faladas como Melisa ("Sou a Melisa..."), suporte a saudações/agradecimentos "valeu melisa" e "oi melisa"; `gemini_adapter.py` com system prompt da Melisa; `test_data_explorer_service.py` atualizado.
+     - `apps/core-api/`: `IntelligenceServiceClient.java` com saudação padrão da Melisa.
+     - `apps/web-app/`: `t10-analytics.component.ts`, `t10-analytics.component.html` e testes `t10-analytics.component.spec.ts` atualizados com nome Melisa no drawer, cabeçalho, placeholder e mensagens iniciais.
+  2. **Tipografia Profissional em Branco na Base da Imagem:**
+     - Adicionada tipografia limpa em branco na base da coluna esquerda sobre vinheta suave: *"Operação de frotas e oficinas. Tecnologia para quem move a logística urbana todos os dias."* — direto ao ponto, sem métricas fake ou jargões de IA.
+  3. **Harmonização do Fluxo de Login com Card Elevado:**
+     - Fundo suave neutro (`#F8F9FA`) no workspace direito com card branco estruturado (`rounded-2xl border border-[#E5E7EB] shadow-[0_4px_24px_rgba(0,0,0,0.03)]`), proporcionando fluxo visual natural, legibilidade e elegância padrão Big Tech.
+- **Validação de Testes e Build:**
+  - Python Pytest (`apps/intelligence-service`): **212/212 testes aprovados com 100% de sucesso**.
+  - Angular Vitest (`apps/web-app`): **26/26 testes aprovados (Login e T10 Analytics)**.
+  - Angular Production Build: **100% compilado com sucesso**.
+  - Script Visual Playwright: verificado em Desktop (1440x900) e Mobile (390x844).

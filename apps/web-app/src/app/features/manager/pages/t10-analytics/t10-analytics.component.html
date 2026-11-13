@@ -1071,13 +1071,13 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- MONALISA • ASSISTENTE OPERACIONAL (Ícone M com Brilho, Modal e Voz)         -->
+    <!-- MELISA • ASSISTENTE OPERACIONAL (Ícone M com Brilho, Modal e Voz)             -->
     <!-- ========================================================================= -->
     <div class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end">
-      <!-- Chat Drawer Window (Modal Profissional e Direto • Monalisa) -->
+      <!-- Chat Drawer Window (Modal Profissional e Direto • Melisa) -->
       @if (isCopilotOpen()) {
         <div class="mb-3 w-[calc(100vw-2rem)] sm:w-[390px] md:w-[410px] max-h-[82vh] sm:max-h-[620px] bg-white border border-[#E2E8F0] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in slide-in-from-bottom-3 duration-150">
-          <!-- Monalisa Header Padrão Google Enterprise -->
+          <!-- Melisa Header Padrão Google Enterprise -->
           <div class="bg-[#141414] text-white px-4 py-3 flex items-center justify-between border-b border-[#262626]">
             <div class="flex items-center gap-3">
               <div class="relative">
@@ -1095,7 +1095,7 @@
                 </span>
               </div>
               <div>
-                <h4 class="text-xs font-bold text-white tracking-wide">Monalisa</h4>
+                <h4 class="text-xs font-bold text-white tracking-wide">Melisa</h4>
                 <!-- WhatsApp Style Online Indicator (Bolinha verde + online) -->
                 <div class="flex items-center gap-1.5 mt-0.5">
                   <span class="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span>
@@ -1304,7 +1304,7 @@
                   name="copilotMsg"
                   [ngModel]="copilotInput()"
                   (ngModelChange)="copilotInput.set($event)"
-                  placeholder="Pergunte à Monalisa ou use a voz..."
+                  placeholder="Pergunte à Melisa ou use a voz..."
                   class="w-full h-10 pl-3.5 pr-9 rounded-xl bg-[#F8FAFC] border border-[#CBD5E1] focus:bg-white focus:border-[#05944F] focus:ring-1 focus:ring-[#05944F] text-xs text-[#0F172A] placeholder-[#94A3B8] focus:outline-none transition-all"
                 />
 
@@ -1345,10 +1345,10 @@
       <button
         type="button"
         (click)="toggleCopilot()"
-        title="Abrir Monalisa (IA Operacional)"
+        title="Abrir Melisa (IA Operacional)"
         class="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-[#05944F] to-[#036837] hover:from-[#047840] hover:to-[#02522B] text-white shadow-2xl flex items-center justify-center border-2 border-white transition-all transform hover:scale-105 active:scale-95 relative cursor-pointer group"
       >
-        <!-- Ícone M Monalisa Estilizado SVG com Spark Dourado -->
+        <!-- Ícone M Melisa Estilizado SVG com Spark Dourado -->
         <svg class="w-7 h-7 sm:w-8 sm:h-8 drop-shadow-xs" viewBox="0 0 32 32" fill="none">
           <path d="M6 24.5L9.8 7.5C10.1 6.4 11.2 5.8 12.2 6.1C13.1 6.4 13.8 7.2 14 8.2L16 16.5L18 8.2C18.2 7.2 18.9 6.4 19.8 6.1C20.8 5.8 21.9 6.4 22.2 7.5L26 24.5" stroke="white" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M16 19.8L16.7 21.8L18.8 22.5L16.7 23.2L16 25.2L15.3 23.2L13.2 22.5L15.3 21.8L16 19.8Z" fill="#FBBF24"/>

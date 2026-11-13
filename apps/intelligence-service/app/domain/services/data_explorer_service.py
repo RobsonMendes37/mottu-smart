@@ -56,7 +56,7 @@ def classify_conversational_intent(query: str) -> Optional[str]:
     courtesy_words = {
         "obrigado", "obrigada", "valeu", "show", "show de bola",
         "blz", "beleza", "tchau", "ate mais", "até mais", "otimo", "ótimo",
-        "perfeito", "maravilha", "top", "legal", "valeu monalisa"
+        "perfeito", "maravilha", "top", "legal", "valeu melisa", "valeu monalisa"
     }
     if cleaned in courtesy_words:
         return "COURTESY"
@@ -172,8 +172,8 @@ def answer_manager_query(
             }
         if conv_intent == "IDENTITY":
             return {
-                "direct_answer": f"Sou a Monalisa, inteligência operacional da Mottu em {resolved_yard}. Monitoro frotas, oficinas, peças e vistorias em tempo real.",
-                "spoken_answer": "Sou a Monalisa, copiloto operacional da Mottu.",
+                "direct_answer": f"Sou a Melisa, inteligência operacional da Mottu em {resolved_yard}. Monitoro frotas, oficinas, peças e vistorias em tempo real.",
+                "spoken_answer": "Sou a Melisa, copiloto operacional da Mottu.",
                 "should_show_table": False,
                 "key_metric_label": "",
                 "key_metric_value": "",
@@ -186,7 +186,7 @@ def answer_manager_query(
             }
         # GREETING
         return {
-            "direct_answer": f"Olá! Sou a Monalisa, sua assistente operacional da Mottu em {resolved_yard}. Em que posso apoiar na operação da frota e oficina hoje?",
+            "direct_answer": f"Olá! Sou a Melisa, sua assistente operacional da Mottu em {resolved_yard}. Em que posso apoiar na operação da frota e oficina hoje?",
             "spoken_answer": "Olá! Estou à disposição para ajudar na operação.",
             "should_show_table": False,
             "key_metric_label": "",
@@ -556,7 +556,7 @@ def answer_manager_query(
         ["Almoxarifado e Peças", "4 SKUs em alerta", "Giro de 1,2 un./dia", "Sugestão de reposição calculada"]
     ]
     return {
-        "direct_answer": f"Olá! Sou a Monalisa, sua assistente operacional da Mottu. A operação de {resolved_yard} está com alta eficiência: 78,5% das vistorias foram resolvidas automaticamente, com fila zero na oficina e 16 motos em locação ativa.",
+        "direct_answer": f"Olá! Sou a Melisa, sua assistente operacional da Mottu. A operação de {resolved_yard} está com alta eficiência: 78,5% das vistorias foram resolvidas automaticamente, com fila zero na oficina e 16 motos em locação ativa.",
         "spoken_answer": "Operação estável com fila zero e setenta e oito por cento das vistorias automatizadas.",
         "should_show_table": wants_table,
         "key_metric_label": "Eficiência Global da Unidade" if wants_table else "",

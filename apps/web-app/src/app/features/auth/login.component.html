@@ -1,16 +1,16 @@
-<div class="min-h-screen w-full flex flex-col lg:flex-row bg-[#FFFFFF] text-[#1F1F1F]">
-  <!-- LEFT COLUMN: 3D STYLIZED FLEET & WORKSHOP (CLEAN ARTWORK, ZERO MARKETING / AI OVERLAYS) -->
+<div class="min-h-screen w-full flex flex-col lg:flex-row bg-[#F8F9FA] text-[#1F1F1F]">
+  <!-- LEFT COLUMN: 3D STYLIZED FLEET & WORKSHOP (CLEAN ARTWORK + EDITORIAL WHITE TYPOGRAPHY) -->
   <aside class="hidden lg:relative lg:flex lg:w-1/2 xl:w-[50%] bg-[#0D1412] text-white flex-col justify-between overflow-hidden select-none">
-    <!-- 3D Artwork -->
+    <!-- 3D Artwork (Melisa na Oficina Mottu) -->
     <img
       src="/demo-photos/login-hero-mottu-3d.webp"
       (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/login-hero-mottu-3d.jpg'"
-      alt="Operação Mottu 3D"
+      alt="Melisa na Operação Mottu 3D"
       class="absolute inset-0 w-full h-full object-cover object-center"
     />
 
-    <!-- Subtle gradient at top only for brand readability -->
-    <div class="absolute inset-0 bg-gradient-to-b from-[#0D1412]/50 via-transparent to-transparent pointer-events-none"></div>
+    <!-- Subtle vignette for top brand and bottom typography readability -->
+    <div class="absolute inset-0 bg-gradient-to-t from-[#0D1412]/85 via-transparent to-[#0D1412]/40 pointer-events-none"></div>
 
     <!-- Minimalist Brand at Top -->
     <div class="relative z-10 p-10 flex items-center gap-3">
@@ -20,31 +20,42 @@
       <span class="text-lg font-bold tracking-tight text-white">Mottu</span>
     </div>
 
-    <!-- Empty spacer: art breathes cleanly without any text or metric boxes -->
-    <div></div>
+    <!-- Professional White Tagline at Bottom (Direto sobre a plataforma, sem jargões de IA) -->
+    <div class="relative z-10 p-10 space-y-1.5">
+      <h2 class="text-2xl xl:text-3xl font-semibold text-white tracking-tight">
+        Operação de frotas e oficinas.
+      </h2>
+      <p class="text-sm text-white/80 max-w-md leading-relaxed">
+        Tecnologia para quem move a logística urbana todos os dias.
+      </p>
+    </div>
   </aside>
 
-  <!-- RIGHT COLUMN: DIRECT GOOGLE-STYLE AUTH WORKSPACE -->
-  <main class="w-full lg:w-1/2 xl:w-[50%] min-h-screen flex flex-col justify-between p-6 sm:p-12 overflow-y-auto bg-[#FFFFFF]">
-    <div class="w-full max-w-[400px] mx-auto my-auto py-8">
-      <!-- Mottu Brand on Mobile -->
-      <div class="flex items-center gap-2.5 mb-8 lg:hidden">
-        <div class="w-8 h-8 rounded-lg bg-[#05944F] flex items-center justify-center text-white font-bold text-base">
-          M
-        </div>
-        <span class="text-lg font-bold tracking-tight text-[#1F1F1F]">Mottu</span>
+  <!-- RIGHT COLUMN: STRUCTURED GOOGLE-STYLE AUTH WORKSPACE COM FLUXO E CARD ELEVADO -->
+  <main class="w-full lg:w-1/2 xl:w-[50%] min-h-screen flex flex-col justify-between p-4 sm:p-8 lg:p-12 overflow-y-auto bg-[#F8F9FA]">
+    <!-- Mobile Brand Header -->
+    <div class="flex items-center gap-2.5 mb-4 lg:hidden">
+      <div class="w-9 h-9 rounded-xl bg-[#05944F] flex items-center justify-center text-white font-bold text-lg">
+        M
       </div>
+      <div>
+        <span class="text-lg font-bold tracking-tight text-[#1F1F1F]">Mottu Ops</span>
+        <span class="text-[10px] block text-[#5E5E5E]">Portal Operacional Integrado</span>
+      </div>
+    </div>
 
-      <!-- Header (Direto padrão Google) -->
+    <!-- Elevated Sculpted Card (Cria fluxo visual e elimina campos soltos no vazio) -->
+    <div class="w-full max-w-[420px] mx-auto my-auto bg-white border border-[#E5E7EB] rounded-2xl p-7 sm:p-9 shadow-[0_4px_24px_rgba(0,0,0,0.03)]">
+      <!-- Header Direto padrão Google -->
       <div class="mb-6">
-        <h1 class="text-2xl font-medium text-[#1F1F1F] tracking-tight">
+        <h1 class="text-2xl font-semibold text-[#1F1F1F] tracking-tight">
           @if (activeTab() === 'LOGIN') {
             Fazer login
           } @else {
             Criar conta
           }
         </h1>
-        <p class="text-sm text-[#5E5E5E] mt-1.5">
+        <p class="text-xs text-[#5E5E5E] mt-1.5 leading-relaxed">
           @if (activeTab() === 'LOGIN') {
             Acesse com seu e-mail cadastrado
           } @else {
@@ -55,20 +66,20 @@
 
       <!-- Alerts -->
       @if (pendingApprovalNotice()) {
-        <div class="mb-5 p-3.5 rounded-lg bg-[#FEF7E0] border border-[#FEEFC3] text-xs text-[#7A4B04] leading-relaxed">
-          <p class="font-medium">Cadastro em análise</p>
+        <div class="mb-5 p-3.5 rounded-xl bg-[#FEF7E0] border border-[#FEEFC3] text-xs text-[#7A4B04] leading-relaxed">
+          <p class="font-semibold">Cadastro em análise</p>
           <p class="mt-0.5 text-[#5F370E]">Seus dados foram recebidos. O gestor da unidade liberará seu acesso em breve.</p>
         </div>
       }
 
       @if (successMessage()) {
-        <div class="mb-5 p-3.5 rounded-lg bg-[#E6F4EA] border border-[#CEEAD6] text-xs font-medium text-[#137333]">
+        <div class="mb-5 p-3.5 rounded-xl bg-[#E6F4EA] border border-[#CEEAD6] text-xs font-medium text-[#137333]">
           {{ successMessage() }}
         </div>
       }
 
       @if (errorMessage()) {
-        <div class="mb-5 p-3.5 rounded-lg bg-[#FCE8E6] border border-[#FAD2CF] text-xs font-medium text-[#C5221F]">
+        <div class="mb-5 p-3.5 rounded-xl bg-[#FCE8E6] border border-[#FAD2CF] text-xs font-medium text-[#C5221F]">
           {{ errorMessage() }}
         </div>
       }
@@ -88,7 +99,7 @@
               [ngModel]="loginEmail()"
               (ngModelChange)="loginEmail.set($event)"
               placeholder="nome@mottu.com.br"
-              class="w-full h-12 px-3.5 rounded-lg border border-[#747775]/50 focus:border-[#05944F] focus:ring-1 focus:ring-[#05944F] text-sm text-[#1F1F1F] placeholder-[#8E918F] outline-none transition-colors"
+              class="w-full h-11 px-3.5 rounded-lg border border-[#D1D5DB] focus:border-[#05944F] focus:ring-1 focus:ring-[#05944F] text-sm text-[#1F1F1F] placeholder-[#9CA3AF] outline-none transition-colors"
             />
           </div>
 
@@ -113,7 +124,7 @@
               [ngModel]="loginPassword()"
               (ngModelChange)="loginPassword.set($event)"
               placeholder="Digite sua senha"
-              class="w-full h-12 px-3.5 rounded-lg border border-[#747775]/50 focus:border-[#05944F] focus:ring-1 focus:ring-[#05944F] text-sm text-[#1F1F1F] placeholder-[#8E918F] outline-none transition-colors"
+              class="w-full h-11 px-3.5 rounded-lg border border-[#D1D5DB] focus:border-[#05944F] focus:ring-1 focus:ring-[#05944F] text-sm text-[#1F1F1F] placeholder-[#9CA3AF] outline-none transition-colors"
             />
           </div>
 
@@ -153,7 +164,7 @@
                 type="button"
                 (click)="registerRole.set('RIDER')"
                 class="h-10 rounded-lg border text-xs font-medium transition-colors cursor-pointer"
-                [class]="registerRole() === 'RIDER' ? 'border-[#05944F] bg-[#E6F4EA] text-[#137333]' : 'border-[#C4C7C5] text-[#444746]'"
+                [class]="registerRole() === 'RIDER' ? 'border-[#05944F] bg-[#E6F4EA] text-[#137333]' : 'border-[#D1D5DB] text-[#444746]'"
               >
                 Entregador
               </button>
@@ -161,7 +172,7 @@
                 type="button"
                 (click)="registerRole.set('MECHANIC')"
                 class="h-10 rounded-lg border text-xs font-medium transition-colors cursor-pointer"
-                [class]="registerRole() === 'MECHANIC' ? 'border-[#05944F] bg-[#E6F4EA] text-[#137333]' : 'border-[#C4C7C5] text-[#444746]'"
+                [class]="registerRole() === 'MECHANIC' ? 'border-[#05944F] bg-[#E6F4EA] text-[#137333]' : 'border-[#D1D5DB] text-[#444746]'"
               >
                 Mecânico
               </button>
@@ -177,7 +188,7 @@
               [ngModel]="registerFullName()"
               (ngModelChange)="registerFullName.set($event)"
               placeholder="Seu nome"
-              class="w-full h-11 px-3.5 rounded-lg border border-[#747775]/50 focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
+              class="w-full h-10 px-3 rounded-lg border border-[#D1D5DB] focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
             />
           </div>
 
@@ -191,7 +202,7 @@
                 [ngModel]="registerCpf()"
                 (ngModelChange)="registerCpf.set($event)"
                 placeholder="000.000.000-00"
-                class="w-full h-11 px-3 rounded-lg border border-[#747775]/50 focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
+                class="w-full h-10 px-3 rounded-lg border border-[#D1D5DB] focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
               />
             </div>
             <div>
@@ -203,7 +214,7 @@
                 [ngModel]="registerPhone()"
                 (ngModelChange)="registerPhone.set($event)"
                 placeholder="(11) 99999-9999"
-                class="w-full h-11 px-3 rounded-lg border border-[#747775]/50 focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
+                class="w-full h-10 px-3 rounded-lg border border-[#D1D5DB] focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
               />
             </div>
           </div>
@@ -217,7 +228,7 @@
               [ngModel]="registerEmail()"
               (ngModelChange)="registerEmail.set($event)"
               placeholder="nome@email.com"
-              class="w-full h-11 px-3.5 rounded-lg border border-[#747775]/50 focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
+              class="w-full h-10 px-3 rounded-lg border border-[#D1D5DB] focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
             />
           </div>
 
@@ -230,7 +241,7 @@
               [ngModel]="registerPassword()"
               (ngModelChange)="registerPassword.set($event)"
               placeholder="Mínimo 8 caracteres"
-              class="w-full h-11 px-3.5 rounded-lg border border-[#747775]/50 focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
+              class="w-full h-10 px-3 rounded-lg border border-[#D1D5DB] focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
             />
           </div>
 
@@ -260,20 +271,20 @@
         </form>
       }
 
-      <!-- GOOGLE-STYLE DIRECT QUICK ACCESS WITH CHAVEAMENTO -->
+      <!-- GOOGLE-STYLE DIRECT QUICK ACCESS COM CHAVEAMENTO LIMPO -->
       @if (publicDemoMode()) {
-        <div class="mt-8 pt-6 border-t border-[#E0E2EC]">
+        <div class="mt-8 pt-6 border-t border-[#E5E7EB]">
           <!-- Chaveamento de Contas -->
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[11px] font-medium text-[#747775]">
+            <span class="text-xs font-medium text-[#5E5E5E]">
               Acesso rápido:
             </span>
-            <div class="inline-flex p-0.5 rounded-full bg-[#F0F2F5] border border-[#E0E2EC] text-[11px]">
+            <div class="inline-flex p-0.5 rounded-full bg-[#F0F2F5] border border-[#E5E7EB] text-[11px]">
               <button
                 type="button"
                 (click)="setQuickAccessMode('VITRINE')"
                 class="px-2.5 py-1 rounded-full transition-all cursor-pointer"
-                [class]="quickAccessMode() === 'VITRINE' ? 'bg-white text-[#1F1F1F] font-semibold shadow-xs' : 'text-[#747775] hover:text-[#1F1F1F]'"
+                [class]="quickAccessMode() === 'VITRINE' ? 'bg-white text-[#1F1F1F] font-semibold shadow-xs' : 'text-[#5E5E5E] hover:text-[#1F1F1F]'"
               >
                 Demonstração
               </button>
@@ -281,7 +292,7 @@
                 type="button"
                 (click)="setQuickAccessMode('LIVE')"
                 class="px-2.5 py-1 rounded-full transition-all cursor-pointer"
-                [class]="quickAccessMode() === 'LIVE' ? 'bg-white text-[#1F1F1F] font-semibold shadow-xs' : 'text-[#747775] hover:text-[#1F1F1F]'"
+                [class]="quickAccessMode() === 'LIVE' ? 'bg-white text-[#1F1F1F] font-semibold shadow-xs' : 'text-[#5E5E5E] hover:text-[#1F1F1F]'"
               >
                 Contas Reais
               </button>
@@ -294,7 +305,7 @@
               type="button"
               [disabled]="isLoading()"
               (click)="onQuickLogin('RIDER')"
-              class="flex-1 py-1.5 px-3 rounded-full border border-[#C4C7C5] hover:border-[#05944F] hover:bg-[#F2FBF6] text-xs font-medium text-[#1F1F1F] transition-all cursor-pointer disabled:opacity-50"
+              class="flex-1 py-1.5 px-3 rounded-full border border-[#D1D5DB] hover:border-[#05944F] hover:bg-[#F2FBF6] text-xs font-medium text-[#1F1F1F] text-center transition-colors cursor-pointer disabled:opacity-50"
             >
               Entregador
             </button>
@@ -302,7 +313,7 @@
               type="button"
               [disabled]="isLoading()"
               (click)="onQuickLogin('MECHANIC')"
-              class="flex-1 py-1.5 px-3 rounded-full border border-[#C4C7C5] hover:border-[#05944F] hover:bg-[#F2FBF6] text-xs font-medium text-[#1F1F1F] transition-all cursor-pointer disabled:opacity-50"
+              class="flex-1 py-1.5 px-3 rounded-full border border-[#D1D5DB] hover:border-[#05944F] hover:bg-[#F2FBF6] text-xs font-medium text-[#1F1F1F] text-center transition-colors cursor-pointer disabled:opacity-50"
             >
               Mecânico
             </button>
@@ -310,7 +321,7 @@
               type="button"
               [disabled]="isLoading()"
               (click)="onQuickLogin('MANAGER')"
-              class="flex-1 py-1.5 px-3 rounded-full border border-[#C4C7C5] hover:border-[#05944F] hover:bg-[#F2FBF6] text-xs font-medium text-[#1F1F1F] transition-all cursor-pointer disabled:opacity-50"
+              class="flex-1 py-1.5 px-3 rounded-full border border-[#D1D5DB] hover:border-[#05944F] hover:bg-[#F2FBF6] text-xs font-medium text-[#1F1F1F] text-center transition-colors cursor-pointer disabled:opacity-50"
             >
               Gestor
             </button>
@@ -320,7 +331,7 @@
     </div>
 
     <!-- Minimalist Clean Footer -->
-    <footer class="pt-6 text-center text-xs text-[#747775]">
+    <footer class="pt-4 text-center text-xs text-[#747775]">
       Mottu © 2026 • Termos de uso • Privacidade
     </footer>
   </main>

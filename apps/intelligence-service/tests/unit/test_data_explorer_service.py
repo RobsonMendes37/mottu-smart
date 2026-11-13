@@ -152,6 +152,7 @@ def test_resolve_context_yard_all_cases():
 
 def test_is_greeting_or_casual_cases():
     assert is_greeting_or_casual("oi") is True
+    assert is_greeting_or_casual("oi melissa") is True
     assert is_greeting_or_casual("oi melisa") is True
     assert is_greeting_or_casual("oi monalisa") is True
     assert is_greeting_or_casual("olá!") is True
@@ -178,7 +179,7 @@ def test_answer_manager_query_greeting_intent():
     assert res["rows"] == []
     assert res["key_metric_label"] == ""
     assert res["should_show_table"] is False
-    assert "Melisa" in res["direct_answer"]
+    assert "Melissa" in res["direct_answer"]
     assert "disposição" in res["spoken_answer"] or "apoiar" in res["spoken_answer"]
 
 
@@ -202,7 +203,7 @@ def test_answer_manager_query_courtesy():
     assert "nada" in res["direct_answer"] or "disposição" in res["direct_answer"]
     assert "Disponha" in res["spoken_answer"]
 
-    res2 = answer_manager_query("valeu melisa", "Todas as Unidades (SP)", {})
+    res2 = answer_manager_query("valeu melissa", "Todas as Unidades (SP)", {})
     assert res2["active_skill"] == "CONVERSATIONAL"
     assert res2["should_show_table"] is False
 
@@ -211,8 +212,8 @@ def test_answer_manager_query_identity():
     res = answer_manager_query("quem é você?", "Todas as Unidades (SP)", {})
     assert res["active_skill"] == "CONVERSATIONAL"
     assert res["should_show_table"] is False
-    assert "Melisa" in res["direct_answer"]
-    assert "Melisa" in res["spoken_answer"]
+    assert "Melissa" in res["direct_answer"]
+    assert "Melissa" in res["spoken_answer"]
 
     res2 = answer_manager_query("o que você faz?", "Todas as Unidades (SP)", {})
     assert res2["active_skill"] == "CONVERSATIONAL"

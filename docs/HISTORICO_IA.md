@@ -1960,3 +1960,16 @@
   - Angular Vitest (`apps/web-app`): **26/26 testes aprovados (Login e T10 Analytics)**.
   - Angular Production Build: **100% compilado com sucesso**.
   - Script Visual Playwright: verificado em Desktop (1440x900) e Mobile (390x844).
+
+### [2026-11-13 08:35] — Padronização Oficial da Grafia: **Melissa** (Dois S)
+- **Agente / Modelo:** `@frontend-specialist` + `@backend-specialist` + `@clean-code`
+- **Motivação:** O usuário especificou que a grafia oficial da assistente é **Melissa** (com dois "s").
+- **Implementações Realizadas:**
+  1. **Atualização da Grafia em Todo o Ecossistema:**
+     - `apps/intelligence-service/`: `data_explorer_service.py` atualizado para responder como "Melissa" mantendo tolerância natural a variações ("oi melissa", "oi melisa", "valeu melissa"), `gemini_adapter.py` com system prompt "Você é a Melissa...", testes `test_data_explorer_service.py` atualizados.
+     - `apps/core-api/`: `IntelligenceServiceClient.java` saudação padrão atualizada para "Melissa".
+     - `apps/web-app/`: `t10-analytics.component.html`, `.ts`, `.spec.ts` e `login.component.html` com o nome oficial Melissa.
+- **Validação de Testes e Build:**
+  - Python Pytest: **212/212 testes aprovados**.
+  - Angular Vitest: **26/26 testes aprovados**.
+  - Angular Production Build: **100% compilado em 7.3s**.

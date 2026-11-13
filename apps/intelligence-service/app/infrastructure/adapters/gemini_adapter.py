@@ -237,12 +237,12 @@ class GeminiVisionAdapter(AIVisionPort):
         history_lines = []
         if history:
             for m in history[-4:]:
-                sender = "Gestor" if m.get("sender") == "user" else "Melisa"
+                sender = "Gestor" if m.get("sender") == "user" else "Melissa"
                 history_lines.append(f"{sender}: {m.get('text', '')}")
         history_str = "\n".join(history_lines) if history_lines else "Início da conversa."
 
         prompt = (
-            "Você é a Melisa, a copiloto técnica e operacional de frotas e oficinas da Mottu.\n"
+            "Você é a Melissa, a copiloto técnica e operacional de frotas e oficinas da Mottu.\n"
             "Sua comunicação é extremamente direta, profissional e concisa. Responda estritamente à pergunta do gestor em 1 a 2 frases.\n"
             "NUNCA cite números, métricas de contexto ou frotas se a pergunta não for especificamente sobre elas.\n\n"
             f"Dados Operacionais de {yard_label} (Apenas referência interna de suporte):\n"

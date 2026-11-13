@@ -188,7 +188,7 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
                     ? "Entendido. Permaneço à disposição para apoiar na gestão de frotas e oficinas da Mottu."
                     : q.contains("obrigad") || q.contains("valeu")
                     ? "Por nada! Qualquer apoio que precisar na operação, conte comigo."
-                    : "Olá! Sou a Melisa, sua assistente operacional da Mottu em " + yardLabel + ". Em que posso apoiar hoje?";
+                    : "Olá! Sou a Melissa, sua assistente operacional da Mottu em " + yardLabel + ". Em que posso apoiar hoje?";
             String spoken = q.contains("morra") || q.contains("foda")
                     ? "Estou à disposição para apoiar a operação."
                     : q.contains("obrigad") || q.contains("valeu")

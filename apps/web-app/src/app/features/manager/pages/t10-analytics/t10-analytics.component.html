@@ -1008,6 +1008,28 @@
 
           <!-- Embedded Frame / Interactive Google Dashboard Canvas -->
           @if (safeEmbedUrl()) {
+            <!-- Banner Informativo de Incorporação Google -->
+            <div class="p-3.5 rounded-xl bg-[#E8F0FE] border border-[#D2E3FC] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#1967D2]">
+              <div class="flex items-start sm:items-center gap-2.5">
+                <span class="text-base leading-none">ℹ️</span>
+                <div>
+                  <span class="font-bold">Para visualizar dentro da plataforma:</span>
+                  <span class="block text-[11px] text-[#3C4043] mt-0.5">
+                    No Google Looker Studio, clique em <strong>Arquivo &gt; Incorporar relatório</strong> (ou na setinha de <em>Compartilhar</em>) e marque <strong>"Ativar incorporação"</strong>.
+                  </span>
+                </div>
+              </div>
+              <a
+                [href]="rawEmbedUrl() || 'https://datastudio.google.com/reporting/7da4b13e-f12a-4434-b33f-73f8603f3662'"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="px-3 py-1.5 rounded-lg bg-[#1A73E8] hover:bg-[#1557B0] text-white text-xs font-semibold whitespace-nowrap inline-flex items-center gap-1.5 transition-colors self-start sm:self-auto cursor-pointer shadow-xs"
+              >
+                <span>Abrir no Looker Studio</span>
+                <span>↗</span>
+              </a>
+            </div>
+
             <iframe
               [src]="safeEmbedUrl()"
               title="Painel Analítico Mottu Ops - Google Looker Studio"

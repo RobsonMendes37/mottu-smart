@@ -90,9 +90,9 @@ jobs:
               echo "S3_PUBLIC_ENDPOINT=http://161.153.2.148" >> .env
             fi
             if grep -q "^LOOKER_STUDIO_EMBED_URL=" .env 2>/dev/null; then
-              sed -i 's|^LOOKER_STUDIO_EMBED_URL=.*|LOOKER_STUDIO_EMBED_URL=https://datastudio.google.com/embed/reporting/7da4b13e-f12a-4434-b33f-73f8603f3662|' .env
+              sed -i 's|^LOOKER_STUDIO_EMBED_URL=.*|LOOKER_STUDIO_EMBED_URL=https://datastudio.google.com/embed/reporting/7da4b13e-f12a-4434-b33f-73f8603f3662/page/1xZU|' .env
             else
-              echo "LOOKER_STUDIO_EMBED_URL=https://datastudio.google.com/embed/reporting/7da4b13e-f12a-4434-b33f-73f8603f3662" >> .env
+              echo "LOOKER_STUDIO_EMBED_URL=https://datastudio.google.com/embed/reporting/7da4b13e-f12a-4434-b33f-73f8603f3662/page/1xZU" >> .env
             fi
             if grep -q "^BIGQUERY_ENABLED=" .env 2>/dev/null; then
               sed -i 's|^BIGQUERY_ENABLED=.*|BIGQUERY_ENABLED=true|' .env

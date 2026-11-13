@@ -94,6 +94,9 @@ describe('InspectionStatusComponent (Screen T04 - SSE Live Status & Contest/Book
     expect(comp.totalPriceDisplay()).toBe('R$ 60,00');
     expect(comp.isMauUso()).toBe(true);
     expect(comp.isZeroCost()).toBe(false);
+    expect(comp.partsSubtotalBrl()).toBe(25.0);
+    expect(comp.minEstimatedBrl()).toBe(25.0);
+    expect(comp.maxEstimatedBrl()).toBe(60.0);
   });
 
   it('TC-T04-4: Displays R$ 0,00 and zero cost tag for PRE_EXISTENTE verdict', () => {
@@ -101,11 +104,17 @@ describe('InspectionStatusComponent (Screen T04 - SSE Live Status & Contest/Book
       ...mockStore.currentInspection(),
       finalVerdict: 'PRE_EXISTENTE',
       totalEstimatedBrl: 0,
+      laborFeeBrl: 35.0,
+      items: [
+        { catalogPartId: 'part-1', partName: 'Manete de Freio', unitPriceBrl: 25.0, addedBy: 'AI' },
+      ],
     });
 
     expect(comp.totalPriceDisplay()).toBe('R$ 0,00');
     expect(comp.isZeroCost()).toBe(true);
     expect(comp.isMauUso()).toBe(false);
+    expect(comp.partsSubtotalBrl()).toBe(25.0);
+    expect(comp.totalSavedBrl()).toBe(60.0); // 25 + 35
   });
 
   it('TC-T04-5: Contestation enforces minimum 10 characters before submitting', async () => {

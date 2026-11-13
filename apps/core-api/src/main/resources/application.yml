@@ -67,4 +67,4 @@ mottu:
     dataset: ${BIGQUERY_DATASET:mottu_ops_bi}
     table: ${BIGQUERY_TABLE:fact_inspections}
   looker:
-    embed-url: ${LOOKER_STUDIO_EMBED_URL:${MOTTU_LOOKER_EMBED_URL:https://datastudio.google.com/embed/reporting/7da4b13e-f12a-4434-b33f-73f8603f3662}}
+    embed-url: ${LOOKER_STUDIO_EMBED_URL:${MOTTU_LOOKER_EMBED_URL:https://datastudio.google.com/embed/reporting/7da4b13e-f12a-4434-b33f-73f8603f3662/page/1xZU}}

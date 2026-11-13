@@ -168,7 +168,7 @@ services:
       S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-http://localhost:19000}
       BIGQUERY_ENABLED: ${BIGQUERY_ENABLED:-true}
       PUBLIC_DEMO_MODE: ${PUBLIC_DEMO_MODE:-false}
-      LOOKER_STUDIO_EMBED_URL: ${LOOKER_STUDIO_EMBED_URL:-https://datastudio.google.com/embed/reporting/7da4b13e-f12a-4434-b33f-73f8603f3662}
+      LOOKER_STUDIO_EMBED_URL: ${LOOKER_STUDIO_EMBED_URL:-https://datastudio.google.com/embed/reporting/7da4b13e-f12a-4434-b33f-73f8603f3662/page/1xZU}
       JAVA_OPTS: "-XX:+UseSerialGC -Xmx220m -Xms64m -XX:MaxMetaspaceSize=220m"
     deploy:
       resources:

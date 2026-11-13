@@ -99,6 +99,29 @@ export class InspectionStatusComponent implements OnInit, OnDestroy {
     return c ? !c.canIdentifyPartsClearly : false;
   });
 
+  partsSubtotalBrl = computed(() => {
+    const items = this.inspection()?.items || [];
+    return items.reduce((sum, item) => sum + (item.unitPriceBrl || 0), 0);
+  });
+
+  minEstimatedBrl = computed(() => {
+    if (this.isZeroCost()) return 0;
+    return this.partsSubtotalBrl();
+  });
+
+  maxEstimatedBrl = computed(() => {
+    if (this.isZeroCost()) return 0;
+    const ins = this.inspection();
+    return ins ? ins.totalEstimatedBrl : 0;
+  });
+
+  totalSavedBrl = computed(() => {
+    if (!this.isZeroCost()) return 0;
+    const ins = this.inspection();
+    const labor = ins?.laborFeeBrl ?? 50.0;
+    return this.partsSubtotalBrl() + labor;
+  });
+
   totalPriceDisplay = computed(() => {
     const ins = this.inspection();
     if (!ins) return 'Calculando...';

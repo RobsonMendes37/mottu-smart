@@ -1983,3 +1983,25 @@
   - Angular Vitest: **10/10 testes de login aprovados**.
   - Angular Production Build: **100% compilado em 5.9s (bundle main-7VIEXEYC.js)**.
   - Script Visual Playwright: snapshot verificado e aprovado.
+
+### [2026-11-13 09:00] — Transparência Total de Peças/Valores na Vistoria do Entregador & URL Completa do Looker Studio (/page/1xZU)
+- **Agente / Modelo:** `@frontend-specialist` + `@backend-specialist` + `@clean-code`
+- **Motivação:**
+  1. O usuário forneceu o link de incorporação exato com a página do relatório no Google Looker Studio: `https://datastudio.google.com/embed/reporting/7da4b13e-f12a-4434-b33f-73f8603f3662/page/1xZU`.
+  2. O usuário pontuou que, como usuário normal (entregador), esperava que a IA retornasse a lista detalhada de todas as peças identificadas, estimativas mínima e máxima e valores das peças avaliadas, mas isso não estava aparecendo na tela de status.
+- **Implementações Realizadas:**
+  1. **URL de Incorporação Completa do Looker Studio com Page ID (`/page/1xZU`):**
+     - Atualizada a URL em `.env`, `apps/core-api/src/main/resources/application.yml`, `infra/docker-compose.prod.yml`, `.github/workflows/cd.yml` e no fallback de `t10-analytics.component.html`.
+     - A adição do identificador de página `/page/1xZU` é necessária pelo Looker Studio para renderização direta em iframe sem erro de página não encontrada.
+  2. **Transparência de Peças e Valores para o Entregador (`inspection-status.component.ts` e `.html`):**
+     - **Causa Raiz da Omissão:** O template possuía a condição restritiva `@if (!isZeroCost() && ins.items.length > 0)`. Como vistorias com veredito de Desgaste Natural ou Avaria Pré-existente possuem custo R$ 0,00 para o entregador (`isZeroCost() == true`), a lista inteira de peças era ocultada, deixando o entregador sem transparência sobre quais peças a IA analisou.
+     - **Correção e Melhoria:**
+       - Criados sinais computados `partsSubtotalBrl`, `minEstimatedBrl`, `maxEstimatedBrl` e `totalSavedBrl` (economia garantida pela Mottu).
+       - Exibição de **todas as peças avaliadas**, com código de catálogo oficial Loja Mottu, valor unitário e selo de cobertura:
+         - Para `isZeroCost()`: valor unitário riscado com destaque verde `✓ Coberto Mottu (R$ 0,00)`, demonstrativo do desconto integral do plano e total a pagar `R$ 0,00`.
+         - Para avarias faturadas (`MAU_USO`): discriminação de subtotal de peças, mão de obra de oficina, estimativa mínima (apenas peças) e estimativa máxima (peças + oficina).
+       - Caso nenhuma avaria seja detectada nas fotos (`items.length === 0`), exibição de card tranquilizador e afirmativo: *"Nenhuma avaria ou quebra mecânica detectada. Sua moto está em conformidade e liberada!"*.
+       - Durante a triagem da oficina (`HUMAN_TRIAGE`), inclusão da prévia dos componentes identificados preliminarmente pela IA em análise pelo mecânico.
+- **Validação:**
+  - Angular Vitest: **250/250 testes aprovados em 38 arquivos** (incluindo 8 testes dedicados com novos cálculos de transparência em `inspection-status.component.spec.ts`).
+  - Angular Production Build: **100% concluído com sucesso** (`main-4BD7RA3G.js`).

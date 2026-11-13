@@ -1857,7 +1857,17 @@
   - Angular Production Build: **Compilado com 100% de sucesso (404 kB inicial)**.
   - Auditoria Visual Playwright: Desktop (1440x900) e Mobile (390x844) testados com renderização real de pixels e conformidade estrita ao Purple Ban.
 
-### [2026-11-13 07:05] — Refinamento Visual Executivo do Login (Padrão BigTech / Stripe)
+### [2026-11-13 07:35] — Atualização do Dashboard Google Looker Studio na Tela T10
+- **Agente / Modelo:** `@devops-engineer` + `@backend-specialist` + `@frontend-specialist`
+- **Alterações Realizadas:**
+  1. **Atualização da URL Oficial do Looker Studio:**
+     - Substituída a URL anterior pela nova URL de relatório fornecida pelo usuário: `https://datastudio.google.com/embed/reporting/7da4b13e-f12a-4434-b33f-73f8603f3662`.
+     - Atualizados: `.env`, `application.yml`, `infra/docker-compose.prod.yml` e `.github/workflows/cd.yml`.
+  2. **Auto-Normalização de Embed no Frontend Angular (`t10-analytics.component.ts`):**
+     - Adicionada blindagem automática: caso o backend ou o usuário informe a URL no formato padrão `/reporting/`, o frontend automaticamente converte para `/embed/reporting/` ao sanitizar o iframe (`DomSanitizer.bypassSecurityTrustResourceUrl`), prevenindo que o Google bloqueie o carregamento por `X-Frame-Options: DENY` ou `frame-ancestors: 'none'`.
+- **Validação de Testes:**
+  - Angular Vitest: **16/16 testes aprovados no componente T10 Analytics**.
+  - Angular Production Build: **100% concluído com sucesso**.
 - **Agente / Modelo:** `@frontend-specialist` + `@design-spec` + `@clean-code`
 - **Aprimoramentos de UI/UX Realizados:**
   1. **Card de Autenticação Unificado e Esculpido:**

@@ -550,8 +550,9 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
 
         const url = res.lookerStudioEmbedUrl?.trim();
         if (url && url.length > 0) {
+          const embedUrl = url.includes('/embed/') ? url : url.replace('/reporting/', '/embed/reporting/');
           this.rawEmbedUrl.set(url);
-          this.safeEmbedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+          this.safeEmbedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl));
           this.isOfflineFallback.set(false);
         } else {
           this.rawEmbedUrl.set(null);

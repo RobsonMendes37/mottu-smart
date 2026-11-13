@@ -1,6 +1,6 @@
-<div class="min-h-screen w-full flex flex-col lg:flex-row bg-[#F6F6F6] text-[#141414]">
+<div class="min-h-screen w-full flex flex-col lg:flex-row bg-[#F8F9FA] text-[#141414]">
   <!-- LEFT COLUMN: EDITORIAL VISUAL HERO (DESKTOP ONLY: HIDDEN ON MOBILE / TABLET) -->
-  <aside class="hidden lg:relative lg:flex lg:w-1/2 xl:w-[50%] 2xl:w-[52%] bg-[#141414] text-white flex-col justify-between overflow-hidden select-none">
+  <aside class="hidden lg:relative lg:flex lg:w-1/2 xl:w-[50%] 2xl:w-[52%] bg-[#0A0D0C] text-white flex-col justify-between overflow-hidden select-none">
     <!-- Background Editorial Image -->
     <img
       src="/demo-photos/login-hero-mottu.webp"
@@ -10,26 +10,26 @@
     />
 
     <!-- Multi-Layer Vignette & Contrast Overlay -->
-    <div class="absolute inset-0 bg-gradient-to-t from-[#141414]/95 via-[#141414]/50 to-[#141414]/80"></div>
-    <div class="absolute inset-0 bg-radial from-transparent via-[#141414]/30 to-[#141414]/80"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-[#0A0D0C]/95 via-[#0A0D0C]/55 to-[#0A0D0C]/75"></div>
+    <div class="absolute inset-0 bg-radial from-transparent via-[#0A0D0C]/25 to-[#0A0D0C]/80"></div>
 
     <!-- Top Left Mottu Brand Header -->
     <div class="relative z-10 p-8 xl:p-12 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-[#05944F] flex items-center justify-center text-white font-black text-xl shadow-md border border-white/20">
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-xl bg-[#05944F] flex items-center justify-center text-white font-black text-2xl shadow-[0_0_24px_rgba(5,148,79,0.45)] border border-white/25">
           M
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <span class="text-lg font-black tracking-tight text-white">Mottu</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/15 text-white backdrop-blur-xs border border-white/10">
+            <span class="text-xl font-black tracking-tight text-white">Mottu</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/15 text-white backdrop-blur-md border border-white/15">
               Smart Ops
             </span>
           </div>
-          <p class="text-xs text-white/70 font-medium">Sistema Operacional de Frota</p>
+          <p class="text-xs text-white/70 font-medium">Sistema Operacional de Frota • v2.2</p>
         </div>
       </div>
-      <div class="flex items-center gap-2 text-xs font-semibold text-white/80 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+      <div class="flex items-center gap-2 text-xs font-semibold text-white/90 bg-black/45 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-sm">
         <span class="w-2 h-2 rounded-full bg-[#05944F] animate-pulse"></span>
         <span>Rede Operacional Ativa</span>
       </div>
@@ -37,14 +37,14 @@
 
     <!-- Bottom Content: Editorial Narrative & Telemetry Badges -->
     <div class="relative z-10 p-8 xl:p-12 space-y-6">
-      <div class="space-y-3 max-w-xl">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#05944F]/20 border border-[#05944F]/40 text-[#4ade80] text-xs font-semibold">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <div class="space-y-3.5 max-w-xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#05944F]/25 border border-[#05944F]/50 text-[#4ade80] text-xs font-semibold backdrop-blur-xs">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
           </svg>
-          <span>Tecnologia Multimodal de Vistoria</span>
+          <span>Inteligência Artificial Multimodal de Pátio</span>
         </div>
-        <h2 class="text-2xl xl:text-3xl font-extrabold tracking-tight text-white leading-tight">
+        <h2 class="text-2xl xl:text-3xl 2xl:text-4xl font-extrabold tracking-tight text-white leading-tight">
           Eficiência e agilidade na gestão da maior frota de motos da América Latina.
         </h2>
         <p class="text-sm xl:text-base text-white/80 leading-relaxed font-normal">
@@ -53,87 +53,119 @@
       </div>
 
       <!-- Live Feature Pills -->
-      <div class="grid grid-cols-3 gap-3 pt-2">
-        <div class="p-3 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
-          <p class="text-[11px] font-medium text-white/60 uppercase tracking-wider">Velocidade</p>
-          <p class="text-sm font-bold text-white mt-0.5">Laudo em 5s</p>
+      <div class="grid grid-cols-3 gap-3 pt-1">
+        <div class="p-3.5 rounded-xl bg-black/45 backdrop-blur-md border border-white/15 shadow-sm">
+          <div class="flex items-center gap-1.5 text-white/60 mb-0.5">
+            <svg class="w-3 h-3 text-[#4ade80]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Velocidade</span>
+          </div>
+          <p class="text-base font-extrabold text-white">Laudo em 5s</p>
+          <p class="text-[11px] text-white/60 mt-0.5">Triagem Gemini Vision</p>
         </div>
-        <div class="p-3 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
-          <p class="text-[11px] font-medium text-white/60 uppercase tracking-wider">Defesa</p>
-          <p class="text-sm font-bold text-white mt-0.5">Zero Fraude</p>
+        <div class="p-3.5 rounded-xl bg-black/45 backdrop-blur-md border border-white/15 shadow-sm">
+          <div class="flex items-center gap-1.5 text-white/60 mb-0.5">
+            <svg class="w-3 h-3 text-[#4ade80]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Defesa</span>
+          </div>
+          <p class="text-base font-extrabold text-white">Zero Fraude</p>
+          <p class="text-[11px] text-white/60 mt-0.5">Catálogo Oficial & Junta</p>
         </div>
-        <div class="p-3 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
-          <p class="text-[11px] font-medium text-white/60 uppercase tracking-wider">Operação</p>
-          <p class="text-sm font-bold text-white mt-0.5">+50k Motos</p>
+        <div class="p-3.5 rounded-xl bg-black/45 backdrop-blur-md border border-white/15 shadow-sm">
+          <div class="flex items-center gap-1.5 text-white/60 mb-0.5">
+            <svg class="w-3 h-3 text-[#4ade80]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.25 2.25L15 6" />
+            </svg>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Escala</span>
+          </div>
+          <p class="text-base font-extrabold text-white">+50k Motos</p>
+          <p class="text-[11px] text-white/60 mt-0.5">Brasil e México</p>
         </div>
       </div>
 
       <!-- Unit Location Footnote -->
-      <div class="pt-2 flex items-center justify-between text-xs text-white/50 border-t border-white/10">
-        <span>Hub Operacional Butantã (SP-04)</span>
-        <span>São Paulo • Brasil</span>
+      <div class="pt-3 flex items-center justify-between text-xs text-white/60 border-t border-white/15 font-medium">
+        <span>Hub Butantã (SP-04)</span>
+        <span>São Paulo • Brasil • SLA 99.9%</span>
       </div>
     </div>
   </aside>
 
-  <!-- RIGHT COLUMN: LOGIN & AUTH WORKSPACE (RESPONSIVE: FULL WIDTH ON MOBILE, 50% ON DESKTOP) -->
-  <main class="w-full lg:w-1/2 xl:w-[50%] 2xl:w-[48%] min-h-screen flex flex-col justify-between p-4 sm:p-8 xl:p-12 overflow-y-auto">
+  <!-- RIGHT COLUMN: LOGIN & AUTH WORKSPACE -->
+  <main class="w-full lg:w-1/2 xl:w-[50%] 2xl:w-[48%] min-h-screen flex flex-col justify-between p-5 sm:p-8 xl:p-12 overflow-y-auto bg-[#F8F9FA]">
     <!-- Top Bar Navigation / Institutional Identifier -->
-    <header class="flex items-center justify-between pb-6 border-b border-[#EEEEEE] lg:border-none">
-      <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-md bg-[#05944F] flex items-center justify-center text-white font-extrabold text-base lg:hidden">
+    <header class="flex items-center justify-between pb-6 border-b border-[#E5E7EB]">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-[#05944F] flex items-center justify-center text-white font-black text-lg shadow-sm">
           M
         </div>
         <div>
-          <span class="text-base font-extrabold tracking-tight text-[#141414]">Mottu Ops</span>
-          <span class="text-xs text-[#545454] hidden sm:inline ml-2">• Aluguel e Oficina</span>
+          <span class="text-base font-black tracking-tight text-[#111827]">Mottu Ops</span>
+          <p class="text-[11px] font-medium text-[#6B7280]">Portal Operacional Integrado</p>
         </div>
       </div>
-      <span class="text-xs font-medium text-[#757575]">
-        Suporte 24h • Unidade Butantã
-      </span>
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-semibold text-[#374151] shadow-2xs">
+          <span class="w-2 h-2 rounded-full bg-[#05944F] animate-pulse"></span>
+          <span>Suporte 24h • Pátio Butantã</span>
+        </span>
+      </div>
     </header>
 
     <!-- Centered Form Container -->
-    <div class="w-full max-w-[420px] mx-auto my-auto py-6 space-y-4">
-      <!-- Main White Card -->
-      <section class="bg-white border border-[#E2E2E2] rounded-lg p-6 shadow-sm">
-        <div class="mb-5">
-          <h1 class="text-xl font-bold text-[#141414] tracking-tight">
+    <div class="w-full max-w-[440px] mx-auto my-auto py-8">
+      <!-- Unified Main Card -->
+      <section class="bg-white border border-[#E5E7EB] rounded-2xl p-7 sm:p-8 shadow-[0_10px_35px_rgba(0,0,0,0.05)]">
+        <!-- Card Header -->
+        <div class="mb-6">
+          <h1 class="text-2xl font-black text-[#111827] tracking-tight">
             @if (activeTab() === 'LOGIN') {
               Acesse sua conta
             } @else {
               Solicitar acesso à unidade
             }
           </h1>
-          <p class="text-xs text-[#545454] mt-1">
-            Vistorias rápidas, contratos semanais e operação de oficina em um só lugar.
+          <p class="text-xs text-[#6B7280] mt-1.5 leading-relaxed">
+            @if (activeTab() === 'LOGIN') {
+              Entre com suas credenciais para acessar vistorias, bancada mecânica e telemetria da frota.
+            } @else {
+              Preencha os dados abaixo para submeter sua solicitação de vínculo com o pátio operacional.
+            }
           </p>
         </div>
 
         <!-- Segmented Control (Entrar / Criar cadastro) -->
-        <div class="grid grid-cols-2 bg-[#F3F3F3] rounded-md p-1 mb-5">
+        <div class="grid grid-cols-2 bg-[#F3F4F6] rounded-xl p-1 mb-6">
           <button
             type="button"
             (click)="setTab('LOGIN')"
-            class="h-10 rounded-sm text-xs font-bold transition-all cursor-pointer"
+            class="h-10 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
             [class.bg-white]="activeTab() === 'LOGIN'"
-            [class.text-[#141414]]="activeTab() === 'LOGIN'"
-            [class.shadow-sm]="activeTab() === 'LOGIN'"
-            [class.text-[#545454]]="activeTab() !== 'LOGIN'"
+            [class.text-[#111827]]="activeTab() === 'LOGIN'"
+            [class.shadow-xs]="activeTab() === 'LOGIN'"
+            [class.text-[#6B7280]]="activeTab() !== 'LOGIN'"
           >
-            Entrar
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+            </svg>
+            <span>Entrar</span>
           </button>
           <button
             type="button"
             (click)="setTab('REGISTER')"
-            class="h-10 rounded-sm text-xs font-bold transition-all cursor-pointer"
+            class="h-10 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
             [class.bg-white]="activeTab() === 'REGISTER'"
-            [class.text-[#141414]]="activeTab() === 'REGISTER'"
-            [class.shadow-sm]="activeTab() === 'REGISTER'"
-            [class.text-[#545454]]="activeTab() !== 'REGISTER'"
+            [class.text-[#111827]]="activeTab() === 'REGISTER'"
+            [class.shadow-xs]="activeTab() === 'REGISTER'"
+            [class.text-[#6B7280]]="activeTab() !== 'REGISTER'"
           >
-            Criar cadastro
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.765z" />
+            </svg>
+            <span>Criar cadastro</span>
           </button>
         </div>
 
@@ -141,9 +173,14 @@
         @if (pendingApprovalNotice()) {
           <div
             role="status"
-            class="mb-4 p-3.5 rounded-md bg-[#FEF3C7] border border-[#D97706]/30 text-xs text-[#92400E]"
+            class="mb-5 p-4 rounded-xl bg-[#FFFBEB] border border-[#F59E0B]/30 text-xs text-[#92400E] space-y-1"
           >
-            <p class="font-bold mb-0.5">Cadastro aguardando liberação</p>
+            <div class="flex items-center gap-2 font-bold text-[#B45309]">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+              </svg>
+              <span>Cadastro aguardando liberação</span>
+            </div>
             <p class="leading-relaxed">
               Seus dados foram recebidos. Assim que o gestor da unidade vincular seu contrato ou bancada, seu acesso será liberado.
             </p>
@@ -154,9 +191,12 @@
         @if (successMessage()) {
           <div
             role="status"
-            class="mb-4 p-3.5 rounded-md bg-[#E6F4EE] border border-[#05944F]/30 text-xs font-medium text-[#046C3A]"
+            class="mb-5 p-4 rounded-xl bg-[#E6F4EE] border border-[#05944F]/30 text-xs font-semibold text-[#046C3A] flex items-center gap-2"
           >
-            {{ successMessage() }}
+            <svg class="w-4 h-4 shrink-0 text-[#05944F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{{ successMessage() }}</span>
           </div>
         }
 
@@ -164,56 +204,107 @@
         @if (errorMessage()) {
           <div
             role="alert"
-            class="mb-4 p-3.5 rounded-md bg-[#FEE2E2] border border-[#DC2626]/30 text-xs font-medium text-[#B91C1C]"
+            class="mb-5 p-4 rounded-xl bg-[#FEE2E2] border border-[#DC2626]/30 text-xs font-semibold text-[#B91C1C] flex items-center gap-2"
           >
-            {{ errorMessage() }}
+            <svg class="w-4 h-4 shrink-0 text-[#DC2626]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+            <span>{{ errorMessage() }}</span>
           </div>
         }
 
         <!-- LOGIN FORM -->
         @if (activeTab() === 'LOGIN') {
           <form (ngSubmit)="onLogin()" class="space-y-4">
+            <!-- Email Input -->
             <div>
-              <label for="loginEmail" class="block text-xs font-semibold text-[#545454] mb-1.5">
-                E-mail cadastrado
+              <label for="loginEmail" class="block text-xs font-bold text-[#374151] mb-1.5">
+                E-mail corporativo ou credencial
               </label>
-              <input
-                id="loginEmail"
-                name="loginEmail"
-                type="email"
-                autocomplete="username"
-                [ngModel]="loginEmail()"
-                (ngModelChange)="loginEmail.set($event)"
-                placeholder="seu.email@mottu.com.br"
-                class="w-full h-touch px-3.5 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm text-[#141414] placeholder-[#757575] focus:outline-none transition-colors"
-              />
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#9CA3AF]">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                  </svg>
+                </div>
+                <input
+                  id="loginEmail"
+                  name="loginEmail"
+                  type="email"
+                  autocomplete="username"
+                  [ngModel]="loginEmail()"
+                  (ngModelChange)="loginEmail.set($event)"
+                  placeholder="seu.email@mottu.com.br"
+                  class="w-full h-12 pl-10 pr-3.5 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] focus:bg-white focus:border-[#05944F] focus:ring-4 focus:ring-[#05944F]/10 text-sm font-medium text-[#111827] placeholder-[#9CA3AF] focus:outline-none transition-all"
+                />
+              </div>
             </div>
 
+            <!-- Password Input -->
             <div>
-              <label for="loginPassword" class="block text-xs font-semibold text-[#545454] mb-1.5">
-                Senha
-              </label>
-              <input
-                id="loginPassword"
-                name="loginPassword"
-                type="password"
-                autocomplete="current-password"
-                [ngModel]="loginPassword()"
-                (ngModelChange)="loginPassword.set($event)"
-                placeholder="••••••••"
-                class="w-full h-touch px-3.5 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm text-[#141414] placeholder-[#757575] focus:outline-none transition-colors"
-              />
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="loginPassword" class="block text-xs font-bold text-[#374151]">
+                  Senha de acesso
+                </label>
+                <span class="text-[11px] font-semibold text-[#05944F] hover:text-[#047840] cursor-pointer">
+                  Esqueceu a senha?
+                </span>
+              </div>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#9CA3AF]">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                  </svg>
+                </div>
+                <input
+                  id="loginPassword"
+                  name="loginPassword"
+                  [type]="showPassword() ? 'text' : 'password'"
+                  autocomplete="current-password"
+                  [ngModel]="loginPassword()"
+                  (ngModelChange)="loginPassword.set($event)"
+                  placeholder="••••••••"
+                  class="w-full h-12 pl-10 pr-10 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] focus:bg-white focus:border-[#05944F] focus:ring-4 focus:ring-[#05944F]/10 text-sm font-medium text-[#111827] placeholder-[#9CA3AF] focus:outline-none transition-all"
+                />
+                <button
+                  type="button"
+                  (click)="toggleShowPassword()"
+                  class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#9CA3AF] hover:text-[#374151] cursor-pointer"
+                  [attr.aria-label]="showPassword() ? 'Ocultar senha' : 'Exibir senha'"
+                >
+                  @if (showPassword()) {
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                    </svg>
+                  } @else {
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  }
+                </button>
+              </div>
             </div>
 
+            <!-- Submit CTA -->
             <button
               type="submit"
               [disabled]="isLoading()"
-              class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white font-bold text-sm transition-colors flex items-center justify-center cursor-pointer shadow-sm"
+              class="w-full h-12 rounded-xl bg-[#05944F] hover:bg-[#047840] active:scale-[0.99] disabled:opacity-50 text-white font-bold text-sm shadow-[0_4px_12px_rgba(5,148,79,0.25)] hover:shadow-[0_6px_16px_rgba(5,148,79,0.35)] transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
             >
               @if (isLoading()) {
-                <span>Autenticando...</span>
+                <span class="inline-flex items-center gap-2">
+                  <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Autenticando na rede...</span>
+                </span>
               } @else {
-                <span>Continuar</span>
+                <span>Entrar na plataforma</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
               }
             </button>
           </form>
@@ -221,41 +312,47 @@
 
         <!-- REGISTER FORM -->
         @if (activeTab() === 'REGISTER') {
-          <form (ngSubmit)="onRegister()" class="space-y-3.5">
+          <form (ngSubmit)="onRegister()" class="space-y-4">
             <div>
-              <span class="block text-xs font-semibold text-[#545454] mb-1.5">Perfil de atuação</span>
+              <span class="block text-xs font-bold text-[#374151] mb-1.5">Perfil de atuação</span>
               <div class="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   (click)="registerRole.set('RIDER')"
-                  class="h-11 rounded-md border text-xs font-bold transition-colors cursor-pointer"
-                  [class.border-[#141414]]="registerRole() === 'RIDER'"
-                  [class.bg-[#141414]]="registerRole() === 'RIDER'"
+                  class="h-11 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  [class.border-[#111827]]="registerRole() === 'RIDER'"
+                  [class.bg-[#111827]]="registerRole() === 'RIDER'"
                   [class.text-white]="registerRole() === 'RIDER'"
-                  [class.border-[#E2E2E2]]="registerRole() !== 'RIDER'"
-                  [class.bg-[#F3F3F3]]="registerRole() !== 'RIDER'"
-                  [class.text-[#545454]]="registerRole() !== 'RIDER'"
+                  [class.border-[#E5E7EB]]="registerRole() !== 'RIDER'"
+                  [class.bg-[#F9FAFB]]="registerRole() !== 'RIDER'"
+                  [class.text-[#4B5563]]="registerRole() !== 'RIDER'"
                 >
-                  Entregador
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                  </svg>
+                  <span>Entregador</span>
                 </button>
                 <button
                   type="button"
                   (click)="registerRole.set('MECHANIC')"
-                  class="h-11 rounded-md border text-xs font-bold transition-colors cursor-pointer"
-                  [class.border-[#141414]]="registerRole() === 'MECHANIC'"
-                  [class.bg-[#141414]]="registerRole() === 'MECHANIC'"
+                  class="h-11 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  [class.border-[#111827]]="registerRole() === 'MECHANIC'"
+                  [class.bg-[#111827]]="registerRole() === 'MECHANIC'"
                   [class.text-white]="registerRole() === 'MECHANIC'"
-                  [class.border-[#E2E2E2]]="registerRole() !== 'MECHANIC'"
-                  [class.bg-[#F3F3F3]]="registerRole() !== 'MECHANIC'"
-                  [class.text-[#545454]]="registerRole() !== 'MECHANIC'"
+                  [class.border-[#E5E7EB]]="registerRole() !== 'MECHANIC'"
+                  [class.bg-[#F9FAFB]]="registerRole() !== 'MECHANIC'"
+                  [class.text-[#4B5563]]="registerRole() !== 'MECHANIC'"
                 >
-                  Mecânico
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75a4.5 4.5 0 01-4.884 4.484c-1.076-.091-2.264.398-2.95 1.085l-7.052 7.052a2.121 2.121 0 01-3-3l7.052-7.052c.687-.686 1.176-1.874 1.085-2.95A4.5 4.5 0 0116.5 2.25c.57 0 1.109.115 1.603.325l-2.67 2.67a1.5 1.5 0 002.122 2.122l2.67-2.67c.21.494.325 1.033.325 1.603z" />
+                  </svg>
+                  <span>Mecânico</span>
                 </button>
               </div>
             </div>
 
             <div>
-              <label for="regName" class="block text-xs font-semibold text-[#545454] mb-1">Nome completo</label>
+              <label for="regName" class="block text-xs font-bold text-[#374151] mb-1">Nome completo</label>
               <input
                 id="regName"
                 name="regName"
@@ -263,13 +360,13 @@
                 [ngModel]="registerFullName()"
                 (ngModelChange)="registerFullName.set($event)"
                 placeholder="Ex.: Carlos Eduardo Silva"
-                class="w-full h-12 px-3.5 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm text-[#141414] placeholder-[#757575] focus:outline-none"
+                class="w-full h-11 px-3.5 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] focus:bg-white focus:border-[#05944F] focus:ring-4 focus:ring-[#05944F]/10 text-sm font-medium text-[#111827] placeholder-[#9CA3AF] focus:outline-none transition-all"
               />
             </div>
 
             <div class="grid grid-cols-2 gap-2.5">
               <div>
-                <label for="regCpf" class="block text-xs font-semibold text-[#545454] mb-1">CPF</label>
+                <label for="regCpf" class="block text-xs font-bold text-[#374151] mb-1">CPF</label>
                 <input
                   id="regCpf"
                   name="regCpf"
@@ -277,11 +374,11 @@
                   [ngModel]="registerCpf()"
                   (ngModelChange)="registerCpf.set($event)"
                   placeholder="000.000.000-00"
-                  class="w-full h-12 px-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm font-mono text-[#141414] placeholder-[#757575] focus:outline-none"
+                  class="w-full h-11 px-3 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] focus:bg-white focus:border-[#05944F] focus:ring-4 focus:ring-[#05944F]/10 text-sm font-mono text-[#111827] placeholder-[#9CA3AF] focus:outline-none transition-all"
                 />
               </div>
               <div>
-                <label for="regPhone" class="block text-xs font-semibold text-[#545454] mb-1">WhatsApp</label>
+                <label for="regPhone" class="block text-xs font-bold text-[#374151] mb-1">WhatsApp</label>
                 <input
                   id="regPhone"
                   name="regPhone"
@@ -289,13 +386,13 @@
                   [ngModel]="registerPhone()"
                   (ngModelChange)="registerPhone.set($event)"
                   placeholder="(11) 99999-9999"
-                  class="w-full h-12 px-3 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm font-mono text-[#141414] placeholder-[#757575] focus:outline-none"
+                  class="w-full h-11 px-3 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] focus:bg-white focus:border-[#05944F] focus:ring-4 focus:ring-[#05944F]/10 text-sm font-mono text-[#111827] placeholder-[#9CA3AF] focus:outline-none transition-all"
                 />
               </div>
             </div>
 
             <div>
-              <label for="regEmail" class="block text-xs font-semibold text-[#545454] mb-1">E-mail</label>
+              <label for="regEmail" class="block text-xs font-bold text-[#374151] mb-1">E-mail corporativo</label>
               <input
                 id="regEmail"
                 name="regEmail"
@@ -303,12 +400,12 @@
                 [ngModel]="registerEmail()"
                 (ngModelChange)="registerEmail.set($event)"
                 placeholder="nome@email.com"
-                class="w-full h-12 px-3.5 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm text-[#141414] placeholder-[#757575] focus:outline-none"
+                class="w-full h-11 px-3.5 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] focus:bg-white focus:border-[#05944F] focus:ring-4 focus:ring-[#05944F]/10 text-sm font-medium text-[#111827] placeholder-[#9CA3AF] focus:outline-none transition-all"
               />
             </div>
 
             <div>
-              <label for="regPassword" class="block text-xs font-semibold text-[#545454] mb-1">Criar senha</label>
+              <label for="regPassword" class="block text-xs font-bold text-[#374151] mb-1">Criar senha segura</label>
               <input
                 id="regPassword"
                 name="regPassword"
@@ -316,102 +413,135 @@
                 [ngModel]="registerPassword()"
                 (ngModelChange)="registerPassword.set($event)"
                 placeholder="Mínimo 8 caracteres"
-                class="w-full h-12 px-3.5 rounded-md bg-[#F3F3F3] border border-transparent focus:bg-white focus:border-[#141414] text-sm text-[#141414] placeholder-[#757575] focus:outline-none"
+                class="w-full h-11 px-3.5 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] focus:bg-white focus:border-[#05944F] focus:ring-4 focus:ring-[#05944F]/10 text-sm font-medium text-[#111827] placeholder-[#9CA3AF] focus:outline-none transition-all"
               />
             </div>
 
             <button
               type="submit"
               [disabled]="isLoading()"
-              class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white font-bold text-sm transition-colors mt-1 cursor-pointer shadow-sm"
+              class="w-full h-12 rounded-xl bg-[#05944F] hover:bg-[#047840] active:scale-[0.99] disabled:opacity-50 text-white font-bold text-sm shadow-[0_4px_12px_rgba(5,148,79,0.25)] hover:shadow-[0_6px_16px_rgba(5,148,79,0.35)] transition-all flex items-center justify-center gap-2 cursor-pointer mt-1"
             >
               @if (isLoading()) {
                 <span>Enviando solicitação...</span>
               } @else {
-                <span>Solicitar cadastro</span>
+                <span>Solicitar cadastro operacional</span>
               }
             </button>
           </form>
         }
+
+        <!-- Integrated Quick Access Divider & Segmented Switcher (DEMO / PRESENTATION MODE) -->
+        @if (publicDemoMode()) {
+          <div class="mt-6 pt-5 border-t border-[#F3F4F6]">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-[#9CA3AF]">
+                Acesso Rápido de Demonstração
+              </span>
+              <!-- Demo vs Live Toggle -->
+              <div class="inline-flex bg-[#F3F4F6] rounded-md p-0.5 text-[10px] font-bold">
+                <button
+                  type="button"
+                  (click)="setQuickAccessMode('VITRINE')"
+                  class="px-2 py-1 rounded transition-all cursor-pointer flex items-center gap-1"
+                  [class.bg-white]="quickAccessMode() === 'VITRINE'"
+                  [class.text-[#111827]]="quickAccessMode() === 'VITRINE'"
+                  [class.shadow-2xs]="quickAccessMode() === 'VITRINE'"
+                  [class.text-[#6B7280]]="quickAccessMode() !== 'VITRINE'"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#D97706]"></span>
+                  <span>Demo</span>
+                </button>
+                <button
+                  type="button"
+                  (click)="setQuickAccessMode('LIVE')"
+                  class="px-2 py-1 rounded transition-all cursor-pointer flex items-center gap-1"
+                  [class.bg-white]="quickAccessMode() === 'LIVE'"
+                  [class.text-[#046C3A]]="quickAccessMode() === 'LIVE'"
+                  [class.shadow-2xs]="quickAccessMode() === 'LIVE'"
+                  [class.text-[#6B7280]]="quickAccessMode() !== 'LIVE'"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#05944F]"></span>
+                  <span>Real</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 3 Persona Action Cards -->
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                [disabled]="isLoading()"
+                (click)="onQuickLogin('RIDER')"
+                class="p-2.5 rounded-xl border text-center transition-all disabled:opacity-50 cursor-pointer flex flex-col items-center justify-center gap-1 group"
+                [class]="quickAccessMode() === 'VITRINE' 
+                  ? 'bg-[#F9FAFB] hover:bg-[#F3F4F6] border-[#E5E7EB] hover:border-[#D1D5DB] text-[#111827]' 
+                  : 'bg-[#E6F4EE] hover:bg-[#D5EFE3] border-[#05944F]/40 hover:border-[#05944F] text-[#046C3A]'"
+              >
+                <div class="w-7 h-7 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                  <svg class="w-3.5 h-3.5 text-[#05944F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                  </svg>
+                </div>
+                <span class="text-xs font-bold leading-tight">Entregador</span>
+                <span class="text-[10px] text-[#9CA3AF] group-hover:text-[#6B7280]">Vistoria</span>
+              </button>
+
+              <button
+                type="button"
+                [disabled]="isLoading()"
+                (click)="onQuickLogin('MECHANIC')"
+                class="p-2.5 rounded-xl border text-center transition-all disabled:opacity-50 cursor-pointer flex flex-col items-center justify-center gap-1 group"
+                [class]="quickAccessMode() === 'VITRINE' 
+                  ? 'bg-[#F9FAFB] hover:bg-[#F3F4F6] border-[#E5E7EB] hover:border-[#D1D5DB] text-[#111827]' 
+                  : 'bg-[#E6F4EE] hover:bg-[#D5EFE3] border-[#05944F]/40 hover:border-[#05944F] text-[#046C3A]'"
+              >
+                <div class="w-7 h-7 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                  <svg class="w-3.5 h-3.5 text-[#05944F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75a4.5 4.5 0 01-4.884 4.484c-1.076-.091-2.264.398-2.95 1.085l-7.052 7.052a2.121 2.121 0 01-3-3l7.052-7.052c.687-.686 1.176-1.874 1.085-2.95A4.5 4.5 0 0116.5 2.25c.57 0 1.109.115 1.603.325l-2.67 2.67a1.5 1.5 0 002.122 2.122l2.67-2.67c.21.494.325 1.033.325 1.603z" />
+                  </svg>
+                </div>
+                <span class="text-xs font-bold leading-tight">Mecânico</span>
+                <span class="text-[10px] text-[#9CA3AF] group-hover:text-[#6B7280]">Oficina</span>
+              </button>
+
+              <button
+                type="button"
+                [disabled]="isLoading()"
+                (click)="onQuickLogin('MANAGER')"
+                class="p-2.5 rounded-xl border text-center transition-all disabled:opacity-50 cursor-pointer flex flex-col items-center justify-center gap-1 group"
+                [class]="quickAccessMode() === 'VITRINE' 
+                  ? 'bg-[#F9FAFB] hover:bg-[#F3F4F6] border-[#E5E7EB] hover:border-[#D1D5DB] text-[#111827]' 
+                  : 'bg-[#E6F4EE] hover:bg-[#D5EFE3] border-[#05944F]/40 hover:border-[#05944F] text-[#046C3A]'"
+              >
+                <div class="w-7 h-7 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                  <svg class="w-3.5 h-3.5 text-[#05944F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                  </svg>
+                </div>
+                <span class="text-xs font-bold leading-tight">Gestor</span>
+                <span class="text-[10px] text-[#9CA3AF] group-hover:text-[#6B7280]">BI & Frota</span>
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Security & Compliance Footer Note inside Card -->
+        <div class="mt-5 pt-4 border-t border-[#F3F4F6] flex items-center justify-between text-[11px] text-[#9CA3AF]">
+          <span class="flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-[#05944F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+            <span>Criptografia ponta a ponta</span>
+          </span>
+          <span>Em conformidade com a LGPD</span>
+        </div>
       </section>
-
-      <!-- Quick Profile Access (Professional Segmented Switcher) -->
-      @if (publicDemoMode()) {
-        <section class="bg-white border border-[#E2E2E2] rounded-lg p-3.5 shadow-xs space-y-2.5">
-          <!-- Segmented Control for Environment/Mode (Stripe/Google standard) -->
-          <div class="grid grid-cols-2 bg-[#F3F3F3] rounded-md p-1">
-            <button
-              type="button"
-              (click)="setQuickAccessMode('VITRINE')"
-              class="h-8 rounded-sm text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-              [class.bg-white]="quickAccessMode() === 'VITRINE'"
-              [class.text-[#141414]]="quickAccessMode() === 'VITRINE'"
-              [class.shadow-sm]="quickAccessMode() === 'VITRINE'"
-              [class.text-[#545454]]="quickAccessMode() !== 'VITRINE'"
-            >
-              <span class="w-1.5 h-1.5 rounded-full bg-[#D97706]"></span>
-              <span>Demonstração</span>
-            </button>
-            <button
-              type="button"
-              (click)="setQuickAccessMode('LIVE')"
-              class="h-8 rounded-sm text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-              [class.bg-white]="quickAccessMode() === 'LIVE'"
-              [class.text-[#046C3A]]="quickAccessMode() === 'LIVE'"
-              [class.shadow-sm]="quickAccessMode() === 'LIVE'"
-              [class.text-[#545454]]="quickAccessMode() !== 'LIVE'"
-            >
-              <span class="w-1.5 h-1.5 rounded-full bg-[#05944F]"></span>
-              <span>Operação Real</span>
-            </button>
-          </div>
-
-          <!-- 3 Persona Action Buttons -->
-          <div class="grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              [disabled]="isLoading()"
-              (click)="onQuickLogin('RIDER')"
-              class="h-10 px-2 rounded-md border text-xs font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
-              [class]="quickAccessMode() === 'VITRINE' ? 'bg-[#F6F6F6] hover:bg-[#EAEAEA] border-[#E2E2E2] text-[#141414]' : 'bg-[#E6F4EE] hover:bg-[#D5EFE3] border-[#05944F] text-[#046C3A]'"
-            >
-              <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-              </svg>
-              <span>Entregador</span>
-            </button>
-            <button
-              type="button"
-              [disabled]="isLoading()"
-              (click)="onQuickLogin('MECHANIC')"
-              class="h-10 px-2 rounded-md border text-xs font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
-              [class]="quickAccessMode() === 'VITRINE' ? 'bg-[#F6F6F6] hover:bg-[#EAEAEA] border-[#E2E2E2] text-[#141414]' : 'bg-[#E6F4EE] hover:bg-[#D5EFE3] border-[#05944F] text-[#046C3A]'"
-            >
-              <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75a4.5 4.5 0 01-4.884 4.484c-1.076-.091-2.264.398-2.95 1.085l-7.052 7.052a2.121 2.121 0 01-3-3l7.052-7.052c.687-.686 1.176-1.874 1.085-2.95A4.5 4.5 0 0116.5 2.25c.57 0 1.109.115 1.603.325l-2.67 2.67a1.5 1.5 0 002.122 2.122l2.67-2.67c.21.494.325 1.033.325 1.603z" />
-              </svg>
-              <span>Mecânico</span>
-            </button>
-            <button
-              type="button"
-              [disabled]="isLoading()"
-              (click)="onQuickLogin('MANAGER')"
-              class="h-10 px-2 rounded-md border text-xs font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
-              [class]="quickAccessMode() === 'VITRINE' ? 'bg-[#F6F6F6] hover:bg-[#EAEAEA] border-[#E2E2E2] text-[#141414]' : 'bg-[#E6F4EE] hover:bg-[#D5EFE3] border-[#05944F] text-[#046C3A]'"
-            >
-              <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-              </svg>
-              <span>Gestor</span>
-            </button>
-          </div>
-        </section>
-      }
     </div>
 
     <!-- Legal & Institutional Footer -->
-    <footer class="pt-6 pb-2 border-t border-[#EEEEEE] text-center text-xs text-[#757575]">
-      © 2026 Mottu Tecnologia Ltda. • Termos de uso • Política de privacidade e LGPD
+    <footer class="pt-6 pb-2 border-t border-[#E5E7EB] text-center text-xs text-[#9CA3AF]">
+      © 2026 Mottu Tecnologia Ltda. • Termos de Uso • Política de Privacidade • Hub Butantã (SP-04)
     </footer>
   </main>
 </div>

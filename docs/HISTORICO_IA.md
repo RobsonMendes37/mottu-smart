@@ -1857,7 +1857,28 @@
   - Angular Production Build: **Compilado com 100% de sucesso (404 kB inicial)**.
   - Auditoria Visual Playwright: Desktop (1440x900) e Mobile (390x844) testados com renderização real de pixels e conformidade estrita ao Purple Ban.
 
-### [2026-11-13 05:45] — Correção de Entrada por Voz, Consulta Imediata de SKU no Copilot e Status Estilo WhatsApp
+### [2026-11-13 07:05] — Refinamento Visual Executivo do Login (Padrão BigTech / Stripe)
+- **Agente / Modelo:** `@frontend-specialist` + `@design-spec` + `@clean-code`
+- **Aprimoramentos de UI/UX Realizados:**
+  1. **Card de Autenticação Unificado e Esculpido:**
+     - Eliminação de caixas empilhadas desconexas no vazio branco: unificação de formulário, alternador de abas e acesso rápido de demonstração em um único container de alta densidade visual (`rounded-2xl border-[#E5E7EB] shadow-[0_10px_35px_rgba(0,0,0,0.05)]`).
+     - Fundo suave neutro (`#F8F9FA`) no workspace direito, garantindo contraste sutil com o card e eliminando o vazio ofuscante.
+     - Cabeçalho superior com monograma Mottu "M", identificador de portal integrado e indicador pulsante de suporte ativo.
+  2. **Micro-Interações e Acessibilidade:**
+     - Ícones SVG elegantes nos campos de e-mail e senha.
+     - Botão de alternar visibilidade da senha (olho aberto / fechado) via signal `showPassword`.
+     - Foco com anel esmeralda suave (`focus:border-[#05944F] focus:ring-4 focus:ring-[#05944F]/10`).
+     - Botão primário de ação com hover sutil, sombra de profundidade e ícone de seta direcionadora.
+  3. **Acesso Rápido de Apresentação Integrado:**
+     - Divisor limpo com tipografia reduzida para perfis de demonstração.
+     - Segmented control Demo vs Real com badges de estado.
+     - 3 mini-cards com ícones e subtextos operacionais (*Entregador - Vistoria*, *Mecânico - Oficina*, *Gestor - BI & Frota*).
+  4. **Coluna Hero Editorial Reforçada:**
+     - Tipografia aprimorada, badges com micro-ícones e cards de telemetria transparentes com backdrop-blur.
+- **Validação de Testes:**
+  - Angular Vitest: **10/10 testes de login aprovados com 100% de sucesso**.
+  - Angular Production Build: **Compilado com 100% de sucesso**.
+  - Auditoria Visual Playwright: Desktop (1440x900) e Mobile (390x844) renderizados com perfeição.
 - **Agente / Modelo:** `@backend-specialist` + `@frontend-specialist` + `@clean-code`
 - **Causas Raízes e Correções Implementadas:**
   1. **Entrada de Voz / Microfone na Monalisa (`t10-analytics.component.ts` e `.html`):**

@@ -23,6 +23,7 @@ export class LoginComponent {
   pendingApprovalNotice = signal<boolean>(false);
   successMessage = signal<string | null>(null);
   quickAccessMode = signal<'VITRINE' | 'LIVE'>('VITRINE');
+  showPassword = signal<boolean>(false);
 
   // Demo mode signal from service
   publicDemoMode = computed(() => {
@@ -61,6 +62,10 @@ export class LoginComponent {
     this.errorMessage.set(null);
     this.pendingApprovalNotice.set(false);
     this.successMessage.set(null);
+  }
+
+  toggleShowPassword(): void {
+    this.showPassword.update((prev) => !prev);
   }
 
   onLogin(): void {

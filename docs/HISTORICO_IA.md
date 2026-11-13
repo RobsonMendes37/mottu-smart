@@ -1906,3 +1906,22 @@
   - Java Core API: `mvn test-compile` e testes de analytics aprovados com sucesso.
   - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
   - Angular Build: **100% concluído**.
+
+### [2026-11-13 07:55] — Redesign do Login: Ilustração 3D Tech Cartunizada & Restauração dos Perfis Reais de Operação
+- **Agente / Modelo:** `@frontend-specialist` + `@design-spec` + `@clean-code`
+- **Motivação:** O usuário pontuou que a foto realista do dia a dia da oficina parecia estranha e solicitou uma abordagem cartunizada/3D estilizada, além de destacar a falta do seletor dos perfis reais de operação no acesso rápido.
+- **Implementações Realizadas:**
+  1. **Ilustração 3D Stylized Tech (Cartunizada):**
+     - Gerada imagem 3D estilizada de alta definição (`login-hero-mottu-3d.webp` e `login-hero-mottu-3d.jpg`) retratando um técnico amigável com uniforme Mottu verde, moto da frota, tablet com laudo digital e oficina moderna com iluminação cinematográfica e estilo 3D tech (Pixar/Notion).
+     - Substituída a foto realista na coluna lateral esquerda (`login.component.html`), combinada com vinheta protetora suave e badges de telemetria operacional (Laudo em 5s, Zero Fraude, +50k Motos).
+  2. **Card Elevado e Esculpido no Workspace:**
+     - O formulário foi encapsulado em um card estruturado (`max-w-[420px] bg-white rounded-2xl border border-[#E5E7EB] shadow-[0_4px_24px_rgba(0,0,0,0.04)]`) sobre fundo sutil `#F6F6F6`, eliminando o vazio branco do design anterior.
+  3. **Restauração do Seletor de Perfis Reais & Demonstração:**
+     - Adicionado o seletor segmentado com pontos de status:
+       - `Demonstração` (bolinha âmbar): acesso rápido com mocks e credenciais de vitrine.
+       - `Operação Real` (bolinha verde): preenchimento e login com os usuários reais integrados ao banco de dados PostgreSQL / BigQuery (`entregador.real@mottu-ops.local`, `mecanico.real@mottu-ops.local`, `gestor.real@mottu-ops.local`).
+     - Botões táteis com ícones para os 3 perfis: 🛵 **Entregador** (Vistoria), 🔧 **Mecânico** (Oficina) e 📊 **Gestor** (BI & Frota).
+- **Validação de Testes e Build:**
+  - Angular Vitest: **10/10 testes unitários de autenticação aprovados com 100% de sucesso**.
+  - Angular Production Build: **100% aprovado em 6.8s (Zero erros de compilação)**.
+  - Script Visual Playwright: snapshots em Desktop (1440x900) e Mobile (390x844) gerados com sucesso e conformidade estrita com o Purple Ban.

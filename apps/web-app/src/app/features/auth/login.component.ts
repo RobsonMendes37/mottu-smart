@@ -169,6 +169,9 @@ export class LoginComponent {
 
   setQuickAccessMode(mode: 'VITRINE' | 'LIVE'): void {
     this.quickAccessMode.set(mode);
+    const creds = SEED_CREDENTIALS[mode].RIDER;
+    this.loginEmail.set(creds.email);
+    this.loginPassword.set(creds.password);
   }
 
   onQuickLogin(role: UserRole): void {

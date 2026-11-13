@@ -1,81 +1,150 @@
-<div class="min-h-screen w-full flex flex-col lg:flex-row bg-[#FFFFFF] text-[#1F1F1F]">
-  <!-- LEFT COLUMN: CLEAN EDITORIAL PHOTOGRAPHY (DESKTOP ONLY) -->
-  <aside class="hidden lg:relative lg:flex lg:w-1/2 xl:w-[50%] bg-[#111315] text-white flex-col justify-between overflow-hidden select-none">
-    <!-- Clean Full-Bleed Photo -->
+<div class="min-h-screen w-full flex flex-col lg:flex-row bg-[#F6F6F6] text-[#141414]">
+  <!-- LEFT COLUMN: 3D STYLIZED FLEET & WORKSHOP (DESKTOP ONLY) -->
+  <aside class="hidden lg:relative lg:flex lg:w-1/2 xl:w-[50%] bg-[#0D1412] text-white flex-col justify-between overflow-hidden select-none">
+    <!-- 3D Cartoon Stylized Graphic -->
     <img
-      src="/demo-photos/login-hero-mottu.webp"
-      (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/login-hero-mottu.jpg'"
-      alt="Pátio operacional Mottu"
+      src="/demo-photos/login-hero-mottu-3d.webp"
+      (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/login-hero-mottu-3d.jpg'"
+      alt="Ilustração 3D da Operação Mottu"
       class="absolute inset-0 w-full h-full object-cover object-center"
     />
 
-    <!-- Subtle vignette to preserve photo beauty while maintaining logo readability -->
-    <div class="absolute inset-0 bg-gradient-to-t from-[#111315]/80 via-transparent to-[#111315]/40"></div>
+    <!-- Subtle vignette to preserve 3D artwork while keeping texts razor sharp -->
+    <div class="absolute inset-0 bg-gradient-to-t from-[#0D1412]/95 via-[#0D1412]/30 to-[#0D1412]/60"></div>
 
     <!-- Minimalist Brand at Top -->
-    <div class="relative z-10 p-10 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-[#05944F] flex items-center justify-center text-white font-bold text-lg shadow-sm">
-        M
+    <div class="relative z-10 p-8 xl:p-10 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-[#05944F] flex items-center justify-center text-white font-black text-xl shadow-md">
+          M
+        </div>
+        <div>
+          <span class="text-xl font-bold tracking-tight text-white block leading-none">Mottu</span>
+          <span class="text-[11px] font-semibold text-[#05944F] uppercase tracking-wider">Smart Ops</span>
+        </div>
       </div>
-      <span class="text-lg font-bold tracking-tight text-white">Mottu</span>
+
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1C2622]/80 border border-[#05944F]/40 backdrop-blur-sm text-xs font-medium text-[#7EEBA8]">
+        <span class="w-2 h-2 rounded-full bg-[#05944F] animate-pulse"></span>
+        Rede Operacional Ativa
+      </div>
     </div>
 
-    <!-- Minimalist Baseline at Bottom (Clean & Human) -->
-    <div class="relative z-10 p-10 space-y-1.5">
-      <h2 class="text-2xl xl:text-3xl font-semibold text-white tracking-tight">
-        Operação de frotas e oficinas.
-      </h2>
-      <p class="text-sm text-white/70">
-        Tecnologia para quem move a logística urbana todos os dias.
-      </p>
+    <!-- Editorial Overlay at Bottom -->
+    <div class="relative z-10 p-8 xl:p-10 space-y-6">
+      <div class="space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#05944F]/20 border border-[#05944F]/30 text-xs font-semibold text-[#68D391]">
+          <span>⚡ Inteligência Artificial de Pátio</span>
+        </div>
+        <h2 class="text-2xl xl:text-3xl font-bold text-white tracking-tight leading-tight">
+          Eficiência e agilidade na gestão da maior frota da América Latina.
+        </h2>
+        <p class="text-sm xl:text-base text-[#D1D5DB] leading-relaxed max-w-xl">
+          Triagem autônoma por IA em 5 segundos, laudos transparentes baseados no catálogo oficial de peças e governança conectada à bancada mecânica.
+        </p>
+      </div>
+
+      <!-- Live Operational Badges -->
+      <div class="grid grid-cols-3 gap-3 pt-2">
+        <div class="p-3.5 rounded-xl bg-[#111A16]/80 border border-white/10 backdrop-blur-sm">
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-[#9CA3AF]">Velocidade</p>
+          <p class="text-base font-bold text-white mt-0.5">Laudo em 5s</p>
+          <p class="text-[11px] text-[#05944F]">Gemini Vision</p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-[#111A16]/80 border border-white/10 backdrop-blur-sm">
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-[#9CA3AF]">Defesa</p>
+          <p class="text-base font-bold text-white mt-0.5">Zero Fraude</p>
+          <p class="text-[11px] text-[#05944F]">Catálogo Oficial</p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-[#111A16]/80 border border-white/10 backdrop-blur-sm">
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-[#9CA3AF]">Escala</p>
+          <p class="text-base font-bold text-white mt-0.5">+50k Motos</p>
+          <p class="text-[11px] text-[#05944F]">Brasil & México</p>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between text-xs text-[#9CA3AF] pt-2 border-t border-white/10">
+        <span>Hub Operacional Butantã (SP-04)</span>
+        <span>São Paulo • Brasil • SLA 99.9%</span>
+      </div>
     </div>
   </aside>
 
-  <!-- RIGHT COLUMN: MINIMALIST GOOGLE-STYLE AUTH WORKSPACE -->
-  <main class="w-full lg:w-1/2 xl:w-[50%] min-h-screen flex flex-col justify-between p-6 sm:p-12 overflow-y-auto bg-[#FFFFFF]">
-    <div class="w-full max-w-[400px] mx-auto my-auto py-8">
-      <!-- Mottu Brand on Mobile -->
-      <div class="flex items-center gap-2.5 mb-8 lg:hidden">
-        <div class="w-8 h-8 rounded-lg bg-[#05944F] flex items-center justify-center text-white font-bold text-base">
+  <!-- RIGHT COLUMN: ELEVATED WHITE CARD CONTAINER -->
+  <main class="w-full lg:w-1/2 xl:w-[50%] min-h-screen flex flex-col justify-between p-4 sm:p-8 lg:p-12 overflow-y-auto bg-[#F6F6F6]">
+    <!-- Mobile Brand Header -->
+    <div class="flex items-center justify-between mb-4 lg:hidden">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-[#05944F] flex items-center justify-center text-white font-bold text-lg">
           M
         </div>
-        <span class="text-lg font-bold tracking-tight text-[#1F1F1F]">Mottu</span>
+        <div>
+          <span class="text-lg font-bold tracking-tight text-[#141414]">Mottu Ops</span>
+          <span class="text-[10px] block text-[#5E5E5E]">Portal Operacional Integrado</span>
+        </div>
+      </div>
+      <div class="text-[11px] font-medium text-[#05944F] flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-[#05944F]"></span>
+        Pátio Ativo
+      </div>
+    </div>
+
+    <!-- Main Elevated Card -->
+    <div class="w-full max-w-[420px] mx-auto my-auto bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
+      <!-- Segmented Tab Switcher (Entrar / Criar cadastro) -->
+      <div class="flex items-center p-1 rounded-xl bg-[#F0F2F5] border border-[#E5E7EB] mb-6">
+        <button
+          type="button"
+          (click)="setTab('LOGIN')"
+          class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer"
+          [class]="activeTab() === 'LOGIN' ? 'bg-white text-[#141414] shadow-xs' : 'text-[#5E5E5E] hover:text-[#141414]'"
+        >
+          Entrar
+        </button>
+        <button
+          type="button"
+          (click)="setTab('REGISTER')"
+          class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer"
+          [class]="activeTab() === 'REGISTER' ? 'bg-white text-[#141414] shadow-xs' : 'text-[#5E5E5E] hover:text-[#141414]'"
+        >
+          Criar cadastro
+        </button>
       </div>
 
-      <!-- Header -->
-      <div class="mb-6">
-        <h1 class="text-2xl font-medium text-[#1F1F1F] tracking-tight">
+      <!-- Card Title & Subtitle -->
+      <div class="mb-5">
+        <h1 class="text-xl font-bold text-[#141414] tracking-tight">
           @if (activeTab() === 'LOGIN') {
-            Fazer login
+            Acesse sua conta
           } @else {
-            Criar conta
+            Criar novo cadastro
           }
         </h1>
-        <p class="text-sm text-[#5E5E5E] mt-1.5">
+        <p class="text-xs text-[#5E5E5E] mt-1 leading-relaxed">
           @if (activeTab() === 'LOGIN') {
-            Acesse com seu e-mail cadastrado
+            Vistorias rápidas, contratos semanais e operação de oficina em um só lugar.
           } @else {
-            Solicite seu acesso à operação
+            Solicite seu acesso operacional para validação do gestor da unidade.
           }
         </p>
       </div>
 
       <!-- Alerts -->
       @if (pendingApprovalNotice()) {
-        <div class="mb-5 p-3.5 rounded-lg bg-[#FEF7E0] border border-[#FEEFC3] text-xs text-[#7A4B04] leading-relaxed">
-          <p class="font-medium">Cadastro em análise</p>
+        <div class="mb-4 p-3 rounded-xl bg-[#FEF7E0] border border-[#FEEFC3] text-xs text-[#7A4B04] leading-relaxed">
+          <p class="font-semibold">Cadastro em análise</p>
           <p class="mt-0.5 text-[#5F370E]">Seus dados foram recebidos. O gestor da unidade liberará seu acesso em breve.</p>
         </div>
       }
 
       @if (successMessage()) {
-        <div class="mb-5 p-3.5 rounded-lg bg-[#E6F4EA] border border-[#CEEAD6] text-xs font-medium text-[#137333]">
+        <div class="mb-4 p-3 rounded-xl bg-[#E6F4EA] border border-[#CEEAD6] text-xs font-medium text-[#137333]">
           {{ successMessage() }}
         </div>
       }
 
       @if (errorMessage()) {
-        <div class="mb-5 p-3.5 rounded-lg bg-[#FCE8E6] border border-[#FAD2CF] text-xs font-medium text-[#C5221F]">
+        <div class="mb-4 p-3 rounded-xl bg-[#FCE8E6] border border-[#FAD2CF] text-xs font-medium text-[#C5221F]">
           {{ errorMessage() }}
         </div>
       }
@@ -84,8 +153,8 @@
       @if (activeTab() === 'LOGIN') {
         <form (ngSubmit)="onLogin()" class="space-y-4">
           <div>
-            <label for="loginEmail" class="block text-xs font-medium text-[#444746] mb-1.5">
-              E-mail
+            <label for="loginEmail" class="block text-xs font-semibold text-[#444746] mb-1.5">
+              E-mail corporativo ou credencial
             </label>
             <input
               id="loginEmail"
@@ -94,20 +163,20 @@
               autocomplete="username"
               [ngModel]="loginEmail()"
               (ngModelChange)="loginEmail.set($event)"
-              placeholder="nome@mottu.com.br"
-              class="w-full h-12 px-3.5 rounded-lg border border-[#747775]/50 focus:border-[#05944F] focus:ring-1 focus:ring-[#05944F] text-sm text-[#1F1F1F] placeholder-[#8E918F] outline-none transition-colors"
+              placeholder="ex: entregador@mottu-ops.local"
+              class="w-full h-11 px-3.5 rounded-lg border border-[#D1D5DB] focus:border-[#05944F] focus:ring-1 focus:ring-[#05944F] text-sm text-[#141414] placeholder-[#9CA3AF] outline-none transition-colors"
             />
           </div>
 
           <div>
             <div class="flex items-center justify-between mb-1.5">
-              <label for="loginPassword" class="block text-xs font-medium text-[#444746]">
-                Senha
+              <label for="loginPassword" class="block text-xs font-semibold text-[#444746]">
+                Senha de acesso
               </label>
               <button
                 type="button"
                 (click)="toggleShowPassword()"
-                class="text-xs text-[#05944F] hover:underline cursor-pointer"
+                class="text-xs font-medium text-[#05944F] hover:underline cursor-pointer"
               >
                 {{ showPassword() ? 'Ocultar' : 'Mostrar' }}
               </button>
@@ -120,31 +189,21 @@
               [ngModel]="loginPassword()"
               (ngModelChange)="loginPassword.set($event)"
               placeholder="Digite sua senha"
-              class="w-full h-12 px-3.5 rounded-lg border border-[#747775]/50 focus:border-[#05944F] focus:ring-1 focus:ring-[#05944F] text-sm text-[#1F1F1F] placeholder-[#8E918F] outline-none transition-colors"
+              class="w-full h-11 px-3.5 rounded-lg border border-[#D1D5DB] focus:border-[#05944F] focus:ring-1 focus:ring-[#05944F] text-sm text-[#141414] placeholder-[#9CA3AF] outline-none transition-colors"
             />
           </div>
 
-          <div class="pt-2">
+          <div class="pt-1">
             <button
               type="submit"
               [disabled]="isLoading()"
-              class="w-full h-11 rounded-full bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white font-medium text-sm transition-colors flex items-center justify-center cursor-pointer shadow-xs"
+              class="w-full h-11 rounded-lg bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white font-semibold text-sm transition-colors flex items-center justify-center cursor-pointer shadow-xs"
             >
               @if (isLoading()) {
                 <span>Acessando...</span>
               } @else {
-                <span>Avançar</span>
+                <span>Continuar →</span>
               }
-            </button>
-          </div>
-
-          <div class="flex items-center justify-center pt-2">
-            <button
-              type="button"
-              (click)="setTab('REGISTER')"
-              class="text-xs font-medium text-[#05944F] hover:underline cursor-pointer"
-            >
-              Não tem uma conta? Criar cadastro
             </button>
           </div>
         </form>
@@ -154,23 +213,23 @@
       @if (activeTab() === 'REGISTER') {
         <form (ngSubmit)="onRegister()" class="space-y-3.5">
           <div>
-            <span class="block text-xs font-medium text-[#444746] mb-1.5">Função operacional</span>
+            <span class="block text-xs font-semibold text-[#444746] mb-1.5">Função operacional</span>
             <div class="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 (click)="registerRole.set('RIDER')"
-                class="h-10 rounded-lg border text-xs font-medium transition-colors cursor-pointer"
-                [class]="registerRole() === 'RIDER' ? 'border-[#05944F] bg-[#E6F4EA] text-[#137333]' : 'border-[#C4C7C5] text-[#444746]'"
+                class="h-10 rounded-lg border text-xs font-semibold transition-colors cursor-pointer"
+                [class]="registerRole() === 'RIDER' ? 'border-[#05944F] bg-[#E6F4EA] text-[#137333]' : 'border-[#D1D5DB] text-[#444746]'"
               >
-                Entregador
+                🛵 Entregador
               </button>
               <button
                 type="button"
                 (click)="registerRole.set('MECHANIC')"
-                class="h-10 rounded-lg border text-xs font-medium transition-colors cursor-pointer"
-                [class]="registerRole() === 'MECHANIC' ? 'border-[#05944F] bg-[#E6F4EA] text-[#137333]' : 'border-[#C4C7C5] text-[#444746]'"
+                class="h-10 rounded-lg border text-xs font-semibold transition-colors cursor-pointer"
+                [class]="registerRole() === 'MECHANIC' ? 'border-[#05944F] bg-[#E6F4EA] text-[#137333]' : 'border-[#D1D5DB] text-[#444746]'"
               >
-                Mecânico
+                🔧 Mecânico
               </button>
             </div>
           </div>
@@ -184,11 +243,11 @@
               [ngModel]="registerFullName()"
               (ngModelChange)="registerFullName.set($event)"
               placeholder="Seu nome"
-              class="w-full h-11 px-3.5 rounded-lg border border-[#747775]/50 focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
+              class="w-full h-10 px-3 rounded-lg border border-[#D1D5DB] focus:border-[#05944F] text-sm text-[#141414] outline-none"
             />
           </div>
 
-          <div class="grid grid-cols-2 gap-2.5">
+          <div class="grid grid-cols-2 gap-2">
             <div>
               <label for="regCpf" class="block text-xs font-medium text-[#444746] mb-1">CPF</label>
               <input
@@ -198,7 +257,7 @@
                 [ngModel]="registerCpf()"
                 (ngModelChange)="registerCpf.set($event)"
                 placeholder="000.000.000-00"
-                class="w-full h-11 px-3 rounded-lg border border-[#747775]/50 focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
+                class="w-full h-10 px-3 rounded-lg border border-[#D1D5DB] focus:border-[#05944F] text-sm text-[#141414] outline-none"
               />
             </div>
             <div>
@@ -210,7 +269,7 @@
                 [ngModel]="registerPhone()"
                 (ngModelChange)="registerPhone.set($event)"
                 placeholder="(11) 99999-9999"
-                class="w-full h-11 px-3 rounded-lg border border-[#747775]/50 focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
+                class="w-full h-10 px-3 rounded-lg border border-[#D1D5DB] focus:border-[#05944F] text-sm text-[#141414] outline-none"
               />
             </div>
           </div>
@@ -224,7 +283,7 @@
               [ngModel]="registerEmail()"
               (ngModelChange)="registerEmail.set($event)"
               placeholder="nome@email.com"
-              class="w-full h-11 px-3.5 rounded-lg border border-[#747775]/50 focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
+              class="w-full h-10 px-3 rounded-lg border border-[#D1D5DB] focus:border-[#05944F] text-sm text-[#141414] outline-none"
             />
           </div>
 
@@ -237,7 +296,7 @@
               [ngModel]="registerPassword()"
               (ngModelChange)="registerPassword.set($event)"
               placeholder="Mínimo 8 caracteres"
-              class="w-full h-11 px-3.5 rounded-lg border border-[#747775]/50 focus:border-[#05944F] text-sm text-[#1F1F1F] outline-none"
+              class="w-full h-10 px-3 rounded-lg border border-[#D1D5DB] focus:border-[#05944F] text-sm text-[#141414] outline-none"
             />
           </div>
 
@@ -245,7 +304,7 @@
             <button
               type="submit"
               [disabled]="isLoading()"
-              class="w-full h-11 rounded-full bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white font-medium text-sm transition-colors flex items-center justify-center cursor-pointer shadow-xs"
+              class="w-full h-11 rounded-lg bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white font-semibold text-sm transition-colors flex items-center justify-center cursor-pointer shadow-xs"
             >
               @if (isLoading()) {
                 <span>Enviando...</span>
@@ -254,58 +313,88 @@
               }
             </button>
           </div>
-
-          <div class="flex items-center justify-center pt-1">
-            <button
-              type="button"
-              (click)="setTab('LOGIN')"
-              class="text-xs font-medium text-[#05944F] hover:underline cursor-pointer"
-            >
-              Já possui conta? Fazer login
-            </button>
-          </div>
         </form>
       }
 
-      <!-- MINIMALIST QUICK DEMO PILLS (CLEAN, GOOGLE-STYLE) -->
+      <!-- QUICK ACCESS CARD SECTION WITH REAL / DEMO TOGGLE -->
       @if (publicDemoMode()) {
-        <div class="mt-10 pt-6 border-t border-[#E0E2EC]">
-          <p class="text-[11px] font-medium text-[#747775] text-center mb-3">
-            Perfis de demonstração:
-          </p>
-          <div class="flex items-center justify-center gap-2">
+        <div class="mt-6 pt-5 border-t border-[#E5E7EB]">
+          <!-- Switcher between Demonstração and Operação Real -->
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-[#747775]">
+              Acesso Rápido
+            </span>
+
+            <div class="flex items-center gap-1 p-0.5 rounded-lg bg-[#F0F2F5] border border-[#E5E7EB]">
+              <button
+                type="button"
+                (click)="setQuickAccessMode('VITRINE')"
+                class="px-2.5 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-1.5 cursor-pointer"
+                [class]="quickAccessMode() === 'VITRINE' ? 'bg-white text-[#141414] font-semibold shadow-xs' : 'text-[#5E5E5E] hover:text-[#141414]'"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#E37400]"></span>
+                Demonstração
+              </button>
+              <button
+                type="button"
+                (click)="setQuickAccessMode('LIVE')"
+                class="px-2.5 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-1.5 cursor-pointer"
+                [class]="quickAccessMode() === 'LIVE' ? 'bg-white text-[#141414] font-semibold shadow-xs' : 'text-[#5E5E5E] hover:text-[#141414]'"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#05944F]"></span>
+                Operação Real
+              </button>
+            </div>
+          </div>
+
+          <!-- 3 Role Buttons -->
+          <div class="grid grid-cols-3 gap-2">
             <button
               type="button"
               [disabled]="isLoading()"
               (click)="onQuickLogin('RIDER')"
-              class="px-4 py-1.5 rounded-full border border-[#C4C7C5] hover:border-[#05944F] hover:bg-[#F2FBF6] text-xs font-medium text-[#1F1F1F] transition-all cursor-pointer"
+              class="p-2.5 rounded-xl border border-[#E5E7EB] hover:border-[#05944F] hover:bg-[#F2FBF6] bg-[#FAFAFA] text-center transition-all cursor-pointer group disabled:opacity-50"
             >
-              Entregador
+              <div class="text-base mb-0.5">🛵</div>
+              <p class="text-xs font-semibold text-[#141414] group-hover:text-[#05944F]">Entregador</p>
+              <p class="text-[10px] text-[#747775]">Vistoria</p>
             </button>
+
             <button
               type="button"
               [disabled]="isLoading()"
               (click)="onQuickLogin('MECHANIC')"
-              class="px-4 py-1.5 rounded-full border border-[#C4C7C5] hover:border-[#05944F] hover:bg-[#F2FBF6] text-xs font-medium text-[#1F1F1F] transition-all cursor-pointer"
+              class="p-2.5 rounded-xl border border-[#E5E7EB] hover:border-[#05944F] hover:bg-[#F2FBF6] bg-[#FAFAFA] text-center transition-all cursor-pointer group disabled:opacity-50"
             >
-              Mecânico
+              <div class="text-base mb-0.5">🔧</div>
+              <p class="text-xs font-semibold text-[#141414] group-hover:text-[#05944F]">Mecânico</p>
+              <p class="text-[10px] text-[#747775]">Oficina</p>
             </button>
+
             <button
               type="button"
               [disabled]="isLoading()"
               (click)="onQuickLogin('MANAGER')"
-              class="px-4 py-1.5 rounded-full border border-[#C4C7C5] hover:border-[#05944F] hover:bg-[#F2FBF6] text-xs font-medium text-[#1F1F1F] transition-all cursor-pointer"
+              class="p-2.5 rounded-xl border border-[#E5E7EB] hover:border-[#05944F] hover:bg-[#F2FBF6] bg-[#FAFAFA] text-center transition-all cursor-pointer group disabled:opacity-50"
             >
-              Gestor
+              <div class="text-base mb-0.5">📊</div>
+              <p class="text-xs font-semibold text-[#141414] group-hover:text-[#05944F]">Gestor</p>
+              <p class="text-[10px] text-[#747775]">BI & Frota</p>
             </button>
+          </div>
+
+          <div class="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-[#747775]">
+            <span>🔒 Criptografia ponta a ponta</span>
+            <span>•</span>
+            <span>Em conformidade com a LGPD</span>
           </div>
         </div>
       }
     </div>
 
     <!-- Minimalist Clean Footer -->
-    <footer class="pt-6 text-center text-xs text-[#747775]">
-      Mottu © 2026 • Termos de uso • Privacidade
+    <footer class="pt-4 text-center text-xs text-[#747775]">
+      © 2026 Mottu Tecnologia Ltda. • Termos de uso • Política de privacidade • Hub Butantã (SP-04)
     </footer>
   </main>
 </div>

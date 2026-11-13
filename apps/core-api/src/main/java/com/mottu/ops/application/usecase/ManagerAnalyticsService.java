@@ -395,7 +395,16 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
             String qLower = safeQuery.toLowerCase();
 
             // ON-DEMAND QUERYING (Zero Full-DB Dump)
-            boolean isStock = "SKILL_ESTOQUE".equals(skillId) || qLower.contains("estoque") || qLower.contains("peça") || qLower.contains("peca") || qLower.contains("ruptura");
+            boolean isStock = "SKILL_ESTOQUE".equals(skillId)
+                    || qLower.contains("estoque")
+                    || qLower.contains("peça")
+                    || qLower.contains("peca")
+                    || qLower.contains("ruptura")
+                    || qLower.contains("sku")
+                    || qLower.contains("quant")
+                    || qLower.contains("saldo")
+                    || qLower.contains("inventar")
+                    || qLower.contains("item");
             boolean isWorkshop = "SKILL_OFICINA".equals(skillId) || qLower.contains("oficina") || qLower.contains("baia") || qLower.contains("ordem de serviço") || qLower.contains("ordens de serviço") || qLower.contains("manutenção");
             boolean isApprovals = "SKILL_APROVACOES".equals(skillId) || qLower.contains("aprova") || qLower.contains("pendente");
 

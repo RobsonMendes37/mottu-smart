@@ -218,6 +218,19 @@ class GeminiVisionAdapter(AIVisionPort):
         critical_parts = [p.get("partName", "") for p in parts if p.get("currentStock", 0) <= p.get("safetyStock", 0)]
         critical_str = ", ".join(critical_parts[:4]) if critical_parts else "estoque sem alertas críticos"
 
+        # Identifica se o usuário perguntou sobre um SKU ou peça específica
+        part_context_str = ""
+        q_upper = query.upper()
+        for p in parts:
+            p_sku = str(p.get("sku", p.get("vtexSku", ""))).upper()
+            p_name = str(p.get("part_name", p.get("partName", "")))
+            if (p_sku and p_sku in q_upper) or (p_name and len(p_name) >= 4 and p_name.lower() in query.lower()):
+                stock_qty = p.get("stock_quantity", p.get("currentStock", 0))
+                min_stock = p.get("min_stock_quantity", p.get("safetyStock", 8))
+                model = p.get("model_name", p.get("modelName", ""))
+                part_context_str = f"- Peça específica identificada no inventário: SKU {p_sku} ({p_name} - {model}) conta com saldo de {stock_qty} unidades em estoque no galpão (estoque mínimo de segurança: {min_stock} un.).\n"
+                break
+
         orders = context_data.get("service_orders", [])
         orders_summary = f"{len(orders)} ordens abertas na oficina"
 
@@ -234,10 +247,12 @@ class GeminiVisionAdapter(AIVisionPort):
             "NUNCA cite números, métricas de contexto ou frotas se a pergunta não for especificamente sobre elas.\n\n"
             f"Dados Operacionais de {yard_label} (Apenas referência interna de suporte):\n"
             f"- Peças: {parts_summary} ({critical_str})\n"
+            f"{part_context_str}"
             f"- Oficina: {orders_summary}, fila liberada\n"
             "- Vistorias: 78.5% deflexão sem fila, operação estável\n\n"
             f"Histórico recente:\n{history_str}\n\n"
             f"Mensagem do Usuário: {query}\n\n"
+            "Instrução Crítica: Se o usuário perguntou sobre a quantidade ou saldo de uma peça ou código SKU, informe obrigatoriamente a quantidade exata encontrada nos dados operacionais.\n\n"
             "Retorne estritamente um JSON no seguinte formato:\n"
             "{\n"
             '  "direct_answer": "Texto objetivo em 1 ou no máximo 2 frases. Sem markdown, sem hashtags, sem emojis.",\n'

@@ -1,24 +1,101 @@
-<div class="min-h-screen bg-[#F6F6F6] text-[#141414] flex flex-col justify-between">
-  <!-- Institutional Top Header -->
-  <header class="h-14 bg-white border-b border-[#EEEEEE] px-4 sm:px-8 flex items-center justify-between">
-    <div class="flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-md bg-[#05944F] flex items-center justify-center text-white font-extrabold text-base">
-        M
+<div class="min-h-screen w-full flex flex-col lg:flex-row bg-[#F6F6F6] text-[#141414]">
+  <!-- LEFT COLUMN: EDITORIAL VISUAL HERO (DESKTOP ONLY: HIDDEN ON MOBILE / TABLET) -->
+  <aside class="hidden lg:relative lg:flex lg:w-1/2 xl:w-[50%] 2xl:w-[52%] bg-[#141414] text-white flex-col justify-between overflow-hidden select-none">
+    <!-- Background Editorial Image -->
+    <img
+      src="/demo-photos/login-hero-mottu.webp"
+      (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/login-hero-mottu.jpg'"
+      alt="Pátio e oficina de operações técnicas da frota Mottu"
+      class="absolute inset-0 w-full h-full object-cover object-center transform scale-102 transition-transform duration-1000 ease-out"
+    />
+
+    <!-- Multi-Layer Vignette & Contrast Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-t from-[#141414]/95 via-[#141414]/50 to-[#141414]/80"></div>
+    <div class="absolute inset-0 bg-radial from-transparent via-[#141414]/30 to-[#141414]/80"></div>
+
+    <!-- Top Left Mottu Brand Header -->
+    <div class="relative z-10 p-8 xl:p-12 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-[#05944F] flex items-center justify-center text-white font-black text-xl shadow-md border border-white/20">
+          M
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-lg font-black tracking-tight text-white">Mottu</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/15 text-white backdrop-blur-xs border border-white/10">
+              Smart Ops
+            </span>
+          </div>
+          <p class="text-xs text-white/70 font-medium">Sistema Operacional de Frota</p>
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="text-base font-extrabold tracking-tight text-[#141414]">Mottu</span>
-        <span class="text-[#E2E2E2]">•</span>
-        <span class="text-xs font-medium text-[#545454]">Operações e aluguel</span>
+      <div class="flex items-center gap-2 text-xs font-semibold text-white/80 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+        <span class="w-2 h-2 rounded-full bg-[#05944F] animate-pulse"></span>
+        <span>Rede Operacional Ativa</span>
       </div>
     </div>
-    <span class="text-xs font-medium text-[#757575] hidden sm:inline">
-      Suporte 24h • Unidade Butantã (SP-04)
-    </span>
-  </header>
 
-  <!-- Centered Auth Container -->
-  <main class="flex-1 flex flex-col items-center justify-center px-4 py-8">
-    <div class="w-full max-w-[420px] space-y-4">
+    <!-- Bottom Content: Editorial Narrative & Telemetry Badges -->
+    <div class="relative z-10 p-8 xl:p-12 space-y-6">
+      <div class="space-y-3 max-w-xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#05944F]/20 border border-[#05944F]/40 text-[#4ade80] text-xs font-semibold">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+          </svg>
+          <span>Tecnologia Multimodal de Vistoria</span>
+        </div>
+        <h2 class="text-2xl xl:text-3xl font-extrabold tracking-tight text-white leading-tight">
+          Eficiência e agilidade na gestão da maior frota de motos da América Latina.
+        </h2>
+        <p class="text-sm xl:text-base text-white/80 leading-relaxed font-normal">
+          Elimine filas de pátio com triagem autônoma por IA em 5 segundos, laudos transparentes baseados no catálogo oficial e governança conectada à bancada mecânica.
+        </p>
+      </div>
+
+      <!-- Live Feature Pills -->
+      <div class="grid grid-cols-3 gap-3 pt-2">
+        <div class="p-3 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
+          <p class="text-[11px] font-medium text-white/60 uppercase tracking-wider">Velocidade</p>
+          <p class="text-sm font-bold text-white mt-0.5">Laudo em 5s</p>
+        </div>
+        <div class="p-3 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
+          <p class="text-[11px] font-medium text-white/60 uppercase tracking-wider">Defesa</p>
+          <p class="text-sm font-bold text-white mt-0.5">Zero Fraude</p>
+        </div>
+        <div class="p-3 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
+          <p class="text-[11px] font-medium text-white/60 uppercase tracking-wider">Operação</p>
+          <p class="text-sm font-bold text-white mt-0.5">+50k Motos</p>
+        </div>
+      </div>
+
+      <!-- Unit Location Footnote -->
+      <div class="pt-2 flex items-center justify-between text-xs text-white/50 border-t border-white/10">
+        <span>Hub Operacional Butantã (SP-04)</span>
+        <span>São Paulo • Brasil</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT COLUMN: LOGIN & AUTH WORKSPACE (RESPONSIVE: FULL WIDTH ON MOBILE, 50% ON DESKTOP) -->
+  <main class="w-full lg:w-1/2 xl:w-[50%] 2xl:w-[48%] min-h-screen flex flex-col justify-between p-4 sm:p-8 xl:p-12 overflow-y-auto">
+    <!-- Top Bar Navigation / Institutional Identifier -->
+    <header class="flex items-center justify-between pb-6 border-b border-[#EEEEEE] lg:border-none">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-md bg-[#05944F] flex items-center justify-center text-white font-extrabold text-base lg:hidden">
+          M
+        </div>
+        <div>
+          <span class="text-base font-extrabold tracking-tight text-[#141414]">Mottu Ops</span>
+          <span class="text-xs text-[#545454] hidden sm:inline ml-2">• Aluguel e Oficina</span>
+        </div>
+      </div>
+      <span class="text-xs font-medium text-[#757575]">
+        Suporte 24h • Unidade Butantã
+      </span>
+    </header>
+
+    <!-- Centered Form Container -->
+    <div class="w-full max-w-[420px] mx-auto my-auto py-6 space-y-4">
       <!-- Main White Card -->
       <section class="bg-white border border-[#E2E2E2] rounded-lg p-6 shadow-sm">
         <div class="mb-5">
@@ -34,12 +111,12 @@
           </p>
         </div>
 
-        <!-- Segmented Control -->
+        <!-- Segmented Control (Entrar / Criar cadastro) -->
         <div class="grid grid-cols-2 bg-[#F3F3F3] rounded-md p-1 mb-5">
           <button
             type="button"
             (click)="setTab('LOGIN')"
-            class="h-10 rounded-sm text-xs font-bold transition-all"
+            class="h-10 rounded-sm text-xs font-bold transition-all cursor-pointer"
             [class.bg-white]="activeTab() === 'LOGIN'"
             [class.text-[#141414]]="activeTab() === 'LOGIN'"
             [class.shadow-sm]="activeTab() === 'LOGIN'"
@@ -50,7 +127,7 @@
           <button
             type="button"
             (click)="setTab('REGISTER')"
-            class="h-10 rounded-sm text-xs font-bold transition-all"
+            class="h-10 rounded-sm text-xs font-bold transition-all cursor-pointer"
             [class.bg-white]="activeTab() === 'REGISTER'"
             [class.text-[#141414]]="activeTab() === 'REGISTER'"
             [class.shadow-sm]="activeTab() === 'REGISTER'"
@@ -131,7 +208,7 @@
             <button
               type="submit"
               [disabled]="isLoading()"
-              class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white font-bold text-sm transition-colors flex items-center justify-center"
+              class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white font-bold text-sm transition-colors flex items-center justify-center cursor-pointer shadow-sm"
             >
               @if (isLoading()) {
                 <span>Autenticando...</span>
@@ -151,7 +228,7 @@
                 <button
                   type="button"
                   (click)="registerRole.set('RIDER')"
-                  class="h-11 rounded-md border text-xs font-bold transition-colors"
+                  class="h-11 rounded-md border text-xs font-bold transition-colors cursor-pointer"
                   [class.border-[#141414]]="registerRole() === 'RIDER'"
                   [class.bg-[#141414]]="registerRole() === 'RIDER'"
                   [class.text-white]="registerRole() === 'RIDER'"
@@ -164,7 +241,7 @@
                 <button
                   type="button"
                   (click)="registerRole.set('MECHANIC')"
-                  class="h-11 rounded-md border text-xs font-bold transition-colors"
+                  class="h-11 rounded-md border text-xs font-bold transition-colors cursor-pointer"
                   [class.border-[#141414]]="registerRole() === 'MECHANIC'"
                   [class.bg-[#141414]]="registerRole() === 'MECHANIC'"
                   [class.text-white]="registerRole() === 'MECHANIC'"
@@ -246,7 +323,7 @@
             <button
               type="submit"
               [disabled]="isLoading()"
-              class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white font-bold text-sm transition-colors mt-1"
+              class="w-full h-touch rounded-md bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white font-bold text-sm transition-colors mt-1 cursor-pointer shadow-sm"
             >
               @if (isLoading()) {
                 <span>Enviando solicitação...</span>
@@ -266,7 +343,7 @@
             <button
               type="button"
               (click)="setQuickAccessMode('VITRINE')"
-              class="h-8 rounded-sm text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+              class="h-8 rounded-sm text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               [class.bg-white]="quickAccessMode() === 'VITRINE'"
               [class.text-[#141414]]="quickAccessMode() === 'VITRINE'"
               [class.shadow-sm]="quickAccessMode() === 'VITRINE'"
@@ -278,7 +355,7 @@
             <button
               type="button"
               (click)="setQuickAccessMode('LIVE')"
-              class="h-8 rounded-sm text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+              class="h-8 rounded-sm text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               [class.bg-white]="quickAccessMode() === 'LIVE'"
               [class.text-[#046C3A]]="quickAccessMode() === 'LIVE'"
               [class.shadow-sm]="quickAccessMode() === 'LIVE'"
@@ -295,7 +372,7 @@
               type="button"
               [disabled]="isLoading()"
               (click)="onQuickLogin('RIDER')"
-              class="h-10 px-2 rounded-md border text-xs font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+              class="h-10 px-2 rounded-md border text-xs font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
               [class]="quickAccessMode() === 'VITRINE' ? 'bg-[#F6F6F6] hover:bg-[#EAEAEA] border-[#E2E2E2] text-[#141414]' : 'bg-[#E6F4EE] hover:bg-[#D5EFE3] border-[#05944F] text-[#046C3A]'"
             >
               <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -307,7 +384,7 @@
               type="button"
               [disabled]="isLoading()"
               (click)="onQuickLogin('MECHANIC')"
-              class="h-10 px-2 rounded-md border text-xs font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+              class="h-10 px-2 rounded-md border text-xs font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
               [class]="quickAccessMode() === 'VITRINE' ? 'bg-[#F6F6F6] hover:bg-[#EAEAEA] border-[#E2E2E2] text-[#141414]' : 'bg-[#E6F4EE] hover:bg-[#D5EFE3] border-[#05944F] text-[#046C3A]'"
             >
               <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -319,7 +396,7 @@
               type="button"
               [disabled]="isLoading()"
               (click)="onQuickLogin('MANAGER')"
-              class="h-10 px-2 rounded-md border text-xs font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+              class="h-10 px-2 rounded-md border text-xs font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
               [class]="quickAccessMode() === 'VITRINE' ? 'bg-[#F6F6F6] hover:bg-[#EAEAEA] border-[#E2E2E2] text-[#141414]' : 'bg-[#E6F4EE] hover:bg-[#D5EFE3] border-[#05944F] text-[#046C3A]'"
             >
               <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -331,10 +408,10 @@
         </section>
       }
     </div>
-  </main>
 
-  <!-- Legal & Institutional Footer -->
-  <footer class="py-4 px-6 border-t border-[#EEEEEE] bg-white text-center text-xs text-[#757575]">
-    © 2026 Mottu Tecnologia Ltda. • Termos de uso • Política de privacidade e LGPD
-  </footer>
+    <!-- Legal & Institutional Footer -->
+    <footer class="pt-6 pb-2 border-t border-[#EEEEEE] text-center text-xs text-[#757575]">
+      © 2026 Mottu Tecnologia Ltda. • Termos de uso • Política de privacidade e LGPD
+    </footer>
+  </main>
 </div>

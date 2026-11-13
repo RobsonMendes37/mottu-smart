@@ -21,6 +21,17 @@ def detect_plate_or_code(text: str) -> Optional[str]:
     return None
 
 
+def detect_sku_code(text: str) -> Optional[str]:
+    """Detect SKU codes like SKU-POP-002, SKU-MANETE-DIR-SPORT, etc., even with attached punctuation."""
+    if not text:
+        return None
+    # Matches patterns like SKU-POP-002 or with punctuation touching, e.g. "peças?SKU-POP-002"
+    match = re.search(r'SKU[-_][A-Z0-9_-]+', text.upper())
+    if match:
+        return match.group(0)
+    return None
+
+
 def classify_conversational_intent(query: str) -> Optional[str]:
     """Identify conversational intents: GREETING, COURTESY, IDENTITY, ABUSE, or None."""
     if not query:
@@ -272,7 +283,78 @@ def answer_manager_query(
     # =========================================================================
     # 4. SKILL: ESTOQUE E RUPTURA (SKILL_ESTOQUE)
     # =========================================================================
-    if skill_id == "SKILL_ESTOQUE" or any(k in q for k in ["estoque", "ruptura", "peça", "peca", "comprar", "repor", "falta", "gaveta", "almoxarifado"]):
+    detected_sku = detect_sku_code(query)
+    # If not in query, check history for follow-up questions (e.g. "quantas peças?")
+    if not detected_sku and history and any(k in q for k in ["quant", "saldo", "tem", "disponiv", "estoque", "unidade"]):
+        for m in reversed(history[-3:]):
+            found_h = detect_sku_code(str(m.get("text", "")))
+            if found_h:
+                detected_sku = found_h
+                break
+
+    target_part: Optional[Dict[str, Any]] = None
+    if detected_sku and parts_inventory:
+        clean_sku = detected_sku.upper()
+        for p in parts_inventory:
+            p_sku = str(p.get("sku", "")).upper()
+            if p_sku == clean_sku or clean_sku in p_sku or p_sku in clean_sku:
+                target_part = p
+                break
+
+    if not target_part and parts_inventory and any(k in q for k in ["quant", "saldo", "tem", "peça", "peca", "estoque"]):
+        for p in parts_inventory:
+            name = str(p.get("part_name", "")).lower()
+            if name and len(name) >= 4 and name in q:
+                target_part = p
+                break
+
+    if target_part:
+        sku = str(target_part.get("sku", detected_sku or "SKU"))
+        name = str(target_part.get("part_name", "Componente"))
+        model = str(target_part.get("model_name", "Frota Mottu"))
+        stock = int(target_part.get("stock_quantity", 0))
+        min_stock = int(target_part.get("min_stock_quantity", 8))
+        burn = float(target_part.get("daily_burn_rate", 1.0))
+        days = max(1, int(round(stock / max(burn, 0.2))))
+        is_crit = stock <= min_stock or days <= 5
+
+        status_label = f"Crítico ({days}d de cobertura)" if is_crit else f"Regular ({days}d de cobertura)"
+        direct_ans = (
+            f"O item {sku} ({name} - {model}) conta com {stock} unidades disponíveis no estoque do galpão de {resolved_yard}. "
+            f"O estoque mínimo recomendado é de {min_stock} unidades ({'abaixo da margem de segurança' if is_crit else 'nível regular'})."
+        )
+        spoken_ans = f"O item {name} conta com {stock} unidades em estoque."
+        return {
+            "direct_answer": direct_ans,
+            "spoken_answer": spoken_ans,
+            "should_show_table": True,
+            "key_metric_label": f"Estoque • {sku}",
+            "key_metric_value": f"{stock} Unidades",
+            "key_metric_trend": f"Mínimo: {min_stock} un. • {status_label}",
+            "columns": ["Código SKU", "Componente", "Modelo Compatível", "Saldo em Estoque", "Mínimo de Segurança", "Status Operacional"],
+            "rows": [
+                [sku, name, model, f"{stock} un.", f"{min_stock} un.", status_label]
+            ],
+            "suggested_action_label": "Ver Peça no Almoxarifado",
+            "suggested_action_route": "/mechanic/operations",
+            "active_skill": "SKILL_ESTOQUE",
+        }
+    elif detected_sku:
+        return {
+            "direct_answer": f"O item com código {detected_sku} não foi localizado no inventário do galpão de {resolved_yard}. Verifique o código SKU no catálogo da Mottu Store.",
+            "spoken_answer": f"Código {detected_sku} não encontrado no estoque.",
+            "should_show_table": False,
+            "key_metric_label": f"Consulta • {detected_sku}",
+            "key_metric_value": "Não Localizado",
+            "key_metric_trend": "SKU não encontrado no galpão",
+            "columns": [],
+            "rows": [],
+            "suggested_action_label": "Consultar Catálogo de Peças",
+            "suggested_action_route": "/manager/catalog",
+            "active_skill": "SKILL_ESTOQUE",
+        }
+
+    if skill_id == "SKILL_ESTOQUE" or any(k in q for k in ["estoque", "ruptura", "peça", "peca", "comprar", "repor", "falta", "gaveta", "almoxarifado", "quant", "saldo"]):
         critical_items: List[List[str]] = []
         for p in parts_inventory:
             stock = int(p.get("stock_quantity", 0))

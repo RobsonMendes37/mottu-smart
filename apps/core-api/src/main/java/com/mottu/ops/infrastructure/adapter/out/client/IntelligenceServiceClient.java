@@ -209,7 +209,24 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
             return res;
         }
 
-        if (q.contains("estoque") || q.contains("ruptura") || q.contains("peça") || q.contains("peca") || q.contains("comprar")) {
+        if (q.contains("sku-pop-002")) {
+            res.put("directAnswer", "O item SKU-POP-002 (Espelho Retrovisor Par - Honda Pop 110i) conta atualmente com 4 unidades disponíveis no estoque do galpão.");
+            res.put("spokenAnswer", "O item possui 4 unidades em estoque no galpão.");
+            res.put("shouldShowTable", true);
+            res.put("keyMetricLabel", "Estoque • SKU-POP-002");
+            res.put("keyMetricValue", "4 Unidades");
+            res.put("keyMetricTrend", "Mínimo: 8 un. • Reposição sugerida");
+            res.put("columns", List.of("Código SKU", "Componente", "Modelo Compatível", "Saldo em Estoque", "Mínimo de Segurança", "Status Operacional"));
+            res.put("rows", List.of(
+                    List.of("SKU-POP-002", "Espelho Retrovisor Par", "Honda Pop 110i", "4 un.", "8 un.", "Crítico (3d de cobertura)")
+            ));
+            res.put("suggestedActionLabel", "Ver Peça no Almoxarifado");
+            res.put("suggestedActionRoute", "/mechanic/operations");
+            res.put("activeSkill", "SKILL_ESTOQUE");
+            return res;
+        }
+
+        if (q.contains("estoque") || q.contains("ruptura") || q.contains("peça") || q.contains("peca") || q.contains("comprar") || q.contains("sku") || q.contains("quant")) {
             res.put("directAnswer", "Foram identificados 5 itens com estoque crítico ou abaixo da margem de segurança no galpão.");
             res.put("spokenAnswer", "Identificados cinco itens com estoque crítico no galpão.");
             res.put("shouldShowTable", true);

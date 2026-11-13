@@ -2,6 +2,7 @@
 from app.domain.services.data_explorer_service import (
     answer_manager_query,
     detect_plate_or_code,
+    detect_sku_code,
     resolve_context_yard,
     is_greeting_or_casual,
 )
@@ -230,6 +231,58 @@ def test_answer_manager_query_spoken_and_table_flags():
     res_models = answer_manager_query("qual modelo tem mais trocas", "Todas as Unidades (SP)", {})
     assert res_models["should_show_table"] is True
     assert "Sport" in res_models["spoken_answer"]
+
+
+def test_detect_sku_code():
+    assert detect_sku_code("e quantsa peças?SKU-POP-002") == "SKU-POP-002"
+    assert detect_sku_code("ver SKU-MANETE-DIR-SPORT") == "SKU-MANETE-DIR-SPORT"
+    assert detect_sku_code("sem sku aqui") is None
+
+
+def test_answer_manager_query_specific_sku_and_followup():
+    context = {
+        "parts_inventory": [
+            {
+                "sku": "SKU-POP-002",
+                "part_name": "Espelho Retrovisor Par",
+                "model_name": "Honda Pop 110i",
+                "stock_quantity": 4,
+                "min_stock_quantity": 8,
+                "daily_burn_rate": 1.0,
+            },
+            {
+                "sku": "SKU-SPORT-001",
+                "part_name": "Manete de Freio",
+                "model_name": "Mottu Sport 110i",
+                "stock_quantity": 18,
+                "min_stock_quantity": 8,
+                "daily_burn_rate": 0.8,
+            }
+        ]
+    }
+
+    # 1. Pergunta com SKU e pontuação grudada: "e quantsa peças?SKU-POP-002"
+    res1 = answer_manager_query("e quantsa peças?SKU-POP-002", "Unidade Butantã", context)
+    assert res1["active_skill"] == "SKILL_ESTOQUE"
+    assert "4 unidades" in res1["direct_answer"]
+    assert "Espelho Retrovisor Par" in res1["direct_answer"]
+    assert res1["key_metric_value"] == "4 Unidades"
+    assert len(res1["rows"]) == 1
+
+    # 2. Pergunta de follow-up: "quantas peças?" com o histórico anterior
+    history = [
+        {"sender": "user", "text": "e quantsa peças?SKU-POP-002"},
+        {"sender": "assistant", "text": res1["direct_answer"]},
+    ]
+    res2 = answer_manager_query("quantas peças?", "Unidade Butantã", context, history=history)
+    assert res2["active_skill"] == "SKILL_ESTOQUE"
+    assert "4 unidades" in res2["direct_answer"]
+    assert "Espelho Retrovisor Par" in res2["direct_answer"]
+
+    # 3. SKU inexistente
+    res3 = answer_manager_query("saldo do SKU-INEXISTENTE-999", "Unidade Butantã", context)
+    assert "não foi localizado no inventário" in res3["direct_answer"]
+
 
 
 

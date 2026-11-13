@@ -581,6 +581,7 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
   // Reconhecimento de Voz (Microfone do Usuário)
   readonly isListening = signal<boolean>(false);
   readonly speechRecognitionSupported = signal<boolean>(false);
+  readonly speechNotice = signal<string | null>(null);
   private recognition: any = null;
   private availableVoices: any[] = [];
   private currentAudioPlayer: HTMLAudioElement | null = null;
@@ -668,6 +669,7 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
 
         this.recognition.onstart = () => {
           this.isListening.set(true);
+          this.speechNotice.set(null);
         };
 
         this.recognition.onresult = (event: any) => {
@@ -680,8 +682,18 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
           }
         };
 
-        this.recognition.onerror = () => {
+        this.recognition.onerror = (event: any) => {
           this.isListening.set(false);
+          const err = event?.error;
+          if (err === 'not-allowed' || err === 'service-not-allowed') {
+            this.speechNotice.set('Permissão de microfone negada. Clique no ícone de cadeado/configurações ao lado da barra de endereço para permitir o microfone.');
+          } else if (err === 'no-speech') {
+            this.speechNotice.set('Nenhuma fala foi detectada. Tente falar novamente mais próximo ao microfone.');
+          } else if (err === 'audio-capture') {
+            this.speechNotice.set('Nenhum microfone encontrado neste dispositivo.');
+          } else if (err === 'network') {
+            this.speechNotice.set('Falha de rede no serviço de voz do navegador.');
+          }
         };
 
         this.recognition.onend = () => {
@@ -691,31 +703,65 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
             this.sendCopilotMessage();
           }
         };
+      } else {
+        this.speechRecognitionSupported.set(false);
       }
     } catch {
-      // Safe fallback
+      this.speechRecognitionSupported.set(false);
+    }
+  }
+
+  dismissSpeechNotice(): void {
+    this.speechNotice.set(null);
+  }
+
+  cancelSpeechRecognition(): void {
+    if (this.recognition) {
+      try {
+        this.recognition.stop();
+      } catch {}
+    }
+    this.isListening.set(false);
+  }
+
+  finishAndSendSpeech(): void {
+    if (this.recognition) {
+      try {
+        this.recognition.stop();
+      } catch {}
+    }
+    this.isListening.set(false);
+    const spoken = this.copilotInput().trim();
+    if (spoken) {
+      this.sendCopilotMessage();
     }
   }
 
   toggleSpeechRecognition(): void {
     if (typeof window === 'undefined') return;
+
     if (!this.speechRecognitionSupported() || !this.recognition) {
-      this.copilotInput.set('Como está a frota e vistorias hoje?');
+      const isSecure = typeof window !== 'undefined' && (window.isSecureContext || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+      if (!isSecure) {
+        this.speechNotice.set('O microfone do navegador exige conexão segura HTTPS ou localhost. Em conexões HTTP por IP (como 161.153.2.148), os navegadores desabilitam o áudio por segurança. Acesse via HTTPS, localhost ou digite sua pergunta.');
+      } else {
+        this.speechNotice.set('Reconhecimento de fala nativo não suportado neste navegador. Recomendamos utilizar o Google Chrome ou Microsoft Edge.');
+      }
       return;
     }
 
     if (this.isListening()) {
-      try {
-        this.recognition.stop();
-      } catch {}
-      this.isListening.set(false);
+      this.cancelSpeechRecognition();
     } else {
       this.stopSpeech();
+      this.speechNotice.set(null);
       this.copilotInput.set('');
+
       try {
         this.recognition.start();
-      } catch {
+      } catch (err: any) {
         this.isListening.set(false);
+        this.speechNotice.set('Não foi possível ativar o microfone: ' + (err?.message || 'Permissão necessária.'));
       }
     }
   }

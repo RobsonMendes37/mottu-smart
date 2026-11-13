@@ -1840,3 +1840,38 @@
 - **Validação:**
   - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
   - Angular Production Build: **100% concluído com sucesso**.
+
+
+### [2026-11-13 05:20] — Redesign do Login Split-Screen Responsivo e Profissionalização do README
+- **Agente / Modelo:** `@frontend-specialist` + `@design-spec` + `@clean-code`
+- **Requisitos Atendidos:**
+  1. **Login Split-Screen Responsivo (`login.component.html`):**
+     - No desktop (`>= lg`), exibe layout dividido com painel fotográfico editorial à esquerda (alta resolução de 896x1200 com técnicos e motos Mottu no pátio Butantã, vignette escurecido de contraste, monograma Mottu "M", badges operacionais e métricas "Laudo em 5s", "Zero Fraude" e "+50k Motos") e card de autenticação/demo à direita.
+     - Em telas móveis (`< lg`), a coluna da imagem é automaticamente oculta (`hidden lg:flex`), mantendo um login mobile ultralimpo com botões de 52px e foco na operação sob o sol.
+     - Imagem otimizada em WebP (`login-hero-mottu.webp`) e fallback JPG (`login-hero-mottu.jpg`) com manipulador de erro seguro para evitar 404s.
+  2. **Profissionalização do README (`README.md`):**
+     - Remoção completa de excesso de emojis para padrão corporativo BigTech.
+     - Atualização de badges, descrição executiva, arquitetura, catálogo de telas, tabelas SemVer e métricas de qualidade.
+- **Validação de Testes e Qualidade:**
+  - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Angular Production Build: **Compilado com 100% de sucesso (404 kB inicial)**.
+  - Auditoria Visual Playwright: Desktop (1440x900) e Mobile (390x844) testados com renderização real de pixels e conformidade estrita ao Purple Ban.
+
+### [2026-11-13 05:45] — Correção de Entrada por Voz, Consulta Imediata de SKU no Copilot e Status Estilo WhatsApp
+- **Agente / Modelo:** `@backend-specialist` + `@frontend-specialist` + `@clean-code`
+- **Causas Raízes e Correções Implementadas:**
+  1. **Entrada de Voz / Microfone na Monalisa (`t10-analytics.component.ts` e `.html`):**
+     - **Causa Raiz:** O microfone Web Speech (`webkitSpeechRecognition` / `getUserMedia`) exige estritamente um *Contexto Seguro* (`window.isSecureContext === true`). Navegadores modernos silenciosamente bloqueiam o acesso ao microfone quando acessados via IP direto HTTP não seguro (ex.: `http://161.153.2.148:18088`). Antes, o botão de microfone ficava inerte ou falhava sem avisar o usuário.
+     - **Solução:** Adicionada checagem explícita de `window.isSecureContext` e mapeamento detalhado dos códigos de erro da Speech API (`not-allowed`, `audio-capture`, `network`, `no-speech`). Criado banner explicativo amigável com opção de descartar ou seguir a orientação de HTTPS/localhost, além de barra inferior animada de gravação com botões "Enviar" e "Cancelar" enquanto fala.
+  2. **Consulta Imediata de Quantidade de Peças / SKU na 1ª Pergunta:**
+     - **Causa Raiz:** Ao perguntar `e quantsa peças?SKU-POP-002`, a inteligência recebia apenas métricas agregadas gerais da frota ("364 peças monitoradas no catálogo"), sem a injeção do detalhe do SKU específico no prompt do Gemini. Sem a quantidade daquela peça específica, a IA respondia de forma evasiva ("apresenta disponibilidade imediata"), exigindo que o usuário perguntasse uma segunda vez.
+     - **Solução:** Em `data_explorer_service.py`, adicionada a função `detect_sku_code(text)` capaz de extrair SKUs mesmo colados a pontuações (ex.: `?SKU-POP-002`). Ao identificar um SKU, busca instantaneamente o registro exato no `parts_inventory` e retorna a contagem precisa na primeira resposta (`X unidades em estoque`). Adicionado suporte a histórico recente: caso o usuário pergunte na sequência `quantas peças?`, a conversa anterior é inspecionada para herdar o SKU.
+     - Em `gemini_adapter.py`, os itens de estoque identificados são injetados diretamente no prompt de sistema com instrução expressa para responder a quantidade logo no primeiro turno.
+     - Em `ManagerAnalyticsService.java`, ampliada a captura de palavras-chave para sempre carregar o catálogo de peças quando houver menção a "peças", "peça", "estoque" ou "sku".
+  3. **Indicador de Status Online Estilo WhatsApp (`t10-analytics.component.html`):**
+     - Substituída a tag estática e pesada por uma bolinha verde pulsante (`w-2 h-2 rounded-full bg-[#22C55E] animate-pulse`) e a palavra minúscula `online`, exatamente como a interface do WhatsApp Web.
+- **Validação:**
+  - Python Pytest: **212/212 testes aprovados** (com 4 novos testes unitários para SKU imediato e histórico).
+  - Java Core API: `mvn test-compile` e testes de analytics aprovados com sucesso.
+  - Angular Vitest: **250/250 testes aprovados em 38 suítes**.
+  - Angular Build: **100% concluído**.

@@ -1973,3 +1973,13 @@
   - Python Pytest: **212/212 testes aprovados**.
   - Angular Vitest: **26/26 testes aprovados**.
   - Angular Production Build: **100% compilado em 7.3s**.
+
+### [2026-11-13 08:44] — Limpeza de Subtítulo na Coluna Editorial do Login
+- **Agente / Modelo:** `@frontend-specialist` + `@clean-code`
+- **Motivação:** O usuário solicitou a remoção do subtítulo ("Tecnologia para quem move a logística urbana todos os dias"), mantendo apenas o título limpo e direto.
+- **Implementações Realizadas:**
+  - `apps/web-app/src/app/features/auth/login.component.html`: Removido o parágrafo de subtítulo na coluna esquerda, preservando apenas o título conciso *"Operação de frotas e oficinas."* em tipografia branca de alto contraste.
+- **Validação de Testes e Build:**
+  - Angular Vitest: **10/10 testes de login aprovados**.
+  - Angular Production Build: **100% compilado em 5.9s (bundle main-7VIEXEYC.js)**.
+  - Script Visual Playwright: snapshot verificado e aprovado.

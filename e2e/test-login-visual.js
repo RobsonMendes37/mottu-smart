@@ -67,7 +67,7 @@ server.listen(port, async () => {
     });
 
     await desktopPage.goto(`http://localhost:${port}/login`, { waitUntil: 'networkidle' });
-    await desktopPage.waitForSelector('text=Acesse sua conta');
+    await desktopPage.waitForSelector('input[type="email"]');
 
     // Verify image rendered with real pixels
     const imgInfo = await desktopPage.locator('aside img').evaluate(el => ({
@@ -105,7 +105,7 @@ server.listen(port, async () => {
     });
 
     await mobilePage.goto(`http://localhost:${port}/login`, { waitUntil: 'networkidle' });
-    await mobilePage.waitForSelector('text=Acesse sua conta');
+    await mobilePage.waitForSelector('input[type="email"]');
 
     // Verify that the aside image column is hidden on mobile
     const asideVisible = await mobilePage.locator('aside').isVisible();

@@ -1925,3 +1925,20 @@
   - Angular Vitest: **10/10 testes unitários de autenticação aprovados com 100% de sucesso**.
   - Angular Production Build: **100% aprovado em 6.8s (Zero erros de compilação)**.
   - Script Visual Playwright: snapshots em Desktop (1440x900) e Mobile (390x844) gerados com sucesso e conformidade estrita com o Purple Ban.
+
+### [2026-11-13 08:10] — Refinamento Big Tech do Login: Remoção de Textos/Métricas de IA e Acesso Rápido Direto Padrão Google
+- **Agente / Modelo:** `@frontend-specialist` + `@design-spec` + `@clean-code`
+- **Motivação:** O usuário apreciou o estilo rascunho/3D da ilustração, mas pontuou que o bloco inferior de textos e métricas dava "cara de IA" ao design. Solicitou a remoção do bloco de textos sob a imagem e a simplificação do acesso rápido para o estilo direto padrão Google com chaveamento simples entre contas reais e demonstração.
+- **Implementações Realizadas:**
+  1. **Ilustração 3D Limpa e Desobstruída:**
+     - Removido todo o bloco de textos, títulos de marketing e cards de métricas de telemetria da coluna esquerda (`login.component.html`).
+     - Mantido apenas o logotipo Mottu limpo no canto superior, permitindo que a arte 3D da oficina, moto e técnico respire sem poluição visual.
+  2. **Formulário de Login Padrão Google:**
+     - Título direto "Fazer login", subtítulo "Acesse com seu e-mail cadastrado", inputs limpos de e-mail e senha com "Mostrar/Ocultar" e botão primário verde "Avançar".
+  3. **Acesso Rápido Direto e Chaveamento Simples:**
+     - Chaveador em formato segmented pill compacto: `Demonstração` | `Contas Reais`.
+     - 3 botões em formato pill direto no padrão Google Account Picker (`Entregador`, `Mecânico`, `Gestor`), sem emojis e sem caixas excessivas.
+- **Validação de Testes e Build:**
+  - Angular Vitest: **10/10 testes unitários de autenticação aprovados com 100% de sucesso**.
+  - Angular Production Build: **100% compilado em 6.2s**.
+  - Script Visual Playwright: snapshot verificado e aprovado em Desktop (1440x900) e Mobile (390x844).

@@ -20,6 +20,13 @@ http://161.153.2.148, http://mottu-smart.duckdns.org, http://:80 {
 		-Server
 	}
 
+	@pwa_no_cache path / /index.html /ngsw.json /ngsw-worker.js /manifest.webmanifest
+	header @pwa_no_cache {
+		Cache-Control "no-cache, no-store, must-revalidate"
+		Pragma "no-cache"
+		Expires "0"
+	}
+
 	# Spring Boot REST API & Server-Sent Events (SSE)
 	handle /api/* {
 		reverse_proxy core-api:8080 {
@@ -67,6 +74,13 @@ mottu-smart.duckdns.org, 161.153.2.148.sslip.io, 161.153.2.148.nip.io {
 		-Server
 	}
 
+	@pwa_no_cache path / /index.html /ngsw.json /ngsw-worker.js /manifest.webmanifest
+	header @pwa_no_cache {
+		Cache-Control "no-cache, no-store, must-revalidate"
+		Pragma "no-cache"
+		Expires "0"
+	}
+
 	# Spring Boot REST API & Server-Sent Events (SSE)
 	handle /api/* {
 		reverse_proxy core-api:8080 {
@@ -112,6 +126,13 @@ https://161.153.2.148, :443 {
 		X-Frame-Options SAMEORIGIN
 		Referrer-Policy strict-origin-when-cross-origin
 		-Server
+	}
+
+	@pwa_no_cache path / /index.html /ngsw.json /ngsw-worker.js /manifest.webmanifest
+	header @pwa_no_cache {
+		Cache-Control "no-cache, no-store, must-revalidate"
+		Pragma "no-cache"
+		Expires "0"
 	}
 
 	# Spring Boot REST API & Server-Sent Events (SSE)

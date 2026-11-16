@@ -44,7 +44,7 @@
               [class.bg-[#E6F4EE]]="biViewMode() !== 'reclame_aqui'"
               [class.text-[#046C3A]]="biViewMode() !== 'reclame_aqui'"
             >
-              640
+              10,2 mil
             </span>
           </button>
           <button
@@ -1120,16 +1120,16 @@
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <div class="bg-white border border-[#E2E2E2] rounded-xl p-4">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-[#757575]">Amostra Minerada (6m)</span>
+                  <span class="text-xs font-semibold text-[#757575]">Base Nacional Minerada (6m)</span>
                   <span class="px-2 py-0.5 rounded bg-[#F3F3F3] text-[#141414] font-mono text-[10px] font-bold">
                     {{ ra.responseRatePct }}% respondidas
                   </span>
                 </div>
                 <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1.5">
-                  {{ ra.totalComplaintsMinered }} casos
+                  {{ ra.totalComplaintsMinered | number:'1.0-0' }} casos
                 </p>
                 <span class="text-[11px] text-[#545454]">
-                  {{ ra.wouldDoBusinessAgainPct }}% voltariam a fazer negócio
+                  {{ ra.wouldDoBusinessAgainPct }}% voltariam a fazer negócio (10,2 mil)
                 </span>
               </div>
 

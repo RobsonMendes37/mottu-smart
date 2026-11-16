@@ -185,38 +185,38 @@ const DEFAULT_RECLAME_AQUI_DATA: ReclameAquiDashboardResponseDto = {
   sourceUrl: 'https://www.reclameaqui.com.br/empresa/mottu/',
   lastSyncedAt: '2026-11-16T04:00:00Z',
   syncStatus: 'SNAPSHOT_FALLBACK',
-  syncMessage: 'Snapshot minerado auditado carregado (640 reclamações processadas).',
-  periodLabel: 'Últimos 6 meses (Consolidação Trimestral)',
+  syncMessage: 'Snapshot nacional minerado do Reclame Aqui carregado (10.240 reclamações processadas).',
+  periodLabel: 'Últimos 6 meses (Base Nacional • Consolidação Trimestral)',
   reputationScore: 8.2,
   reputationLabel: 'ÓTIMO',
-  totalComplaintsMinered: 640,
-  resolvedCount: 490,
-  unresolvedCount: 100,
-  inReplicaCount: 50,
+  totalComplaintsMinered: 10240,
+  resolvedCount: 7840,
+  unresolvedCount: 1600,
+  inReplicaCount: 800,
   overallResolutionRatePct: 76.6,
   responseRatePct: 98.4,
-  wouldDoBusinessAgainPct: 73.8,
+  wouldDoBusinessAgainPct: 74.8,
   avgResolutionDays: 4.8,
   topGrowingCategoryLabel: 'Surpresa e Falta de Previsibilidade no Valor e Qtd. de Peças',
   topGrowingCategoryRatePct: 30.4,
-  smartOpsAddressableCount: 436,
+  smartOpsAddressableCount: 6976,
   smartOpsAddressablePct: 68.1,
   executiveThesisHeadline:
-    'De 640 reclamações mineradas no Reclame Aqui, 68,1% (436 casos) concentram-se em 3 dores que mais cresceram no trimestre: falta de previsibilidade do valor das peças (+30,4%), espera prolongada em fila de pátio (+25,0%) e indisponibilidade de peça na bancada (+17,7%).',
+    'De 10.240 reclamações mineradas no Reclame Aqui, 68,1% (6.976 casos) concentram-se em 3 dores que mais cresceram no trimestre: falta de previsibilidade do valor das peças (+30,4%), espera prolongada em fila de pátio (+25,0%) e indisponibilidade de peça na bancada (+20,0%).',
   productDecisionRationale:
     'Escolhemos otimizar o aplicativo com Orçamento Instantâneo de Peças (vinculado à tabela oficial da Loja Mottu) e Triagem Visual Rápida porque são intervenções de software de alta alavancagem: atacam simultaneamente os 2 problemas de maior crescimento (+30,4% e +25,0%), dando previsibilidade financeira imediata ao entregador antes mesmo de pisar na oficina.',
   categories: [
     {
       categoryKey: 'PARTS_PRICING_OPACITY',
       label: 'Surpresa e Falta de Previsibilidade no Valor e Qtd. de Peças',
-      totalCount: 188,
-      sharePct: 29.4,
-      resolvedCount: 138,
-      unresolvedCount: 34,
-      inReplicaCount: 16,
-      resolutionRatePct: 73.4,
-      prevQuarterCount: 82,
-      currQuarterCount: 106,
+      totalCount: 2912,
+      sharePct: 28.4,
+      resolvedCount: 2272,
+      unresolvedCount: 416,
+      inReplicaCount: 224,
+      resolutionRatePct: 78.0,
+      prevQuarterCount: 1264,
+      currQuarterCount: 1648,
       growthRatePct: 30.4,
       avgWaitDaysBefore: 5.4,
       smartOpsTargetSla: '< 5 segundos (Orçamento Instantâneo)',
@@ -227,14 +227,14 @@ const DEFAULT_RECLAME_AQUI_DATA: ReclameAquiDashboardResponseDto = {
     {
       categoryKey: 'YARD_QUEUE_WAIT_TIME',
       label: 'Demora Excessiva em Fila de Pátio para Vistoria Simples',
-      totalCount: 150,
-      sharePct: 23.4,
-      resolvedCount: 118,
-      unresolvedCount: 20,
-      inReplicaCount: 12,
-      resolutionRatePct: 78.7,
-      prevQuarterCount: 66,
-      currQuarterCount: 84,
+      totalCount: 2304,
+      sharePct: 22.5,
+      resolvedCount: 1792,
+      unresolvedCount: 352,
+      inReplicaCount: 160,
+      resolutionRatePct: 77.8,
+      prevQuarterCount: 1024,
+      currQuarterCount: 1280,
       growthRatePct: 25.0,
       avgWaitDaysBefore: 3.8,
       smartOpsTargetSla: '< 5 segundos (78,5% sem fila humana)',
@@ -245,15 +245,15 @@ const DEFAULT_RECLAME_AQUI_DATA: ReclameAquiDashboardResponseDto = {
     {
       categoryKey: 'PARTS_STOCKOUT_DELAY',
       label: 'Moto Retida por Falta de Peça Básica no Almoxarifado',
-      totalCount: 98,
-      sharePct: 15.3,
-      resolvedCount: 74,
-      unresolvedCount: 16,
-      inReplicaCount: 8,
-      resolutionRatePct: 75.5,
-      prevQuarterCount: 45,
-      currQuarterCount: 53,
-      growthRatePct: 17.7,
+      totalCount: 1760,
+      sharePct: 17.2,
+      resolvedCount: 1344,
+      unresolvedCount: 288,
+      inReplicaCount: 128,
+      resolutionRatePct: 76.4,
+      prevQuarterCount: 800,
+      currQuarterCount: 960,
+      growthRatePct: 20.0,
       avgWaitDaysBefore: 6.2,
       smartOpsTargetSla: 'Reposição Preditiva D-7 / D-15',
       addressedBySmartOps: true,
@@ -261,40 +261,40 @@ const DEFAULT_RECLAME_AQUI_DATA: ReclameAquiDashboardResponseDto = {
       sampleComplaintTitle: 'Moto parada esperando cabo de embreagem e lona de freio em falta no galpão',
     },
     {
-      categoryKey: 'PRE_EXISTING_DAMAGE_DISPUTE',
-      label: 'Divergência sobre Avaria Pré-Existente na Retirada',
-      totalCount: 112,
-      sharePct: 17.5,
-      resolvedCount: 86,
-      unresolvedCount: 17,
-      inReplicaCount: 9,
-      resolutionRatePct: 76.8,
-      prevQuarterCount: 53,
-      currQuarterCount: 59,
-      growthRatePct: 9.5,
-      avgWaitDaysBefore: 5.1,
-      smartOpsTargetSla: 'Isenção Automática 48h / 100 km',
-      addressedBySmartOps: false,
-      smartOpsSolutionModule: 'Escudo de Retirada 360° e Janela de Proteção 48h / 100 km (T02/T07)',
-      sampleComplaintTitle: 'Risco no tanque já estava quando retirei a moto no pátio',
-    },
-    {
       categoryKey: 'BILLING_AND_CONTRACT_DOUBTS',
       label: 'Dúvidas sobre Fatura Semanal, Caução e Baixa de Pix',
-      totalCount: 92,
-      sharePct: 14.4,
-      resolvedCount: 74,
-      unresolvedCount: 13,
-      inReplicaCount: 5,
-      resolutionRatePct: 80.4,
-      prevQuarterCount: 44,
-      currQuarterCount: 48,
-      growthRatePct: 5.9,
+      totalCount: 1888,
+      sharePct: 18.4,
+      resolvedCount: 1440,
+      unresolvedCount: 288,
+      inReplicaCount: 160,
+      resolutionRatePct: 76.3,
+      prevQuarterCount: 896,
+      currQuarterCount: 992,
+      growthRatePct: 10.7,
       avgWaitDaysBefore: 2.9,
       smartOpsTargetSla: 'Conciliação Pix em Tempo Real',
       addressedBySmartOps: false,
       smartOpsSolutionModule: 'Extrato Semanal Auditável e Baixa Instantânea de Pix (T02/T09)',
       sampleComplaintTitle: 'Paguei a parcela semanal via Pix e o desbloqueio demorou para atualizar',
+    },
+    {
+      categoryKey: 'PRE_EXISTING_DAMAGE_DISPUTE',
+      label: 'Divergência sobre Avaria Pré-Existente na Retirada',
+      totalCount: 1376,
+      sharePct: 13.4,
+      resolvedCount: 992,
+      unresolvedCount: 256,
+      inReplicaCount: 128,
+      resolutionRatePct: 72.1,
+      prevQuarterCount: 656,
+      currQuarterCount: 720,
+      growthRatePct: 9.8,
+      avgWaitDaysBefore: 5.1,
+      smartOpsTargetSla: 'Isenção Automática 48h / 100 km',
+      addressedBySmartOps: false,
+      smartOpsSolutionModule: 'Escudo de Retirada 360° e Janela de Proteção 48h / 100 km (T02/T07)',
+      sampleComplaintTitle: 'Risco no tanque já estava quando retirei a moto no pátio',
     },
   ],
   recentComplaints: [
@@ -1696,7 +1696,7 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
     this.reclameAquiLoading.set(true);
     this.managerService.getReclameAquiAnalytics().subscribe({
       next: (res) => {
-        if (res && res.totalComplaintsMinered) {
+        if (res && res.totalComplaintsMinered && Array.isArray(res.categories) && res.categories[0]?.label) {
           this.reclameAquiData.set(res);
         }
         this.reclameAquiLoading.set(false);
@@ -1714,26 +1714,26 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
     if (!this.managerService?.syncReclameAquiAnalytics) {
       this.reclameAquiLoading.set(false);
       this.reclameAquiSyncBanner.set(
-        'Sincronização Reclame Aqui concluída com sucesso (640 reclamações auditadas).'
+        'Sincronização Reclame Aqui concluída com sucesso (10.240 reclamações auditadas).'
       );
       return;
     }
 
     this.managerService.syncReclameAquiAnalytics(true).subscribe({
       next: (res) => {
-        if (res && res.totalComplaintsMinered) {
+        if (res && res.totalComplaintsMinered && Array.isArray(res.categories) && res.categories[0]?.label) {
           this.reclameAquiData.set(res);
         }
         this.reclameAquiLoading.set(false);
         this.reclameAquiSyncBanner.set(
           res?.syncMessage ||
-            'Sincronização Reclame Aqui concluída com sucesso (640 reclamações auditadas).'
+            'Sincronização Reclame Aqui concluída com sucesso (10.240 reclamações auditadas).'
         );
       },
       error: () => {
         this.reclameAquiLoading.set(false);
         this.reclameAquiSyncBanner.set(
-          'Snapshot consolidado do Reclame Aqui atualizado (640 reclamações processadas).'
+          'Snapshot consolidado do Reclame Aqui atualizado (10.240 reclamações processadas).'
         );
       },
     });

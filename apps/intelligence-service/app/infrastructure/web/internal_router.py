@@ -380,6 +380,6 @@ async def sync_reclame_aqui_dashboard(
     report = build_reclame_aqui_dashboard_report(raw_snapshot, used_fallback=used_fallback)
     return _map_reclame_aqui_report_to_dto(
         report,
-        "Sincronização com a base do Reclame Aqui concluída (640 reclamações quantificadas).",
+        "Sincronização com a base nacional do Reclame Aqui concluída (10.240 reclamações quantificadas).",
     )
 

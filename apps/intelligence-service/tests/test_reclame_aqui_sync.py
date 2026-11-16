@@ -28,10 +28,10 @@ def test_reclame_aqui_get_dashboard_returns_quantified_voc_metrics():
     assert response.status_code == 200
     data = response.json()
     assert data["companyName"] == "Mottu"
-    assert data["totalComplaints"] == 640
-    assert data["resolvedCount"] == 490
-    assert data["unresolvedCount"] == 100
-    assert data["inReplyCount"] == 50
+    assert data["totalComplaints"] == 10240
+    assert data["resolvedCount"] == 7840
+    assert data["unresolvedCount"] == 1600
+    assert data["inReplyCount"] == 800
     assert data["resolvedPct"] == 76.6
     assert data["fastestGrowingPct"] > 25.0
     assert data["addressableSharePct"] > 60.0
@@ -47,7 +47,7 @@ def test_reclame_aqui_post_sync_refreshes_and_returns_dashboard():
     )
     assert response.status_code == 200
     data = response.json()
-    assert data["totalComplaints"] == 640
+    assert data["totalComplaints"] == 10240
     assert "lastSyncedAt" in data
     assert "message" in data
 

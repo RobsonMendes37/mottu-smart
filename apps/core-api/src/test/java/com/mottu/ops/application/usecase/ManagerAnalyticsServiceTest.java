@@ -217,10 +217,10 @@ class ManagerAnalyticsServiceTest {
     void testGetAndSyncReclameAquiAnalytics() {
         Map<String, Object> mockVoc = Map.of(
                 "companyName", "Mottu",
-                "totalComplaints", 640,
-                "resolvedCount", 490,
-                "unresolvedCount", 100,
-                "inReplyCount", 50,
+                "totalComplaints", 10240,
+                "resolvedCount", 7840,
+                "unresolvedCount", 1600,
+                "inReplyCount", 800,
                 "resolvedPct", 76.6,
                 "fastestGrowingCategory", "Previsibilidade no Valor e Quantidade de Peças",
                 "fastestGrowingPct", 30.4,
@@ -231,7 +231,7 @@ class ManagerAnalyticsServiceTest {
 
         Map<String, Object> getRes = service.getReclameAquiAnalytics();
         assertNotNull(getRes);
-        assertEquals(640, getRes.get("totalComplaints"));
+        assertEquals(10240, getRes.get("totalComplaints"));
         assertEquals(76.6, getRes.get("resolvedPct"));
 
         Map<String, Object> syncRes = service.syncReclameAquiAnalytics(true);

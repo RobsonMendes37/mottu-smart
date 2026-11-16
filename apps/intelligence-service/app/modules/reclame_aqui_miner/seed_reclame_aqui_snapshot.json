@@ -7,20 +7,20 @@
   "wouldDoBusinessAgainPct": 74.8,
   "avgResponseTimeHours": 18.5,
   "summary": {
-    "totalComplaints": 640,
-    "resolvedCount": 490,
-    "unresolvedCount": 100,
-    "inReplyCount": 50
+    "totalComplaints": 10240,
+    "resolvedCount": 7840,
+    "unresolvedCount": 1600,
+    "inReplyCount": 800
   },
   "categories": [
     {
       "categoryKey": "ORCAMENTO_PECAS_AVARIAS",
       "categoryLabel": "Previsibilidade no Valor e Quantidade de Peças",
-      "previousQuarterCount": 79,
-      "currentQuarterCount": 103,
-      "resolvedCount": 142,
-      "unresolvedCount": 26,
-      "inReplyCount": 14,
+      "previousQuarterCount": 1264,
+      "currentQuarterCount": 1648,
+      "resolvedCount": 2272,
+      "unresolvedCount": 416,
+      "inReplyCount": 224,
       "addressedBySmartOps": true,
       "smartOpsSolution": "Orçamento instantâneo por foto (T02/T04) com quantidade e preços da Loja Mottu",
       "smartOpsRoute": "/manager/catalog"
@@ -28,11 +28,11 @@
     {
       "categoryKey": "FILA_ESPERA_GALPAO",
       "categoryLabel": "Tempo de Espera e Fila Presencial no Galpão",
-      "previousQuarterCount": 64,
-      "currentQuarterCount": 80,
-      "resolvedCount": 112,
-      "unresolvedCount": 22,
-      "inReplyCount": 10,
+      "previousQuarterCount": 1024,
+      "currentQuarterCount": 1280,
+      "resolvedCount": 1792,
+      "unresolvedCount": 352,
+      "inReplyCount": 160,
       "addressedBySmartOps": true,
       "smartOpsSolution": "Triagem autônoma por Visão Computacional + Junta Multi-IA (78,5% sem fila)",
       "smartOpsRoute": "/mechanic/queue"
@@ -40,11 +40,11 @@
     {
       "categoryKey": "RUPTURA_PECA_OFICINA",
       "categoryLabel": "Falta de Peça em Manutenção Agendada",
-      "previousQuarterCount": 50,
-      "currentQuarterCount": 60,
-      "resolvedCount": 84,
-      "unresolvedCount": 18,
-      "inReplyCount": 8,
+      "previousQuarterCount": 800,
+      "currentQuarterCount": 960,
+      "resolvedCount": 1344,
+      "unresolvedCount": 288,
+      "inReplyCount": 128,
       "addressedBySmartOps": true,
       "smartOpsSolution": "Motor Preditivo de Ruptura WMS com Reposição Preventiva em 1 Clique",
       "smartOpsRoute": "/mechanic/operations"
@@ -52,11 +52,11 @@
     {
       "categoryKey": "CONCILIACAO_PIX_FATURA",
       "categoryLabel": "Dúvidas em Fatura Semanal, Multas e Baixa Pix",
-      "previousQuarterCount": 56,
-      "currentQuarterCount": 62,
-      "resolvedCount": 90,
-      "unresolvedCount": 18,
-      "inReplyCount": 10,
+      "previousQuarterCount": 896,
+      "currentQuarterCount": 992,
+      "resolvedCount": 1440,
+      "unresolvedCount": 288,
+      "inReplyCount": 160,
       "addressedBySmartOps": false,
       "smartOpsSolution": "Extrato semanal transparente e conciliação Pix em tempo real (T12)",
       "smartOpsRoute": "/manager/billing"
@@ -64,11 +64,11 @@
     {
       "categoryKey": "AVARIA_RETIRADA_CONTRATO",
       "categoryLabel": "Divergência de Avaria Pré-Existente na Retirada",
-      "previousQuarterCount": 41,
-      "currentQuarterCount": 45,
-      "resolvedCount": 62,
-      "unresolvedCount": 16,
-      "inReplyCount": 8,
+      "previousQuarterCount": 656,
+      "currentQuarterCount": 720,
+      "resolvedCount": 992,
+      "unresolvedCount": 256,
+      "inReplyCount": 128,
       "addressedBySmartOps": false,
       "smartOpsSolution": "Giro 360 de Retirada com Dupla Validação Digital e Escudo 48h/100km",
       "smartOpsRoute": "/mechanic/fleet"

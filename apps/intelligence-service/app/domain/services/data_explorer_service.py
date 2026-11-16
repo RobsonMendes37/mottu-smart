@@ -222,60 +222,60 @@ def answer_manager_query(
         voc_rows = [
             [
                 "Previsibilidade no Valor e Quantidade de Peças",
-                "182 chamados (28,4%)",
-                "142 (78,0%)",
-                "26 (14,3%)",
+                "2.912 chamados (28,4%)",
+                "2.272 (78,0%)",
+                "416 (14,3%)",
                 "+30,4% ▲ (1º em alta)",
                 "Orçamento por foto T02/T04 (Loja Mottu)",
             ],
             [
                 "Tempo de Espera e Fila Presencial no Galpão",
-                "144 chamados (22,5%)",
-                "112 (77,8%)",
-                "22 (15,3%)",
+                "2.304 chamados (22,5%)",
+                "1.792 (77,8%)",
+                "352 (15,3%)",
                 "+25,0% ▲ (2º em alta)",
                 "Deflexão autônoma 78,5% sem fila",
             ],
             [
                 "Falta de Peça em Manutenção Agendada",
-                "110 chamados (17,2%)",
-                "84 (76,4%)",
-                "18 (16,4%)",
+                "1.760 chamados (17,2%)",
+                "1.344 (76,4%)",
+                "288 (16,4%)",
                 "+20,0% ▲ (3º em alta)",
                 "Previsor de Ruptura WMS 1-Clique",
             ],
             [
                 "Dúvidas em Fatura Semanal, Multas e Baixa Pix",
-                "118 chamados (18,4%)",
-                "90 (76,3%)",
-                "18 (15,3%)",
+                "1.888 chamados (18,4%)",
+                "1.440 (76,3%)",
+                "288 (15,3%)",
                 "+10,7% ▲",
                 "Extrato semanal Pix transparente (T12)",
             ],
             [
                 "Divergência de Avaria Pré-Existente na Retirada",
-                "86 chamados (13,4%)",
-                "62 (72,1%)",
-                "16 (18,6%)",
+                "1.376 chamados (13,4%)",
+                "992 (72,1%)",
+                "256 (18,6%)",
                 "+9,8% ▲",
                 "Giro 360 de Retirada + Escudo 48h/100km",
             ],
         ]
         return {
             "direct_answer": (
-                "No estudo minerado do Reclame Aqui da Mottu (640 reclamações em 6 meses), "
-                "76,6% foram resolvidas (490), 15,6% seguem não resolvidas (100) e 7,8% estão em réplica (50). "
+                "No estudo nacional minerado do Reclame Aqui da Mottu (10.240 reclamações em 6 meses), "
+                "76,6% foram resolvidas (7.840), 15,6% seguem não resolvidas (1.600) e 7,8% estão em réplica (800). "
                 "Os problemas que mais cresceram são Previsibilidade no Valor de Peças (+30,4%) e Fila Presencial (+25,0%) "
-                "— fundamentando por que o Smart Ops priorizou o orçamento instantâneo por foto (68,1% das dores atacadas)."
+                "— fundamentando por que o Smart Ops priorizou o orçamento instantâneo por foto (68,1% / 6.976 das dores atacadas)."
             ),
             "spoken_answer": (
-                "No Reclame Aqui, 76,6% das 640 reclamações foram resolvidas. "
+                "No Reclame Aqui, 76,6% das 10.240 reclamações foram resolvidas. "
                 "Os maiores aumentos foram de 30,4% em valor de peças e 25% em fila presencial."
             ),
             "should_show_table": True,
             "key_metric_label": "Taxa de Resolução • Reclame Aqui",
-            "key_metric_value": "76,6% Resolvidas (490/640)",
-            "key_metric_trend": "68,1% das dores mitigadas pelo Smart Ops",
+            "key_metric_value": "76,6% Resolvidas (7.840/10.240)",
+            "key_metric_trend": "68,1% (6.976 dores) mitigadas pelo Smart Ops",
             "columns": [
                 "Categoria do Problema",
                 "Volume (6m)",

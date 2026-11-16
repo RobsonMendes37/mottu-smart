@@ -366,7 +366,7 @@ const BASE_URL = process.env.BASE_URL || 'http://161.153.2.148';
       const raTab = page.locator('[data-testid="tab-reclame-aqui"]');
       if (await raTab.isVisible().catch(() => false)) {
         await raTab.click();
-        await page.waitForSelector('text=640 casos', { timeout: 8000 });
+        await page.waitForSelector('text=76.6% Resolvidas', { timeout: 8000 });
         await assertImages('Gestor Analytics T10 - Reclame Aqui VoC');
       }
     });

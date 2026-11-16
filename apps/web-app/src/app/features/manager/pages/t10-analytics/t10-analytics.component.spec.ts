@@ -294,9 +294,9 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
   it('TC-T10-17: Switches to Reclame Aqui (VoC) tab, filters complaints by status and category, and exposes top growth metrics', () => {
     comp.setBiViewMode('reclame_aqui');
     expect(comp.biViewMode()).toBe('reclame_aqui');
-    expect(comp.reclameAquiData().totalComplaintsMinered).toBe(640);
-    expect(comp.reclameAquiData().resolvedCount).toBe(490);
-    expect(comp.reclameAquiData().unresolvedCount).toBe(100);
+    expect(comp.reclameAquiData().totalComplaintsMinered).toBe(10240);
+    expect(comp.reclameAquiData().resolvedCount).toBe(7840);
+    expect(comp.reclameAquiData().unresolvedCount).toBe(1600);
     expect(comp.reclameAquiData().topGrowingCategoryRatePct).toBeGreaterThan(25);
     expect(comp.filteredReclameAquiComplaints().length).toBeGreaterThan(0);
 

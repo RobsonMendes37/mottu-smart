@@ -238,9 +238,9 @@ class BillingAndAnalyticsAdvisorIntegrationTest {
         mockMvc.perform(get("/api/v1/manager/analytics/reclame-aqui"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.companyName").value("Mottu"))
-                .andExpect(jsonPath("$.totalComplaints").value(640))
-                .andExpect(jsonPath("$.resolvedCount").value(490))
-                .andExpect(jsonPath("$.unresolvedCount").value(100))
+                .andExpect(jsonPath("$.totalComplaints").value(10240))
+                .andExpect(jsonPath("$.resolvedCount").value(7840))
+                .andExpect(jsonPath("$.unresolvedCount").value(1600))
                 .andExpect(jsonPath("$.resolvedPct").value(76.6))
                 .andExpect(jsonPath("$.categories", hasSize(5)))
                 .andExpect(jsonPath("$.recentComplaints", hasSize(greaterThanOrEqualTo(5))));
@@ -249,7 +249,7 @@ class BillingAndAnalyticsAdvisorIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"forceRefresh\": true}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalComplaints").value(640))
+                .andExpect(jsonPath("$.totalComplaints").value(10240))
                 .andExpect(jsonPath("$.addressableSharePct").value(68.1));
     }
 

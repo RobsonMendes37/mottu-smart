@@ -202,9 +202,9 @@ const DEFAULT_RECLAME_AQUI_DATA: ReclameAquiDashboardResponseDto = {
   smartOpsAddressableCount: 6976,
   smartOpsAddressablePct: 68.1,
   executiveThesisHeadline:
-    'De 10.240 reclamações mineradas no Reclame Aqui, 68,1% (6.976 casos) concentram-se em 3 dores que mais cresceram no trimestre: falta de previsibilidade do valor das peças (+30,4%), espera prolongada em fila de pátio (+25,0%) e indisponibilidade de peça na bancada (+20,0%).',
+    '6.976 de 10.240 chamados (68,1%) concentram-se em valor de peças (+30,4%), fila no galpão (+25,0%) e falta de peças (+20,0%).',
   productDecisionRationale:
-    'Escolhemos otimizar o aplicativo com Orçamento Instantâneo de Peças (vinculado à tabela oficial da Loja Mottu) e Triagem Visual Rápida porque são intervenções de software de alta alavancagem: atacam simultaneamente os 2 problemas de maior crescimento (+30,4% e +25,0%), dando previsibilidade financeira imediata ao entregador antes mesmo de pisar na oficina.',
+    'Orçamento por foto com preços da Loja Mottu e triagem sem fila atacam os dois problemas que mais cresceram.',
   categories: [
     {
       categoryKey: 'PARTS_PRICING_OPACITY',
@@ -1828,6 +1828,11 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  formatInt(value: number | null | undefined): string {
+    const n = Math.round(Number(value ?? 0));
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
   refresh(): void {

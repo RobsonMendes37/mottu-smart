@@ -1,25 +1,31 @@
 <app-desktop-shell
   sectionLabel="Cadastros"
-  pageTitle="Indicadores operacionais"
-  activeNav="analytics"
+  [pageTitle]="biViewMode() === 'reclame_aqui' ? 'Reclame Aqui' : 'Indicadores operacionais'"
+  [activeNav]="biViewMode() === 'reclame_aqui' ? 'reclame_aqui' : 'analytics'"
 >
   <div class="space-y-5">
-    <!-- Top Header + Primary View Mode Switcher (Immediately Visible at Top) -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white border border-[#E2E2E2] rounded-xl p-4 shadow-2xs">
+    <!-- Top Header + Primary View Mode Switcher -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white border border-[#E2E2E2] rounded-lg p-4">
       <div>
-        <h2 class="text-xl font-bold text-[#141414]">Indicadores operacionais da unidade</h2>
+        <h2 class="text-xl font-bold text-[#141414]">
+          {{ biViewMode() === 'reclame_aqui' ? 'Reclame Aqui — Base nacional' : 'Indicadores operacionais da unidade' }}
+        </h2>
         <p class="text-sm text-[#545454]">
-          Acompanhamento de frota ativa, estudo Reclame Aqui (VoC), tempo poupado nas baias e previsão de demanda.
+          @if (biViewMode() === 'reclame_aqui') {
+            Monitoramento de reclamações públicas (10.240 chamados em 6 meses) e impacto na oficina.
+          } @else {
+            Acompanhamento de frota ativa, tempo poupado nas baias e distribuição de pareceres de vistoria.
+          }
         </p>
       </div>
 
       <div class="flex items-center gap-2.5 flex-wrap">
         <!-- Top-Level Executive Tabs -->
-        <div class="inline-flex p-1 rounded-lg bg-[#F3F3F3] border border-[#E2E2E2]">
+        <div class="inline-flex p-1 rounded-md bg-[#F3F3F3] border border-[#E2E2E2]">
           <button
             type="button"
             (click)="setBiViewMode('native')"
-            class="px-3.5 h-8 rounded-md text-xs font-bold transition-colors cursor-pointer"
+            class="px-3.5 h-8 rounded text-xs font-bold transition-colors cursor-pointer"
             [class.bg-[#141414]]="biViewMode() === 'native'"
             [class.text-white]="biViewMode() === 'native'"
             [class.text-[#545454]]="biViewMode() !== 'native'"
@@ -30,27 +36,17 @@
             type="button"
             data-testid="tab-reclame-aqui-top"
             (click)="setBiViewMode('reclame_aqui')"
-            class="px-3.5 h-8 rounded-md text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer"
-            [class.bg-[#05944F]]="biViewMode() === 'reclame_aqui'"
+            class="px-3.5 h-8 rounded text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+            [class.bg-[#141414]]="biViewMode() === 'reclame_aqui'"
             [class.text-white]="biViewMode() === 'reclame_aqui'"
-            [class.text-[#046C3A]]="biViewMode() !== 'reclame_aqui'"
+            [class.text-[#545454]]="biViewMode() !== 'reclame_aqui'"
           >
-            <span class="w-2 h-2 rounded-full" [class.bg-white]="biViewMode() === 'reclame_aqui'" [class.bg-[#05944F]]="biViewMode() !== 'reclame_aqui'"></span>
-            <span>Reclame Aqui (VoC)</span>
-            <span
-              class="px-1.5 py-0.5 rounded text-[10px] font-mono font-extrabold"
-              [class.bg-[#046C3A]]="biViewMode() === 'reclame_aqui'"
-              [class.text-white]="biViewMode() === 'reclame_aqui'"
-              [class.bg-[#E6F4EE]]="biViewMode() !== 'reclame_aqui'"
-              [class.text-[#046C3A]]="biViewMode() !== 'reclame_aqui'"
-            >
-              10,2 mil
-            </span>
+            <span>Reclame Aqui</span>
           </button>
           <button
             type="button"
             (click)="setBiViewMode('looker')"
-            class="px-3.5 h-8 rounded-md text-xs font-bold transition-colors cursor-pointer"
+            class="px-3.5 h-8 rounded text-xs font-bold transition-colors cursor-pointer"
             [class.bg-[#141414]]="biViewMode() === 'looker'"
             [class.text-white]="biViewMode() === 'looker'"
             [class.text-[#545454]]="biViewMode() !== 'looker'"
@@ -433,13 +429,12 @@
               type="button"
               data-testid="tab-reclame-aqui"
               (click)="setBiViewMode('reclame_aqui')"
-              class="px-3 h-7 rounded text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer"
-              [class.bg-[#05944F]]="biViewMode() === 'reclame_aqui'"
+              class="px-3 h-7 rounded text-xs font-bold transition-colors cursor-pointer"
+              [class.bg-[#141414]]="biViewMode() === 'reclame_aqui'"
               [class.text-white]="biViewMode() === 'reclame_aqui'"
-              [class.text-[#141414]]="biViewMode() !== 'reclame_aqui'"
+              [class.text-[#545454]]="biViewMode() !== 'reclame_aqui'"
             >
-              <span class="w-1.5 h-1.5 rounded-full" [class.bg-white]="biViewMode() === 'reclame_aqui'" [class.bg-[#05944F]]="biViewMode() !== 'reclame_aqui'"></span>
-              <span>Reclame Aqui (VoC)</span>
+              Reclame Aqui
             </button>
             <button
               type="button"
@@ -1038,26 +1033,20 @@
         <!-- RECLAME AQUI (VOICE OF THE CUSTOMER - VoC) EXECUTIVE INTELLIGENCE SUITE   -->
         <!-- ========================================================================= -->
         @if (reclameAquiData(); as ra) {
-          <div data-testid="reclame-aqui-overview-section" class="p-5 bg-[#F6F6F6] space-y-5">
-            <!-- 1. Top Control & Live Scraper Sync Header -->
-            <div class="bg-white border border-[#E2E2E2] rounded-xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-2xs">
+          <div data-testid="reclame-aqui-overview-section" class="p-5 bg-[#F6F6F6]/60 space-y-5">
+            <!-- 1. Control & Live Sync Header -->
+            <div class="bg-white border border-[#E2E2E2] rounded-lg p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div class="space-y-1">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="px-2.5 py-0.5 rounded bg-[#141414] text-white font-mono text-[10px] font-bold uppercase tracking-wider">
-                    VoC Analytics • Python Miner
-                  </span>
-                  <h4 class="text-sm sm:text-base font-extrabold text-[#141414]">
-                    Estudo de Inteligência • Reclame Aqui ({{ ra.companyName }})
+                  <h4 class="text-sm font-bold text-[#141414]">
+                    Reclame Aqui — Mottu
                   </h4>
-                  <span class="px-2.5 py-0.5 rounded-full bg-[#E6F4EE] text-[#046C3A] font-mono text-[11px] font-bold">
+                  <span class="px-2 py-0.5 rounded bg-[#E6F4EE] text-[#046C3A] font-mono text-[11px] font-bold">
                     Nota {{ ra.reputationScore }}/10 ({{ ra.reputationLabel }})
                   </span>
-                  <span class="px-2.5 py-0.5 rounded-full bg-[#F3F3F3] text-[#545454] font-mono text-[11px] font-semibold">
-                    {{ ra.periodLabel }}
-                  </span>
                 </div>
-                <p class="text-xs text-[#545454]">
-                  Mineração automatizada de reclamações públicas para quantificar taxas de resolução, crescimento trimestral por categoria e aderência das soluções do Mottu Smart Ops.
+                <p class="text-xs text-[#757575]">
+                  {{ formatInt(ra.smartOpsAddressableCount) }} dos {{ formatInt(ra.totalComplaintsMinered) }} chamados (6m) concentram-se em valor de peças, fila no pátio e estoque.
                 </p>
               </div>
 
@@ -1066,10 +1055,10 @@
                   type="button"
                   data-testid="btn-ask-melissa-ra"
                   (click)="openMelissaWithReclameAquiSkill()"
-                  class="px-3.5 h-9 rounded-lg bg-[#F3F3F3] hover:bg-[#E2E2E2] border border-[#D4D4D4] text-[#141414] text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                  class="px-3.5 h-9 rounded-md bg-white hover:bg-[#F3F3F3] border border-[#E2E2E2] text-[#141414] text-xs font-semibold transition-colors inline-flex items-center gap-1.5 cursor-pointer"
                 >
                   <span class="w-2 h-2 rounded-full bg-[#05944F]"></span>
-                  <span>Analisar com a Melissa</span>
+                  <span>Perguntar para a Melissa</span>
                 </button>
 
                 <button
@@ -1077,14 +1066,14 @@
                   data-testid="btn-sync-reclame-aqui"
                   (click)="syncReclameAqui()"
                   [disabled]="reclameAquiLoading()"
-                  class="px-4 h-9 rounded-lg bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white text-xs font-bold transition-colors inline-flex items-center gap-2 cursor-pointer shadow-xs"
+                  class="px-4 h-9 rounded-md bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white text-xs font-bold transition-colors inline-flex items-center gap-2 cursor-pointer"
                 >
                   @if (reclameAquiLoading()) {
                     <svg class="animate-spin w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                     </svg>
-                    <span>Minerando Reclame Aqui...</span>
+                    <span>Sincronizando...</span>
                   } @else {
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -1100,96 +1089,96 @@
               <div
                 data-testid="reclame-aqui-sync-banner"
                 role="status"
-                class="p-3.5 rounded-xl bg-[#E6F4EE] border border-[#05944F]/40 text-xs font-bold text-[#046C3A] flex items-center justify-between shadow-2xs"
+                class="p-3 rounded-lg bg-[#E6F4EE] border border-[#05944F]/30 text-xs font-semibold text-[#046C3A] flex items-center justify-between"
               >
                 <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#05944F] text-white flex items-center justify-center text-[11px]">✓</span>
+                  <span class="w-4 h-4 rounded-full bg-[#05944F] text-white flex items-center justify-center text-[10px]">✓</span>
                   <span>{{ reclameAquiSyncBanner() }}</span>
                 </div>
                 <button
                   type="button"
                   (click)="reclameAquiSyncBanner.set(null)"
-                  class="px-2.5 py-1 rounded bg-white/80 hover:bg-white text-[#046C3A] font-bold text-[11px] cursor-pointer"
+                  class="px-2 py-0.5 rounded bg-white hover:bg-[#F3F3F3] text-[#046C3A] font-semibold text-[11px] cursor-pointer"
                 >
                   Fechar
                 </button>
               </div>
             }
 
-            <!-- 2. 4 Executive VoC Scorecards -->
+            <!-- 2. 4 Executive Scorecards -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div class="bg-white border border-[#E2E2E2] rounded-xl p-4">
+              <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-[#757575]">Base Nacional Minerada (6m)</span>
-                  <span class="px-2 py-0.5 rounded bg-[#F3F3F3] text-[#141414] font-mono text-[10px] font-bold">
-                    {{ ra.responseRatePct }}% respondidas
+                  <span class="text-xs font-medium text-[#757575]">Reclamações (6 meses)</span>
+                  <span class="text-[11px] font-mono font-semibold text-[#545454]">
+                    {{ ra.responseRatePct }}% resp.
                   </span>
                 </div>
-                <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1.5">
-                  {{ ra.totalComplaintsMinered | number:'1.0-0' }} casos
+                <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1">
+                  {{ formatInt(ra.totalComplaintsMinered) }} casos
                 </p>
-                <span class="text-[11px] text-[#545454]">
-                  {{ ra.wouldDoBusinessAgainPct }}% voltariam a fazer negócio (10,2 mil)
+                <span class="text-xs text-[#757575]">
+                  {{ ra.wouldDoBusinessAgainPct }}% voltariam a fazer negócio
                 </span>
               </div>
 
-              <div class="bg-white border border-[#E2E2E2] rounded-xl p-4">
+              <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-[#757575]">Resolvidas vs. Não Resolvidas</span>
-                  <span class="px-2 py-0.5 rounded bg-[#E6F4EE] text-[#046C3A] font-mono text-[10px] font-bold">
+                  <span class="text-xs font-medium text-[#757575]">Taxa de resolução</span>
+                  <span class="text-[11px] font-mono font-semibold text-[#046C3A]">
                     Média {{ ra.avgResolutionDays }}d
                   </span>
                 </div>
-                <p class="text-2xl font-extrabold font-mono text-[#046C3A] mt-1.5">
+                <p class="text-2xl font-extrabold font-mono text-[#05944F] mt-1">
                   {{ ra.overallResolutionRatePct }}% Resolvidas
                 </p>
-                <span class="text-[11px] text-[#545454] font-medium">
-                  {{ ra.resolvedCount }} resolvidas • {{ ra.unresolvedCount }} não resolvidas • {{ ra.inReplicaCount }} réplicas
+                <span class="text-xs text-[#757575]">
+                  {{ formatInt(ra.resolvedCount) }} resolvidas • {{ formatInt(ra.unresolvedCount) }} não resolvidas • {{ formatInt(ra.inReplicaCount) }} réplicas
                 </span>
               </div>
 
-              <div class="bg-white border border-[#E2E2E2] rounded-xl p-4">
+              <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-[#757575]">Maior Índice de Crescimento</span>
-                  <span class="px-2 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] font-mono text-[10px] font-extrabold">
-                    #1 Prioridade
+                  <span class="text-xs font-medium text-[#757575]">Maior alta no trimestre</span>
+                  <span class="text-[11px] font-mono font-semibold text-[#92400E]">
+                    Top #1
                   </span>
                 </div>
-                <p class="text-2xl font-extrabold font-mono text-[#D97706] mt-1.5">
+                <p class="text-2xl font-extrabold font-mono text-[#D97706] mt-1">
                   +{{ ra.topGrowingCategoryRatePct }}% ▲
                 </p>
-                <span class="text-[11px] text-[#141414] font-semibold line-clamp-1" [title]="ra.topGrowingCategoryLabel">
+                <span class="text-xs text-[#757575] line-clamp-1" [title]="ra.topGrowingCategoryLabel">
                   Valor e Qtd. de Peças (T1→T2)
                 </span>
               </div>
 
-              <div class="bg-white border-2 border-[#05944F] rounded-xl p-4">
+              <div class="bg-white border border-[#E2E2E2] rounded-lg p-4">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-[#046C3A]">Aderência do Smart Ops</span>
-                  <span class="px-2 py-0.5 rounded bg-[#05944F] text-white font-mono text-[10px] font-bold">
-                    ROI Direto
+                  <span class="text-xs font-medium text-[#757575]">Cobertura Smart Ops</span>
+                  <span class="text-[11px] font-mono font-semibold text-[#046C3A]">
+                    Direto no app
                   </span>
                 </div>
-                <p class="text-2xl font-extrabold font-mono text-[#046C3A] mt-1.5">
-                  {{ ra.smartOpsAddressablePct }}% ({{ ra.smartOpsAddressableCount }})
+                <p class="text-2xl font-extrabold font-mono text-[#046C3A] mt-1">
+                  {{ ra.smartOpsAddressablePct }}% ({{ formatInt(ra.smartOpsAddressableCount) }})
                 </p>
-                <span class="text-[11px] text-[#046C3A] font-semibold">
-                  Dores mitigadas direto no app e oficina
+                <span class="text-xs text-[#757575]">
+                  Dores mitigadas no app e oficina
                 </span>
               </div>
             </div>
 
-            <!-- 3. Comparative Chart (7 cols) + Product Prioritization Rationale Matrix (5 cols) -->
+            <!-- 3. Comparative Chart (7 cols) + Direct Observation Card (5 cols) -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-              <!-- Left (7 cols): Quantificação por Problema (Resolvidas vs Não Resolvidas + Índice de Crescimento) -->
-              <div class="lg:col-span-7 bg-white border border-[#E2E2E2] rounded-xl p-5 flex flex-col justify-between space-y-4">
+              <!-- Left (7 cols): Quantificação por Problema -->
+              <div class="lg:col-span-7 bg-white border border-[#E2E2E2] rounded-lg p-5 flex flex-col justify-between space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#EEEEEE]">
                   <div>
-                    <h5 class="text-sm font-extrabold text-[#141414]">
-                      Principais Problemas: Resolvidas vs. Não Resolvidas &amp; Crescimento
+                    <h5 class="text-sm font-bold text-[#141414]">
+                      Principais problemas e crescimento trimestral
                     </h5>
                     <p class="text-xs text-[#757575]">
-                      Quantificação por categoria minerada e evolução entre o 1º e o 2º trimestre
+                      Volume minerado, status de resolução e variação entre o 1º e o 2º trimestre
                     </p>
                   </div>
 
@@ -1206,14 +1195,14 @@
                   </div>
                 </div>
 
-                <div class="space-y-4">
+                <div class="space-y-3.5">
                   @for (cat of ra.categories; track cat.categoryKey) {
                     <div class="p-3.5 rounded-lg bg-[#FBFBFB] border border-[#E8E8E8] space-y-2">
                       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                         <div class="flex items-center gap-2 flex-wrap">
-                          <span class="text-xs font-extrabold text-[#141414]">{{ cat.label }}</span>
+                          <span class="text-xs font-bold text-[#141414]">{{ cat.label }}</span>
                           <span
-                            class="px-2 py-0.5 rounded font-mono text-[10px] font-extrabold"
+                            class="px-2 py-0.5 rounded font-mono text-[10px] font-bold"
                             [class.bg-[#FEE2E2]]="cat.growthRatePct >= 25"
                             [class.text-[#DC2626]]="cat.growthRatePct >= 25"
                             [class.bg-[#FEF3C7]]="cat.growthRatePct >= 15 && cat.growthRatePct < 25"
@@ -1221,40 +1210,40 @@
                             [class.bg-[#F3F3F3]]="cat.growthRatePct < 15"
                             [class.text-[#545454]]="cat.growthRatePct < 15"
                           >
-                            +{{ cat.growthRatePct }}% ▲ ({{ cat.prevQuarterCount }}→{{ cat.currQuarterCount }})
+                            +{{ cat.growthRatePct }}% ▲ ({{ formatInt(cat.prevQuarterCount) }}→{{ formatInt(cat.currQuarterCount) }})
                           </span>
                         </div>
                         <span class="font-mono text-xs font-bold text-[#141414] shrink-0">
-                          {{ cat.totalCount }} casos ({{ cat.sharePct }}%)
+                          {{ formatInt(cat.totalCount) }} casos ({{ cat.sharePct }}%)
                         </span>
                       </div>
 
-                      <!-- Stacked Horizontal Bar (Resolvidas / Em Réplica / Não Resolvidas) -->
-                      <div class="w-full h-3 rounded-full bg-[#EDEDED] overflow-hidden flex">
+                      <!-- Stacked Horizontal Bar -->
+                      <div class="w-full h-2.5 rounded-full bg-[#EDEDED] overflow-hidden flex">
                         <div
                           class="h-full bg-[#05944F]"
                           [style.width.%]="(cat.resolvedCount * 100) / (cat.totalCount || 1)"
-                          [title]="'Resolvidas: ' + cat.resolvedCount"
+                          [title]="'Resolvidas: ' + formatInt(cat.resolvedCount)"
                         ></div>
                         <div
                           class="h-full bg-[#D97706]"
                           [style.width.%]="(cat.inReplicaCount * 100) / (cat.totalCount || 1)"
-                          [title]="'Em Réplica: ' + cat.inReplicaCount"
+                          [title]="'Em Réplica: ' + formatInt(cat.inReplicaCount)"
                         ></div>
                         <div
                           class="h-full bg-[#DC2626]"
                           [style.width.%]="(cat.unresolvedCount * 100) / (cat.totalCount || 1)"
-                          [title]="'Não Resolvidas: ' + cat.unresolvedCount"
+                          [title]="'Não Resolvidas: ' + formatInt(cat.unresolvedCount)"
                         ></div>
                       </div>
 
                       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px]">
                         <div class="flex items-center gap-3 font-mono">
-                          <span class="text-[#046C3A] font-bold">{{ cat.resolvedCount }} resolvidas ({{ cat.resolutionRatePct }}%)</span>
-                          <span class="text-[#92400E] font-semibold">{{ cat.inReplicaCount }} réplica</span>
-                          <span class="text-[#DC2626] font-bold">{{ cat.unresolvedCount }} não resolvidas</span>
+                          <span class="text-[#046C3A] font-semibold">{{ formatInt(cat.resolvedCount) }} resolvidas ({{ cat.resolutionRatePct }}%)</span>
+                          <span class="text-[#92400E] font-medium">{{ formatInt(cat.inReplicaCount) }} réplica</span>
+                          <span class="text-[#DC2626] font-semibold">{{ formatInt(cat.unresolvedCount) }} não resolvidas</span>
                         </div>
-                        <span class="inline-flex items-center gap-1 font-semibold text-[#141414]">
+                        <span class="inline-flex items-center gap-1 font-medium text-[#545454]">
                           <span class="text-[#05944F]">✓</span>
                           <span>{{ cat.smartOpsSolutionModule }}</span>
                         </span>
@@ -1264,39 +1253,32 @@
                 </div>
               </div>
 
-              <!-- Right (5 cols): Fundamentação de Produto (Matriz de Priorização Big Tech) -->
-              <div class="lg:col-span-5 bg-white border border-[#E2E2E2] rounded-xl p-5 flex flex-col justify-between space-y-4">
-                <div class="space-y-3">
-                  <div class="flex items-center justify-between pb-3 border-b border-[#EEEEEE]">
-                    <div>
-                      <span class="text-[10px] font-mono uppercase tracking-wider font-extrabold text-[#05944F]">
-                        Product Discovery • Data-Driven
-                      </span>
-                      <h5 class="text-sm font-extrabold text-[#141414] mt-0.5">
-                        Por que priorizamos Previsibilidade de Peças &amp; Triagem Rápida?
-                      </h5>
+              <!-- Right (5 cols): Observação direta + comparativo -->
+              <div class="lg:col-span-5 bg-white border border-[#E2E2E2] rounded-lg p-5 flex flex-col justify-between space-y-4">
+                <div class="space-y-4">
+                  <div class="pb-3 border-b border-[#EEEEEE]">
+                    <h5 class="text-sm font-bold text-[#141414]">
+                      Observação operacional
+                    </h5>
+                    <p class="text-xs text-[#757575]">
+                      Comparativo direto entre o fluxo anterior e o Smart Ops
+                    </p>
+                  </div>
+
+                  <!-- Direct Observation Bullet Summary -->
+                  <div class="p-3.5 rounded-lg bg-[#F6F6F6] border border-[#E2E2E2] space-y-2 text-xs text-[#141414]">
+                    <div class="flex items-start gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#05944F] mt-1.5 shrink-0"></span>
+                      <p><strong>Previsibilidade de peças (+30,4%):</strong> o entregador vê quantidade e preço unitário oficial da Loja Mottu já nas telas de vistoria.</p>
                     </div>
-                    <span class="px-2.5 py-1 rounded bg-[#141414] text-white font-mono text-[10px] font-bold">
-                      Impacto × Esforço
-                    </span>
-                  </div>
-
-                  <!-- Executive Thesis Box -->
-                  <div class="p-3.5 rounded-lg bg-[#F6F6F6] border border-[#E2E2E2] space-y-1.5">
-                    <span class="text-[10px] font-mono font-bold uppercase text-[#545454]">Diagnóstico Quantitativo</span>
-                    <p class="text-xs font-bold text-[#141414] leading-relaxed">
-                      {{ ra.executiveThesisHeadline }}
-                    </p>
-                  </div>
-
-                  <!-- Product Rationale Box -->
-                  <div class="p-3.5 rounded-lg bg-[#E6F4EE]/70 border border-[#05944F]/30 space-y-1.5">
-                    <span class="text-[10px] font-mono font-extrabold uppercase text-[#046C3A]">
-                      Decisão de Engenharia (Quick Win de Alto Impacto)
-                    </span>
-                    <p class="text-xs text-[#141414] leading-relaxed font-medium">
-                      {{ ra.productDecisionRationale }}
-                    </p>
+                    <div class="flex items-start gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#05944F] mt-1.5 shrink-0"></span>
+                      <p><strong>Fila no pátio (+25,0%):</strong> 78,5% das triagens são resolvidas pelo app em segundos, reduzindo espera na oficina.</p>
+                    </div>
+                    <div class="flex items-start gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#D97706] mt-1.5 shrink-0"></span>
+                      <p><strong>Dúvidas adicionais:</strong> clique em <em>Perguntar para a Melissa</em> para filtrar ou comparar qualquer categoria.</p>
+                    </div>
                   </div>
 
                   <!-- Before vs After SLA Comparison Table -->
@@ -1311,19 +1293,19 @@
                       </thead>
                       <tbody class="divide-y divide-[#EEEEEE]">
                         <tr>
-                          <td class="py-2 px-3 font-bold text-[#141414]">Saber Qtd. e Valor das Peças</td>
-                          <td class="py-2 px-3 font-mono text-[#DC2626]">5,4 dias (No escuro)</td>
+                          <td class="py-2 px-3 font-semibold text-[#141414]">Qtd. e valor das peças</td>
+                          <td class="py-2 px-3 font-mono text-[#DC2626]">5,4 dias</td>
                           <td class="py-2 px-3 text-right font-mono font-bold text-[#046C3A]">&lt; 5s (Foto → Preço)</td>
                         </tr>
                         <tr>
-                          <td class="py-2 px-3 font-bold text-[#141414]">Vistoria de Desgaste Natural</td>
-                          <td class="py-2 px-3 font-mono text-[#DC2626]">3,8 dias / 2h30 fila</td>
+                          <td class="py-2 px-3 font-semibold text-[#141414]">Vistoria desgaste natural</td>
+                          <td class="py-2 px-3 font-mono text-[#DC2626]">2h30 fila</td>
                           <td class="py-2 px-3 text-right font-mono font-bold text-[#046C3A]">78,5% sem fila (R$ 0)</td>
                         </tr>
                         <tr>
-                          <td class="py-2 px-3 font-bold text-[#141414]">Falta de Peça Básica na Baia</td>
-                          <td class="py-2 px-3 font-mono text-[#DC2626]">6,2 dias moto retida</td>
-                          <td class="py-2 px-3 text-right font-mono font-bold text-[#046C3A]">Alerta Preditivo D-7</td>
+                          <td class="py-2 px-3 font-semibold text-[#141414]">Falta de peça na baia</td>
+                          <td class="py-2 px-3 font-mono text-[#DC2626]">6,2 dias retida</td>
+                          <td class="py-2 px-3 text-right font-mono font-bold text-[#046C3A]">Alerta D-7 no WMS</td>
                         </tr>
                       </tbody>
                     </table>
@@ -1331,10 +1313,16 @@
                 </div>
 
                 <div class="pt-3 border-t border-[#EEEEEE] flex items-center justify-between text-xs">
-                  <span class="text-[#545454] font-medium">Fonte auditável: snapshot modular JSON</span>
+                  <button
+                    type="button"
+                    (click)="openMelissaWithReclameAquiSkill()"
+                    class="font-semibold text-[#05944F] hover:underline cursor-pointer"
+                  >
+                    Perguntar detalhes à Melissa →
+                  </button>
                   <a
                     routerLink="/rider/garage"
-                    class="font-bold text-[#05944F] hover:underline"
+                    class="font-semibold text-[#141414] hover:underline"
                   >
                     Ver visão do entregador →
                   </a>
@@ -1343,14 +1331,14 @@
             </div>
 
             <!-- 4. Filterable Explorer of Minered Complaints -->
-            <div data-testid="reclame-aqui-complaints-table" class="bg-white border border-[#E2E2E2] rounded-xl overflow-hidden">
+            <div data-testid="reclame-aqui-complaints-table" class="bg-white border border-[#E2E2E2] rounded-lg overflow-hidden">
               <div class="px-5 py-4 border-b border-[#EEEEEE] flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div>
-                  <h5 class="text-sm font-extrabold text-[#141414]">
-                    Amostra Auditável de Reclamações Mineradas e Como o Smart Ops Resolve
+                  <h5 class="text-sm font-bold text-[#141414]">
+                    Amostra de reclamações registradas
                   </h5>
                   <p class="text-xs text-[#757575]">
-                    Filtre por status de resolução ou categoria de dor para inspecionar os casos reais mapeados
+                    Filtre por status ou categoria para inspecionar casos reais e a solução aplicada
                   </p>
                 </div>
 

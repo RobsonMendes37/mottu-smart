@@ -12,6 +12,7 @@ export type DesktopNavKey =
   | 'approvals'
   | 'catalog'
   | 'analytics'
+  | 'reclame_aqui'
   | 'billing'
   | 'account';
 

@@ -244,19 +244,29 @@ class GeminiVisionAdapter(AIVisionPort):
         prompt = (
             "Você é a Melissa, a copiloto técnica e operacional de frotas e oficinas da Mottu.\n"
             "Sua comunicação é extremamente direta, profissional e concisa. Responda estritamente à pergunta do gestor em 1 a 2 frases.\n"
-            "NUNCA cite números, métricas de contexto ou frotas se a pergunta não for especificamente sobre elas.\n\n"
-            f"Dados Operacionais de {yard_label} (Apenas referência interna de suporte):\n"
+            "NUNCA cite números de outras áreas se a pergunta não for sobre elas, mas SEMPRE cite os números e porcentagens exatos do tema perguntado!\n\n"
+            f"Dados Operacionais de {yard_label} (Referência oficial da operação):\n"
             f"- Peças: {parts_summary} ({critical_str})\n"
             f"{part_context_str}"
             f"- Oficina: {orders_summary}, fila liberada\n"
-            "- Vistorias: 78.5% deflexão sem fila, operação estável\n\n"
+            "- Vistorias: 78.5% deflexão sem fila, operação estável\n"
+            "- Reclame Aqui (VoC - 640 reclamações em 6 meses): 76,6% resolvidas (490), 15,6% não resolvidas (100), 7,8% em réplica (50). "
+            "Maiores aumentos/crescimentos nos últimos meses (trimestre): Previsibilidade no Valor e Quantidade de Peças teve aumento de +30,4% (182 chamados / 28,4%), "
+            "Tempo de Espera e Fila Presencial teve aumento de +25,0% (144 chamados / 22,5%), "
+            "Falta de Peça em Manutenção Agendada teve aumento de +20,0% (110 chamados / 17,2%), "
+            "Dúvidas em Fatura Semanal e Pix teve aumento de +10,7% (118 chamados / 18,4%), "
+            "e Divergência de Avaria na Retirada teve aumento de +9,8% (86 chamados / 13,4%). "
+            "O Mottu Smart Ops ataca diretamente 68,1% (436 casos) dessas dores.\n\n"
             f"Histórico recente:\n{history_str}\n\n"
             f"Mensagem do Usuário: {query}\n\n"
-            "Instrução Crítica: Se o usuário perguntou sobre a quantidade ou saldo de uma peça ou código SKU, informe obrigatoriamente a quantidade exata encontrada nos dados operacionais.\n\n"
+            "Instrução Crítica:\n"
+            "- Se o usuário perguntar sobre aumento, crescimento, variação nos últimos meses, principais problemas, Reclame Aqui ou porcentagens, informe OBRIGATORIAMENTE as porcentagens exatas (ex: 30,4% em valor de peças e 25,0% em fila presencial) TANTO em 'direct_answer' QUANTO em 'spoken_answer'!\n"
+            "- Escreva números e porcentagens sempre em algarismos (ex: 30,4% e 25,0%), nunca por extenso.\n"
+            "- Se o usuário perguntou sobre a quantidade ou saldo de uma peça ou código SKU, informe obrigatoriamente a quantidade exata encontrada nos dados operacionais.\n\n"
             "Retorne estritamente um JSON no seguinte formato:\n"
             "{\n"
-            '  "direct_answer": "Texto objetivo em 1 ou no máximo 2 frases. Sem markdown, sem hashtags, sem emojis.",\n'
-            '  "spoken_answer": "Frase falada ultra-curta e natural para voz (máximo 12 palavras).",\n'
+            '  "direct_answer": "Texto objetivo em 1 ou no máximo 2 frases com os números/porcentagens exatos. Sem markdown, sem hashtags, sem emojis.",\n'
+            '  "spoken_answer": "Frase falada natural para voz contendo obrigatoriamente os mesmos números e porcentagens de direct_answer.",\n'
             '  "should_show_table": false\n'
             "}\n\n"
             "Regras Inquebráveis:\n"
@@ -296,6 +306,8 @@ class GeminiVisionAdapter(AIVisionPort):
                             direct = re.sub(r"^#{1,6}\s+", "", direct, flags=re.MULTILINE)
                             spoken = re.sub(r"\*\*(.*?)\*\*", r"\1", spoken)
                             spoken = re.sub(r"^#{1,6}\s+", "", spoken, flags=re.MULTILINE)
+                            if "%" in direct and "%" not in spoken:
+                                spoken = direct
                             return {
                                 "direct_answer": direct,
                                 "spoken_answer": spoken,

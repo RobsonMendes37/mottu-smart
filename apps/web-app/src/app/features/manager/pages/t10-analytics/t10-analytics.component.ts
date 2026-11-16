@@ -1113,7 +1113,8 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
           this.copilotLoading.set(false);
           const assistantMsgId = Date.now() + 1;
           const answer = res.directAnswer || 'Análise operacional concluída com sucesso com os dados de pátio e estoque.';
-          const spoken = res.spokenAnswer || answer;
+          const rawSpoken = res.spokenAnswer || answer;
+          const spoken = answer.includes('%') && !rawSpoken.includes('%') ? answer : rawSpoken;
           const shouldShowTable = res.shouldShowTable !== false;
 
           if (res.isAiOffline !== undefined) {
@@ -1230,6 +1231,8 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
     return text
       .replace(/R\$\s*(\d+)[,.](\d{2})/g, '$1 reais e $2 centavos')
       .replace(/R\$\s*(\d+)/g, '$1 reais')
+      .replace(/\+\s*(\d+)/g, '$1')
+      .replace(/(\d+)[,.]0%/g, '$1 por cento')
       .replace(/(\d+)[,.](\d+)%/g, '$1 vírgula $2 por cento')
       .replace(/(\d+)%/g, '$1 por cento')
       .replace(/\bkm\/h\b/gi, 'quilômetros por hora')

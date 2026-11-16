@@ -212,6 +212,11 @@ def answer_manager_query(
             "nao resolvidas",
             "por que otimizar",
             "dor do entregador",
+            "qual foi o aumento",
+            "quai foi alemnto",
+            "alemnto",
+            "quantos porcento",
+            "qual a porcentagem",
         ]
     ):
         voc_rows = [
@@ -263,7 +268,10 @@ def answer_manager_query(
                 "Os problemas que mais cresceram são Previsibilidade no Valor de Peças (+30,4%) e Fila Presencial (+25,0%) "
                 "— fundamentando por que o Smart Ops priorizou o orçamento instantâneo por foto (68,1% das dores atacadas)."
             ),
-            "spoken_answer": "No Reclame Aqui, setenta e seis por cento foram resolvidas. Maior alta em dúvida de valor de peças.",
+            "spoken_answer": (
+                "No Reclame Aqui, 76,6% das 640 reclamações foram resolvidas. "
+                "Os maiores aumentos foram de 30,4% em valor de peças e 25% em fila presencial."
+            ),
             "should_show_table": True,
             "key_metric_label": "Taxa de Resolução • Reclame Aqui",
             "key_metric_value": "76,6% Resolvidas (490/640)",

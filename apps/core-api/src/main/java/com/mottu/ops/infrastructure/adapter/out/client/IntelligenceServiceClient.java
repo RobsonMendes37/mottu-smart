@@ -369,7 +369,7 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
                 || q.contains("não resolvidas") || q.contains("nao resolvidas")
                 || "SKILL_RECLAME_AQUI".equals(requestPayload.get("skillId"))) {
             res.put("directAnswer", "No estudo minerado do Reclame Aqui da Mottu (640 reclamações em 6 meses), 76,6% foram resolvidas (490), 15,6% seguem não resolvidas (100) e 7,8% estão em réplica (50). Os problemas que mais cresceram são Previsibilidade no Valor de Peças (+30,4%) e Fila Presencial (+25,0%) — fundamentando por que o Smart Ops priorizou o orçamento instantâneo por foto (68,1% das dores atacadas).");
-            res.put("spokenAnswer", "No Reclame Aqui, setenta e seis por cento foram resolvidas. Maior alta em dúvida de valor de peças.");
+            res.put("spokenAnswer", "No Reclame Aqui, 76,6% das 640 reclamações foram resolvidas. Os maiores aumentos foram de 30,4% em valor de peças e 25% em fila presencial.");
             res.put("shouldShowTable", true);
             res.put("keyMetricLabel", "Taxa de Resolução • Reclame Aqui");
             res.put("keyMetricValue", "76,6% Resolvidas (490/640)");

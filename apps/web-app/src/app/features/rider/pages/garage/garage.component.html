@@ -129,101 +129,6 @@
           <span>Sofreu queda ou colisão? Relatar acidente em vídeo</span>
         </button>
       </section>
-
-      <!-- Vistoria 360 de Expedição & Dupla Validação do Entregador -->
-      <section class="bg-white border border-[#E2E2E2] rounded-lg p-5 space-y-3.5">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="text-lg">📸</span>
-            <h3 class="text-sm font-bold text-[#141414]">Giro 360 de Retirada</h3>
-          </div>
-          @if (activeContract()?.pickupValidatedByRider || validationSuccess()) {
-            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#E6F4EE] text-[#046C3A] text-[11px] font-bold">
-              ✓ Validado por você
-            </span>
-          } @else {
-            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-[11px] font-bold">
-              Aguardando confirmação
-            </span>
-          }
-        </div>
-
-        <p class="text-xs text-[#545454]">
-          Fotos registradas pela Mottu no momento da entrega da chave. Caso note qualquer arranhão ou detalhe não apontado aqui durante o período do escudo, sua vistoria será 100% coberta.
-        </p>
-
-        <!-- 4 Angles Grid + Odometer -->
-        @if (baselinePhotos(); as photos) {
-          <div class="grid grid-cols-4 gap-2 pt-1">
-            <div class="text-center">
-              <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
-                <img [src]="photos.frontPhotoUrl" alt="Frente" class="w-full h-full object-cover" (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-farol.webp'" />
-              </div>
-              <span class="text-[10px] text-[#757575] mt-1 block font-medium">Frente</span>
-            </div>
-            <div class="text-center">
-              <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
-                <img [src]="photos.rearPhotoUrl" alt="Traseira" class="w-full h-full object-cover" (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-pneu.webp'" />
-              </div>
-              <span class="text-[10px] text-[#757575] mt-1 block font-medium">Traseira</span>
-            </div>
-            <div class="text-center">
-              <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
-                <img [src]="photos.rightSidePhotoUrl" alt="Lateral D." class="w-full h-full object-cover" (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-retrovisor.webp'" />
-              </div>
-              <span class="text-[10px] text-[#757575] mt-1 block font-medium">Lado D.</span>
-            </div>
-            <div class="text-center">
-              <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
-                <img [src]="photos.leftSidePhotoUrl" alt="Lateral E." class="w-full h-full object-cover" (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-escapamento.webp'" />
-              </div>
-              <span class="text-[10px] text-[#757575] mt-1 block font-medium">Lado E.</span>
-            </div>
-          </div>
-        } @else {
-          <div class="p-4 rounded-md bg-[#F3F3F3] text-center text-xs text-[#757575]">
-            As fotos do giro 360 estão sendo sincronizadas pelo pátio da unidade.
-          </div>
-        }
-
-        <!-- Double Validation Confirmation CTA -->
-        @if (!activeContract()?.pickupValidatedByRider && !validationSuccess()) {
-          <button
-            type="button"
-            (click)="onConfirmPickup()"
-            [disabled]="isValidating()"
-            class="w-full py-2.5 px-4 rounded-md bg-[#141414] hover:bg-black text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-          >
-            @if (isValidating()) {
-              <span>Confirmando recebimento...</span>
-            } @else {
-              <span>✓ Confirmar Vistoria de Recebimento da Moto</span>
-            }
-          </button>
-        } @else {
-          <div class="rounded-md bg-[#F6F6F6] p-2.5 text-center text-[11px] text-[#046C3A] font-semibold">
-            ✓ Vistoria de recebimento confirmada digitalmente por você. Proteção ativa no contrato.
-          </div>
-        }
-      </section>
-
-      <!-- Quick Ecosystem Shortcuts -->
-      <section class="grid grid-cols-2 gap-3">
-        <a
-          routerLink="/rider/rental"
-          class="bg-white border border-[#E2E2E2] hover:border-[#141414] rounded-lg p-3.5 transition-colors block"
-        >
-          <span class="text-xs font-bold text-[#141414] block">Aluguel e Pix</span>
-          <span class="text-[11px] text-[#757575] block mt-0.5">Ver fatura semanal e descontos</span>
-        </a>
-        <a
-          routerLink="/rider/account"
-          class="bg-white border border-[#E2E2E2] hover:border-[#141414] rounded-lg p-3.5 transition-colors block"
-        >
-          <span class="text-xs font-bold text-[#141414] block">Meus dados</span>
-          <span class="text-[11px] text-[#757575] block mt-0.5">WhatsApp, chave Pix e unidade</span>
-        </a>
-      </section>
     } @else if (!store.isLoadingGarage() && !store.garageError()) {
       <section class="bg-white border border-[#E2E2E2] rounded-lg p-6 text-center space-y-2">
         <h2 class="text-base font-bold text-[#141414]">Nenhuma moto vinculada no momento</h2>
@@ -233,7 +138,7 @@
       </section>
     }
 
-    <!-- Recent Inspections List & Parts Payment Predictability Card -->
+    <!-- Recent Inspections List & Parts Payment Predictability Card (IMMEDIATELY VISIBLE ABOVE FOLD) -->
     @if (latestEvaluatedInspection(); as latest) {
       <section class="bg-white border-2 border-[#141414] rounded-lg p-5 space-y-3.5 shadow-xs">
         <div class="flex items-start justify-between gap-2">
@@ -347,6 +252,103 @@
             }
           </div>
         }
+      </section>
+    }
+
+    @if (motorcycle()) {
+      <!-- Vistoria 360 de Expedição & Dupla Validação do Entregador -->
+      <section class="bg-white border border-[#E2E2E2] rounded-lg p-5 space-y-3.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">📸</span>
+            <h3 class="text-sm font-bold text-[#141414]">Giro 360 de Retirada</h3>
+          </div>
+          @if (activeContract()?.pickupValidatedByRider || validationSuccess()) {
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#E6F4EE] text-[#046C3A] text-[11px] font-bold">
+              ✓ Validado por você
+            </span>
+          } @else {
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-[11px] font-bold">
+              Aguardando confirmação
+            </span>
+          }
+        </div>
+
+        <p class="text-xs text-[#545454]">
+          Fotos registradas pela Mottu no momento da entrega da chave. Caso note qualquer arranhão ou detalhe não apontado aqui durante o período do escudo, sua vistoria será 100% coberta.
+        </p>
+
+        <!-- 4 Angles Grid + Odometer -->
+        @if (baselinePhotos(); as photos) {
+          <div class="grid grid-cols-4 gap-2 pt-1">
+            <div class="text-center">
+              <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
+                <img [src]="photos.frontPhotoUrl" alt="Frente" class="w-full h-full object-cover" (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-farol.webp'" />
+              </div>
+              <span class="text-[10px] text-[#757575] mt-1 block font-medium">Frente</span>
+            </div>
+            <div class="text-center">
+              <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
+                <img [src]="photos.rearPhotoUrl" alt="Traseira" class="w-full h-full object-cover" (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-pneu.webp'" />
+              </div>
+              <span class="text-[10px] text-[#757575] mt-1 block font-medium">Traseira</span>
+            </div>
+            <div class="text-center">
+              <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
+                <img [src]="photos.rightSidePhotoUrl" alt="Lateral D." class="w-full h-full object-cover" (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-retrovisor.webp'" />
+              </div>
+              <span class="text-[10px] text-[#757575] mt-1 block font-medium">Lado D.</span>
+            </div>
+            <div class="text-center">
+              <div class="aspect-square rounded-md overflow-hidden bg-[#F3F3F3] border border-[#E2E2E2]">
+                <img [src]="photos.leftSidePhotoUrl" alt="Lateral E." class="w-full h-full object-cover" (error)="$any($event.target).onerror = null; $any($event.target).src = '/demo-photos/avaria-escapamento.webp'" />
+              </div>
+              <span class="text-[10px] text-[#757575] mt-1 block font-medium">Lado E.</span>
+            </div>
+          </div>
+        } @else {
+          <div class="p-4 rounded-md bg-[#F3F3F3] text-center text-xs text-[#757575]">
+            As fotos do giro 360 estão sendo sincronizadas pelo pátio da unidade.
+          </div>
+        }
+
+        <!-- Double Validation Confirmation CTA -->
+        @if (!activeContract()?.pickupValidatedByRider && !validationSuccess()) {
+          <button
+            type="button"
+            (click)="onConfirmPickup()"
+            [disabled]="isValidating()"
+            class="w-full py-2.5 px-4 rounded-md bg-[#141414] hover:bg-black text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+          >
+            @if (isValidating()) {
+              <span>Confirmando recebimento...</span>
+            } @else {
+              <span>✓ Confirmar Vistoria de Recebimento da Moto</span>
+            }
+          </button>
+        } @else {
+          <div class="rounded-md bg-[#F6F6F6] p-2.5 text-center text-[11px] text-[#046C3A] font-semibold">
+            ✓ Vistoria de recebimento confirmada digitalmente por você. Proteção ativa no contrato.
+          </div>
+        }
+      </section>
+
+      <!-- Quick Ecosystem Shortcuts -->
+      <section class="grid grid-cols-2 gap-3">
+        <a
+          routerLink="/rider/rental"
+          class="bg-white border border-[#E2E2E2] hover:border-[#141414] rounded-lg p-3.5 transition-colors block"
+        >
+          <span class="text-xs font-bold text-[#141414] block">Aluguel e Pix</span>
+          <span class="text-[11px] text-[#757575] block mt-0.5">Ver fatura semanal e descontos</span>
+        </a>
+        <a
+          routerLink="/rider/account"
+          class="bg-white border border-[#E2E2E2] hover:border-[#141414] rounded-lg p-3.5 transition-colors block"
+        >
+          <span class="text-xs font-bold text-[#141414] block">Meus dados</span>
+          <span class="text-[11px] text-[#757575] block mt-0.5">WhatsApp, chave Pix e unidade</span>
+        </a>
       </section>
     }
   </div>

@@ -45,3 +45,4 @@ UPDATE inspections
 SET created_at = NOW() - INTERVAL '6 hours',
     resolved_at = NOW() - INTERVAL '5 hours'
 WHERE id = 'd2000000-0000-0000-0000-000000000004';
+

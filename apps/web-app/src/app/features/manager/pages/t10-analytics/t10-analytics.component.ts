@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, computed, inject, signal } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ManagerService } from '../../services/manager.service';
 import {
@@ -438,6 +438,7 @@ const DEFAULT_RECLAME_AQUI_DATA: ReclameAquiDashboardResponseDto = {
 export class T10AnalyticsComponent implements OnInit, OnDestroy {
   private managerService: ManagerService;
   private sanitizer: DomSanitizer;
+  private route: ActivatedRoute | null = null;
 
   summary = signal<AnalyticsSummaryResponseDto | null>(null);
   safeEmbedUrl = signal<SafeResourceUrl | string | null>(null);
@@ -801,6 +802,11 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
     } catch {
       this.sanitizer = sanitizer as DomSanitizer;
     }
+    try {
+      this.route = inject(ActivatedRoute, { optional: true });
+    } catch {
+      this.route = null;
+    }
   }
 
   ngOnInit(): void {
@@ -810,6 +816,20 @@ export class T10AnalyticsComponent implements OnInit, OnDestroy {
     this.loadReclameAqui();
     this.initVoices();
     this.initSpeechRecognition();
+
+    try {
+      this.route?.queryParams?.subscribe?.((params) => {
+        const tab = params?.['tab'];
+        if (tab === 'reclame_aqui' || tab === 'native' || tab === 'looker') {
+          this.biViewMode.set(tab);
+        }
+      });
+      if (typeof window !== 'undefined' && window.location?.search?.includes('tab=reclame_aqui')) {
+        this.biViewMode.set('reclame_aqui');
+      }
+    } catch {
+      // Safe fallback for unit tests
+    }
   }
 
   loadSummary(): void {

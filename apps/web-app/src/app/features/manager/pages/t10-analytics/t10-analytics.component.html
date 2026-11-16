@@ -4,34 +4,81 @@
   activeNav="analytics"
 >
   <div class="space-y-5">
-    <!-- Top Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <!-- Top Header + Primary View Mode Switcher (Immediately Visible at Top) -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white border border-[#E2E2E2] rounded-xl p-4 shadow-2xs">
       <div>
         <h2 class="text-xl font-bold text-[#141414]">Indicadores operacionais da unidade</h2>
         <p class="text-sm text-[#545454]">
-          Acompanhamento de frota ativa, tempo poupado nas baias e distribuição de pareceres de vistoria.
+          Acompanhamento de frota ativa, estudo Reclame Aqui (VoC), tempo poupado nas baias e previsão de demanda.
         </p>
       </div>
 
-      <button
-        type="button"
-        (click)="refresh()"
-        [disabled]="isLoading() || aiAdvisorLoading()"
-        class="self-start sm:self-auto px-4 h-10 rounded-md bg-white border border-[#E2E2E2] hover:bg-[#F3F3F3] text-xs font-semibold text-[#141414] transition-colors flex items-center gap-2 disabled:opacity-50"
-      >
-        @if (isLoading() || aiAdvisorLoading()) {
-          <svg class="animate-spin w-3.5 h-3.5 text-[#141414]" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-          </svg>
-          <span>Atualizando indicadores...</span>
-        } @else {
-          <svg class="w-3.5 h-3.5 text-[#545454]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-          <span>Atualizar painel</span>
-        }
-      </button>
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <!-- Top-Level Executive Tabs -->
+        <div class="inline-flex p-1 rounded-lg bg-[#F3F3F3] border border-[#E2E2E2]">
+          <button
+            type="button"
+            (click)="setBiViewMode('native')"
+            class="px-3.5 h-8 rounded-md text-xs font-bold transition-colors cursor-pointer"
+            [class.bg-[#141414]]="biViewMode() === 'native'"
+            [class.text-white]="biViewMode() === 'native'"
+            [class.text-[#545454]]="biViewMode() !== 'native'"
+          >
+            Visão consolidada
+          </button>
+          <button
+            type="button"
+            data-testid="tab-reclame-aqui-top"
+            (click)="setBiViewMode('reclame_aqui')"
+            class="px-3.5 h-8 rounded-md text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+            [class.bg-[#05944F]]="biViewMode() === 'reclame_aqui'"
+            [class.text-white]="biViewMode() === 'reclame_aqui'"
+            [class.text-[#046C3A]]="biViewMode() !== 'reclame_aqui'"
+          >
+            <span class="w-2 h-2 rounded-full" [class.bg-white]="biViewMode() === 'reclame_aqui'" [class.bg-[#05944F]]="biViewMode() !== 'reclame_aqui'"></span>
+            <span>Reclame Aqui (VoC)</span>
+            <span
+              class="px-1.5 py-0.5 rounded text-[10px] font-mono font-extrabold"
+              [class.bg-white/20]="biViewMode() === 'reclame_aqui'"
+              [class.text-white]="biViewMode() === 'reclame_aqui'"
+              [class.bg-[#E6F4EE]]="biViewMode() !== 'reclame_aqui'"
+              [class.text-[#046C3A]]="biViewMode() !== 'reclame_aqui'"
+            >
+              640
+            </span>
+          </button>
+          <button
+            type="button"
+            (click)="setBiViewMode('looker')"
+            class="px-3.5 h-8 rounded-md text-xs font-bold transition-colors cursor-pointer"
+            [class.bg-[#141414]]="biViewMode() === 'looker'"
+            [class.text-white]="biViewMode() === 'looker'"
+            [class.text-[#545454]]="biViewMode() !== 'looker'"
+          >
+            Looker Studio
+          </button>
+        </div>
+
+        <button
+          type="button"
+          (click)="refresh()"
+          [disabled]="isLoading() || aiAdvisorLoading()"
+          class="px-3.5 h-9 rounded-lg bg-white border border-[#E2E2E2] hover:bg-[#F3F3F3] text-xs font-semibold text-[#141414] transition-colors flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+        >
+          @if (isLoading() || aiAdvisorLoading()) {
+            <svg class="animate-spin w-3.5 h-3.5 text-[#141414]" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            <span>Atualizando...</span>
+          } @else {
+            <svg class="w-3.5 h-3.5 text-[#545454]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Atualizar painel</span>
+          }
+        </button>
+      </div>
     </div>
 
     @if (errorMessage()) {
@@ -111,6 +158,7 @@
       </div>
     </div>
 
+    @if (biViewMode() === 'native') {
     <!-- OPERATIONAL DATA SEARCH & EXPLORER -->
     <section class="bg-white border border-[#E2E2E2] rounded-xl p-5 shadow-xs space-y-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-[#EEEEEE]">
@@ -344,6 +392,7 @@
         </div>
       </section>
     </div>
+    }
 
     <!-- Consolidated Analytics & Looker Studio Section -->
     <section class="bg-white border border-[#E2E2E2] rounded-lg overflow-hidden">

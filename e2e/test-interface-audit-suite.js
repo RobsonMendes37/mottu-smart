@@ -157,11 +157,11 @@ const BASE_URL = process.env.BASE_URL || 'http://161.153.2.148';
     // -----------------------------------------------------------------------------------
     await runAuditedTest('Login: Vitrine Demo, Troca de Perfis e Zero Erros de Rede', async (page, ctx, { assertImages }) => {
       await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
-      await page.waitForSelector('text=Acesse sua conta', { timeout: 8000 });
+      await page.waitForSelector('text=Fazer login', { timeout: 8000 });
       await assertImages('Tela de Login');
 
-      // Testar alternância entre Modo Vitrine e Operação Real
-      const realModeBtn = page.locator('button:has-text("Operação Real")');
+      // Testar alternância entre Modo Vitrine e Contas Reais
+      const realModeBtn = page.locator('button:has-text("Contas Reais")');
       await realModeBtn.click();
       await page.waitForTimeout(300);
 
@@ -192,8 +192,8 @@ const BASE_URL = process.env.BASE_URL || 'http://161.153.2.148';
     await runAuditedTest('Entregador (Mobile): Fluxo Completo do Wizard de Vistoria (4 Fotos + Envio)', async (page, ctx, { assertImages }) => {
       await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
       
-      // Chavear para Operação Real (Carlos Silva) para fluxo autêntico com cota livre
-      const realModeBtn = page.locator('button:has-text("Operação Real")');
+      // Chavear para Contas Reais (Carlos Silva) para fluxo autêntico com cota livre
+      const realModeBtn = page.locator('button:has-text("Contas Reais")');
       await realModeBtn.click();
       await page.waitForTimeout(300);
 

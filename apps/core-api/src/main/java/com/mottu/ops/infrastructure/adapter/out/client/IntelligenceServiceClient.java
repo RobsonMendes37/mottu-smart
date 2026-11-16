@@ -174,7 +174,10 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
                     .header("X-Internal-Token", internalToken)
                     .retrieve()
                     .body(Map.class);
-            if (response != null && response.containsKey("totalComplaints")) {
+            if (response != null && (response.containsKey("totalComplaintsMinered") || response.containsKey("totalComplaints"))) {
+                response.putIfAbsent("totalComplaints", response.getOrDefault("totalComplaintsMinered", 640));
+                response.putIfAbsent("resolvedPct", response.getOrDefault("overallResolutionRatePct", 76.6));
+                response.putIfAbsent("addressableSharePct", response.getOrDefault("smartOpsAddressablePct", 68.1));
                 return response;
             }
         } catch (Exception e) {
@@ -193,7 +196,10 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
                     .body(Map.of("forceRefresh", forceRefresh))
                     .retrieve()
                     .body(Map.class);
-            if (response != null && response.containsKey("totalComplaints")) {
+            if (response != null && (response.containsKey("totalComplaintsMinered") || response.containsKey("totalComplaints"))) {
+                response.putIfAbsent("totalComplaints", response.getOrDefault("totalComplaintsMinered", 640));
+                response.putIfAbsent("resolvedPct", response.getOrDefault("overallResolutionRatePct", 76.6));
+                response.putIfAbsent("addressableSharePct", response.getOrDefault("smartOpsAddressablePct", 68.1));
                 return response;
             }
         } catch (Exception e) {
@@ -205,42 +211,59 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
     public static Map<String, Object> buildLocalReclameAquiFallback(String message) {
         Map<String, Object> res = new java.util.LinkedHashMap<>();
         res.put("companyName", "Mottu");
+        res.put("sourceUrl", "https://www.reclameaqui.com.br/empresa/mottu/");
         res.put("platform", "Reclame Aqui");
         res.put("reputationBadge", "ÓTIMO");
+        res.put("reputationLabel", "ÓTIMO");
         res.put("overallScore", 8.2);
+        res.put("reputationScore", 8.2);
+        res.put("periodLabel", "Últimos 6 meses (Consolidação Trimestral)");
         res.put("solutionRatePct", 81.4);
+        res.put("responseRatePct", 98.4);
         res.put("wouldDoBusinessAgainPct", 74.8);
         res.put("avgResponseTimeHours", 18.5);
+        res.put("avgResolutionDays", 4.8);
         res.put("totalComplaints", 640);
+        res.put("totalComplaintsMinered", 640);
         res.put("resolvedCount", 490);
         res.put("unresolvedCount", 100);
         res.put("inReplyCount", 50);
+        res.put("inReplicaCount", 50);
         res.put("resolvedPct", 76.6);
+        res.put("overallResolutionRatePct", 76.6);
         res.put("unresolvedPct", 15.6);
         res.put("inReplyPct", 7.8);
-        res.put("fastestGrowingCategory", "Previsibilidade no Valor e Quantidade de Peças");
+        res.put("fastestGrowingCategory", "Surpresa e Falta de Previsibilidade no Valor e Qtd. de Peças");
+        res.put("topGrowingCategoryLabel", "Surpresa e Falta de Previsibilidade no Valor e Qtd. de Peças");
         res.put("fastestGrowingPct", 30.4);
+        res.put("topGrowingCategoryRatePct", 30.4);
         res.put("addressedComplaintsCount", 436);
+        res.put("smartOpsAddressableCount", 436);
         res.put("addressableSharePct", 68.1);
+        res.put("smartOpsAddressablePct", 68.1);
         res.put("productRationaleHeadline", "68.1% das reclamações operacionais no Reclame Aqui concentram-se na previsibilidade do valor de peças, tempo de fila em galpão e disponibilidade de estoque — os 3 pilares automatizados pelo Mottu Smart Ops.");
+        res.put("executiveThesisHeadline", "De 640 reclamações mineradas no Reclame Aqui, 68,1% (436 casos) concentram-se em 3 dores que mais cresceram no trimestre: falta de previsibilidade do valor das peças (+30,4%), espera prolongada em fila de pátio (+25,0%) e indisponibilidade de peça na bancada (+17,7%).");
+        res.put("productDecisionRationale", "Escolhemos otimizar o aplicativo com Orçamento Instantâneo de Peças (vinculado à tabela oficial da Loja Mottu) e Triagem Visual Rápida porque são intervenções de software de alta alavancagem: atacam simultaneamente os 2 problemas de maior crescimento (+30,4% e +25,0%), dando previsibilidade financeira imediata ao entregador antes mesmo de pisar na oficina.");
         res.put("categories", List.of(
-                createCategoryMap("ORCAMENTO_PECAS_AVARIAS", "Previsibilidade no Valor e Quantidade de Peças", 182, 79, 103, 30.4, 142, 26, 14, 78.0, 14.3, 7.7, true, "Orçamento instantâneo por foto (T02/T04) com quantidade e preços da Loja Mottu", "/manager/catalog"),
-                createCategoryMap("FILA_ESPERA_GALPAO", "Tempo de Espera e Fila Presencial no Galpão", 144, 64, 80, 25.0, 112, 22, 10, 77.8, 15.3, 6.9, true, "Triagem autônoma por Visão Computacional + Junta Multi-IA (78,5% sem fila)", "/mechanic/queue"),
-                createCategoryMap("RUPTURA_PECA_OFICINA", "Falta de Peça em Manutenção Agendada", 110, 50, 60, 20.0, 84, 18, 8, 76.4, 16.4, 7.2, true, "Motor Preditivo de Ruptura WMS com Reposição Preventiva em 1 Clique", "/mechanic/operations"),
-                createCategoryMap("CONCILIACAO_PIX_FATURA", "Dúvidas em Fatura Semanal, Multas e Baixa Pix", 118, 56, 62, 10.7, 90, 18, 10, 76.3, 15.3, 8.4, false, "Extrato semanal transparente e conciliação Pix em tempo real (T12)", "/manager/billing"),
-                createCategoryMap("AVARIA_RETIRADA_CONTRATO", "Divergência de Avaria Pré-Existente na Retirada", 86, 41, 45, 9.8, 62, 16, 8, 72.1, 18.6, 9.3, false, "Giro 360 de Retirada com Dupla Validação Digital e Escudo 48h/100km", "/mechanic/fleet")
+                createCategoryMap("PARTS_PRICING_OPACITY", "Surpresa e Falta de Previsibilidade no Valor e Qtd. de Peças", 188, 82, 106, 30.4, 138, 34, 16, 73.4, 18.1, 8.5, true, "Orçamento Transparente de Peças + Catálogo Oficial Loja Mottu (T02/T04)", "/manager/catalog"),
+                createCategoryMap("YARD_QUEUE_WAIT_TIME", "Demora Excessiva em Fila de Pátio para Vistoria Simples", 150, 66, 84, 25.0, 118, 20, 12, 78.7, 13.3, 8.0, true, "Triagem Visual Multi-IA com Deflexão de 78,5% sem Fila Humana (T03/T04)", "/mechanic/queue"),
+                createCategoryMap("PARTS_STOCKOUT_DELAY", "Moto Retida por Falta de Peça Básica no Almoxarifado", 98, 45, 53, 17.7, 74, 16, 8, 75.5, 16.3, 8.2, true, "Previsão Preditiva de Estoque e Alerta de Ruptura WMS (T10/T06)", "/mechanic/operations"),
+                createCategoryMap("PRE_EXISTING_DAMAGE_DISPUTE", "Divergência sobre Avaria Pré-Existente na Retirada", 112, 53, 59, 9.5, 86, 17, 9, 76.8, 15.2, 8.0, false, "Escudo de Retirada 360° e Janela de Proteção 48h / 100 km (T02/T07)", "/mechanic/fleet"),
+                createCategoryMap("BILLING_AND_CONTRACT_DOUBTS", "Dúvidas sobre Fatura Semanal, Caução e Baixa de Pix", 92, 44, 48, 5.9, 74, 13, 5, 80.4, 14.1, 5.5, false, "Extrato Semanal Auditável e Baixa Instantânea de Pix (T02/T09)", "/manager/billing")
         ));
         res.put("recentComplaints", List.of(
-                createComplaintMap("RA-2026-9841", "Fui na unidade e não sabia quanto ia pagar no retrovisor e manete quebrados", "ORCAMENTO_PECAS_AVARIAS", "Previsibilidade no Valor e Quantidade de Peças", "RESOLVED", "São Paulo - SP (Butantã)", "SP-04", "2026-11-15T16:40:00Z", 3.5, "Orçamento Transparente T02/T04 (Loja Mottu)"),
-                createComplaintMap("RA-2026-9838", "Cobrança de pneu e lona de freio que gastaram pelo uso diário de entregas", "ORCAMENTO_PECAS_AVARIAS", "Previsibilidade no Valor e Quantidade de Peças", "RESOLVED", "Guarulhos - SP", "SP-01", "2026-11-15T13:15:00Z", 4.1, "Regra Automática Desgaste Natural (R$ 0,00)"),
-                createComplaintMap("RA-2026-9832", "Perdi 3 horas de turno na fila só para o mecânico olhar o protetor do escapamento", "FILA_ESPERA_GALPAO", "Tempo de Espera e Fila Presencial no Galpão", "RESOLVED", "São Paulo - SP (Butantã)", "SP-04", "2026-11-14T18:20:00Z", 5.0, "Vistoria por Foto em 5s (78,5% sem fila)"),
-                createComplaintMap("RA-2026-9825", "Queria saber antes de ir no pátio qual o valor exato das peças da Sport 110i", "ORCAMENTO_PECAS_AVARIAS", "Previsibilidade no Valor e Quantidade de Peças", "UNRESOLVED", "São Paulo - SP (Interlagos)", "SP-03", "2026-11-14T11:05:00Z", 14.2, "Catálogo Sincronizado VTEX + Previsibilidade T02"),
-                createComplaintMap("RA-2026-9819", "Agendei revisão de manhã mas faltou cabo de embreagem e manete no estoque", "RUPTURA_PECA_OFICINA", "Falta de Peça em Manutenção Agendada", "UNRESOLVED", "São Paulo - SP (Lapa)", "SP-02", "2026-11-13T15:50:00Z", 19.0, "Previsor de Estoque WMS (Reposição Preventiva)"),
-                createComplaintMap("RA-2026-9811", "Ralado na carenagem lateral já estava quando peguei a moto ontem no galpão", "AVARIA_RETIRADA_CONTRATO", "Divergência de Avaria Pré-Existente na Retirada", "RESOLVED", "São Paulo - SP (Butantã)", "SP-04", "2026-11-13T09:30:00Z", 2.8, "Escudo de Retirada 48h/100km + Giro 360")
+                createComplaintMap("RA-2026-908412", "Não consigo saber o valor individual das peças antes de ir na oficina", "PARTS_PRICING_OPACITY", "Surpresa e Falta de Previsibilidade no Valor e Qtd. de Peças", "UNRESOLVED", "São Paulo - SP", "SP-04", "2026-11-14", 3.5, "Resolvido na T02 e T04: O entregador vê na hora a quantidade de peças (ex: 3 peças), o preço unitário da Loja Mottu (R$ 42,50 + R$ 25,00 + R$ 38,00) e o total exato a preparar (R$ 140,50)."),
+                createComplaintMap("RA-2026-907985", "Fila longa no pátio apenas para confirmar desgaste natural de freio e relação", "YARD_QUEUE_WAIT_TIME", "Demora Excessiva em Fila de Pátio para Vistoria Simples", "RESOLVED", "Guarulhos - SP", "SP-01", "2026-11-12", 4.1, "Resolvido na T03/T04: A Junta Técnica Multi-IA aprova desgaste natural em menos de 5 segundos com R$ 0,00 para o entregador e economia demonstrada de R$ 248,00."),
+                createComplaintMap("RA-2026-907310", "Dúvida no valor cobrado pelo pedal de câmbio e carcaça do farol após bancada", "PARTS_PRICING_OPACITY", "Surpresa e Falta de Previsibilidade no Valor e Qtd. de Peças", "IN_REPLICA", "São Paulo - SP", "SP-04", "2026-11-10", 5.0, "Resolvido na T02/T04: Mesmo em vistorias HUMAN_RESOLVED, o recibo discrimina cada SKU e a mão de obra."),
+                createComplaintMap("RA-2026-906844", "Espera por reposição de manete e pneu traseiro Sport 110i no galpão", "PARTS_STOCKOUT_DELAY", "Moto Retida por Falta de Peça Básica no Almoxarifado", "RESOLVED", "São Paulo - SP", "SP-07", "2026-11-08", 4.2, "Resolvido na T10/T06: O Previsor de Demanda calcula o burn-rate diário e permite reposição em 1 clique antes da ruptura."),
+                createComplaintMap("RA-2026-906112", "Queria orçamento prévio pela foto antes de perder turno de entregas no almoço", "PARTS_PRICING_OPACITY", "Surpresa e Falta de Previsibilidade no Valor e Qtd. de Peças", "UNRESOLVED", "São Paulo - SP", "SP-02", "2026-11-05", 6.0, "Resolvido na T02/T04: Transparência radical com badge de quantidade de peças avariadas e tabela oficial VTEX."),
+                createComplaintMap("RA-2026-905490", "Avaria estética já existia quando peguei a moto no primeiro dia de contrato", "PRE_EXISTING_DAMAGE_DISPUTE", "Divergência sobre Avaria Pré-Existente na Retirada", "RESOLVED", "São Paulo - SP", "SP-04", "2026-11-02", 2.8, "Resolvido na T02/T07: Escudo de Retirada 360° compara automaticamente as 4 fotos de expedição e isenta avarias pré-existentes.")
         ));
         res.put("usedFallback", true);
+        res.put("syncStatus", "SNAPSHOT_FALLBACK");
         res.put("lastSyncedAt", Instant.now().toString());
         res.put("message", message);
+        res.put("syncMessage", message);
         return res;
     }
 
@@ -252,18 +275,25 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
         Map<String, Object> m = new java.util.LinkedHashMap<>();
         m.put("categoryKey", key);
         m.put("categoryLabel", label);
+        m.put("label", label);
         m.put("totalCount", total);
+        m.put("sharePct", Math.round((total * 1000.0) / 640.0) / 10.0);
         m.put("previousQuarterCount", prevQ);
+        m.put("prevQuarterCount", prevQ);
         m.put("currentQuarterCount", currQ);
+        m.put("currQuarterCount", currQ);
         m.put("growthRatePct", growthPct);
         m.put("resolvedCount", resolved);
         m.put("unresolvedCount", unresolved);
         m.put("inReplyCount", inReply);
+        m.put("inReplicaCount", inReply);
         m.put("resolvedPct", resPct);
+        m.put("resolutionRatePct", resPct);
         m.put("unresolvedPct", unresPct);
         m.put("inReplyPct", replyPct);
         m.put("addressedBySmartOps", addressed);
         m.put("smartOpsSolution", solution);
+        m.put("smartOpsSolutionModule", solution);
         m.put("smartOpsRoute", route);
         return m;
     }
@@ -274,15 +304,20 @@ public class IntelligenceServiceClient implements FeedbackPolisherPort, CatalogS
     ) {
         Map<String, Object> m = new java.util.LinkedHashMap<>();
         m.put("id", id);
+        m.put("externalId", id);
         m.put("title", title);
         m.put("categoryKey", catKey);
         m.put("categoryLabel", catLabel);
         m.put("status", status);
+        m.put("statusLabel", "RESOLVED".equals(status) ? "Resolvida" : ("IN_REPLICA".equals(status) ? "Em Réplica" : "Não Resolvida"));
         m.put("city", city);
         m.put("yardKey", yardKey);
         m.put("createdAt", createdAt);
         m.put("responseTimeHours", respHours);
+        m.put("resolvedInDays", 4);
+        m.put("customerExcerpt", title);
         m.put("smartOpsModule", module);
+        m.put("smartOpsHowItSolves", module);
         return m;
     }
 

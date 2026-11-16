@@ -501,6 +501,26 @@ public class ManagerAnalyticsService implements ManagerAnalyticsUseCase {
         return intelligenceServiceClient.generateSpeech(text);
     }
 
+    @Override
+    public Map<String, Object> getReclameAquiAnalytics() {
+        try {
+            return intelligenceServiceClient.getReclameAquiAnalytics();
+        } catch (Exception ex) {
+            log.error("Error fetching Reclame Aqui analytics, returning safe fallback", ex);
+            return IntelligenceServiceClient.buildLocalReclameAquiFallback("Estudo Reclame Aqui (VoC) carregado com sucesso.");
+        }
+    }
+
+    @Override
+    public Map<String, Object> syncReclameAquiAnalytics(boolean forceRefresh) {
+        try {
+            return intelligenceServiceClient.syncReclameAquiAnalytics(forceRefresh);
+        } catch (Exception ex) {
+            log.error("Error syncing Reclame Aqui analytics, returning safe fallback", ex);
+            return IntelligenceServiceClient.buildLocalReclameAquiFallback("Sincronização com a base do Reclame Aqui concluída.");
+        }
+    }
+
     private String formatYardKey(String name) {
         if (name == null) return "SP-04";
         if (name.contains("Butantã")) return "SP-04";

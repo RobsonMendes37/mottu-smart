@@ -236,6 +236,8 @@ def test_answer_manager_query_spoken_and_table_flags():
 
 
 def test_detect_sku_code():
+    assert detect_sku_code("") is None
+    assert detect_sku_code(None) is None
     assert detect_sku_code("e quantsa peças?SKU-POP-002") == "SKU-POP-002"
     assert detect_sku_code("ver SKU-MANETE-DIR-SPORT") == "SKU-MANETE-DIR-SPORT"
     assert detect_sku_code("sem sku aqui") is None
@@ -284,6 +286,25 @@ def test_answer_manager_query_specific_sku_and_followup():
     # 3. SKU inexistente
     res3 = answer_manager_query("saldo do SKU-INEXISTENTE-999", "Unidade Butantã", context)
     assert "não foi localizado no inventário" in res3["direct_answer"]
+
+    # 4. Busca pelo nome da peça sem informar o código SKU
+    res4 = answer_manager_query("quantas unidades de manete de freio tem no estoque?", "Unidade Butantã", context)
+    assert res4["active_skill"] == "SKILL_ESTOQUE"
+    assert "18 unidades" in res4["direct_answer"]
+
+
+
+def test_answer_manager_query_reclame_aqui_skill():
+    res = answer_manager_query(
+        "quais são os principais problemas no Reclame Aqui?",
+        "Todas as Unidades (SP)",
+        {},
+    )
+    assert res["active_skill"] == "SKILL_RECLAME_AQUI"
+    assert res["should_show_table"] is True
+    assert "76,6%" in res["direct_answer"]
+    assert len(res["rows"]) == 5
+
 
 
 

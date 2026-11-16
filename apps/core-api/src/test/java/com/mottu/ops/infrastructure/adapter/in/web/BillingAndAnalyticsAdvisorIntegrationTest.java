@@ -230,5 +230,38 @@ class BillingAndAnalyticsAdvisorIntegrationTest {
                 .andExpect(jsonPath("$.growthAnalysisText").isNotEmpty())
                 .andExpect(jsonPath("$.recommendedActions", hasSize(greaterThanOrEqualTo(1))));
     }
+
+    @Test
+    @WithMockUser(username = "gestor@mottu-ops.local", roles = "MANAGER")
+    @DisplayName("GET and POST /api/v1/manager/analytics/reclame-aqui return quantified Reclame Aqui VoC analytics")
+    void shouldReturnAndSyncReclameAquiAnalyticsForManager() throws Exception {
+        mockMvc.perform(get("/api/v1/manager/analytics/reclame-aqui"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.companyName").value("Mottu"))
+                .andExpect(jsonPath("$.totalComplaints").value(640))
+                .andExpect(jsonPath("$.resolvedCount").value(490))
+                .andExpect(jsonPath("$.unresolvedCount").value(100))
+                .andExpect(jsonPath("$.resolvedPct").value(76.6))
+                .andExpect(jsonPath("$.categories", hasSize(5)))
+                .andExpect(jsonPath("$.recentComplaints", hasSize(greaterThanOrEqualTo(5))));
+
+        mockMvc.perform(post("/api/v1/manager/analytics/reclame-aqui/sync")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"forceRefresh\": true}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalComplaints").value(640))
+                .andExpect(jsonPath("$.addressableSharePct").value(68.1));
+    }
+
+    @Test
+    @WithMockUser(username = "entregador@mottu-ops.local", roles = "RIDER")
+    @DisplayName("GET and POST /api/v1/manager/analytics/reclame-aqui reject non-MANAGER roles with 403 Forbidden")
+    void shouldRejectReclameAquiAnalyticsForNonManager() throws Exception {
+        mockMvc.perform(get("/api/v1/manager/analytics/reclame-aqui"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/api/v1/manager/analytics/reclame-aqui/sync"))
+                .andExpect(status().isForbidden());
+    }
 }
 

@@ -21,4 +21,10 @@ public interface ManagerAnalyticsUseCase {
     default byte[] generateSpeech(String text) {
         return new byte[0];
     }
+    default Map<String, Object> getReclameAquiAnalytics() {
+        return Map.of();
+    }
+    default Map<String, Object> syncReclameAquiAnalytics(boolean forceRefresh) {
+        return getReclameAquiAnalytics();
+    }
 }

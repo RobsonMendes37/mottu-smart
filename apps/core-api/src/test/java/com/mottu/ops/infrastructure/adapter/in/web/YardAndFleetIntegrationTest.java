@@ -52,6 +52,9 @@ class YardAndFleetIntegrationTest {
     private SpringDataInspectionRepository inspectionRepository;
 
     @Autowired
+    private SpringDataInspectionItemRepository inspectionItemRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     private YardJpaEntity yardButanta;
@@ -64,6 +67,7 @@ class YardAndFleetIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        inspectionItemRepository.deleteAll();
         inspectionRepository.deleteAll();
         rentalContractRepository.deleteAll();
         motorcycleRepository.deleteAll();
@@ -180,7 +184,24 @@ class YardAndFleetIntegrationTest {
         inspection.setContestedOnce(false);
         inspection.setRetryCount(0);
         inspection.setCreatedAt(Instant.now());
-        inspectionRepository.save(inspection);
+        inspection = inspectionRepository.save(inspection);
+
+        inspectionItemRepository.save(new InspectionItemJpaEntity(
+                UUID.randomUUID(),
+                inspection.getId(),
+                UUID.fromString("77777777-7777-7777-7777-777777777773"),
+                "Retrovisor Direito Sport",
+                new BigDecimal("42.50"),
+                "AI"
+        ));
+        inspectionItemRepository.save(new InspectionItemJpaEntity(
+                UUID.randomUUID(),
+                inspection.getId(),
+                UUID.fromString("77777777-7777-7777-7777-777777777771"),
+                "Manete de Freio Direito",
+                new BigDecimal("25.00"),
+                "AI"
+        ));
     }
 
     // ==========================================
@@ -250,7 +271,9 @@ class YardAndFleetIntegrationTest {
                 .andExpect(jsonPath("$.openInspectionsCount", is(1)))
                 .andExpect(jsonPath("$.recentInspections", hasSize(1)))
                 .andExpect(jsonPath("$.recentInspections[0].status", is("QUEUED_AI")))
-                .andExpect(jsonPath("$.recentInspections[0].finalVerdict", is("PRE_EXISTENTE")));
+                .andExpect(jsonPath("$.recentInspections[0].finalVerdict", is("PRE_EXISTENTE")))
+                .andExpect(jsonPath("$.recentInspections[0].itemsCount", is(2)))
+                .andExpect(jsonPath("$.recentInspections[0].partNamesSummary", hasSize(2)));
     }
 
     @Test

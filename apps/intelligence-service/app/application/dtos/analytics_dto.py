@@ -93,3 +93,66 @@ class DataExplorerQueryResponseDTO(BaseModel):
 class TextToSpeechRequestDTO(BaseModel):
     text: str
     voice: str = "pt-BR-FranciscaNeural"
+
+
+class ReclameAquiCategoryDTO(BaseModel):
+    categoryKey: str
+    categoryLabel: str
+    totalCount: int
+    previousQuarterCount: int
+    currentQuarterCount: int
+    growthRatePct: float
+    resolvedCount: int
+    unresolvedCount: int
+    inReplyCount: int
+    resolvedPct: float
+    unresolvedPct: float
+    inReplyPct: float
+    addressedBySmartOps: bool
+    smartOpsSolution: str
+    smartOpsRoute: str
+
+
+class ReclameAquiComplaintItemDTO(BaseModel):
+    id: str
+    title: str
+    categoryKey: str
+    categoryLabel: str
+    status: str
+    city: str
+    yardKey: str
+    createdAt: str
+    responseTimeHours: float
+    smartOpsModule: str
+
+
+class ReclameAquiSyncRequestDTO(BaseModel):
+    forceRefresh: bool = False
+
+
+class ReclameAquiDashboardResponseDTO(BaseModel):
+    companyName: str
+    platform: str
+    reputationBadge: str
+    overallScore: float
+    solutionRatePct: float
+    wouldDoBusinessAgainPct: float
+    avgResponseTimeHours: float
+    totalComplaints: int
+    resolvedCount: int
+    unresolvedCount: int
+    inReplyCount: int
+    resolvedPct: float
+    unresolvedPct: float
+    inReplyPct: float
+    fastestGrowingCategory: str
+    fastestGrowingPct: float
+    addressedComplaintsCount: int
+    addressableSharePct: float
+    productRationaleHeadline: str
+    categories: List[ReclameAquiCategoryDTO]
+    recentComplaints: List[ReclameAquiComplaintItemDTO]
+    usedFallback: bool
+    lastSyncedAt: datetime
+    message: str = "Base do Reclame Aqui minerada e quantificada com sucesso."
+

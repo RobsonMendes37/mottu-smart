@@ -371,8 +371,9 @@
           <div class="inline-flex p-1 rounded-md bg-[#F3F3F3] border border-[#E2E2E2]">
             <button
               type="button"
+              data-testid="tab-native-bi"
               (click)="setBiViewMode('native')"
-              class="px-3 h-7 rounded text-xs font-bold transition-colors"
+              class="px-3 h-7 rounded text-xs font-bold transition-colors cursor-pointer"
               [class.bg-[#141414]]="biViewMode() === 'native'"
               [class.text-white]="biViewMode() === 'native'"
               [class.text-[#545454]]="biViewMode() !== 'native'"
@@ -381,8 +382,21 @@
             </button>
             <button
               type="button"
+              data-testid="tab-reclame-aqui"
+              (click)="setBiViewMode('reclame_aqui')"
+              class="px-3 h-7 rounded text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+              [class.bg-[#05944F]]="biViewMode() === 'reclame_aqui'"
+              [class.text-white]="biViewMode() === 'reclame_aqui'"
+              [class.text-[#141414]]="biViewMode() !== 'reclame_aqui'"
+            >
+              <span class="w-1.5 h-1.5 rounded-full" [class.bg-white]="biViewMode() === 'reclame_aqui'" [class.bg-[#05944F]]="biViewMode() !== 'reclame_aqui'"></span>
+              <span>Reclame Aqui (VoC)</span>
+            </button>
+            <button
+              type="button"
+              data-testid="tab-looker-studio"
               (click)="setBiViewMode('looker')"
-              class="px-3 h-7 rounded text-xs font-bold transition-colors"
+              class="px-3 h-7 rounded text-xs font-bold transition-colors cursor-pointer"
               [class.bg-[#141414]]="biViewMode() === 'looker'"
               [class.text-white]="biViewMode() === 'looker'"
               [class.text-[#545454]]="biViewMode() !== 'looker'"
@@ -970,6 +984,455 @@
             </div>
           </div>
         </div>
+      } @else if (biViewMode() === 'reclame_aqui') {
+        <!-- ========================================================================= -->
+        <!-- RECLAME AQUI (VOICE OF THE CUSTOMER - VoC) EXECUTIVE INTELLIGENCE SUITE   -->
+        <!-- ========================================================================= -->
+        @if (reclameAquiData(); as ra) {
+          <div data-testid="reclame-aqui-overview-section" class="p-5 bg-[#F6F6F6] space-y-5">
+            <!-- 1. Top Control & Live Scraper Sync Header -->
+            <div class="bg-white border border-[#E2E2E2] rounded-xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-2xs">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2.5 py-0.5 rounded bg-[#141414] text-white font-mono text-[10px] font-bold uppercase tracking-wider">
+                    VoC Analytics • Python Miner
+                  </span>
+                  <h4 class="text-sm sm:text-base font-extrabold text-[#141414]">
+                    Estudo de Inteligência • Reclame Aqui ({{ ra.companyName }})
+                  </h4>
+                  <span class="px-2.5 py-0.5 rounded-full bg-[#E6F4EE] text-[#046C3A] font-mono text-[11px] font-bold">
+                    Nota {{ ra.reputationScore }}/10 ({{ ra.reputationLabel }})
+                  </span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-[#F3F3F3] text-[#545454] font-mono text-[11px] font-semibold">
+                    {{ ra.periodLabel }}
+                  </span>
+                </div>
+                <p class="text-xs text-[#545454]">
+                  Mineração automatizada de reclamações públicas para quantificar taxas de resolução, crescimento trimestral por categoria e aderência das soluções do Mottu Smart Ops.
+                </p>
+              </div>
+
+              <div class="flex items-center gap-2.5 self-start lg:self-auto shrink-0">
+                <button
+                  type="button"
+                  data-testid="btn-ask-melissa-ra"
+                  (click)="openMelissaWithReclameAquiSkill()"
+                  class="px-3.5 h-9 rounded-lg bg-[#F3F3F3] hover:bg-[#E2E2E2] border border-[#D4D4D4] text-[#141414] text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span class="w-2 h-2 rounded-full bg-[#05944F]"></span>
+                  <span>Analisar com a Melissa</span>
+                </button>
+
+                <button
+                  type="button"
+                  data-testid="btn-sync-reclame-aqui"
+                  (click)="syncReclameAqui()"
+                  [disabled]="reclameAquiLoading()"
+                  class="px-4 h-9 rounded-lg bg-[#05944F] hover:bg-[#047840] disabled:opacity-50 text-white text-xs font-bold transition-colors inline-flex items-center gap-2 cursor-pointer shadow-xs"
+                >
+                  @if (reclameAquiLoading()) {
+                    <svg class="animate-spin w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    <span>Minerando Reclame Aqui...</span>
+                  } @else {
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>Sincronizar Reclame Aqui</span>
+                  }
+                </button>
+              </div>
+            </div>
+
+            <!-- Sync Confirmation Banner -->
+            @if (reclameAquiSyncBanner()) {
+              <div
+                data-testid="reclame-aqui-sync-banner"
+                role="status"
+                class="p-3.5 rounded-xl bg-[#E6F4EE] border border-[#05944F]/40 text-xs font-bold text-[#046C3A] flex items-center justify-between shadow-2xs"
+              >
+                <div class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-full bg-[#05944F] text-white flex items-center justify-center text-[11px]">✓</span>
+                  <span>{{ reclameAquiSyncBanner() }}</span>
+                </div>
+                <button
+                  type="button"
+                  (click)="reclameAquiSyncBanner.set(null)"
+                  class="px-2.5 py-1 rounded bg-white/80 hover:bg-white text-[#046C3A] font-bold text-[11px] cursor-pointer"
+                >
+                  Fechar
+                </button>
+              </div>
+            }
+
+            <!-- 2. 4 Executive VoC Scorecards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="bg-white border border-[#E2E2E2] rounded-xl p-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-[#757575]">Amostra Minerada (6m)</span>
+                  <span class="px-2 py-0.5 rounded bg-[#F3F3F3] text-[#141414] font-mono text-[10px] font-bold">
+                    {{ ra.responseRatePct }}% respondidas
+                  </span>
+                </div>
+                <p class="text-2xl font-extrabold font-mono text-[#141414] mt-1.5">
+                  {{ ra.totalComplaintsMinered }} casos
+                </p>
+                <span class="text-[11px] text-[#545454]">
+                  {{ ra.wouldDoBusinessAgainPct }}% voltariam a fazer negócio
+                </span>
+              </div>
+
+              <div class="bg-white border border-[#E2E2E2] rounded-xl p-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-[#757575]">Resolvidas vs. Não Resolvidas</span>
+                  <span class="px-2 py-0.5 rounded bg-[#E6F4EE] text-[#046C3A] font-mono text-[10px] font-bold">
+                    Média {{ ra.avgResolutionDays }}d
+                  </span>
+                </div>
+                <p class="text-2xl font-extrabold font-mono text-[#046C3A] mt-1.5">
+                  {{ ra.overallResolutionRatePct }}% Resolvidas
+                </p>
+                <span class="text-[11px] text-[#545454] font-medium">
+                  {{ ra.resolvedCount }} resolvidas • {{ ra.unresolvedCount }} não resolvidas • {{ ra.inReplicaCount }} réplicas
+                </span>
+              </div>
+
+              <div class="bg-white border border-[#E2E2E2] rounded-xl p-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-[#757575]">Maior Índice de Crescimento</span>
+                  <span class="px-2 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] font-mono text-[10px] font-extrabold">
+                    #1 Prioridade
+                  </span>
+                </div>
+                <p class="text-2xl font-extrabold font-mono text-[#D97706] mt-1.5">
+                  +{{ ra.topGrowingCategoryRatePct }}% ▲
+                </p>
+                <span class="text-[11px] text-[#141414] font-semibold line-clamp-1" [title]="ra.topGrowingCategoryLabel">
+                  Valor e Qtd. de Peças (T1→T2)
+                </span>
+              </div>
+
+              <div class="bg-white border-2 border-[#05944F] rounded-xl p-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-[#046C3A]">Aderência do Smart Ops</span>
+                  <span class="px-2 py-0.5 rounded bg-[#05944F] text-white font-mono text-[10px] font-bold">
+                    ROI Direto
+                  </span>
+                </div>
+                <p class="text-2xl font-extrabold font-mono text-[#046C3A] mt-1.5">
+                  {{ ra.smartOpsAddressablePct }}% ({{ ra.smartOpsAddressableCount }})
+                </p>
+                <span class="text-[11px] text-[#046C3A] font-semibold">
+                  Dores mitigadas direto no app e oficina
+                </span>
+              </div>
+            </div>
+
+            <!-- 3. Comparative Chart (7 cols) + Product Prioritization Rationale Matrix (5 cols) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              <!-- Left (7 cols): Quantificação por Problema (Resolvidas vs Não Resolvidas + Índice de Crescimento) -->
+              <div class="lg:col-span-7 bg-white border border-[#E2E2E2] rounded-xl p-5 flex flex-col justify-between space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#EEEEEE]">
+                  <div>
+                    <h5 class="text-sm font-extrabold text-[#141414]">
+                      Principais Problemas: Resolvidas vs. Não Resolvidas &amp; Crescimento
+                    </h5>
+                    <p class="text-xs text-[#757575]">
+                      Quantificação por categoria minerada e evolução entre o 1º e o 2º trimestre
+                    </p>
+                  </div>
+
+                  <div class="flex items-center gap-3 text-[11px] font-semibold shrink-0">
+                    <span class="inline-flex items-center gap-1.5 text-[#046C3A]">
+                      <span class="w-2.5 h-2.5 rounded-xs bg-[#05944F]"></span> Resolvidas
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 text-[#92400E]">
+                      <span class="w-2.5 h-2.5 rounded-xs bg-[#D97706]"></span> Réplica
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 text-[#DC2626]">
+                      <span class="w-2.5 h-2.5 rounded-xs bg-[#DC2626]"></span> Não Resolvidas
+                    </span>
+                  </div>
+                </div>
+
+                <div class="space-y-4">
+                  @for (cat of ra.categories; track cat.categoryKey) {
+                    <div class="p-3.5 rounded-lg bg-[#FBFBFB] border border-[#E8E8E8] space-y-2">
+                      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <span class="text-xs font-extrabold text-[#141414]">{{ cat.label }}</span>
+                          <span
+                            class="px-2 py-0.5 rounded font-mono text-[10px] font-extrabold"
+                            [class.bg-[#FEE2E2]]="cat.growthRatePct >= 25"
+                            [class.text-[#DC2626]]="cat.growthRatePct >= 25"
+                            [class.bg-[#FEF3C7]]="cat.growthRatePct >= 15 && cat.growthRatePct < 25"
+                            [class.text-[#92400E]]="cat.growthRatePct >= 15 && cat.growthRatePct < 25"
+                            [class.bg-[#F3F3F3]]="cat.growthRatePct < 15"
+                            [class.text-[#545454]]="cat.growthRatePct < 15"
+                          >
+                            +{{ cat.growthRatePct }}% ▲ ({{ cat.prevQuarterCount }}→{{ cat.currQuarterCount }})
+                          </span>
+                        </div>
+                        <span class="font-mono text-xs font-bold text-[#141414] shrink-0">
+                          {{ cat.totalCount }} casos ({{ cat.sharePct }}%)
+                        </span>
+                      </div>
+
+                      <!-- Stacked Horizontal Bar (Resolvidas / Em Réplica / Não Resolvidas) -->
+                      <div class="w-full h-3 rounded-full bg-[#EDEDED] overflow-hidden flex">
+                        <div
+                          class="h-full bg-[#05944F]"
+                          [style.width.%]="(cat.resolvedCount * 100) / (cat.totalCount || 1)"
+                          [title]="'Resolvidas: ' + cat.resolvedCount"
+                        ></div>
+                        <div
+                          class="h-full bg-[#D97706]"
+                          [style.width.%]="(cat.inReplicaCount * 100) / (cat.totalCount || 1)"
+                          [title]="'Em Réplica: ' + cat.inReplicaCount"
+                        ></div>
+                        <div
+                          class="h-full bg-[#DC2626]"
+                          [style.width.%]="(cat.unresolvedCount * 100) / (cat.totalCount || 1)"
+                          [title]="'Não Resolvidas: ' + cat.unresolvedCount"
+                        ></div>
+                      </div>
+
+                      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px]">
+                        <div class="flex items-center gap-3 font-mono">
+                          <span class="text-[#046C3A] font-bold">{{ cat.resolvedCount }} resolvidas ({{ cat.resolutionRatePct }}%)</span>
+                          <span class="text-[#92400E] font-semibold">{{ cat.inReplicaCount }} réplica</span>
+                          <span class="text-[#DC2626] font-bold">{{ cat.unresolvedCount }} não resolvidas</span>
+                        </div>
+                        <span class="inline-flex items-center gap-1 font-semibold text-[#141414]">
+                          <span class="text-[#05944F]">✓</span>
+                          <span>{{ cat.smartOpsSolutionModule }}</span>
+                        </span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Right (5 cols): Fundamentação de Produto (Matriz de Priorização Big Tech) -->
+              <div class="lg:col-span-5 bg-white border border-[#E2E2E2] rounded-xl p-5 flex flex-col justify-between space-y-4">
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between pb-3 border-b border-[#EEEEEE]">
+                    <div>
+                      <span class="text-[10px] font-mono uppercase tracking-wider font-extrabold text-[#05944F]">
+                        Product Discovery • Data-Driven
+                      </span>
+                      <h5 class="text-sm font-extrabold text-[#141414] mt-0.5">
+                        Por que priorizamos Previsibilidade de Peças &amp; Triagem Rápida?
+                      </h5>
+                    </div>
+                    <span class="px-2.5 py-1 rounded bg-[#141414] text-white font-mono text-[10px] font-bold">
+                      Impacto × Esforço
+                    </span>
+                  </div>
+
+                  <!-- Executive Thesis Box -->
+                  <div class="p-3.5 rounded-lg bg-[#F6F6F6] border border-[#E2E2E2] space-y-1.5">
+                    <span class="text-[10px] font-mono font-bold uppercase text-[#545454]">Diagnóstico Quantitativo</span>
+                    <p class="text-xs font-bold text-[#141414] leading-relaxed">
+                      {{ ra.executiveThesisHeadline }}
+                    </p>
+                  </div>
+
+                  <!-- Product Rationale Box -->
+                  <div class="p-3.5 rounded-lg bg-[#E6F4EE]/70 border border-[#05944F]/30 space-y-1.5">
+                    <span class="text-[10px] font-mono font-extrabold uppercase text-[#046C3A]">
+                      Decisão de Engenharia (Quick Win de Alto Impacto)
+                    </span>
+                    <p class="text-xs text-[#141414] leading-relaxed font-medium">
+                      {{ ra.productDecisionRationale }}
+                    </p>
+                  </div>
+
+                  <!-- Before vs After SLA Comparison Table -->
+                  <div class="border border-[#E2E2E2] rounded-lg overflow-hidden">
+                    <table class="w-full text-left border-collapse text-[11px]">
+                      <thead>
+                        <tr class="bg-[#F3F3F3] text-[#545454] font-bold border-b border-[#E2E2E2]">
+                          <th class="py-2 px-3">Dor no Reclame Aqui</th>
+                          <th class="py-2 px-3">Antes (RA)</th>
+                          <th class="py-2 px-3 text-right">Com Smart Ops</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-[#EEEEEE]">
+                        <tr>
+                          <td class="py-2 px-3 font-bold text-[#141414]">Saber Qtd. e Valor das Peças</td>
+                          <td class="py-2 px-3 font-mono text-[#DC2626]">5,4 dias (No escuro)</td>
+                          <td class="py-2 px-3 text-right font-mono font-bold text-[#046C3A]">&lt; 5s (Foto → Preço)</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 px-3 font-bold text-[#141414]">Vistoria de Desgaste Natural</td>
+                          <td class="py-2 px-3 font-mono text-[#DC2626]">3,8 dias / 2h30 fila</td>
+                          <td class="py-2 px-3 text-right font-mono font-bold text-[#046C3A]">78,5% sem fila (R$ 0)</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 px-3 font-bold text-[#141414]">Falta de Peça Básica na Baia</td>
+                          <td class="py-2 px-3 font-mono text-[#DC2626]">6,2 dias moto retida</td>
+                          <td class="py-2 px-3 text-right font-mono font-bold text-[#046C3A]">Alerta Preditivo D-7</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="pt-3 border-t border-[#EEEEEE] flex items-center justify-between text-xs">
+                  <span class="text-[#545454] font-medium">Fonte auditável: snapshot modular JSON</span>
+                  <a
+                    routerLink="/rider/garage"
+                    class="font-bold text-[#05944F] hover:underline"
+                  >
+                    Ver visão do entregador →
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Filterable Explorer of Minered Complaints -->
+            <div data-testid="reclame-aqui-complaints-table" class="bg-white border border-[#E2E2E2] rounded-xl overflow-hidden">
+              <div class="px-5 py-4 border-b border-[#EEEEEE] flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                  <h5 class="text-sm font-extrabold text-[#141414]">
+                    Amostra Auditável de Reclamações Mineradas e Como o Smart Ops Resolve
+                  </h5>
+                  <p class="text-xs text-[#757575]">
+                    Filtre por status de resolução ou categoria de dor para inspecionar os casos reais mapeados
+                  </p>
+                </div>
+
+                <!-- Filter Pills -->
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <button
+                    type="button"
+                    data-testid="filter-ra-all"
+                    (click)="setReclameAquiFilter('ALL')"
+                    class="px-3 h-7 rounded-full text-xs font-bold transition-colors cursor-pointer"
+                    [class.bg-[#141414]]="reclameAquiFilter() === 'ALL'"
+                    [class.text-white]="reclameAquiFilter() === 'ALL'"
+                    [class.bg-[#F3F3F3]]="reclameAquiFilter() !== 'ALL'"
+                    [class.text-[#545454]]="reclameAquiFilter() !== 'ALL'"
+                  >
+                    Todas ({{ ra.recentComplaints.length }})
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="filter-ra-resolved"
+                    (click)="setReclameAquiFilter('RESOLVED')"
+                    class="px-3 h-7 rounded-full text-xs font-bold transition-colors cursor-pointer"
+                    [class.bg-[#05944F]]="reclameAquiFilter() === 'RESOLVED'"
+                    [class.text-white]="reclameAquiFilter() === 'RESOLVED'"
+                    [class.bg-[#F3F3F3]]="reclameAquiFilter() !== 'RESOLVED'"
+                    [class.text-[#545454]]="reclameAquiFilter() !== 'RESOLVED'"
+                  >
+                    Resolvidas
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="filter-ra-unresolved"
+                    (click)="setReclameAquiFilter('UNRESOLVED')"
+                    class="px-3 h-7 rounded-full text-xs font-bold transition-colors cursor-pointer"
+                    [class.bg-[#DC2626]]="reclameAquiFilter() === 'UNRESOLVED'"
+                    [class.text-white]="reclameAquiFilter() === 'UNRESOLVED'"
+                    [class.bg-[#F3F3F3]]="reclameAquiFilter() !== 'UNRESOLVED'"
+                    [class.text-[#545454]]="reclameAquiFilter() !== 'UNRESOLVED'"
+                  >
+                    Não Resolvidas
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="filter-ra-pricing"
+                    (click)="setReclameAquiFilter('PARTS_PRICING_OPACITY')"
+                    class="px-3 h-7 rounded-full text-xs font-bold transition-colors cursor-pointer"
+                    [class.bg-[#141414]]="reclameAquiFilter() === 'PARTS_PRICING_OPACITY'"
+                    [class.text-white]="reclameAquiFilter() === 'PARTS_PRICING_OPACITY'"
+                    [class.bg-[#F3F3F3]]="reclameAquiFilter() !== 'PARTS_PRICING_OPACITY'"
+                    [class.text-[#545454]]="reclameAquiFilter() !== 'PARTS_PRICING_OPACITY'"
+                  >
+                    Valor e Qtd. de Peças (+30,4%)
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="filter-ra-queue"
+                    (click)="setReclameAquiFilter('YARD_QUEUE_WAIT_TIME')"
+                    class="px-3 h-7 rounded-full text-xs font-bold transition-colors cursor-pointer"
+                    [class.bg-[#141414]]="reclameAquiFilter() === 'YARD_QUEUE_WAIT_TIME'"
+                    [class.text-white]="reclameAquiFilter() === 'YARD_QUEUE_WAIT_TIME'"
+                    [class.bg-[#F3F3F3]]="reclameAquiFilter() !== 'YARD_QUEUE_WAIT_TIME'"
+                    [class.text-[#545454]]="reclameAquiFilter() !== 'YARD_QUEUE_WAIT_TIME'"
+                  >
+                    Fila de Pátio (+25,0%)
+                  </button>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr class="bg-[#F3F3F3] text-[#545454] font-bold border-b border-[#E2E2E2]">
+                      <th class="py-2.5 px-4">Protocolo / Data</th>
+                      <th class="py-2.5 px-4">Unidade</th>
+                      <th class="py-2.5 px-4">Relato Minerado no Reclame Aqui</th>
+                      <th class="py-2.5 px-4">Status no RA</th>
+                      <th class="py-2.5 px-4">Como o Mottu Smart Ops Resolve</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-[#EEEEEE]">
+                    @for (item of filteredReclameAquiComplaints(); track item.externalId) {
+                      <tr class="hover:bg-[#F6F6F6]/60 align-top">
+                        <td class="py-3 px-4 whitespace-nowrap">
+                          <span class="font-mono font-bold text-[#141414] block">{{ item.externalId }}</span>
+                          <span class="text-[11px] text-[#757575] font-mono">{{ item.createdAt }}</span>
+                        </td>
+                        <td class="py-3 px-4 whitespace-nowrap">
+                          <span class="px-2 py-0.5 rounded bg-[#F3F3F3] text-[#141414] font-mono text-[11px] font-bold">
+                            {{ item.yardKey }}
+                          </span>
+                          <span class="block text-[11px] text-[#757575] mt-0.5">{{ item.city }}</span>
+                        </td>
+                        <td class="py-3 px-4 max-w-md">
+                          <p class="font-bold text-[#141414]">{{ item.title }}</p>
+                          <p class="text-[11px] text-[#545454] mt-0.5 leading-relaxed">{{ item.customerExcerpt }}</p>
+                        </td>
+                        <td class="py-3 px-4 whitespace-nowrap">
+                          @switch (item.status) {
+                            @case ('RESOLVED') {
+                              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#E6F4EE] text-[#046C3A] font-bold text-[11px]">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#05944F]"></span>
+                                Resolvida ({{ item.resolvedInDays || 4 }}d)
+                              </span>
+                            }
+                            @case ('IN_REPLICA') {
+                              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold text-[11px]">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#D97706]"></span>
+                                Em Réplica
+                              </span>
+                            }
+                            @default {
+                              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FEE2E2] text-[#DC2626] font-bold text-[11px]">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#DC2626]"></span>
+                                Não Resolvida
+                              </span>
+                            }
+                          }
+                        </td>
+                        <td class="py-3 px-4 max-w-sm">
+                          <div class="p-2.5 rounded-lg bg-[#E6F4EE]/60 border border-[#05944F]/25 text-[11px] text-[#141414] font-medium leading-relaxed">
+                            {{ item.smartOpsHowItSolves }}
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        }
       } @else {
         <!-- EXTERNAL LOOKER STUDIO EMBED MODE -->
         <div class="bg-[#F6F6F6] p-5 space-y-4">
@@ -1188,7 +1651,7 @@
           </div>
 
           <!-- Messages Body -->
-          <div class="p-4 space-y-3 max-h-[320px] sm:max-h-[380px] overflow-y-auto bg-[#F8FAFC] text-xs">
+          <div id="melissa-chat-scroll-container" class="p-4 space-y-3 max-h-[360px] sm:max-h-[430px] overflow-y-auto bg-[#F8FAFC] text-xs">
             @for (msg of copilotMessages(); track msg.id) {
               @if (msg.sender === 'user') {
                 <div class="flex justify-end">

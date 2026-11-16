@@ -195,7 +195,8 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
   it('TC-T10-15: Floating Voice Copilot Melissa toggles, executes skills, sends messages, and manages audio', () => {
     expect(comp.isCopilotOpen()).toBe(false);
     expect(comp.autoVoiceEnabled()).toBe(true);
-    expect(comp.operationalSkills.length).toBe(7);
+    expect(comp.operationalSkills.length).toBe(8);
+    expect(comp.operationalSkills.some((s) => s.id === 'SKILL_RECLAME_AQUI')).toBe(true);
     expect(comp.copilotMessages()[0].text).toContain('Melissa');
 
     comp.toggleCopilot();
@@ -288,5 +289,43 @@ describe('T10AnalyticsComponent (Screen T10 - Looker Studio Executive Analytics)
     // Verify verdict bar classes for colors
     expect(comp.verdictBreakdown[0].barClass).toBe('bg-[#05944F]');
     expect(comp.verdictBreakdown[1].barClass).toBe('bg-[#D97706]');
+  });
+
+  it('TC-T10-17: Switches to Reclame Aqui (VoC) tab, filters complaints by status and category, and exposes top growth metrics', () => {
+    comp.setBiViewMode('reclame_aqui');
+    expect(comp.biViewMode()).toBe('reclame_aqui');
+    expect(comp.reclameAquiData().totalComplaintsMinered).toBe(640);
+    expect(comp.reclameAquiData().resolvedCount).toBe(490);
+    expect(comp.reclameAquiData().unresolvedCount).toBe(100);
+    expect(comp.reclameAquiData().topGrowingCategoryRatePct).toBeGreaterThan(25);
+    expect(comp.filteredReclameAquiComplaints().length).toBeGreaterThan(0);
+
+    comp.setReclameAquiFilter('UNRESOLVED');
+    expect(comp.reclameAquiFilter()).toBe('UNRESOLVED');
+    expect(comp.filteredReclameAquiComplaints().every((c) => c.status === 'UNRESOLVED')).toBe(true);
+
+    comp.setReclameAquiFilter('RESOLVED');
+    expect(comp.filteredReclameAquiComplaints().every((c) => c.status === 'RESOLVED')).toBe(true);
+
+    comp.setReclameAquiFilter('PARTS_PRICING_OPACITY');
+    expect(comp.filteredReclameAquiComplaints().every((c) => c.categoryKey === 'PARTS_PRICING_OPACITY')).toBe(true);
+
+    comp.setReclameAquiFilter('ALL');
+    expect(comp.filteredReclameAquiComplaints().length).toBe(comp.reclameAquiData().recentComplaints.length);
+  });
+
+  it('TC-T10-18: syncReclameAqui triggers live miner sync and shows confirmation banner', () => {
+    mockManagerService.syncReclameAquiAnalytics = vi.fn().mockReturnValue(
+      of({
+        ...comp.reclameAquiData(),
+        syncStatus: 'SYNCED_LIVE',
+        syncMessage: 'Sincronização Reclame Aqui concluída com sucesso (640 registros auditados).',
+      })
+    );
+
+    comp.syncReclameAqui();
+    expect(mockManagerService.syncReclameAquiAnalytics).toHaveBeenCalledWith(true);
+    expect(comp.reclameAquiLoading()).toBe(false);
+    expect(comp.reclameAquiSyncBanner()).toContain('Sincronização Reclame Aqui concluída');
   });
 });

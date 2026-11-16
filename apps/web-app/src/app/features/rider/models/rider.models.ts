@@ -49,6 +49,8 @@ export interface RecentInspection {
   finalVerdict: DamageVerdict | null;
   totalEstimatedBrl: number;
   createdAt: string;
+  itemsCount?: number;
+  partNamesSummary?: string[];
 }
 
 export interface RiderGarageResponse {

@@ -88,12 +88,27 @@
 
         @if (inspection()?.items && inspection()!.items.length > 0) {
           <div class="border-t border-[#EEEEEE] pt-3 space-y-2">
-            <p class="text-xs font-bold text-[#545454]">Itens identificados preliminarmente pela IA (em validação):</p>
+            <div class="flex items-center justify-between">
+              <p class="text-xs font-bold text-[#141414]">
+                Prévia de peças e valores tabelados ({{ partsQuantityTotal() }} {{ partsQuantityTotal() === 1 ? 'peça' : 'peças' }}):
+              </p>
+              <span class="font-mono text-[11px] font-bold text-[#141414]">
+                Subtotal: R$ {{ partsSubtotalBrl().toFixed(2).replace('.', ',') }}
+              </span>
+            </div>
             <div class="space-y-1.5">
               @for (item of inspection()!.items; track item.catalogPartId) {
                 <div class="flex items-center justify-between text-xs p-2.5 rounded-lg bg-[#F8F9FA] border border-[#EEEEEE]">
-                  <span class="font-medium text-[#141414]">{{ item.partName }}</span>
-                  <span class="font-mono text-xs font-semibold text-[#D97706]">Em análise</span>
+                  <div>
+                    <span class="font-semibold text-[#141414] block">{{ item.partName }}</span>
+                    <span class="text-[10px] font-mono text-[#757575]">1 un. • Cód: {{ item.catalogPartId || 'MOTTU' }}</span>
+                  </div>
+                  <div class="text-right">
+                    <span class="font-mono text-xs font-bold text-[#141414] block">
+                      R$ {{ item.unitPriceBrl.toFixed(2).replace('.', ',') }}
+                    </span>
+                    <span class="text-[10px] font-semibold text-[#D97706]">Em validação</span>
+                  </div>
                 </div>
               }
             </div>
@@ -153,6 +168,30 @@
 
           <!-- Itemized Parts & Financial Transparency Breakdown -->
           <div class="border-t border-[#EEEEEE] pt-3.5 space-y-3">
+            <!-- Quick Summary Banner: Quantity & Payment Preparation -->
+            <div class="grid grid-cols-2 gap-2.5">
+              <div class="p-3 rounded-lg bg-[#F6F6F6] border border-[#E2E2E2]">
+                <span class="block text-[10px] font-bold uppercase text-[#757575]">Quantidade de peças</span>
+                <span class="block text-sm font-extrabold font-mono text-[#141414] mt-0.5">
+                  {{ partsQuantityTotal() }} {{ partsQuantityTotal() === 1 ? 'unidade' : 'unidades' }}
+                </span>
+                <span class="block text-[10px] text-[#545454]">Avaliadas na foto</span>
+              </div>
+              <div class="p-3 rounded-lg bg-[#F6F6F6] border border-[#E2E2E2]">
+                <span class="block text-[10px] font-bold uppercase text-[#757575]">Preparar para pagar</span>
+                <span
+                  class="block text-sm font-extrabold font-mono mt-0.5"
+                  [class.text-[#046C3A]]="isZeroCost()"
+                  [class.text-[#141414]]="!isZeroCost()"
+                >
+                  R$ {{ amountToPrepareToPayBrl().toFixed(2).replace('.', ',') }}
+                </span>
+                <span class="block text-[10px] text-[#545454]">
+                  {{ isZeroCost() ? '100% coberto Mottu' : 'Peças + oficina' }}
+                </span>
+              </div>
+            </div>
+
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-1.5">
                 <span class="text-xs font-bold text-[#141414]">Peças identificadas na vistoria</span>
@@ -169,7 +208,8 @@
                   <div class="p-2.5 rounded-lg bg-[#F8F9FA] border border-[#EEEEEE] flex items-center justify-between gap-3">
                     <div class="min-w-0">
                       <p class="text-xs font-semibold text-[#141414] truncate">{{ part.partName }}</p>
-                      <div class="flex items-center gap-2 mt-0.5">
+                      <div class="flex items-center gap-1.5 flex-wrap mt-1">
+                        <span class="px-1.5 py-0.5 rounded bg-white border border-[#E2E2E2] text-[10px] text-[#141414] font-mono font-bold">Qtd: 1 un.</span>
                         <span class="text-[10px] text-[#757575] font-mono">Cód: {{ part.catalogPartId || 'MOTTU' }}</span>
                         @if (isZeroCost()) {
                           <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#E6F4EE] text-[#046C3A]">

@@ -275,6 +275,52 @@ mottu-smart-ops/
 
 ---
 
+### FASE 10 — PLANO 01: Previsibilidade de Peças, Quantidades e Valor a Pagar para o Entregador (`T02` & `T04`) com Validação Visual por Prints
+> **ESPECIFICAÇÃO COMPLETA:** Leia obrigatoriamente `PLANO_01_ENTREGADOR_ORCAMENTO_PECAS.md` na raiz do projeto antes de iniciar qualquer tarefa abaixo. **PROIBIDO concluir tarefas sem rodar testes unitários, integração, tirar prints via Playwright e inspecionar os prints com `read_file`.**
+
+- [x] **`TASK-33` — Migration `V16` + Verificação de Assets + Enriquecimento de Peças, Quantidades e Preços no Backend Java (`apps/core-api`)**
+  - **Agent:** `backend-specialist` | **Skills:** `tdd-workflow`, `database-design`, `clean-code`
+  - **Pasta Permitida:** `apps/core-api/`
+  - **Dependencies:** `TASK-32`
+  - **INPUT → OUTPUT → VERIFY:** Ler `PLANO_01_ENTREGADOR_ORCAMENTO_PECAS.md` → Verificar integridade dos 6 assets `avaria-*.webp` em `infra/mock-photos/` e `apps/web-app/public/demo-photos/` → Escrever testes unitários e de integração (`RED`) → Criar `V16__rider_demo_parts_pricing_and_resolved_quotes.sql` (desbloqueando a cota do entregador demo `0 de 3` e populando vistorias `AUTO_RESOLVED` / `HUMAN_RESOLVED` com 2 a 3 peças precificadas da Loja Mottu), enriquecer `RecentInspectionDto` e `RiderInspectionService` (`GREEN`) → `cd apps/core-api && ./mvnw test -Dtest=DomainPurityTest,RiderGarageServiceTest,YardAndFleetIntegrationTest,InspectionCreationIntegrationTest` passa com 100%.
+
+- [x] **`TASK-34` — Frontend Angular 19 (`T02` e `T04`) + Testes de Interface Playwright com Captura e Inspeção de Prints (`apps/web-app` & `e2e/`)**
+  - **Agent:** `frontend-specialist` + `qa-automation-engineer` | **Skills:** `frontend-architecture`, `frontend-design`, `tdd-workflow`, `webapp-testing`
+  - **Pasta Permitida:** `apps/web-app/`, `e2e/`
+  - **Dependencies:** `TASK-33`
+  - **INPUT → OUTPUT → VERIFY:** Ler `PLANO_01_ENTREGADOR_ORCAMENTO_PECAS.md` → Escrever testes Vitest (`RED`) → Atualizar `rider.models.ts`, `garage.component.ts`, `garage.component.html`, `inspection-status.component.ts` e `inspection-status.component.html` (`GREEN`) → Criar e executar `e2e/test-visual-plano01-rider.js` gerando os 3 prints (`print-01-rider-demo-garage-t02.png`, `print-02-rider-demo-status-mau-uso-t04.png`, `print-03-rider-demo-status-isento-t04.png` com trap de 0 erros 404 e `naturalWidth > 0`) e **inspecionar cada imagem `.png` usando `read_file`** → `source ~/.nvm/nvm.sh && cd apps/web-app && npm test -- --run && npm run build -- --configuration production && node ../../e2e/test-visual-plano01-rider.js` passa com 100%.
+
+---
+
+### FASE 11 — PLANO 02: Inteligência de Dados do Reclame Aqui (VoC), Dashboard do Gestor (`T10`), Skill Melissa e Verificação de Pipeline
+> **ESPECIFICAÇÃO COMPLETA:** Leia obrigatoriamente `PLANO_02_RECLAME_AQUI_VOC_GESTOR_MELISSA.md` na raiz do projeto antes de iniciar qualquer tarefa abaixo. **PROIBIDO concluir tarefas sem validar o dataset JSON, atingir 100% de cobertura em domain, tirar prints via Playwright, inspecionar os prints com `read_file` e auditar segurança/pipeline.**
+
+- [x] **`TASK-35` — TDD Domínio Python (`reclame_aqui_analytics.py`) + Validação de Dataset & Minerador (`reclame_aqui_miner`) + Skill Melissa (`SKILL_RECLAME_AQUI`) + Testes de Integração FastAPI**
+  - **Agent:** `test-engineer` → `backend-specialist` | **Skills:** `tdd-workflow`, `python-patterns`, `clean-code`
+  - **Pasta Permitida:** `apps/intelligence-service/`
+  - **Dependencies:** `TASK-34`
+  - **INPUT → OUTPUT → VERIFY:** Ler `PLANO_02_RECLAME_AQUI_VOC_GESTOR_MELISSA.md` → Criar `tests/unit/test_reclame_aqui_analytics.py` e `tests/test_reclame_aqui_sync.py` (`RED`) → Criar `app/modules/reclame_aqui_miner/seed_reclame_aqui_snapshot.json` (validando integridade matemática das 640 reclamações) e `scraper.py`, implementar `app/domain/services/reclame_aqui_analytics.py` (`GREEN` 100% puro), adicionar `SKILL_RECLAME_AQUI` em `data_explorer_service.py` e rotas `/internal/v1/analytics/reclame-aqui` e `/sync` em `internal_router.py` → `cd apps/intelligence-service && ./.venv/bin/pytest --cov=app/domain --cov-branch --cov-fail-under=100 && ./.venv/bin/pytest tests/test_domain_purity.py tests/test_reclame_aqui_sync.py -v` passam com 100% e 0 violações.
+
+- [x] **`TASK-36` — Backend Spring Boot (`apps/core-api`): Endpoints `/api/v1/manager/analytics/reclame-aqui` e `/sync`, Segurança RBAC e Integração Melissa**
+  - **Agent:** `security-auditor` + `backend-specialist` | **Skills:** `api-patterns`, `tdd-workflow`, `clean-code`
+  - **Pasta Permitida:** `apps/core-api/`
+  - **Dependencies:** `TASK-35`
+  - **INPUT → OUTPUT → VERIFY:** Ler `PLANO_02_RECLAME_AQUI_VOC_GESTOR_MELISSA.md` → Escrever testes unitários e de integração com verificação de RBAC `403 Forbidden` para não-gestores (`RED`) → Atualizar `IntelligenceServiceClient.java`, `ManagerAnalyticsUseCase.java`, `ManagerAnalyticsService.java` e `ManagerAnalyticsController.java` com fallback resiliente (`GREEN`) → `cd apps/core-api && ./mvnw test -Dtest=DomainPurityTest,ManagerAnalyticsServiceTest,BillingAndAnalyticsAdvisorIntegrationTest,RbacSecurityIntegrationTest` passa 100%.
+
+- [x] **`TASK-37` — Frontend Angular 19 (`apps/web-app` & `e2e/`): Aba Executiva `Reclame Aqui (VoC)` na `T10`, Botão de Sincronização, Chip da Melissa e Auditoria Visual com Prints**
+  - **Agent:** `frontend-specialist` + `qa-automation-engineer` | **Skills:** `frontend-architecture`, `frontend-design`, `tdd-workflow`, `webapp-testing`
+  - **Pasta Permitida:** `apps/web-app/`, `e2e/`
+  - **Dependencies:** `TASK-36`
+  - **INPUT → OUTPUT → VERIFY:** Ler `PLANO_02_RECLAME_AQUI_VOC_GESTOR_MELISSA.md` → Escrever testes Vitest em `t10-analytics.component.spec.ts` e `manager.service.spec.ts` (`RED`) → Adicionar aba `Reclame Aqui (VoC)` na tela `T10`, botão `Sincronizar Reclame Aqui`, gráficos de Resolvidas vs. Não Resolvidas, ranking de crescimento de problemas, quadro de fundamentação de produto, tabela filtrável e `SKILL_RECLAME_AQUI` na Melissa (`GREEN`) → Criar e executar `e2e/test-visual-plano02-reclame-aqui.js` gerando os 3 prints (`print-04-manager-t10-reclame-aqui-overview.png`, `print-05-manager-t10-reclame-aqui-sync-and-table.png`, `print-06-manager-t10-melissa-reclame-aqui-skill.png`) e **inspecionar cada imagem `.png` usando `read_file`** → `source ~/.nvm/nvm.sh && cd apps/web-app && npm test -- --run && npm run build -- --configuration production && node ../../e2e/test-visual-plano02-reclame-aqui.js` passa sem erros.
+
+- [x] **`TASK-38` — Phase X Final: Bateria Multi-Stack Completa, Segurança (`security_scan.py`), UX Audit (`ux_audit.py`), E2E Global, Verificação de Pipeline e Registro em `docs/HISTORICO_IA.md`**
+  - **Agent:** `qa-automation-engineer` + `security-auditor` + `devops-engineer` | **Skills:** `verify-changes`, `vulnerability-scanner`, `deployment-procedures`
+  - **Pasta Permitida:** Repositório completo
+  - **Dependencies:** `TASK-34`, `TASK-37`
+  - **INPUT → OUTPUT → VERIFY:** Executar suítes completas (Python Pytest 100% domain coverage + AST purity, Java `./mvnw clean verify -B` 100% domain coverage + ArchUnit purity, Angular `npm run lint && npm test -- --run && npm run build`), rodar `security_scan.py --fail-on critical`, `ux_audit.py` e checagem `Purple Ban`, atualizar e rodar `e2e/test-interface-audit-suite.js`, validar `docker compose -f infra/docker-compose.prod.yml config`, verificar subida/saúde da pipeline CI/CD e endpoints, marcar `[x]` em `mottu-smart-ops.md` e registrar entrega detalhada em `docs/HISTORICO_IA.md`.
+
+---
+
 ## 6. Phase X: Checklist Obrigatório de Conclusão
 - [x] Zero códigos de cor roxo/violeta (`Purple Ban` respeitado em CSS, HTML e `.pen`).
 - [x] `python .agents/skills/vulnerability-scanner/scripts/security_scan.py .` sem falhas críticas.

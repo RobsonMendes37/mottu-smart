@@ -211,5 +211,32 @@ class ManagerAnalyticsServiceTest {
         assertNotNull(result.get("directAnswer"));
         assertEquals("Eficiência Global", result.get("keyMetricLabel"));
     }
+
+    @Test
+    @DisplayName("getReclameAquiAnalytics() and syncReclameAquiAnalytics() return quantified VoC data")
+    void testGetAndSyncReclameAquiAnalytics() {
+        Map<String, Object> mockVoc = Map.of(
+                "companyName", "Mottu",
+                "totalComplaints", 640,
+                "resolvedCount", 490,
+                "unresolvedCount", 100,
+                "inReplyCount", 50,
+                "resolvedPct", 76.6,
+                "fastestGrowingCategory", "Previsibilidade no Valor e Quantidade de Peças",
+                "fastestGrowingPct", 30.4,
+                "addressableSharePct", 68.1
+        );
+        when(intelligenceServiceClient.getReclameAquiAnalytics()).thenReturn(mockVoc);
+        when(intelligenceServiceClient.syncReclameAquiAnalytics(true)).thenReturn(mockVoc);
+
+        Map<String, Object> getRes = service.getReclameAquiAnalytics();
+        assertNotNull(getRes);
+        assertEquals(640, getRes.get("totalComplaints"));
+        assertEquals(76.6, getRes.get("resolvedPct"));
+
+        Map<String, Object> syncRes = service.syncReclameAquiAnalytics(true);
+        assertNotNull(syncRes);
+        assertEquals(30.4, syncRes.get("fastestGrowingPct"));
+    }
 }
 

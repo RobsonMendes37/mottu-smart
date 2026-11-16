@@ -326,5 +326,25 @@ describe('ManagerService (API Client for T08, T09, T10)', () => {
       service.restockPart('SKU-1', 10).subscribe();
       expect(mockHttp.patch).toHaveBeenCalledWith('/api/v1/mechanic/operations/stock/SKU-1', { delta: 10 });
     });
+
+    it('TC-MS-17: should issue GET to /api/v1/manager/analytics/reclame-aqui', () => {
+      mockHttp.get.mockReturnValue(of({ totalComplaintsMinered: 640, resolvedCount: 490 }));
+      let res: any;
+      service.getReclameAquiAnalytics().subscribe((data) => (res = data));
+      expect(mockHttp.get).toHaveBeenCalledWith('/api/v1/manager/analytics/reclame-aqui');
+      expect(res.totalComplaintsMinered).toBe(640);
+    });
+
+    it('TC-MS-18: should issue POST to /api/v1/manager/analytics/reclame-aqui/sync', () => {
+      mockHttp.post.mockReturnValue(of({ syncStatus: 'SYNCED_LIVE', totalComplaintsMinered: 640 }));
+      let res: any;
+      service.syncReclameAquiAnalytics(true).subscribe((data) => (res = data));
+      expect(mockHttp.post).toHaveBeenCalledWith(
+        '/api/v1/manager/analytics/reclame-aqui/sync',
+        {},
+        expect.objectContaining({ params: expect.anything() })
+      );
+      expect(res.syncStatus).toBe('SYNCED_LIVE');
+    });
   });
 });

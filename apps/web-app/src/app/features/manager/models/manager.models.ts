@@ -213,3 +213,64 @@ export interface OpsDataExplorerResponseDto {
   activeSkill?: string;
   isAiOffline?: boolean;
 }
+
+export interface ReclameAquiCategoryDto {
+  categoryKey: string;
+  label: string;
+  totalCount: number;
+  sharePct: number;
+  resolvedCount: number;
+  unresolvedCount: number;
+  inReplicaCount: number;
+  resolutionRatePct: number;
+  prevQuarterCount: number;
+  currQuarterCount: number;
+  growthRatePct: number;
+  avgWaitDaysBefore: number;
+  smartOpsTargetSla: string;
+  addressedBySmartOps: boolean;
+  smartOpsSolutionModule: string;
+  sampleComplaintTitle: string;
+}
+
+export interface ReclameAquiComplaintItemDto {
+  externalId: string;
+  title: string;
+  categoryKey: string;
+  categoryLabel: string;
+  status: 'RESOLVED' | 'UNRESOLVED' | 'IN_REPLICA' | string;
+  statusLabel: string;
+  city: string;
+  yardKey: string;
+  createdAt: string;
+  resolvedInDays?: number | null;
+  customerExcerpt: string;
+  smartOpsHowItSolves: string;
+}
+
+export interface ReclameAquiDashboardResponseDto {
+  companyName: string;
+  sourceUrl: string;
+  lastSyncedAt: string;
+  syncStatus: string;
+  syncMessage: string;
+  periodLabel: string;
+  reputationScore: number;
+  reputationLabel: string;
+  totalComplaintsMinered: number;
+  resolvedCount: number;
+  unresolvedCount: number;
+  inReplicaCount: number;
+  overallResolutionRatePct: number;
+  responseRatePct: number;
+  wouldDoBusinessAgainPct: number;
+  avgResolutionDays: number;
+  topGrowingCategoryLabel: string;
+  topGrowingCategoryRatePct: number;
+  smartOpsAddressableCount: number;
+  smartOpsAddressablePct: number;
+  executiveThesisHeadline: string;
+  productDecisionRationale: string;
+  categories: ReclameAquiCategoryDto[];
+  recentComplaints: ReclameAquiComplaintItemDto[];
+}

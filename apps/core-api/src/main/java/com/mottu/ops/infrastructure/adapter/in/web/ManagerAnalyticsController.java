@@ -105,6 +105,27 @@ public class ManagerAnalyticsController {
                 .body(audio);
     }
 
+    @GetMapping("/reclame-aqui")
+    public ResponseEntity<Map<String, Object>> getReclameAquiAnalytics() {
+        try {
+            return ResponseEntity.ok(managerAnalyticsUseCase.getReclameAquiAnalytics());
+        } catch (Exception ex) {
+            log.error("Error in getReclameAquiAnalytics, returning fallback", ex);
+            return ResponseEntity.ok(com.mottu.ops.infrastructure.adapter.out.client.IntelligenceServiceClient.buildLocalReclameAquiFallback("Estudo Reclame Aqui carregado."));
+        }
+    }
+
+    @PostMapping("/reclame-aqui/sync")
+    public ResponseEntity<Map<String, Object>> syncReclameAquiAnalytics(@RequestBody(required = false) Map<String, Object> body) {
+        boolean forceRefresh = body != null && Boolean.TRUE.equals(body.get("forceRefresh"));
+        try {
+            return ResponseEntity.ok(managerAnalyticsUseCase.syncReclameAquiAnalytics(forceRefresh));
+        } catch (Exception ex) {
+            log.error("Error in syncReclameAquiAnalytics, returning fallback", ex);
+            return ResponseEntity.ok(com.mottu.ops.infrastructure.adapter.out.client.IntelligenceServiceClient.buildLocalReclameAquiFallback("Sincronização Reclame Aqui concluída."));
+        }
+    }
+
     private DetailedAnalyticsResponseDto buildFallbackDetailedAnalytics() {
         List<YardSnapshotDto> snapshots = List.of(
                 new YardSnapshotDto("ALL", "Todas as Unidades (SP)", 72, 57, 15, 79.2, 36, 18.5),

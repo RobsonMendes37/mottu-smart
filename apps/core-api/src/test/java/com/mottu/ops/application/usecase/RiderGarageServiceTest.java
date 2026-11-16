@@ -84,15 +84,17 @@ class RiderGarageServiceTest {
         RecentInspectionDto inspection = new RecentInspectionDto(
                 UUID.randomUUID(),
                 InspectionStatus.AUTO_RESOLVED,
-                DamageVerdict.PRE_EXISTENTE,
-                BigDecimal.ZERO,
-                Instant.now()
+                DamageVerdict.MAU_USO,
+                new BigDecimal("140.50"),
+                Instant.now(),
+                3,
+                List.of("Retrovisor Direito Sport", "Manete de Freio Direito", "Protetor Lateral do Escapamento")
         );
 
         when(rentalContractRepositoryPort.findActiveByRiderId(riderId)).thenReturn(Optional.of(contract));
         when(motorcycleRepositoryPort.findById(motoId)).thenReturn(Optional.of(moto));
         when(yardRepositoryPort.findById(yardId)).thenReturn(Optional.of(yard));
-        when(inspectionRepositoryPort.countOpenByContractId(contractId)).thenReturn(1);
+        when(inspectionRepositoryPort.countOpenByContractId(contractId)).thenReturn(0);
         when(inspectionRepositoryPort.findRecentByContractId(contractId, 5)).thenReturn(List.of(inspection));
 
         RiderGarageResponse response = riderGarageService.getGarageForRider(riderId);
@@ -101,7 +103,10 @@ class RiderGarageServiceTest {
         assertEquals(contractId, response.activeContract().contractId());
         assertEquals("MOT1A23", response.activeContract().motorcycle().plate());
         assertEquals("Galpão Butantã", response.activeContract().motorcycle().yardName());
-        assertEquals(1, response.openInspectionsCount());
+        assertEquals(0, response.openInspectionsCount());
         assertEquals(1, response.recentInspections().size());
+        assertEquals(3, response.recentInspections().get(0).itemsCount());
+        assertEquals(3, response.recentInspections().get(0).partNamesSummary().size());
+        assertEquals(new BigDecimal("140.50"), response.recentInspections().get(0).totalEstimatedBrl());
     }
 }

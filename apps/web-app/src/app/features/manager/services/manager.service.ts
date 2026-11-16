@@ -20,6 +20,7 @@ import {
   DetailedAnalyticsDto,
   OpsAdvisorResponseDto,
   OpsDataExplorerResponseDto,
+  ReclameAquiDashboardResponseDto,
 } from '../models/manager.models';
 
 interface FleetMotorcycleRawItem {
@@ -196,6 +197,23 @@ export class ManagerService {
       '/api/v1/manager/analytics/tts',
       { text },
       { responseType: 'blob' }
+    );
+  }
+
+  getReclameAquiAnalytics(): Observable<ReclameAquiDashboardResponseDto> {
+    return this.http.get<ReclameAquiDashboardResponseDto>(
+      '/api/v1/manager/analytics/reclame-aqui'
+    );
+  }
+
+  syncReclameAquiAnalytics(
+    forceRefresh: boolean = true
+  ): Observable<ReclameAquiDashboardResponseDto> {
+    const params = new HttpParams().set('forceRefresh', String(forceRefresh));
+    return this.http.post<ReclameAquiDashboardResponseDto>(
+      '/api/v1/manager/analytics/reclame-aqui/sync',
+      {},
+      { params }
     );
   }
 }

@@ -104,6 +104,17 @@ export class InspectionStatusComponent implements OnInit, OnDestroy {
     return items.reduce((sum, item) => sum + (item.unitPriceBrl || 0), 0);
   });
 
+  partsQuantityTotal = computed(() => {
+    const items = this.inspection()?.items || [];
+    return items.length;
+  });
+
+  amountToPrepareToPayBrl = computed(() => {
+    if (this.isZeroCost()) return 0;
+    const ins = this.inspection();
+    return ins ? ins.totalEstimatedBrl : 0;
+  });
+
   minEstimatedBrl = computed(() => {
     if (this.isZeroCost()) return 0;
     return this.partsSubtotalBrl();
@@ -118,7 +129,7 @@ export class InspectionStatusComponent implements OnInit, OnDestroy {
   totalSavedBrl = computed(() => {
     if (!this.isZeroCost()) return 0;
     const ins = this.inspection();
-    const labor = ins?.laborFeeBrl ?? 50.0;
+    const labor = ins?.laborFeeBrl && ins.laborFeeBrl > 0 ? ins.laborFeeBrl : 35.0;
     return this.partsSubtotalBrl() + labor;
   });
 

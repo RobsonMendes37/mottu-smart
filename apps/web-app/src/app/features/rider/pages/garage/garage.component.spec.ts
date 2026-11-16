@@ -77,4 +77,44 @@ describe('GarageComponent (Screen T02 - Minha Moto / Garagem)', () => {
     comp.onReportAccident();
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/rider/accidents/new']);
   });
+
+  it('TC-T02-7: Exposes latestEvaluatedInspection, parts count and payment preparation summary on Garage screen', () => {
+    mockStore.garage = () => ({
+      activeContract: {
+        contractId: 'a0000000-0000-0000-0000-000000000001',
+        pickedUpAt: '2026-11-15T10:00:00Z',
+        initialOdometerKm: 1000,
+        motorcycle: {
+          id: 'moto-1',
+          plate: 'MOT1A23',
+          model: 'MOTTU_SPORT_110I',
+          status: 'RENTED',
+          currentOdometerKm: 1035,
+          yardName: 'Butantã',
+        },
+      },
+      openInspectionsCount: 0,
+      recentInspections: [
+        {
+          id: 'd2000000-0000-0000-0000-000000000001',
+          status: 'AUTO_RESOLVED',
+          finalVerdict: 'MAU_USO',
+          totalEstimatedBrl: 140.5,
+          createdAt: '2026-11-16T02:00:00Z',
+          itemsCount: 3,
+          partNamesSummary: [
+            'Retrovisor Direito Sport',
+            'Manete de Freio Direito',
+            'Protetor Lateral do Escapamento',
+          ],
+        },
+      ],
+    });
+
+    const latest = comp.latestEvaluatedInspection();
+    expect(latest).not.toBeNull();
+    expect(latest?.itemsCount).toBe(3);
+    expect(comp.latestPaymentPreparationBrl()).toBe(140.5);
+    expect(comp.latestPartsSummaryLabel()).toContain('Retrovisor Direito Sport');
+  });
 });

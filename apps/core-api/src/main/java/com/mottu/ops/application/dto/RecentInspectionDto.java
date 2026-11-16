@@ -5,6 +5,7 @@ import com.mottu.ops.domain.enums.InspectionStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public record RecentInspectionDto(
@@ -12,6 +13,17 @@ public record RecentInspectionDto(
         InspectionStatus status,
         DamageVerdict finalVerdict,
         BigDecimal totalEstimatedBrl,
-        Instant createdAt
+        Instant createdAt,
+        int itemsCount,
+        List<String> partNamesSummary
 ) {
+    public RecentInspectionDto(
+            UUID id,
+            InspectionStatus status,
+            DamageVerdict finalVerdict,
+            BigDecimal totalEstimatedBrl,
+            Instant createdAt
+    ) {
+        this(id, status, finalVerdict, totalEstimatedBrl, createdAt, 0, List.of());
+    }
 }

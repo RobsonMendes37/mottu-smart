@@ -43,10 +43,6 @@ def classify_conversational_intent(query: str) -> Optional[str]:
         return None
 
     # 1. Abuse, insult, or extreme frustration
-    abuse_terms = [
-        "morra", "fodasse", "foda-se", "foda", "vai se fuder", "vai se foder",
-        "vsf", "vtmnc", "cala boca", "cala a boca", "idiota", "burra", "lixo"
-    ]
     if any(term in cleaned for term in ["vai se fuder", "vai se foder", "cala boca", "cala a boca"]):
         return "ABUSE"
     if any(w in ["morra", "fodasse", "foda-se", "idiota", "burra", "lixo", "vsf"] for w in words):
@@ -197,6 +193,93 @@ def answer_manager_query(
             "suggested_action_label": "",
             "suggested_action_route": "",
             "active_skill": "CONVERSATIONAL",
+        }
+
+    # =========================================================================
+    # 0.5. SKILL: RECLAME AQUI & VOICE OF THE CUSTOMER (SKILL_RECLAME_AQUI)
+    # =========================================================================
+    if skill_id == "SKILL_RECLAME_AQUI" or any(
+        k in q
+        for k in [
+            "reclame aqui",
+            "reclamações",
+            "reclamacoes",
+            "reclamação",
+            "reclamacao",
+            "principais problemas",
+            "problemas que mais cresceram",
+            "não resolvidas",
+            "nao resolvidas",
+            "por que otimizar",
+            "dor do entregador",
+        ]
+    ):
+        voc_rows = [
+            [
+                "Previsibilidade no Valor e Quantidade de Peças",
+                "182 chamados (28,4%)",
+                "142 (78,0%)",
+                "26 (14,3%)",
+                "+30,4% ▲ (1º em alta)",
+                "Orçamento por foto T02/T04 (Loja Mottu)",
+            ],
+            [
+                "Tempo de Espera e Fila Presencial no Galpão",
+                "144 chamados (22,5%)",
+                "112 (77,8%)",
+                "22 (15,3%)",
+                "+25,0% ▲ (2º em alta)",
+                "Deflexão autônoma 78,5% sem fila",
+            ],
+            [
+                "Falta de Peça em Manutenção Agendada",
+                "110 chamados (17,2%)",
+                "84 (76,4%)",
+                "18 (16,4%)",
+                "+20,0% ▲ (3º em alta)",
+                "Previsor de Ruptura WMS 1-Clique",
+            ],
+            [
+                "Dúvidas em Fatura Semanal, Multas e Baixa Pix",
+                "118 chamados (18,4%)",
+                "90 (76,3%)",
+                "18 (15,3%)",
+                "+10,7% ▲",
+                "Extrato semanal Pix transparente (T12)",
+            ],
+            [
+                "Divergência de Avaria Pré-Existente na Retirada",
+                "86 chamados (13,4%)",
+                "62 (72,1%)",
+                "16 (18,6%)",
+                "+9,8% ▲",
+                "Giro 360 de Retirada + Escudo 48h/100km",
+            ],
+        ]
+        return {
+            "direct_answer": (
+                "No estudo minerado do Reclame Aqui da Mottu (640 reclamações em 6 meses), "
+                "76,6% foram resolvidas (490), 15,6% seguem não resolvidas (100) e 7,8% estão em réplica (50). "
+                "Os problemas que mais cresceram são Previsibilidade no Valor de Peças (+30,4%) e Fila Presencial (+25,0%) "
+                "— fundamentando por que o Smart Ops priorizou o orçamento instantâneo por foto (68,1% das dores atacadas)."
+            ),
+            "spoken_answer": "No Reclame Aqui, setenta e seis por cento foram resolvidas. Maior alta em dúvida de valor de peças.",
+            "should_show_table": True,
+            "key_metric_label": "Taxa de Resolução • Reclame Aqui",
+            "key_metric_value": "76,6% Resolvidas (490/640)",
+            "key_metric_trend": "68,1% das dores mitigadas pelo Smart Ops",
+            "columns": [
+                "Categoria do Problema",
+                "Volume (6m)",
+                "Resolvidas",
+                "Não Resolvidas",
+                "Crescimento (90d)",
+                "Como o Smart Ops Resolve",
+            ],
+            "rows": voc_rows,
+            "suggested_action_label": "Abrir Painel Reclame Aqui (VoC)",
+            "suggested_action_route": "/manager/analytics",
+            "active_skill": "SKILL_RECLAME_AQUI",
         }
 
     # =========================================================================

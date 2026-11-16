@@ -2005,3 +2005,44 @@
 - **Validação:**
   - Angular Vitest: **250/250 testes aprovados em 38 arquivos** (incluindo 8 testes dedicados com novos cálculos de transparência em `inspection-status.component.spec.ts`).
   - Angular Production Build: **100% concluído com sucesso** (`main-4BD7RA3G.js`).
+
+### [2026-11-16 04:22] — `FASE 10 (PLANO 01: TASK-33 & TASK-34)` & `FASE 11 (PLANO 02: TASK-35 a TASK-38)`: Previsibilidade de Peças/Preços para o Entregador (`T02`/`T04`) + Inteligência de Dados do Reclame Aqui (VoC), Dashboard Executivo (`T10`), Skill Melissa e Auditoria Visual com Prints
+- **Agente / Modelo:** `@backend-specialist` + `@frontend-specialist` + `@qa-automation-engineer` + `@security-auditor` + `@devops-engineer`
+- **Planos Executados:**
+  1. `PLANO_01_ENTREGADOR_ORCAMENTO_PECAS.md` (`TASK-33` e `TASK-34`)
+  2. `PLANO_02_RECLAME_AQUI_VOC_GESTOR_MELISSA.md` (`TASK-35`, `TASK-36`, `TASK-37` e `TASK-38`)
+- **Entregas Realizadas (Plano 01 — Previsibilidade de Quantidade e Valor das Peças para o Entregador Demo e Real):**
+  1. **Migração Flyway `V16__rider_demo_parts_pricing_and_resolved_quotes.sql` (`apps/core-api`):**
+     - Desbloqueio da cota do entregador demo (`entregador@mottu-ops.local`) convertendo vistorias abertas em `AUTO_RESOLVED` / `HUMAN_RESOLVED` (`openInspectionsCount: 0` — cota `0 de 3` liberada).
+     - Enriquecimento de 2 a 3 peças precificadas da tabela oficial Loja Mottu por vistoria tanto para o entregador Demo quanto para o Real (`entregador.real@mottu-ops.local`):
+       - Vistoria `MAU_USO` (`AUTO_RESOLVED`): **3 peças** (`Retrovisor Direito Sport R$ 42,50` + `Manete de Freio Direito R$ 25,00` + `Protetor Lateral do Escapamento R$ 38,00` + Mão de obra `R$ 35,00` = **`R$ 140,50`**).
+       - Vistoria `DESGASTE_NATURAL` (`AUTO_RESOLVED`): **2 peças** (`Pneu Traseiro 80/100-14 R$ 180,00` + `Lona de Freio Traseira R$ 33,00` + Mão de obra `R$ 35,00` = **`R$ 0,00` Isento**, com economia comprovada de **`R$ 248,00`**).
+       - Vistoria `MAU_USO` (`HUMAN_RESOLVED`): **2 peças** (`Bloco Óptico do Farol R$ 130,00` + `Manete de Freio Direito R$ 25,00` + Mão de obra `R$ 35,00` = **`R$ 190,00`**).
+  2. **Backend Core API (`RecentInspectionDto.java`, `InspectionRepositoryAdapter.java`, `RiderInspectionService.java`):**
+     - Adicionados `itemsCount` e `partNamesSummary` (`List<String>`) em `RecentInspectionDto`.
+     - Bypass inteligente de deduplicação SHA-256/dHash para os 6 assets canônicos de demonstração (`avaria-*.webp`), permitindo testar repetidamente o botão `"Usar foto de teste"` no Wizard sem bloqueio.
+  3. **Frontend Angular 19 (`garage.component.*`, `inspection-status.component.*`, `rider.models.ts`, `rider.store.ts`):**
+     - Card em destaque na Garagem (`T02`): **"Quanto você precisa preparar para pagar"** com badge de quantidade de peças (`3 unidades`), chips individuais com preços da Loja Mottu e botão direto para o recibo detalhado (`T04`).
+     - Recibo de Previsibilidade Financeira na tela de Status (`T04`) com quantidade de peças avariadas, preço unitário oficial VTEX, mão de obra e economia demonstrada em casos de desgaste natural.
+- **Entregas Realizadas (Plano 02 — Minerador Modular Reclame Aqui VoC, Aba Executiva `T10` e Skill Melissa):**
+  1. **Domínio Puro Python & Minerador Modular (`apps/intelligence-service`):**
+     - Criado serviço de domínio 100% puro `app/domain/services/reclame_aqui_analytics.py` (calcula taxa de resolução, crescimento trimestral `(Q2 - Q1) / Q1 * 100`, ranking por crescimento e percentual de aderência do Smart Ops).
+     - Criado módulo `app/modules/reclame_aqui_miner/` com dataset auditável `seed_reclame_aqui_snapshot.json` (**640 reclamações**: **490 resolvidas / 76,6%**, **100 não resolvidas / 15,6%**, **50 em réplica / 7,8%**, 5 categorias com destaque para **Previsibilidade de Valor e Qtd. de Peças `+30,4% ▲`** e **Demora em Fila de Pátio `+25,0% ▲`**, e **68,1% / 436 casos** diretamente atacados pelo Smart Ops) e `scraper.py` (`ReclameAquiMiner`) com extração HTTP real (`__NEXT_DATA__` / JSON-LD) e fallback resiliente para o snapshot local (Lei 8).
+     - Adicionada `SKILL_RECLAME_AQUI` em `data_explorer_service.py` para a assistente **Melissa** e endpoints `GET /internal/v1/analytics/reclame-aqui` e `POST /internal/v1/analytics/reclame-aqui/sync` em `internal_router.py`.
+  2. **Backend Spring Boot (`apps/core-api`):**
+     - Expostos endpoints protegidos por `@PreAuthorize("hasRole('MANAGER')")`: `GET /api/v1/manager/analytics/reclame-aqui` e `POST /api/v1/manager/analytics/reclame-aqui/sync` em `ManagerAnalyticsController.java`, `ManagerAnalyticsService.java` e `IntelligenceServiceClient.java` com fallback resiliente completo.
+  3. **Frontend Angular 19 (`T10` — `t10-analytics.component.*`, `manager.service.*`, `manager.models.ts`):**
+     - Nova aba **`Reclame Aqui (VoC)`** no painel do gestor (`T10`) com botão **"Sincronizar Reclame Aqui"**, 4 scorecards executivos, gráfico de barras horizontais empilhadas (**Resolvidas vs. Réplica vs. Não Resolvidas + Índice de Crescimento**), quadro **Product Discovery / Decisão de Engenharia (Impacto × Esforço)** fundamentando a priorização do Orçamento Transparente de Peças e da Triagem Rápida, explorador filtrável de reclamações e integração direta com o chip **`Reclame Aqui (VoC)`** na assistente **Melissa**.
+- **Validação Completa de Qualidade, Prints Inspecionados via `read_file` e Segurança (`Phase X`):**
+  - **6 Prints de Alta Resolução Gerados via Playwright e Inspecionados Visualmente (`read_file`):**
+    1. `print-01-rider-demo-garage-t02.png` (Garagem `T02` Mobile `390x844` com card de previsibilidade `R$ 140,50`, `3 unidades` e cota liberada)
+    2. `print-02-rider-demo-status-mau-uso-t04.png` (Recibo `T04` Mau Uso com 3 peças precificadas da Loja Mottu + `R$ 35,00` oficina = `R$ 140,50`)
+    3. `print-03-rider-demo-status-isento-t04.png` (Recibo `T04` Desgaste Natural `R$ 0,00` com 2 peças cobertas e economia de `- R$ 248,00`)
+    4. `print-04-manager-t10-reclame-aqui-overview.png` (Aba `Reclame Aqui (VoC)` na `T10` Desktop com KPIs `640 casos`, `76.6% Resolvidas`, `+30.4% ▲` e `68.1% (436)`)
+    5. `print-05-manager-t10-reclame-aqui-sync-and-table.png` (Confirmação de sincronização ao vivo do Reclame Aqui e tabela filtrada por `Valor e Qtd. de Peças (+30,4%)`)
+    6. `print-06-manager-t10-melissa-reclame-aqui-skill.png` (Assistente **Melissa** respondendo à `SKILL_RECLAME_AQUI` com tabela comparativa das 5 categorias)
+  - **Python (`apps/intelligence-service`):** `225/225` testes aprovados, **100.00% de cobertura de linhas e branches** em `app/domain` (`710/710` stmts, `292/292` branches), `0` violações AST em `test_domain_purity.py` e `ruff check` 100% limpo.
+  - **Java (`apps/core-api`):** `354/354` testes aprovados (`BUILD SUCCESS`), `jacoco:check` **100% de cobertura no domínio** ("All coverage checks have been met") e `DomainPurityTest` (ArchUnit) com `0` violações.
+  - **Angular 19 (`apps/web-app`):** `npm run lint` (`0` erros), Vitest **`38/38` suítes e `256/256` testes aprovados**, `ng build --configuration production` concluído sem erros.
+  - **Segurança, UX & Infraestrutura:** `security_scan.py --fail-on critical` (`0` vulnerabilidades críticas), `ux_audit.py` (`STATUS: PASS`), `Purple Ban` (`0` ocorrências) e `docker compose` (`dev` e `prod`) validados.
+

@@ -357,11 +357,18 @@ const BASE_URL = process.env.BASE_URL || 'http://161.153.2.148';
       await page.waitForSelector('text=Contratos e conciliação Pix semanal', { timeout: 8000 });
       await assertImages('Gestor Faturamento T12');
 
-      // Analytics com Previsão What-If
+      // Analytics com Previsão What-If e Reclame Aqui (VoC)
       await page.click('a[href="/manager/analytics"]');
       await page.waitForURL('**/manager/analytics', { timeout: 8000 });
       await page.waitForSelector('text=Indicadores operacionais da unidade', { timeout: 8000 });
       await assertImages('Gestor Analytics T10');
+
+      const raTab = page.locator('[data-testid="tab-reclame-aqui"]');
+      if (await raTab.isVisible().catch(() => false)) {
+        await raTab.click();
+        await page.waitForSelector('text=640 casos', { timeout: 8000 });
+        await assertImages('Gestor Analytics T10 - Reclame Aqui VoC');
+      }
     });
 
   } finally {

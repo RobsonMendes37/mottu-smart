@@ -215,4 +215,22 @@ describe('InspectionStatusComponent (Screen T04 - SSE Live Status & Contest/Book
     expect(comp.isPresentialRequested()).toBe(true);
     expect(comp.presentialReason()).toBe('Foto escura no chassi inferior.');
   });
+
+  it('TC-T04-9: Calculates partsQuantityTotal and amountToPrepareToPayBrl for multi-part inspection', () => {
+    mockStore.currentInspection.set({
+      ...mockStore.currentInspection(),
+      finalVerdict: 'MAU_USO',
+      laborFeeBrl: 35.0,
+      totalEstimatedBrl: 140.5,
+      items: [
+        { catalogPartId: 'SKU-RETROVISOR-DIR-SPORT', partName: 'Retrovisor Direito Sport', unitPriceBrl: 42.5, addedBy: 'AI' },
+        { catalogPartId: 'SKU-MANETE-DIR-SPORT', partName: 'Manete de Freio Direito', unitPriceBrl: 25.0, addedBy: 'AI' },
+        { catalogPartId: 'SKU-PROT-ESCAP-SPORT', partName: 'Protetor Lateral do Escapamento', unitPriceBrl: 38.0, addedBy: 'AI' },
+      ],
+    });
+
+    expect(comp.partsQuantityTotal()).toBe(3);
+    expect(comp.partsSubtotalBrl()).toBe(105.5);
+    expect(comp.amountToPrepareToPayBrl()).toBe(140.5);
+  });
 });

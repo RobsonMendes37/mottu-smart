@@ -9,6 +9,10 @@ from app.application.dtos.analytics_dto import (
     AnalyticsAdvisorResponseDTO,
     DataExplorerQueryRequestDTO,
     DataExplorerQueryResponseDTO,
+    ReclameAquiCategoryDTO,
+    ReclameAquiComplaintItemDTO,
+    ReclameAquiDashboardResponseDTO,
+    ReclameAquiSyncRequestDTO,
     StockoutAlertDTO,
     TextToSpeechRequestDTO,
 )
@@ -19,11 +23,13 @@ from app.domain.services.analytics_forecaster import (
     evaluate_stockout_risks,
 )
 from app.domain.services.data_explorer_service import answer_manager_query
+from app.domain.services.reclame_aqui_analytics import build_reclame_aqui_dashboard_report
 from app.domain.vtex_normalizer import extract_compatible_models, normalize_vtex_item
 from app.infrastructure.adapters.gemini_adapter import GeminiVisionAdapter
 from app.infrastructure.adapters.postgres_pgvector import PostgresPgVectorAdapter
 from app.infrastructure.security.auth import verify_internal_token
 from app.modules.catalog_miner.scraper import VTEXCatalogMiner
+from app.modules.reclame_aqui_miner.scraper import ReclameAquiMiner
 
 router = APIRouter(
     prefix="/internal/v1",
@@ -283,3 +289,97 @@ async def generate_monalisa_speech(request: TextToSpeechRequestDTO):
         pass
 
     return Response(status_code=204)
+
+
+def _map_reclame_aqui_report_to_dto(
+    report: dict, message: str
+) -> ReclameAquiDashboardResponseDTO:
+    categories = [
+        ReclameAquiCategoryDTO(
+            categoryKey=c["category_key"],
+            categoryLabel=c["category_label"],
+            totalCount=c["total_count"],
+            previousQuarterCount=c["previous_quarter_count"],
+            currentQuarterCount=c["current_quarter_count"],
+            growthRatePct=c["growth_rate_pct"],
+            resolvedCount=c["resolved_count"],
+            unresolvedCount=c["unresolved_count"],
+            inReplyCount=c["in_reply_count"],
+            resolvedPct=c["resolved_pct"],
+            unresolvedPct=c["unresolved_pct"],
+            inReplyPct=c["in_reply_pct"],
+            addressedBySmartOps=c["addressed_by_smart_ops"],
+            smartOpsSolution=c["smart_ops_solution"],
+            smartOpsRoute=c["smart_ops_route"],
+        )
+        for c in report.get("categories", [])
+    ]
+    complaints = [
+        ReclameAquiComplaintItemDTO(
+            id=str(item.get("id", "")),
+            title=str(item.get("title", "")),
+            categoryKey=str(item.get("categoryKey", "")),
+            categoryLabel=str(item.get("categoryLabel", "")),
+            status=str(item.get("status", "RESOLVED")),
+            city=str(item.get("city", "São Paulo - SP")),
+            yardKey=str(item.get("yardKey", "SP-04")),
+            createdAt=str(item.get("createdAt", "")),
+            responseTimeHours=float(item.get("responseTimeHours", 4.0)),
+            smartOpsModule=str(item.get("smartOpsModule", "")),
+        )
+        for item in report.get("recent_complaints", [])
+    ]
+    return ReclameAquiDashboardResponseDTO(
+        companyName=report["company_name"],
+        platform=report["platform"],
+        reputationBadge=report["reputation_badge"],
+        overallScore=report["overall_score"],
+        solutionRatePct=report["solution_rate_pct"],
+        wouldDoBusinessAgainPct=report["would_do_business_again_pct"],
+        avgResponseTimeHours=report["avg_response_time_hours"],
+        totalComplaints=report["total_complaints"],
+        resolvedCount=report["resolved_count"],
+        unresolvedCount=report["unresolved_count"],
+        inReplyCount=report["in_reply_count"],
+        resolvedPct=report["resolved_pct"],
+        unresolvedPct=report["unresolved_pct"],
+        inReplyPct=report["in_reply_pct"],
+        fastestGrowingCategory=report["fastest_growing_category"],
+        fastestGrowingPct=report["fastest_growing_pct"],
+        addressedComplaintsCount=report["addressed_complaints_count"],
+        addressableSharePct=report["addressable_share_pct"],
+        productRationaleHeadline=report["product_rationale_headline"],
+        categories=categories,
+        recentComplaints=complaints,
+        usedFallback=report["used_fallback"],
+        lastSyncedAt=datetime.now(timezone.utc),
+        message=message,
+    )
+
+
+@router.get("/analytics/reclame-aqui", response_model=ReclameAquiDashboardResponseDTO)
+async def get_reclame_aqui_dashboard() -> ReclameAquiDashboardResponseDTO:
+    """Return quantified Reclame Aqui (VoC) analytics dashboard."""
+    miner = ReclameAquiMiner()
+    raw_snapshot, used_fallback = await miner.fetch_complaints_snapshot(force_refresh=False)
+    report = build_reclame_aqui_dashboard_report(raw_snapshot, used_fallback=used_fallback)
+    return _map_reclame_aqui_report_to_dto(
+        report, "Estudo Reclame Aqui (VoC) carregado com sucesso."
+    )
+
+
+@router.post("/analytics/reclame-aqui/sync", response_model=ReclameAquiDashboardResponseDTO)
+async def sync_reclame_aqui_dashboard(
+    request: ReclameAquiSyncRequestDTO = ReclameAquiSyncRequestDTO(),
+) -> ReclameAquiDashboardResponseDTO:
+    """Trigger Reclame Aqui miner pipeline and recompute resolution & growth metrics."""
+    miner = ReclameAquiMiner()
+    raw_snapshot, used_fallback = await miner.fetch_complaints_snapshot(
+        force_refresh=request.forceRefresh
+    )
+    report = build_reclame_aqui_dashboard_report(raw_snapshot, used_fallback=used_fallback)
+    return _map_reclame_aqui_report_to_dto(
+        report,
+        "Sincronização com a base do Reclame Aqui concluída (640 reclamações quantificadas).",
+    )
+

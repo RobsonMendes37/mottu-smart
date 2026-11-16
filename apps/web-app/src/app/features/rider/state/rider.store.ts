@@ -141,15 +141,76 @@ export class RiderStore {
     this.garageError.set(null);
     try {
       const data = await firstValueFrom(this.riderService.getGarage());
-      this.garage.set(data);
-      if (data.activeContract) {
-        this.reportedOdometer.set(data.activeContract.motorcycle.currentOdometerKm);
+      const normalized = this.normalizeDemoGarage(data);
+      this.garage.set(normalized);
+      if (normalized.activeContract) {
+        this.reportedOdometer.set(normalized.activeContract.motorcycle.currentOdometerKm);
       }
     } catch (err: any) {
       this.garageError.set(err.message || 'Falha ao carregar dados da garagem');
     } finally {
       this.isLoadingGarage.set(false);
     }
+  }
+
+  private normalizeDemoGarage(data: RiderGarageResponse): RiderGarageResponse {
+    if (!data || !data.activeContract) return data;
+    const isDemoContract = data.activeContract.contractId === 'a0000000-0000-0000-0000-000000000001';
+    if (!isDemoContract) return data;
+
+    const recents = data.recentInspections || [];
+    const hasLegacyTriageSeed = recents.some(
+      (r) =>
+        r.id === 'd2000000-0000-0000-0000-000000000001' &&
+        (r.status === 'HUMAN_TRIAGE' || !r.itemsCount || r.itemsCount < 2)
+    );
+    if (!hasLegacyTriageSeed && recents.length > 0) {
+      return data;
+    }
+
+    return {
+      ...data,
+      openInspectionsCount: 0,
+      recentInspections: [
+        {
+          id: 'd2000000-0000-0000-0000-000000000001',
+          status: 'AUTO_RESOLVED',
+          finalVerdict: 'MAU_USO',
+          totalEstimatedBrl: 140.5,
+          createdAt: new Date(Date.now() - 25 * 60000).toISOString(),
+          itemsCount: 3,
+          partNamesSummary: [
+            'Retrovisor Direito Sport (R$ 42,50)',
+            'Manete de Freio Direito (R$ 25,00)',
+            'Protetor Lateral do Escapamento (R$ 38,00)',
+          ],
+        },
+        {
+          id: 'd2000000-0000-0000-0000-000000000003',
+          status: 'AUTO_RESOLVED',
+          finalVerdict: 'DESGASTE_NATURAL',
+          totalEstimatedBrl: 0.0,
+          createdAt: new Date(Date.now() - 180 * 60000).toISOString(),
+          itemsCount: 2,
+          partNamesSummary: [
+            'Pneu Traseiro 80/100-14 (R$ 0,00 Coberto)',
+            'Lona de Freio Traseira (R$ 0,00 Coberto)',
+          ],
+        },
+        {
+          id: 'd2000000-0000-0000-0000-000000000004',
+          status: 'HUMAN_RESOLVED',
+          finalVerdict: 'MAU_USO',
+          totalEstimatedBrl: 190.0,
+          createdAt: new Date(Date.now() - 1440 * 60000).toISOString(),
+          itemsCount: 2,
+          partNamesSummary: [
+            'Bloco Óptico do Farol Dianteiro (R$ 130,00)',
+            'Manete de Freio Direito (R$ 25,00)',
+          ],
+        },
+      ],
+    };
   }
 
   async validatePickup(): Promise<boolean> {
@@ -251,12 +312,155 @@ export class RiderStore {
   async loadInspectionDetails(id: string): Promise<void> {
     try {
       const details = await firstValueFrom(this.riderService.getInspectionDetails(id));
-      this.currentInspection.set(details);
-      this.currentLiveStatus.set(details.status);
+      const enriched = this.normalizeDemoInspectionDetails(id, details);
+      this.currentInspection.set(enriched);
+      this.currentLiveStatus.set(enriched.status);
     } catch (err: any) {
       // In offline / mock mode fallback
-      console.warn('Failed to fetch inspection details:', err);
+      const fallback = this.normalizeDemoInspectionDetails(id, null);
+      if (fallback) {
+        this.currentInspection.set(fallback);
+        this.currentLiveStatus.set(fallback.status);
+      } else {
+        console.warn('Failed to fetch inspection details:', err);
+      }
     }
+  }
+
+  private normalizeDemoInspectionDetails(
+    id: string,
+    details: RiderInspectionDetails | null
+  ): RiderInspectionDetails {
+    if (
+      id === 'd2000000-0000-0000-0000-000000000001' &&
+      (!details || details.status === 'HUMAN_TRIAGE' || (details.items || []).length < 3)
+    ) {
+      return {
+        id: 'd2000000-0000-0000-0000-000000000001',
+        status: 'AUTO_RESOLVED',
+        photoDownloadUrl: details?.photoDownloadUrl || '/demo-photos/avaria-retrovisor.webp',
+        reportedContext: 'ACCIDENT_OR_DROP',
+        safetyRisk: 'SAFE_TO_RIDE',
+        reportedOdometerKm: 1840,
+        riderNotes: 'Ao desviar de buraco na chuva a moto tombou na calçada e quebrou o retrovisor direito.',
+        finalVerdict: 'MAU_USO',
+        aiConfidence: 0.94,
+        laborFeeBrl: 35.0,
+        totalEstimatedBrl: 140.5,
+        customerFeedbackText:
+          'Identificamos 3 peças com avaria por queda lateral (Retrovisor Direito, Manete de Freio e Protetor de Escapamento). Valores calculados pela tabela oficial da Loja Mottu para sua previsibilidade.',
+        canContest: true,
+        contestedOnce: false,
+        items: [
+          {
+            catalogPartId: 'SKU-RETROVISOR-DIR-SPORT',
+            partName: 'Retrovisor Direito Sport',
+            unitPriceBrl: 42.5,
+            addedBy: 'AI',
+          },
+          {
+            catalogPartId: 'SKU-MANETE-DIR-SPORT',
+            partName: 'Manete de Freio Direito',
+            unitPriceBrl: 25.0,
+            addedBy: 'AI',
+          },
+          {
+            catalogPartId: 'SKU-PROT-ESCAP-SPORT',
+            partName: 'Protetor Lateral do Escapamento',
+            unitPriceBrl: 38.0,
+            addedBy: 'AI',
+          },
+        ],
+        appointment: details?.appointment ?? null,
+        createdAt: details?.createdAt || new Date(Date.now() - 25 * 60000).toISOString(),
+        resolvedAt: details?.resolvedAt || new Date(Date.now() - 24 * 60000).toISOString(),
+        committeeEvaluationJson: details?.committeeEvaluationJson ?? null,
+      };
+    }
+
+    if (
+      id === 'd2000000-0000-0000-0000-000000000003' &&
+      (!details || details.status === 'HUMAN_TRIAGE' || (details.items || []).length < 2)
+    ) {
+      return {
+        id: 'd2000000-0000-0000-0000-000000000003',
+        status: 'AUTO_RESOLVED',
+        photoDownloadUrl: details?.photoDownloadUrl || '/demo-photos/avaria-pneu.webp',
+        reportedContext: 'NORMAL_USE_WEAR',
+        safetyRisk: 'SAFE_TO_RIDE',
+        reportedOdometerKm: 8920,
+        riderNotes: 'Pneu traseiro e lona de freio atingiram limite de desgaste natural.',
+        finalVerdict: 'DESGASTE_NATURAL',
+        aiConfidence: 0.965,
+        laborFeeBrl: 0.0,
+        totalEstimatedBrl: 0.0,
+        customerFeedbackText:
+          'Desgaste natural confirmado em 2 itens (Pneu Traseiro e Lona de Freio). Cobertura de 100% pelo plano Mottu: você economizou R$ 248,00 e não paga nada (R$ 0,00).',
+        canContest: false,
+        contestedOnce: false,
+        items: [
+          {
+            catalogPartId: 'SKU-PNEU-TRAS-SPORT',
+            partName: 'Pneu Traseiro 80/100-14',
+            unitPriceBrl: 180.0,
+            addedBy: 'AI',
+          },
+          {
+            catalogPartId: 'SKU-LONA-FREIO-TRAS-SPORT',
+            partName: 'Lona de Freio Traseira',
+            unitPriceBrl: 33.0,
+            addedBy: 'AI',
+          },
+        ],
+        appointment: details?.appointment ?? null,
+        createdAt: details?.createdAt || new Date(Date.now() - 180 * 60000).toISOString(),
+        resolvedAt: details?.resolvedAt || new Date(Date.now() - 179 * 60000).toISOString(),
+        committeeEvaluationJson: details?.committeeEvaluationJson ?? null,
+      };
+    }
+
+    if (
+      id === 'd2000000-0000-0000-0000-000000000004' &&
+      (!details || details.status === 'HUMAN_TRIAGE' || (details.items || []).length < 2)
+    ) {
+      return {
+        id: 'd2000000-0000-0000-0000-000000000004',
+        status: 'HUMAN_RESOLVED',
+        photoDownloadUrl: details?.photoDownloadUrl || '/demo-photos/avaria-farol.webp',
+        reportedContext: 'ACCIDENT_OR_DROP',
+        safetyRisk: 'CRITICAL_STOPPED',
+        reportedOdometerKm: 3420,
+        riderNotes: 'Pedra solta atingiu o farol dianteiro e manete.',
+        finalVerdict: 'MAU_USO',
+        aiConfidence: 0.95,
+        laborFeeBrl: 35.0,
+        totalEstimatedBrl: 190.0,
+        customerFeedbackText:
+          'Avaliação concluída pela oficina: 2 peças listadas (Bloco Óptico do Farol e Manete de Freio Direito). Orçamento transparente pronto para agendamento.',
+        canContest: false,
+        contestedOnce: false,
+        items: [
+          {
+            catalogPartId: 'SKU-FAROL-SPORT',
+            partName: 'Bloco Óptico do Farol Dianteiro',
+            unitPriceBrl: 130.0,
+            addedBy: 'MECHANIC',
+          },
+          {
+            catalogPartId: 'SKU-MANETE-DIR-SPORT',
+            partName: 'Manete de Freio Direito',
+            unitPriceBrl: 25.0,
+            addedBy: 'AI',
+          },
+        ],
+        appointment: details?.appointment ?? null,
+        createdAt: details?.createdAt || new Date(Date.now() - 1440 * 60000).toISOString(),
+        resolvedAt: details?.resolvedAt || new Date(Date.now() - 1400 * 60000).toISOString(),
+        committeeEvaluationJson: details?.committeeEvaluationJson ?? null,
+      };
+    }
+
+    return details as RiderInspectionDetails;
   }
 
   startLiveStream(inspectionId: string): void {

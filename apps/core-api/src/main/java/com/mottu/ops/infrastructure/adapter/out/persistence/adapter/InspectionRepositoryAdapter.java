@@ -3,7 +3,11 @@ package com.mottu.ops.infrastructure.adapter.out.persistence.adapter;
 import com.mottu.ops.application.dto.RecentInspectionDto;
 import com.mottu.ops.application.port.out.InspectionRepositoryPort;
 import com.mottu.ops.domain.enums.InspectionStatus;
+import com.mottu.ops.infrastructure.adapter.out.persistence.entity.InspectionItemJpaEntity;
+import com.mottu.ops.infrastructure.adapter.out.persistence.entity.InspectionJpaEntity;
+import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataInspectionItemRepository;
 import com.mottu.ops.infrastructure.adapter.out.persistence.repository.SpringDataInspectionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,9 +24,19 @@ public class InspectionRepositoryAdapter implements InspectionRepositoryPort {
     );
 
     private final SpringDataInspectionRepository inspectionRepository;
+    private final SpringDataInspectionItemRepository inspectionItemRepository;
 
     public InspectionRepositoryAdapter(SpringDataInspectionRepository inspectionRepository) {
+        this(inspectionRepository, null);
+    }
+
+    @Autowired
+    public InspectionRepositoryAdapter(
+            SpringDataInspectionRepository inspectionRepository,
+            @Autowired(required = false) SpringDataInspectionItemRepository inspectionItemRepository
+    ) {
         this.inspectionRepository = inspectionRepository;
+        this.inspectionItemRepository = inspectionItemRepository;
     }
 
     @Override
@@ -39,13 +53,7 @@ public class InspectionRepositoryAdapter implements InspectionRepositoryPort {
             return List.of();
         }
         return inspectionRepository.findTop5ByContractIdOrderByCreatedAtDesc(contractId).stream()
-                .map(entity -> new RecentInspectionDto(
-                        entity.getId(),
-                        entity.getStatus(),
-                        entity.getFinalVerdict(),
-                        entity.getTotalEstimatedBrl(),
-                        entity.getCreatedAt()
-                ))
+                .map(this::toRecentDto)
                 .toList();
     }
 
@@ -63,13 +71,30 @@ public class InspectionRepositoryAdapter implements InspectionRepositoryPort {
             return List.of();
         }
         return inspectionRepository.findTop5ByRiderIdOrderByCreatedAtDesc(riderId).stream()
-                .map(entity -> new RecentInspectionDto(
-                        entity.getId(),
-                        entity.getStatus(),
-                        entity.getFinalVerdict(),
-                        entity.getTotalEstimatedBrl(),
-                        entity.getCreatedAt()
-                ))
+                .map(this::toRecentDto)
                 .toList();
+    }
+
+    private RecentInspectionDto toRecentDto(InspectionJpaEntity entity) {
+        List<String> partNames = List.of();
+        if (inspectionItemRepository != null && entity.getId() != null) {
+            try {
+                partNames = inspectionItemRepository.findByInspectionId(entity.getId()).stream()
+                        .map(InspectionItemJpaEntity::getPartNameSnapshot)
+                        .filter(name -> name != null && !name.isBlank())
+                        .toList();
+            } catch (Exception ignored) {
+                partNames = List.of();
+            }
+        }
+        return new RecentInspectionDto(
+                entity.getId(),
+                entity.getStatus(),
+                entity.getFinalVerdict(),
+                entity.getTotalEstimatedBrl(),
+                entity.getCreatedAt(),
+                partNames.size(),
+                partNames
+        );
     }
 }
